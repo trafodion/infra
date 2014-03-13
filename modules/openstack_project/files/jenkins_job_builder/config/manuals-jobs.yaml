@@ -1,0 +1,158 @@
+- job-template:
+    name: gate-openstack-manuals-validate-{check}
+    node: precise
+
+    builders:
+      - gerrit-git-prep
+      - shell: "./tools/test.py --check-{check}"
+
+    publishers:
+      - console-log
+
+- job-template:
+    name: 'openstack-{manual}'
+    project-type: maven
+    node: precise
+    concurrent: false
+
+    prebuilders:
+      - gerrit-git-prep
+
+    properties:
+      - inject:
+          script-file: /usr/local/jenkins/slave_scripts/docbook-properties.sh
+          properties-file: gerrit-doc.properties
+
+    maven:
+      maven-name: Maven3
+      root-module:
+        group-id: org.openstack.docs
+        artifact-id: openstack-guide
+      root-pom: doc/{manual}/pom.xml
+      goals: '-Drelease.path.name=${{DOC_RELEASE_PATH}} -Dcomments.enabled=${{DOC_COMMENTS_ENABLED}} clean generate-sources -B'
+
+    publishers:
+      - console-log
+      - ftp:
+          site: docs.openstack.org
+          source: 'doc/{manual}/target/docbkx/webhelp/**'
+          target: ''
+          remove-prefix: 'doc/{manual}/target/docbkx/webhelp/'
+          excludes: '**/*.xml,**/null*'
+      - ftp:
+          site: docs.openstack.org
+          source: 'doc/{manual}/target/docbkx/webhelp/**/atom.xml'
+          target: ''
+          remove-prefix: 'doc/{manual}/target/docbkx/webhelp/'
+
+- job-template:
+    name: 'openstack-install-deploy-guide-{distribution}'
+
+    project-type: maven
+    concurrent: false
+    node: precise
+
+    properties:
+      - inject:
+          script-file: /usr/local/jenkins/slave_scripts/docbook-properties.sh
+          properties-file: gerrit-doc.properties
+
+    prebuilders:
+      - gerrit-git-prep
+
+    maven:
+      maven-name: Maven3
+      root-module:
+        group-id: org.openstack.docs
+        artifact-id: openstack-guide
+      root-pom: doc/install-guide/pom.xml
+      goals: '-Doperating.system={system} -Dprofile.os={profileos} -Drelease.path.name=${{DOC_RELEASE_PATH}} -Dcomments.enabled=${{DOC_COMMENTS_ENABLED}} clean generate-sources -B'
+
+    publishers:
+      - console-log
+      - ftp:
+          site: docs.openstack.org
+          source: 'doc/install-guide/target/docbkx/webhelp/**'
+          target: '/'
+          remove-prefix: 'doc/install-guide/target/docbkx/webhelp/'
+          excludes: '**/*.xml,**/null*'
+      - ftp:
+          site: docs.openstack.org
+          source: 'doc/install-guide/target/docbkx/webhelp/**/atom.xml'
+          target: '/'
+          remove-prefix: 'doc/install-guide/target/docbkx/webhelp/'
+
+- job-template:
+    name: openstack-{oldmanual}-old
+    project-type: maven
+    node: precise
+    concurrent: false
+
+    prebuilders:
+      - gerrit-git-prep
+
+    properties:
+      - inject:
+          script-file: /usr/local/jenkins/slave_scripts/docbook-properties.sh
+          properties-file: gerrit-doc.properties
+
+    maven:
+      maven-name: Maven3
+      root-module:
+        group-id: org.openstack.docs
+        artifact-id: openstack-guide
+      root-pom: doc/src/docbkx/openstack-{oldmanual}/pom.xml
+      goals: '-Drelease.path.name=${{DOC_RELEASE_PATH}} -Dcomments.enabled=${{DOC_COMMENTS_ENABLED}} clean generate-sources -B'
+
+    publishers:
+      - console-log
+      - ftp:
+          site: docs.openstack.org
+          source: 'doc/src/docbkx/openstack-{oldmanual}/target/docbkx/webhelp/**'
+          target: '/'
+          remove-prefix: 'doc/src/docbkx/openstack-{oldmanual}/target/docbkx/webhelp/'
+          excludes: '**/*.xml,**/null*'
+      - ftp:
+          site: docs.openstack.org
+          source: 'doc/src/docbkx/openstack-{oldmanual}/target/docbkx/webhelp/**/atom.xml'
+          target: '/'
+          remove-prefix: 'doc/src/docbkx/openstack-{oldmanual}/target/docbkx/webhelp/'
+
+- job-template:
+    name: openstack-{install}-{distribution}-old
+    project-type: maven
+    node: precise
+    concurrent: false
+
+    prebuilders:
+      - gerrit-git-prep
+
+    properties:
+      - inject:
+          script-file: /usr/local/jenkins/slave_scripts/docbook-properties.sh
+          properties-file: gerrit-doc.properties
+
+    prebuilders:
+      - gerrit-git-prep
+
+    maven:
+      maven-name: Maven3
+      root-module:
+        group-id: org.openstack.docs
+        artifact-id: openstack-guide
+      root-pom: doc/src/docbkx/{install}/pom.xml
+      goals: '-Doperating.system={system} -Dprofile.os={profileos} -Drelease.path.name=${{DOC_RELEASE_PATH}} -Dcomments.enabled=${{DOC_COMMENTS_ENABLED}} clean generate-sources -B'
+
+    publishers:
+      - console-log
+      - ftp:
+          site: docs.openstack.org
+          source: 'doc/src/docbkx/{install}/target/docbkx/webhelp/**'
+          target: ''
+          remove-prefix: 'doc/src/docbkx/{install}/target/docbkx/webhelp/'
+          excludes: '**/*.xml,**/null*'
+      - ftp:
+          site: docs.openstack.org
+          source: 'doc/src/docbkx/{install}/target/docbkx/webhelp/**/atom.xml'
+          target: ''
+          remove-prefix: 'doc/src/docbkx/{install}/target/docbkx/webhelp/'

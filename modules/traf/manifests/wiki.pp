@@ -1,0 +1,228 @@
+# == Class: traf::wiki
+#
+class traf::wiki (
+  $wiki_admin_password = '',
+  $mysql_root_password = '',
+  $sysadmins = [],
+  $ssl_cert_file_contents = '',
+  $ssl_key_file_contents = '',
+  $ssl_chain_file_contents = ''
+) {
+
+  include openssl
+  include subversion
+
+  class { 'traf::server':
+    iptables_public_tcp_ports => [80, 443],
+    sysadmins                 => $sysadmins,
+  }
+
+  # wiki admin not in regular sysadmin list
+  realize (
+    User::Virtual::Localuser['sandstroms'],
+  )
+
+  class { 'mediawiki':
+    role                      => 'all',
+    mediawiki_location        => '/srv/mediawiki/w',
+    mediawiki_images_location => '/srv/mediawiki/images',
+    site_hostname             => $::fqdn,
+    ssl_cert_file             => "/etc/ssl/certs/${::fqdn}.pem",
+    ssl_key_file              => "/etc/ssl/private/${::fqdn}.key",
+    ssl_chain_file            => '/etc/ssl/certs/intermediate.pem',
+    ssl_cert_file_contents    => $ssl_cert_file_contents,
+    ssl_key_file_contents     => $ssl_key_file_contents,
+    ssl_chain_file_contents   => $ssl_chain_file_contents,
+  }
+
+  class { 'memcached':
+    max_memory => 2048,
+    listen_ip  => '127.0.0.1',
+    tcp_port   => 11000,
+    udp_port   => 11000,
+  }
+
+  class { 'mysql::server':
+    config_hash => {
+      'root_password'  => $mysql_root_password,
+      'default_engine' => 'InnoDB',
+      'bind_address'   => '127.0.0.1',
+    }
+  }
+
+  file { '/srv/mediawiki/w/skins/common/images/wiki.png':
+      ensure  => present,
+      source  => 'puppet:///modules/traf/Trafodion.png',
+      owner   => 'www-data',
+      group   => 'www-data',
+      require => Vcsrepo['/srv/mediawiki/w'],
+  }
+
+  # configure mediawiki with default except for the following
+  # installdbuser, installdbpass, pass (admin password)
+  exec { 'install-mediawiki':
+    cwd     => "/srv/mediawiki/w/maintenance",
+    command => "/usr/bin/php install.php --installdbuser root --installdbpass \'$mysql_root_password\' --pass \'$wiki_admin_password\' Trafodion admin",
+    creates => "/srv/mediawiki/w/LocalSettings.php",
+    require => Vcsrepo['/srv/mediawiki/w'],
+  }
+
+  # install OpenID extension
+  vcsrepo { '/srv/mediawiki/w/extensions/OpenID':
+    ensure   => latest,
+    provider => git,
+    revision => 'master',
+    source   => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/OpenID.git',
+    require => Exec['install-mediawiki'],
+  }
+
+  exec { 'install OpenId':
+    cwd     => "/srv/mediawiki/w/extensions/OpenID",
+    command => "/usr/bin/git clone https://github.com/openid/php-openid.git \
+                && /bin/mv php-openid/Auth/ Auth \
+                && /bin/rm -rf php-openid \
+                && cd /srv/mediawiki/w/maintenance \
+                && /usr/bin/php update.php",
+    unless  => "/usr/bin/test -d /srv/mediawiki/w/extensions/OpenID/Auth",
+    require => Vcsrepo['/srv/mediawiki/w/extensions/OpenID'],
+  }
+
+  # install MiniMp3 extension
+  file { '/srv/mediawiki/w/extensions/MiniMp3':
+    ensure  => directory,
+    recurse => true,
+    purge   => false,
+    owner   => www-data,
+    group   => www-data,
+    source  => 'puppet:///modules/traf/mediawiki/extensions/MiniMp3',
+    require => Exec['install-mediawiki'],
+  }
+
+  # install CustomNavBlocks extension
+  vcsrepo { '/srv/mediawiki/w/extensions/CustomNavBlocks':
+    ensure   => latest,
+    provider => git,
+    revision => 'master',
+    source   => 'https://git.fsinf.at/mediawiki/customnavblocks.git',
+    require  => Exec['install-mediawiki'],
+  }
+
+  # install UploadLocal extension
+  vcsrepo { '/srv/mediawiki/w/extensions/UploadLocal':
+    ensure   => latest,
+    provider => git,
+    revision => 'master',
+    source   => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UploadLocal.git',
+    require  => Exec['install-mediawiki'],
+  }
+
+  # install AddMetas extension
+  file { '/srv/mediawiki/w/extensions/AddMetas.php.puppet':
+    ensure  => file,
+    mode    => 644,
+    owner   => www-data,
+    group   => www-data,
+    source  => 'puppet:///modules/traf/mediawiki/extensions/AddMetas.php.puppet',
+    require => Exec['install-mediawiki'],
+  }
+
+  exec { 'update AddMetas.php':
+    cwd     => "/srv/mediawiki/w/extensions",
+    command => "/bin/cp -p /srv/mediawiki/w/extensions/AddMetas.php.puppet /srv/mediawiki/w/extensions/AddMetas.php",
+    unless  => "/bin/grep -E '^# PUPPET ME NOT' /srv/mediawiki/w/extensions/AddMetas.php",
+    require => File['/srv'],
+  }
+
+  # update default CSS files
+  file { '/srv/mediawiki/w/skins/common/commonContent.css':
+    ensure  => file,
+    mode    => 644,
+    owner   => www-data,
+    group   => www-data,
+    source  => 'puppet:///modules/traf/mediawiki/skins/common/commonContent.css',
+    require => Exec['install-mediawiki'],
+  }
+
+  file { '/srv/mediawiki/w/skins/common/commonElements.css':
+    ensure  => file,
+    mode    => 644,
+    owner   => www-data,
+    group   => www-data,
+    source  => 'puppet:///modules/traf/mediawiki/skins/common/commonElements.css',
+    require => Exec['install-mediawiki'],
+  }
+
+  file { '/srv/mediawiki/w/skins/vector/screen.css':
+    ensure  => file,
+    mode    => 644,
+    owner   => www-data,
+    group   => www-data,
+    source  => 'puppet:///modules/traf/mediawiki/skins/vector/screen.css',
+    require => Exec['install-mediawiki'],
+  }
+
+  file { '/srv/mediawiki/w/skins/vector/variables.less':
+    ensure  => file,
+    mode    => 644,
+    owner   => www-data,
+    group   => www-data,
+    source  => 'puppet:///modules/traf/mediawiki/skins/vector/variables.less',
+    require => Exec['install-mediawiki'],
+  }
+
+  # Fix up LocalSettings.php file and configure mediawiki plugins
+  file { '/srv/mediawiki/w/LocalSettings.php':
+    ensure  => file,
+    mode    => 600,
+    owner   => www-data,
+    group   => www-data,
+    require => Exec['install OpenId'],
+  }
+
+  file { '/srv/mediawiki/w/LocalSettings.php.pupppet':
+    mode    => 600,
+    owner   => www-data,
+    group   => www-data,
+    content => template("traf/LocalSettings.php.erb"),
+  }
+
+  exec { 'update LocalSettings.php':
+    cwd     => "/srv/mediawiki/w",
+    command => "/bin/cp /srv/mediawiki/w/LocalSettings.php.pupppet /srv/mediawiki/w/LocalSettings.php",
+    unless  => "/bin/grep -E '^# PUPPET ME NOT' /srv/mediawiki/w/LocalSettings.php",
+    require => [ File['/srv/mediawiki/w/LocalSettings.php'], File['/srv/mediawiki/w/LocalSettings.php.pupppet'] ],
+  }
+
+  file { '/srv':
+    ensure  => directory,
+    recurse => true,
+    owner   => www-data,
+    group   => www-data,
+    notify  => Service[apache2],
+    require => [ Exec['install OpenId'],
+                 File['/srv/mediawiki/w/extensions/MiniMp3'],
+                 Vcsrepo['/srv/mediawiki/w/extensions/CustomNavBlocks'],
+                 Vcsrepo['/srv/mediawiki/w/extensions/UploadLocal'],
+               ]
+  }
+
+  file { '/srv/mediawiki/w/mw-config':
+    ensure  => absent,
+    force   => true,
+    require => File['/srv'],
+  }
+
+
+  include mysql::server::account_security
+
+  mysql_backup::backup { 'wiki':
+    require => Class['mysql::server'],
+  }
+
+  # backup on second node 
+  #include bup
+  #bup::site { 'rs-ord':
+  #  backup_user   => 'bup-wiki',
+  #  backup_server => 'ci-backup-rs-ord.openstack.org',
+  #}
+}

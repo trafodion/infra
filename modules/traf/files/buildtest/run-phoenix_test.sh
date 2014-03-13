@@ -1,0 +1,57 @@
+#!/bin/bash 
+
+source "/usr/local/bin/traf-functions.sh"
+
+export TRAF_DIR="$1"                   # location of trafodion/core
+export DCS_INSTALL_DIR="$2"            # location of trafodion/dcs
+export JAVA_HOME="$3"                  # Java SDK Home Directory 
+export TEST_DIR="$4"                   # location of trafodion/phoenix_test
+
+# check number of parameters
+# if more than 4 parameters then we are also passing in tests to run
+# NOTE: tests should be delimited by a comma with no space.  i.e. AlterTableTest,ArithmeticQueryTest
+if [ $# -gt 4 ]; then
+  shift
+  shift
+  shift
+  shift
+  TESTS="$*"
+elif [ $# -lt 4 ]; then
+  echo "ERROR: Incorrect number of input parameters."
+  exit 1
+fi
+
+set -x
+if [ -z "$WORKSPACE" ]; then
+  export WORKSPACE=$(pwd)
+fi
+
+# start trafodion
+cd $WORKSPACE
+/usr/local/bin/start-traf-instance.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
+set +x
+
+echo "INFO: Waiting 2 minutes and check mxosrvr"
+sleep 120
+set -x
+
+cd $WORKSPACE/$TRAF_DIR/sqf
+source_env
+
+if [ $(sqps | grep -c mxosrvr) -ne 6 ]; then 
+  echo "ERROR: No mxosrvr found. Please check your DCS setup."
+  exit 1 
+fi
+echo ""
+
+# run phoenix_test
+cd "$WORKSPACE/$TEST_DIR"
+if [ -z "$TESTS" ]; then
+  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/hpt4jdbc.jar
+elif [ "$TESTS" = "DONT_RUN_TESTS" ]; then
+  echo "INFO: Will NOT run any phoenix tests as requested. You should not see this message in the normal Jenkins job phoenix_test! This should only be used to turn off testing of the experimetal jobs."
+else 
+  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/hpt4jdbc.jar --tests=$TESTS
+fi
+
+/usr/local/bin/stop-traf-instance.sh 

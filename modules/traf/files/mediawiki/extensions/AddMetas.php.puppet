@@ -1,0 +1,48 @@
+<?php
+#
+# The following line tells puppet not to change the file
+# PUPPET ME NOT
+#
+if( !defined( 'MEDIAWIKI' ) ) {
+    echo( "This file is an extension to the MediaWiki software and cannot be used standalone.\n" );
+    die( 1 );
+}
+ 
+$wgExtensionCredits['other'][] = array( 
+    'name' => 'Add metas', 
+    'status' => 'experimental',
+    'author' => 'Luis Diaz',
+    'version' => '0.1',
+    'url' => 'http://www.buntulug.com.ar/wiki/Add_Metas',
+    'description' => 'Add some custom metas to your wiki pages.',
+);
+ 
+$wgHooks['OutputPageBeforeHTML'][] = 'wfAddMetas';
+ 
+function wfAddMetas( &$out, &$text ) {
+  global $wgTitle, $wgParser, $wgRequest, $action;
+  if(
+          $action !== 'edit'
+       && $action !== 'history'
+       && $action !== 'delete'
+       && $action !== 'watch'
+       && strpos( $wgParser->mTitle->mPrefixedText, 'Special:' ) === false
+       && $wgParser->mTitle->mNamespace !== 8
+  )
+  {
+    $name = $wgTitle->getPrefixedDBKey();
+ 
+    $out->addMeta( 'bu', 'CORP');
+    $out->addMeta( 'description', 'Project Trafodion is a joint HP Labs / HP-IT research project to develop operational SQL database management capabilities on Hadoop. Trafodion provides transactional SQL capabilities built on top of Hadoop HBase software.');
+    $out->addMeta( 'hp_design_version', 'hpweb.1.2a');
+    $out->addMeta( 'keywords', 'trafodion, Hadoop, Hive, HBase, SQL, database, transactional SQL');
+    $out->addMeta( "lifecycle", "applied_use");
+    $out->addMeta( "page_content", "Products");
+    $out->addMeta( "robots", "noindex,nofollow,noarchive");
+    $out->addMeta( 'segment', 'Segment Neutral');
+    $out->addMeta( 'target_country', 'us');
+    $out->addMeta( 'web_section_id', 'R11824' );
+  }
+  return true;
+}
+

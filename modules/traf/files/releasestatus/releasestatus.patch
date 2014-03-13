@@ -1,0 +1,22 @@
+diff --git releasestatus.py releasestatus.py
+index 57c896b..dcaf1ec 100644
+--- releasestatus.py
++++ releasestatus.py
+@@ -34,7 +34,7 @@ class GerritReviews():
+     def _get_from_gerrit(self, *query):
+         chg = {}
+         age = '2mon'
+-        host = "review.openstack.org"
++        host = "review.trafodion.org"
+         port = "29418"
+ 
+         base_cmd = ['/usr/bin/ssh', '-p', port,
+@@ -113,7 +113,7 @@ class ExtendedBlueprint():
+     def grab_xtra_info(self, gerritreviews):
+         if self.whiteboard:
+             matches = re.findall(
+-                          r'Addressed by: https://review.openstack.org/(\d+)',
++                          r'Addressed by: https://review.trafodion.org/(\d+)',
+                           bp.whiteboard)
+             self.reviews.extend(self.grab_links(matches,
+                                           gerritreviews.merged, "MERGED"))

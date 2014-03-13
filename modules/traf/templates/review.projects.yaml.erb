@@ -1,0 +1,33 @@
+- homepage: http://trafodion.org
+  acl-dir: /home/gerrit2/acls
+  local-git-dir: <%= local_git_dir %>
+  gerrit-host: <%= fqdn %>
+  gerrit-user: Trafodion-project-creator
+  gerrit-committer: Project Creator <neo-devtools@hp.com>
+  gerrit-key: <%= ssh_project_key %>
+  github-config: /etc/github/github-projects.secure.config
+  has-wiki: False
+  has-issues: False
+  has-pull-requests: False
+  has-downloads: False
+  has-github: False
+  launchpad: trafodion
+---
+#- project: org/repo
+#  upstream: git://github.com/org/repo.git
+#  description: 
+#  acl-config:
+
+- project: trafodion/sandbox
+  description: Playground - Not a permanent home for anything.
+- project: trafodion/core
+- project: trafodion/phoenix_test
+  acl-config: /home/gerrit2/acls/trafodion/core.config
+- project: trafodion/dcs
+  acl-config: /home/gerrit2/acls/trafodion/core.config
+- project: trafodion/installer
+  acl-config: /home/gerrit2/acls/trafodion/core.config
+- project: trafodion/manuals
+- project: trafodion/infra
+
+# project: trafodion/hbase-trx

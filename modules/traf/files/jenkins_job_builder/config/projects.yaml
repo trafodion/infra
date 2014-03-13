@@ -1,0 +1,63 @@
+- project:
+    name: sandbox
+    github-org: trafodion
+
+    jobs:
+      - gate-noop
+      - gate-{name}-check-for-binary
+      - gate-{name}-puppet-lint
+      - gate-{name}-puppet-syntax
+
+- project:
+    name: infra
+    github-org: trafodion
+
+    jobs:
+      - gate-noop
+      - gate-{name}-puppet-lint
+      - gate-{name}-puppet-syntax
+      - gate-{name}-check-for-binary
+
+- project:
+    name: core
+    github-org: trafodion
+
+    jobs:
+      - traf-pub
+      - traf-regress
+      - traf-regress-experimental
+      - gate-{name}-check-for-binary
+      - phoenix_test
+
+- project:
+    name: manuals
+    github-org: trafodion
+
+    jobs:
+      - gate-noop
+
+- project:
+    name: phoenix_test
+    github-org: trafodion
+
+    jobs:
+      - gate-{name}-check-for-binary
+      - phoenix_test-experimental
+      - phoenix_test
+
+- project:
+    name: dcs
+    github-org: trafodion
+
+    jobs:
+      - gate-{name}-check-for-binary
+      - dcs-build
+      - phoenix_test
+
+- project:
+    name: installer
+    github-org: trafodion
+
+    jobs:
+      - gate-{name}-check-for-binary
+

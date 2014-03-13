@@ -1,0 +1,11 @@
+set nocompatible
+set autoindent
+set showcmd
+set shiftwidth=4
+set softtabstop=4
+set tabstop=4
+set showmatch
+set nohlsearch
+set expandtab
+syntax enable
+colorscheme murphy

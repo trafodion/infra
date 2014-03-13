@@ -1,0 +1,4023 @@
+includes:
+  - python-file: openstack_functions.py
+
+pipelines:
+  - name: check
+    description: Newly uploaded patchsets enter this pipeline to receive an initial +/-1 Verified vote from Jenkins.
+    failure-message: Build failed.  For information on how to proceed, see https://wiki.openstack.org/wiki/GerritJenkinsGit#Test_Failures
+    manager: IndependentPipelineManager
+    precedence: low
+    trigger:
+      gerrit:
+        - event: patchset-created
+        - event: change-restored
+        - event: comment-added
+          comment_filter: (?i)^\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+  - name: gate
+    description: Changes that have been approved by core developers are enqueued in order in this pipeline, and if they pass tests in Jenkins, will be merged.
+    failure-message: Build failed.  For information on how to proceed, see https://wiki.openstack.org/wiki/GerritJenkinsGit#Test_Failures
+    manager: DependentPipelineManager
+    precedence: low
+    trigger:
+      gerrit:
+        - event: comment-added
+          approval:
+            - approved: 1
+        - event: comment-added
+          comment_filter: (?i)^\s*reverify( (?:bug|lp)[\s#:]*(\d+))\s*$
+    start:
+      gerrit:
+        verified: 0
+    success:
+      gerrit:
+        verified: 2
+        submit: true
+    failure:
+      gerrit:
+        verified: -2
+
+  - name: post
+    description: This pipeline runs jobs that operate after each change is merged.
+    manager: IndependentPipelineManager
+    precedence: low
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^(?!(devnull|refs/.*)).*$
+
+  - name: pre-release
+    description: This pipeline runs jobs on projects in response to pre-release tags.
+    manager: IndependentPipelineManager
+    precedence: high
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^refs/tags/([0-9]+\.)+[0-9]*(alpha|beta|candidate|rc|a|b|c|r|g)[0-9]*$
+
+  - name: release
+    description: When a commit is tagged as a release, this pipeline runs jobs that publish archives and documentation.
+    manager: IndependentPipelineManager
+    precedence: high
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^refs/tags/([0-9]+\.)+[0-9]+$
+
+  - name: silent
+    description: This pipeline is used for silently testing new jobs.
+    manager: IndependentPipelineManager
+    precedence: low
+    trigger:
+      gerrit:
+        - event: patchset-created
+        - event: comment-added
+          comment_filter: (?i)^\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+
+  - name: experimental
+    description: On-demand pipeline for requesting a run against a set of jobs that are not yet gating. Leave review comment of "check experimental" to run jobs in this pipeline.
+    manager: IndependentPipelineManager
+    precedence: low
+    trigger:
+      gerrit:
+        - event: comment-added
+          comment_filter: (?i)^\s*check experimental\s*$
+    success:
+      gerrit:
+        force-message: true
+    failure:
+      gerrit:
+        force-message: true
+
+  - name: periodic
+    description: Jobs in this queue are triggered on a timer.
+    manager: IndependentPipelineManager
+    precedence: low
+    trigger:
+      timer:
+        - time: '0 6 * * *'
+
+
+jobs:
+  - name: ^.*$
+    parameter-function: set_log_url
+  - name: ^.*(dsvm|devstack-vm).*$
+    parameter-function: single_use_node
+  - name: gate-config-layout
+    parameter-function: single_use_node
+  - name: ci-docs
+    parameter-function: single_use_node
+  - name: gate-ci-docs
+    parameter-function: single_use_node
+  - name: ^(gate|check)-tempest-dsvm-neutron-pg$
+    branch: ^(?!stable/grizzly).*$
+  - name: ^(gate|check)-tempest-dsvm-neutron-isolated$
+    branch: ^(?!stable/grizzly).*$
+  - name: ^(gate|check)-tempest-dsvm-neutron-pg-isolated$
+    branch: ^(?!stable/grizzly).*$
+  - name: ^(gate|check)-tempest-dsvm-neutron-full$
+    branch: ^(?!stable/grizzly).*$
+    voting: false
+  - name: gate-tempest-dsvm-neutron-heat-slow
+    branch: ^(?!stable/grizzly).*$
+    voting: false
+  - name: ^(gate|check)-devstack-dsvm-cells$
+    voting: false
+  - name: ^(gate|check)-tempest-dsvm-large-ops$
+    branch: ^(?!stable/grizzly).*$
+  - name: ^(gate|check)-tempest-dsvm-neutron-large-ops$
+    branch: ^(?!stable/grizzly).*$
+  - name: ^(gate|check)-tempest-dsvm-cells$
+    voting: false
+  - name: ^(gate|check)-tempest-dsvm-cells-full$
+    voting: false
+  - name: ^(gate|check)-grenade-dsvm$
+    branch: ^(?!stable/grizzly).*$
+  - name: ^(gate|check)-grenade-dsvm-neutron$
+    branch: ^(?!stable/grizzly).*$
+    voting: false
+  - name: gate-tempest-python27
+    branch: ^(?!stable/grizzly).*$
+    # only here until stable is votable, then merge
+    # back to a single job
+  - name: ^(gate|check)-grenade-dsvm-forward$
+    branch: ^(stable/).*$
+    voting: false
+  - name: ^(gate|check)-grenade-dsvm-neutron-forward
+    branch: ^(stable/).*$
+    voting: false
+  - name: gate-grenade-noop
+    branch: ^(stable/grizzly).*$
+  - name: gate-devstack-bash8
+    branch: ^(?!stable/grizzly).*$
+  - name: gate-tempest-docs
+    branch: ^(?!stable/grizzly).*$
+  - name: tempest-docs
+    branch: ^(?!stable/grizzly).*$
+  - name: ^(gate|check)-swift-dsvm-functional$
+    branch: ^(?!stable/grizzly).*$
+  - name: check-tempest-dsvm-full-grizzly
+    voting: false
+  - name: check-tempest-dsvm-neutron-grizzly
+    voting: false
+  - name: check-tempest-dsvm-postgres-full-grizzly
+    voting: false
+  - name: check-devstack-dsvm-cells-grizzly
+    voting: false
+  - name: check-tempest-dsvm-cells-grizzly
+    voting: false
+  - name: check-tempest-dsvm-cells-full-grizzly
+    voting: false
+  - name: check-tempest-dsvm-full-havana
+    voting: false
+  - name: check-tempest-dsvm-neutron-havana
+    voting: false
+  - name: check-tempest-dsvm-postgres-full-havana
+    voting: false
+  - name: check-devstack-dsvm-cells-havana
+    voting: false
+  - name: check-tempest-dsvm-cells-havana
+    voting: false
+  - name: check-tempest-dsvm-cells-full-havana
+    voting: false
+  - name: ^(gate|check)-gerrit-unittests$
+    branch: ^openstack/.*$
+  - name: gerrit-package
+    branch: ^openstack/.*$
+  - name: gate-nova-pylint
+    voting: false
+  - name: gate-cinder-pylint
+    branch: ^(?!stable/grizzly).*$
+    voting: false
+  - name: gate-horizon-python27-django14
+    branch: ^(?!stable/grizzly).*$
+  - name: dev-zuul-coverage
+    voting: false
+  - name: jenkins-job-builder-compare-xml
+    voting: false
+    failure-message: XML output has changed.
+    success-message: XML output is unchanged.
+  - name: config-compare-xml
+    voting: false
+    failure-message: Jenkins XML output has changed.
+    success-message: Jenkins XML output is unchanged.
+    parameter-function: single_use_node
+# Continous publishing from master of the following documentation targets:
+  - name: openstack-admin-guide-cloud
+    branch: ^master$
+  - name: openstack-docs-site
+    branch: ^master$
+  - name: openstack-glossary
+    branch: ^master$
+  - name: openstack-ha-guide
+    branch: ^master$
+  - name: openstack-image-guide
+    branch: ^master$
+  - name: openstack-user-guide
+    branch: ^master$
+  - name: openstack-user-guide-admin
+    branch: ^master$
+  - name: openstack-security-guide
+    branch: ^master$
+  - name: openstack-training-guides
+    branch: ^master$
+# Documentation targets for master and future stable branches:
+  - name: openstack-config-reference
+    branch: ^(?!stable/grizzly).*$
+  - name: openstack-install-deploy-guide-debian
+    branch: ^(?!stable/grizzly).*$
+  - name: openstack-install-deploy-guide-fedora
+    branch: ^(?!stable/grizzly).*$
+  - name: openstack-install-deploy-guide-opensuse
+    branch: ^(?!stable/grizzly).*$
+  - name: openstack-install-deploy-guide-ubuntu
+    branch: ^(?!stable/grizzly).*$
+  - name: gate-openstack-manuals-validate-niceness
+    branch: ^(?!stable/grizzly).*$
+    voting: false
+  - name: gate-openstack-manuals-validate-syntax
+    branch: ^(?!stable/grizzly).*$
+  - name: gate-openstack-manuals-validate-deletions
+    branch: ^(?!stable/grizzly).*$
+  - name: gate-openstack-manuals-validate-build
+    branch: ^(?!stable/grizzly).*$
+# Deprecated documentation targets:
+  - name: openstack-block-storage-admin-old
+    branch: stable/grizzly
+  - name: openstack-compute-admin-old
+    branch: stable/grizzly
+  - name: openstack-network-connectivity-admin-old
+    branch: stable/grizzly
+  - name: openstack-object-storage-admin-old
+    branch: stable/grizzly
+  - name: openstack-basic-install-fedora-old
+    branch: stable/grizzly
+  - name: openstack-basic-install-ubuntu-old
+    branch: stable/grizzly
+  - name: openstack-openstack-install-fedora-old
+    branch: stable/grizzly
+  - name: openstack-openstack-install-ubuntu-old
+    branch: stable/grizzly
+  - name: gate-openstack-manuals-validate
+    branch: stable/grizzly
+  - name: ^gate-.*-docs$
+    success-pattern: http://docs-draft.openstack.org/{build.parameters[LOG_PATH]}/doc/build/html/
+  - name: infra-publications-publish
+    branch: ^(?!master).*$
+  - name: ^gate-.*-requirements$
+    failure-message: Incompatible requirement found; see https://wiki.openstack.org/wiki/Requirements
+    branch: ^(?!stable/(grizzly|havana)).*$
+    files:
+      - '^tools/.*-requires$'
+      - '^.*requirements.txt$'
+  - name: ^gate-requirements-pep8$
+    branch: ^(?!stable/grizzly).*$
+  - name: ^gate-requirements-(python27|pypy)$
+    branch: ^(?!stable/grizzly).*$
+  - name: manuals-upstream-translation-update
+    branch: ^master$
+  - name: gate-hacking-python33
+    voting: false
+  - name: gate-hacking-pypy
+    voting: false
+  - name: gate-hacking-integration-nova
+    voting: false
+  - name: gate-savanna-pylint
+    voting: false
+  - name: ^(gate|check)-tempest-dsvm-savanna-full$
+    voting: false
+  - name: ^(gate|check)-tempest-dsvm-savanna-postgres-full$
+    voting: false
+  - name: ^(gate|check)-tempest-dsvm-savanna-neutron$
+    voting: false
+  - name: gate-marconi-python33
+    voting: false
+  - name: gate-python-ceilometerclient-python33
+    voting: false
+  - name: gate-python-glanceclient-python33
+    voting: false
+  - name: gate-python-heatclient-python33
+    voting: false
+  - name: gate-python-ironicclient-python33
+    voting: false
+  - name: gate-python-keystoneclient-python33
+    voting: false
+  - name: gate-python-neutronclient-python33
+    voting: false
+  - name: gate-python-openstackclient-python33
+    voting: false
+  - name: gate-python-swiftclient-python33
+    voting: false
+  - name: gate-python-tuskarclient-python33
+    voting: false
+  - name: gate-mistral-python33
+    voting: false
+  - name: gate-murano-metadataclient-python33
+    voting: false
+  - name: gate-murano-common-python33
+    voting: false
+  - name: gate-python-muranoclient-python33
+    voting: false
+  - name: gate-murano-repository-python33
+    voting: false
+  - name: gate-solum-pypy
+    voting: false
+  - name: gate-reviewstats-python33
+    voting: false
+  - name: gate-rubick-python33
+    voting: false
+  - name: gate-solum-devstack-dsvm
+    voting: false
+  - name: gate-manila-devstack-dsvm
+    voting: false
+  - name: gate-climate-devstack-dsvm
+    voting: false
+# puppet-openstack targets
+  - name: gate-puppet-vswitch-puppet-lint
+    voting: false
+  - name: gate-puppet-vswitch-puppet-syntax
+    voting: false
+  - name: ^gate-puppet-.*-puppet-unit-3.0$
+    voting: false
+  - name: gate-tomograph-python33
+    voting: false
+
+projects:
+  - name: openstack-infra/zuul
+    check:
+      - gate-zuul-pep8
+      - gate-zuul-docs
+      - gate-zuul-python26
+      - gate-zuul-python27
+      - dev-zuul-coverage
+    gate:
+      - gate-zuul-docs
+      - gate-zuul-pep8
+      - gate-zuul-python26
+      - gate-zuul-python27
+    post:
+      - zuul-branch-tarball
+      - zuul-coverage
+      - zuul-docs
+    pre-release:
+      - zuul-docs
+      - zuul-tarball
+    release:
+      - zuul-docs
+      - zuul-tarball:
+        - zuul-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+    periodic:
+      - periodic-test
+
+  - name: openstack-infra/zuul-packaging
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/askbot-theme
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/nodepool
+    check:
+      - gate-nodepool-pep8
+    gate:
+      - gate-nodepool-pep8
+    post:
+      - nodepool-branch-tarball
+    pre-release:
+      - nodepool-tarball
+    release:
+      - nodepool-tarball:
+        - nodepool-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/nose-html-output
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - nose-html-output-branch-tarball
+    pre-release:
+      - nose-html-output-tarball
+    release:
+      - nose-html-output-tarball:
+        - nose-html-output-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/os-loganalyze
+    check:
+      - gate-os-loganalyze-pep8
+      - gate-os-loganalyze-python27
+    gate:
+      - gate-os-loganalyze-pep8
+      - gate-os-loganalyze-python27
+
+  - name: openstack-infra/gerrit
+    check:
+      - check-gerrit-unittests
+    gate:
+      - gate-gerrit-unittests
+    post:
+      - gerrit-package
+
+  - name: openstack-infra/gerritbot
+    check:
+      - gate-gerritbot-pep8
+    gate:
+      - gate-gerritbot-pep8
+    post:
+      - gerritbot-branch-tarball
+    pre-release:
+      - gerritbot-tarball
+    release:
+      - gerritbot-tarball:
+        - gerritbot-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/gerritlib
+    check:
+      - gate-gerritlib-pep8
+    gate:
+      - gate-gerritlib-pep8
+    pre-release:
+      - gerritlib-tarball
+    release:
+      - gerritlib-tarball:
+        - gerritlib-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/jeepyb
+    check:
+      - gate-jeepyb-pep8
+    gate:
+      - gate-jeepyb-pep8
+    pre-release:
+      - jeepyb-tarball
+    release:
+      - jeepyb-tarball:
+        - jeepyb-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/pypi-mirror
+    check:
+      - gate-pypi-mirror-pep8
+      - check-requirements-integration-dsvm
+    gate:
+      - gate-pypi-mirror-pep8
+      - gate-requirements-integration-dsvm
+    post:
+      - post-mirror-python26
+      - post-mirror-python27
+      - post-mirror-python33
+    pre-release:
+      - pypi-mirror-tarball
+    release:
+      - pypi-mirror-tarball:
+        - pypi-mirror-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/jenkins-job-builder
+    check:
+      - gate-jenkins-job-builder-docs
+      - gate-jenkins-job-builder-pep8
+      - gate-jenkins-job-builder-python26
+      - gate-jenkins-job-builder-python27
+      - jenkins-job-builder-compare-xml
+    gate:
+      - gate-jenkins-job-builder-docs
+      - gate-jenkins-job-builder-pep8
+      - gate-jenkins-job-builder-python26
+      - gate-jenkins-job-builder-python27
+    post:
+      - jenkins-job-builder-branch-tarball
+      - jenkins-job-builder-docs
+    pre-release:
+      - jenkins-job-builder-tarball
+    release:
+      - jenkins-job-builder-tarball:
+        - jenkins-job-builder-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/lodgeit
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/meetbot
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/config
+    check:
+      - config-compare-xml
+      - gate-config-layout
+      - gate-config-pep8
+      - gate-config-puppet-lint
+      - gate-config-puppet-syntax
+      - gate-ci-docs
+    gate:
+      - gate-config-layout
+      - gate-config-pep8
+      - gate-config-puppet-lint
+      - gate-config-puppet-syntax
+    post:
+      - ci-docs
+
+  - name: openstack-infra/publications
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - infra-publications-publish
+      - infra-publications-publish-index
+
+  - name: openstack-infra/puppet-apparmor
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/puppet-dashboard
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/puppet-vcsrepo
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/reviewday
+    check:
+      - gate-reviewday-pep8
+    gate:
+      - gate-reviewday-pep8
+    post:
+      - reviewday-branch-tarball
+      - reviewday-coverage
+    pre-release:
+      - reviewday-tarball
+    release:
+      - reviewday-tarball:
+        - reviewday-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/reviewstats
+    check:
+      - gate-reviewstats-docs
+      - gate-reviewstats-pep8
+      - gate-reviewstats-python26
+      - gate-reviewstats-python27
+      - gate-reviewstats-python33
+    gate:
+      - gate-reviewstats-docs
+      - gate-reviewstats-pep8
+      - gate-reviewstats-python26
+      - gate-reviewstats-python27
+      - gate-reviewstats-python33
+    post:
+      - reviewstats-branch-tarball
+      - reviewstats-coverage
+    pre-release:
+      - reviewstats-tarball
+    release:
+      - reviewstats-tarball:
+        - reviewstats-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/releasestatus
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/storyboard
+    check:
+      - gate-storyboard-pep8
+      - gate-storyboard-python27
+    gate:
+      - gate-storyboard-pep8
+      - gate-storyboard-python27
+    post:
+      - storyboard-branch-tarball
+    pre-release:
+      - storyboard-tarball
+    release:
+      - storyboard-tarball:
+        - storyboard-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+    experimental:
+      - gate-storyboard-python26
+
+  - name: openstack-infra/odsreg
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/statusbot
+    check:
+      - gate-statusbot-pep8
+    gate:
+      - gate-statusbot-pep8
+    post:
+      - statusbot-branch-tarball
+    pre-release:
+      - statusbot-tarball
+    release:
+      - statusbot-tarball:
+        - statusbot-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/cinder
+    check:
+      - gate-cinder-requirements
+      - gate-cinder-pep8
+      - gate-cinder-docs
+      - gate-cinder-python26
+      - gate-cinder-python27
+      - gate-cinder-pylint
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-cinder-requirements
+      - gate-cinder-docs
+      - gate-cinder-pep8
+      - gate-cinder-python26
+      - gate-cinder-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - cinder-branch-tarball
+      - cinder-coverage
+      - cinder-docs
+      - cinder-upstream-translation-update
+    pre-release:
+      - cinder-tarball
+    release:
+      - cinder-tarball
+      - cinder-docs
+      - cinder-merge-release-tags
+    periodic:
+      - cinder-propose-translation-update
+      - periodic-cinder-docs-grizzly
+      - periodic-cinder-python26-grizzly
+      - periodic-cinder-python27-grizzly
+      - periodic-cinder-docs-havana
+      - periodic-cinder-python26-havana
+      - periodic-cinder-python27-havana
+
+  - name: openstack/glance
+    check:
+      - gate-glance-requirements
+      - gate-glance-pep8
+      - gate-glance-docs
+      - gate-glance-python26
+      - gate-glance-python27
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-glance-requirements
+      - gate-glance-docs
+      - gate-glance-pep8
+      - gate-glance-python26
+      - gate-glance-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - glance-branch-tarball
+      - glance-coverage
+      - glance-docs
+    pre-release:
+      - glance-tarball
+    release:
+      - glance-tarball
+      - glance-docs
+      - glance-merge-release-tags
+    periodic:
+      - glance-propose-translation-update
+      - periodic-glance-docs-grizzly
+      - periodic-glance-python26-grizzly
+      - periodic-glance-python27-grizzly
+      - periodic-glance-docs-havana
+      - periodic-glance-python26-havana
+      - periodic-glance-python27-havana
+
+  - name: openstack/horizon
+    check:
+      - gate-horizon-requirements
+      - gate-horizon-pep8
+      - gate-horizon-docs
+      - gate-horizon-python26
+      - gate-horizon-python27
+      - gate-horizon-python27-django14
+      - gate-horizon-selenium
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-horizon-requirements
+      - gate-horizon-docs
+      - gate-horizon-pep8
+      - gate-horizon-python26
+      - gate-horizon-python27
+      - gate-horizon-python27-django14
+      - gate-horizon-selenium
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - horizon-branch-tarball
+      - horizon-coverage
+      - horizon-docs
+    pre-release:
+      - horizon-tarball
+    release:
+      - horizon-tarball
+      - horizon-docs
+      - horizon-merge-release-tags
+    periodic:
+      - periodic-horizon-docs-grizzly
+      - periodic-horizon-python26-grizzly
+      - periodic-horizon-python27-grizzly
+      - periodic-horizon-docs-havana
+      - periodic-horizon-python26-havana
+      - periodic-horizon-python27-havana
+
+  - name: openstack/django_openstack_auth
+    check:
+      - gate-django_openstack_auth-requirements
+      - gate-django_openstack_auth-pep8
+      - gate-django_openstack_auth-docs
+      - gate-django_openstack_auth-python26
+      - gate-django_openstack_auth-python27
+    gate:
+      - gate-django_openstack_auth-requirements
+      - gate-django_openstack_auth-pep8
+      - gate-django_openstack_auth-docs
+      - gate-django_openstack_auth-python26
+      - gate-django_openstack_auth-python27
+    post:
+      - django_openstack_auth-branch-tarball
+      - django_openstack_auth-coverage
+    pre-release:
+      - django_openstack_auth-tarball
+    release:
+      - django_openstack_auth-tarball:
+        - django_openstack_auth-pypi-upload
+      - django_openstack_auth-docs
+
+  - name: openstack/keystone
+    check:
+      - gate-keystone-requirements
+      - gate-keystone-pep8
+      - gate-keystone-docs
+      - gate-keystone-python26
+      - gate-keystone-python27
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+      - check-swift-dsvm-functional
+    gate:
+      - gate-keystone-requirements
+      - gate-keystone-docs
+      - gate-keystone-pep8
+      - gate-keystone-python26
+      - gate-keystone-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+      - gate-swift-dsvm-functional
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - keystone-branch-tarball
+      - keystone-coverage
+      - keystone-docs
+      - keystone-upstream-translation-update
+    pre-release:
+      - keystone-tarball
+    release:
+      - keystone-tarball
+      - keystone-docs
+      - keystone-merge-release-tags
+    periodic:
+      - keystone-propose-translation-update
+      - periodic-keystone-docs-grizzly
+      - periodic-keystone-python26-grizzly
+      - periodic-keystone-python27-grizzly
+      - periodic-keystone-docs-havana
+      - periodic-keystone-python26-havana
+      - periodic-keystone-python27-havana
+      - periodic-swift-dsvm-functional-havana
+
+  - name: openstack/nova
+    check:
+      - gate-nova-requirements
+      - gate-nova-pep8
+      - gate-nova-docs
+      - gate-nova-python26
+      - gate-nova-python27
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+      - gate-devstack-dsvm-cells
+      - gate-nova-pylint
+    gate:
+      - gate-nova-requirements
+      - gate-nova-docs
+      - gate-nova-pep8
+      - gate-nova-python26
+      - gate-nova-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-tempest-dsvm-neutron-full
+    post:
+      - nova-branch-tarball
+      - nova-coverage
+      - nova-docs
+      - nova-upstream-translation-update
+    pre-release:
+      - nova-tarball
+    release:
+      - nova-tarball
+      - nova-docs
+      - nova-merge-release-tags
+    periodic:
+      - nova-propose-translation-update
+      - periodic-nova-docs-grizzly
+      - periodic-nova-python26-grizzly
+      - periodic-nova-python27-grizzly
+      - periodic-nova-docs-havana
+      - periodic-nova-python26-havana
+      - periodic-nova-python27-havana
+
+  - name: openstack/openstack
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack/oslo-incubator
+    check:
+      - gate-oslo-incubator-requirements
+      - gate-oslo-incubator-pep8
+      - gate-oslo-incubator-docs
+      - gate-oslo-incubator-python26
+      - gate-oslo-incubator-python27
+    gate:
+      - gate-oslo-incubator-requirements
+      - gate-oslo-incubator-docs
+      - gate-oslo-incubator-pep8
+      - gate-oslo-incubator-python26
+      - gate-oslo-incubator-python27
+    experimental:
+      - gate-oslo-incubator-python33
+    post:
+      - oslo-incubator-docs
+    release:
+      - oslo-incubator-docs
+
+  - name: openstack/oslo.config
+    check:
+      - gate-oslo.config-requirements
+      - gate-oslo.config-pep8
+      - gate-oslo.config-docs
+      - gate-oslo.config-python26
+      - gate-oslo.config-python27
+      - gate-oslo.config-python33
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-oslo.config-requirements
+      - gate-oslo.config-docs
+      - gate-oslo.config-pep8
+      - gate-oslo.config-python26
+      - gate-oslo.config-python27
+      - gate-oslo.config-python33
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    post:
+      - oslo.config-branch-tarball
+      - oslo.config-docs
+    pre-release:
+      - oslo.config-tarball
+    release:
+      - oslo.config-tarball:
+        - oslo.config-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - oslo.config-docs
+
+  - name: openstack/oslo.messaging
+    check:
+      - gate-oslo.messaging-requirements
+      - gate-oslo.messaging-pep8
+      - gate-oslo.messaging-docs
+      - gate-oslo.messaging-python26
+      - gate-oslo.messaging-python27
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-oslo.messaging-requirements
+      - gate-oslo.messaging-docs
+      - gate-oslo.messaging-pep8
+      - gate-oslo.messaging-python26
+      - gate-oslo.messaging-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    post:
+      - oslo.messaging-branch-tarball
+      - oslo.messaging-docs
+    pre-release:
+      - oslo.messaging-tarball
+    release:
+      - oslo.messaging-tarball:
+        - oslo.messaging-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - oslo.messaging-docs
+
+  - name: openstack/oslo.rootwrap
+    check:
+      - gate-oslo.rootwrap-requirements
+      - gate-oslo.rootwrap-pep8
+      - gate-oslo.rootwrap-python26
+      - gate-oslo.rootwrap-python27
+      - gate-oslo.rootwrap-python33
+    gate:
+      - gate-oslo.rootwrap-requirements
+      - gate-oslo.rootwrap-pep8
+      - gate-oslo.rootwrap-python26
+      - gate-oslo.rootwrap-python27
+      - gate-oslo.rootwrap-python33
+    post:
+      - oslo.rootwrap-branch-tarball
+    pre-release:
+      - oslo.rootwrap-tarball
+    release:
+      - oslo.rootwrap-tarball:
+        - oslo.rootwrap-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/oslo.sphinx
+    check:
+      - gate-oslo.sphinx-requirements
+      - gate-oslo.sphinx-pep8
+    gate:
+      - gate-oslo.sphinx-requirements
+      - gate-oslo.sphinx-pep8
+    post:
+      - oslo.sphinx-branch-tarball
+    pre-release:
+      - oslo.sphinx-tarball
+    release:
+      - oslo.sphinx-tarball:
+        - oslo.sphinx-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/oslo.version
+    check:
+      - gate-oslo.version-requirements
+      - gate-oslo.version-pep8
+      - gate-oslo.version-docs
+      - gate-oslo.version-python26
+      - gate-oslo.version-python27
+      - gate-oslo.version-pypy
+      - gate-oslo.version-python33
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-neutron
+      - check-grenade-dsvm
+    gate:
+      - gate-oslo.version-requirements
+      - gate-oslo.version-docs
+      - gate-oslo.version-pep8
+      - gate-oslo.version-python26
+      - gate-oslo.version-python27
+      - gate-oslo.version-pypy
+      - gate-oslo.version-python33
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-neutron
+      - gate-grenade-dsvm
+    post:
+      - oslo.version-branch-tarball
+      - oslo.version-docs
+    pre-release:
+      - oslo.version-tarball
+    release:
+      - oslo.version-tarball:
+        - oslo.version-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+      - oslo.version-docs
+
+  - name: openstack/neutron
+    check:
+      - gate-neutron-requirements
+      - gate-neutron-pep8
+      - gate-neutron-docs
+      - gate-neutron-python26
+      - gate-neutron-python27
+      - check-tempest-dsvm-neutron
+      - check-tempest-dsvm-neutron-pg
+      - check-tempest-dsvm-neutron-isolated
+      - check-tempest-dsvm-neutron-pg-isolated
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm-neutron
+    gate:
+      - gate-neutron-requirements
+      - gate-neutron-docs
+      - gate-neutron-pep8
+      - gate-neutron-python26
+      - gate-neutron-python27
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-neutron-pg
+      - gate-tempest-dsvm-neutron-isolated
+      - gate-tempest-dsvm-neutron-pg-isolated
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm-neutron
+    experimental:
+      - gate-tempest-dsvm-neutron-full
+      - check-tempest-dsvm-neutron-isolated-parallel
+      - gate-grenade-dsvm-neutron-forward
+    post:
+      - neutron-branch-tarball
+      - neutron-coverage
+      - neutron-docs
+      - neutron-upstream-translation-update
+    pre-release:
+      - neutron-tarball
+    release:
+      - neutron-tarball
+      - neutron-docs
+      - neutron-merge-release-tags
+    periodic:
+      - neutron-propose-translation-update
+      - periodic-neutron-docs-grizzly
+      - periodic-neutron-python26-grizzly
+      - periodic-neutron-python27-grizzly
+      - periodic-neutron-docs-havana
+      - periodic-neutron-python26-havana
+      - periodic-neutron-python27-havana
+
+  - name: openstack/swift
+    check:
+      - gate-swift-requirements
+      - gate-swift-pep8
+      - gate-swift-docs
+      - gate-swift-python26
+      - gate-swift-python27
+      - check-swift-dsvm-functional
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-neutron
+      - check-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-swift-requirements
+      - gate-swift-docs
+      - gate-swift-pep8
+      - gate-swift-python26
+      - gate-swift-python27
+      - gate-swift-dsvm-functional
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - swift-branch-tarball
+      - swift-coverage
+      - swift-docs
+    pre-release:
+      - swift-tarball
+    release:
+      - swift-tarball
+      - swift-docs
+      - swift-merge-release-tags
+
+  - name: openstack/swift-bench
+    check:
+      - gate-swift-bench-pep8
+      - gate-swift-bench-python26
+      - gate-swift-bench-python27
+    gate:
+      - gate-swift-bench-pep8
+      - gate-swift-bench-python26
+      - gate-swift-bench-python27
+    post:
+      - swift-bench-branch-tarball
+    pre-release:
+      - swift-bench-tarball
+    release:
+      - swift-bench-tarball:
+        - swift-bench-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/python-ceilometerclient
+    check:
+      - gate-python-ceilometerclient-requirements
+      - gate-python-ceilometerclient-pep8
+      - gate-python-ceilometerclient-docs
+      - gate-python-ceilometerclient-python26
+      - gate-python-ceilometerclient-python27
+      - gate-python-ceilometerclient-python33
+      - gate-python-ceilometerclient-pypy
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+    gate:
+      - gate-python-ceilometerclient-requirements
+      - gate-python-ceilometerclient-docs
+      - gate-python-ceilometerclient-pep8
+      - gate-python-ceilometerclient-python26
+      - gate-python-ceilometerclient-python27
+      - gate-python-ceilometerclient-pypy
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+    post:
+      - python-ceilometerclient-branch-tarball
+      - python-ceilometerclient-coverage
+    pre-release:
+      - python-ceilometerclient-tarball
+    release:
+      - python-ceilometerclient-tarball:
+        - python-ceilometerclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-ceilometerclient-docs
+
+  - name: openstack/python-cinderclient
+    check:
+      - gate-python-cinderclient-requirements
+      - gate-python-cinderclient-pep8
+      - gate-python-cinderclient-docs
+      - gate-python-cinderclient-python26
+      - gate-python-cinderclient-python27
+      - gate-python-cinderclient-python33
+      - gate-python-cinderclient-pypy
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-python-cinderclient-requirements
+      - gate-python-cinderclient-docs
+      - gate-python-cinderclient-pep8
+      - gate-python-cinderclient-python26
+      - gate-python-cinderclient-python27
+      - gate-python-cinderclient-python33
+      - gate-python-cinderclient-pypy
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - python-cinderclient-branch-tarball
+      - python-cinderclient-coverage
+    pre-release:
+      - python-cinderclient-tarball
+    release:
+      - python-cinderclient-tarball:
+        - python-cinderclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-cinderclient-docs
+
+  - name: openstack/python-glanceclient
+    check:
+      - gate-python-glanceclient-requirements
+      - gate-python-glanceclient-pep8
+      - gate-python-glanceclient-docs
+      - gate-python-glanceclient-python26
+      - gate-python-glanceclient-python27
+      - gate-python-glanceclient-python33
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-python-glanceclient-requirements
+      - gate-python-glanceclient-docs
+      - gate-python-glanceclient-pep8
+      - gate-python-glanceclient-python26
+      - gate-python-glanceclient-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - python-glanceclient-branch-tarball
+      - python-glanceclient-coverage
+    pre-release:
+      - python-glanceclient-tarball
+    release:
+      - python-glanceclient-tarball:
+        - python-glanceclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-glanceclient-docs
+
+  - name: openstack/python-keystoneclient
+    check:
+      - gate-python-keystoneclient-requirements
+      - gate-python-keystoneclient-pep8
+      - gate-python-keystoneclient-docs
+      - gate-python-keystoneclient-python26
+      - gate-python-keystoneclient-python27
+      - gate-python-keystoneclient-python33
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-python-keystoneclient-requirements
+      - gate-python-keystoneclient-docs
+      - gate-python-keystoneclient-pep8
+      - gate-python-keystoneclient-python26
+      - gate-python-keystoneclient-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - python-keystoneclient-branch-tarball
+      - python-keystoneclient-coverage
+    pre-release:
+      - python-keystoneclient-tarball
+    release:
+      - python-keystoneclient-tarball:
+        - python-keystoneclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-keystoneclient-docs
+
+  - name: openstack/python-novaclient
+    check:
+      - gate-python-novaclient-requirements
+      - gate-python-novaclient-pep8
+      - gate-python-novaclient-docs
+      - gate-python-novaclient-python26
+      - gate-python-novaclient-python27
+      - gate-python-novaclient-python33
+      - gate-python-novaclient-pypy
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-python-novaclient-requirements
+      - gate-python-novaclient-docs
+      - gate-python-novaclient-pep8
+      - gate-python-novaclient-python26
+      - gate-python-novaclient-python27
+      - gate-python-novaclient-python33
+      - gate-python-novaclient-pypy
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - python-novaclient-branch-tarball
+      - python-novaclient-coverage
+    pre-release:
+      - python-novaclient-tarball
+    release:
+      - python-novaclient-tarball:
+        - python-novaclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-novaclient-docs
+
+  - name: openstack/python-openstackclient
+    check:
+      - gate-python-openstackclient-requirements
+      - gate-python-openstackclient-pep8
+      - gate-python-openstackclient-docs
+      - gate-python-openstackclient-python26
+      - gate-python-openstackclient-python27
+      - gate-python-openstackclient-python33
+    gate:
+      - gate-python-openstackclient-requirements
+      - gate-python-openstackclient-docs
+      - gate-python-openstackclient-pep8
+      - gate-python-openstackclient-python26
+      - gate-python-openstackclient-python27
+    post:
+      - python-openstackclient-branch-tarball
+      - python-openstackclient-coverage
+    pre-release:
+      - python-openstackclient-tarball
+    release:
+      - python-openstackclient-tarball:
+        - python-openstackclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-openstackclient-docs
+
+  - name: openstack/python-neutronclient
+    check:
+      - gate-python-neutronclient-requirements
+      - gate-python-neutronclient-pep8
+      - gate-python-neutronclient-docs
+      - gate-python-neutronclient-python26
+      - gate-python-neutronclient-python27
+      - gate-python-neutronclient-python33
+      - gate-python-neutronclient-pypy
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - check-tempest-dsvm-neutron-pg
+      - check-tempest-dsvm-neutron-isolated
+      - check-tempest-dsvm-neutron-pg-isolated
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-python-neutronclient-requirements
+      - gate-python-neutronclient-docs
+      - gate-python-neutronclient-pep8
+      - gate-python-neutronclient-python26
+      - gate-python-neutronclient-python27
+      - gate-python-neutronclient-pypy
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-neutron-pg
+      - gate-tempest-dsvm-neutron-isolated
+      - gate-tempest-dsvm-neutron-pg-isolated
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+    post:
+      - python-neutronclient-branch-tarball
+      - python-neutronclient-coverage
+    pre-release:
+      - python-neutronclient-tarball
+    release:
+      - python-neutronclient-tarball:
+        - python-neutronclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-neutronclient-docs
+
+  - name: openstack/python-swiftclient
+    check:
+      - gate-python-swiftclient-requirements
+      - gate-python-swiftclient-pep8
+      - gate-python-swiftclient-docs
+      - gate-python-swiftclient-python26
+      - gate-python-swiftclient-python27
+      - gate-python-swiftclient-python33
+      - gate-python-swiftclient-pypy
+      - check-swift-dsvm-functional
+    gate:
+      - gate-python-swiftclient-requirements
+      - gate-python-swiftclient-docs
+      - gate-python-swiftclient-pep8
+      - gate-python-swiftclient-python26
+      - gate-python-swiftclient-python27
+      - gate-python-swiftclient-pypy
+      - gate-swift-dsvm-functional
+    post:
+      - python-swiftclient-branch-tarball
+      - python-swiftclient-coverage
+    pre-release:
+      - python-swiftclient-tarball
+    release:
+      - python-swiftclient-tarball:
+        - python-swiftclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-swiftclient-docs
+
+  - name: openstack/requirements
+    check:
+      - gate-requirements-pep8
+      - gate-requirements-python27
+      - gate-requirements-pypy
+      - check-requirements-integration-dsvm
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+      - check-swift-dsvm-functional
+    gate:
+      - gate-requirements-pep8
+      - gate-requirements-python27
+      - gate-requirements-pypy
+      - gate-requirements-integration-dsvm
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+      - gate-swift-dsvm-functional
+    post:
+      - post-mirror-python26
+      - post-mirror-python27
+      - post-mirror-python33
+      - propose-requirements-updates
+    periodic:
+      - periodic-mirror-python26
+      - periodic-mirror-python27
+      - periodic-mirror-python33
+
+  - name: openstack-dev/grenade
+    check:
+      - gate-grenade-noop
+      - check-grenade-dsvm
+      - check-grenade-dsvm-forward
+      - check-grenade-dsvm-neutron
+    gate:
+      - gate-grenade-noop
+      - gate-grenade-dsvm
+      - gate-grenade-dsvm-forward
+      - gate-grenade-dsvm-neutron
+    experimental:
+      - gate-grenade-dsvm-neutron-forward
+
+  - name: openstack-dev/cookiecutter
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-dev/hacking
+    check:
+      - gate-hacking-pep8
+      - gate-hacking-docs
+      - gate-hacking-python26
+      - gate-hacking-python27
+      - gate-hacking-python33
+      - gate-hacking-pypy
+      - gate-hacking-integration-nova
+    gate:
+      - gate-hacking-docs
+      - gate-hacking-pep8
+      - gate-hacking-python26
+      - gate-hacking-python27
+      - gate-hacking-python33
+      - gate-hacking-pypy
+      - gate-hacking-integration-nova
+    post:
+      - hacking-docs
+      - hacking-branch-tarball
+      - hacking-coverage
+    pre-release:
+      - hacking-docs
+      - hacking-tarball
+    release:
+      - hacking-docs
+      - hacking-tarball:
+        - hacking-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-dev/pbr
+    check:
+      - gate-pbr-pep8
+      - gate-pbr-docs
+      - gate-pbr-python26
+      - gate-pbr-python27
+      - gate-pbr-python33
+      - gate-pbr-pypy
+      - check-requirements-integration-dsvm
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+      - check-swift-dsvm-functional
+    gate:
+      - gate-pbr-docs
+      - gate-pbr-pep8
+      - gate-pbr-python26
+      - gate-pbr-python27
+      - gate-pbr-python33
+      - gate-pbr-pypy
+      - gate-requirements-integration-dsvm
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+      - gate-swift-dsvm-functional
+    experimental:
+      - gate-devstack-dsvm-cells
+    post:
+      - pbr-branch-tarball
+      - pbr-coverage
+      - pbr-docs
+    pre-release:
+      - pbr-docs
+      - pbr-tarball
+    release:
+      - pbr-docs
+      - pbr-tarball:
+        - pbr-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-dev/devstack
+    check:
+      - gate-devstack-bash8
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+      - check-grenade-dsvm-forward
+      - check-swift-dsvm-functional
+    gate:
+      - gate-devstack-bash8
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+      - gate-grenade-dsvm-forward
+      - gate-swift-dsvm-functional
+    experimental:
+      - gate-tempest-dsvm-neutron-heat-slow
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+
+  - name: openstack-infra/elastic-recheck
+    check:
+      - gate-elastic-recheck-pep8
+      - gate-elastic-recheck-python27
+    gate:
+      - gate-elastic-recheck-pep8
+      - gate-elastic-recheck-python27
+
+  - name: openstack-infra/devstack-gate
+    check:
+      - check-dg-tempest-dsvm-full
+      - check-dg-tempest-dsvm-full-reexec
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+      - check-swift-dsvm-functional
+      - check-tempest-dsvm-full-grizzly
+      - check-tempest-dsvm-neutron-grizzly
+      - check-tempest-dsvm-postgres-full-grizzly
+      - check-devstack-dsvm-cells-grizzly
+      - check-tempest-dsvm-cells-grizzly
+      - check-tempest-dsvm-cells-full-grizzly
+      - check-tempest-dsvm-full-havana
+      - check-tempest-dsvm-neutron-havana
+      - check-tempest-dsvm-postgres-full-havana
+      - check-devstack-dsvm-cells-havana
+      - check-tempest-dsvm-cells-havana
+      - check-tempest-dsvm-cells-full-havana
+    gate:
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+      - gate-swift-dsvm-functional
+    experimental:
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+
+  # This is not strictly necessary; there is currently a transitive
+  # relationship between g-t-dsvm,
+  # g-t-dsvm-{postgres,cinder,neutron} and g-t-dsvm-full
+  # that will ensure that these projects end up in the same shared
+  # change queue, however, this fake project makes it explicit that
+  # g-t-dsvm and g-t-dsvm-full must share a change
+  # queue, which should protect against accidental queue divorce in
+  # case jobs get moved around.  Since g-t-dsvm-full is a
+  # superset of g-t-dsvm, the whole set of projects is still
+  # gated on g-t-dsvm.
+
+  - name: z/tempest
+    gate:
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron-full
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+
+  - name: openstack/tempest
+    check:
+      - gate-tempest-requirements
+      - gate-tempest-pep8
+      - gate-tempest-docs
+      - gate-tempest-python27
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-grenade-dsvm
+    gate:
+      - gate-tempest-requirements
+      - gate-tempest-pep8
+      - gate-tempest-docs
+      - gate-tempest-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-grenade-dsvm
+    experimental:
+      - gate-tempest-dsvm-neutron-heat-slow
+      - gate-grenade-dsvm-forward
+      - gate-devstack-dsvm-cells
+      - gate-tempest-dsvm-neutron-full
+    post:
+      - tempest-docs
+      - tempest-branch-tarball
+    periodic:
+      - periodic-tempest-dsvm-full-grizzly
+      - periodic-tempest-dsvm-neutron-grizzly
+      - periodic-tempest-dsvm-postgres-full-grizzly
+      - periodic-tempest-dsvm-full-havana
+      - periodic-tempest-dsvm-neutron-havana
+      - periodic-tempest-dsvm-postgres-full-havana
+      - periodic-tempest-dsvm-all-havana
+      - periodic-tempest-dsvm-stress-havana
+      - periodic-tempest-dsvm-neutron-pg-havana
+      - periodic-tempest-dsvm-large-ops-havana
+      - periodic-tempest-dsvm-neutron-large-ops-havana
+
+  - name: openstack/ceilometer
+    check:
+      - gate-ceilometer-requirements
+      - gate-ceilometer-pep8
+      - gate-ceilometer-docs
+      - gate-ceilometer-python26
+      - gate-ceilometer-python27
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - check-swift-dsvm-functional
+    gate:
+      - gate-ceilometer-requirements
+      - gate-ceilometer-docs
+      - gate-ceilometer-pep8
+      - gate-ceilometer-python26
+      - gate-ceilometer-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+      - gate-swift-dsvm-functional
+    post:
+      - ceilometer-branch-tarball
+      - ceilometer-coverage
+      - ceilometer-docs
+      - ceilometer-upstream-translation-update
+    pre-release:
+      - ceilometer-tarball
+    release:
+      - ceilometer-docs
+      - ceilometer-tarball
+      - ceilometer-merge-release-tags
+    periodic:
+      - ceilometer-propose-translation-update
+      - periodic-ceilometer-docs-grizzly
+      - periodic-ceilometer-python26-grizzly
+      - periodic-ceilometer-python27-grizzly
+      - periodic-ceilometer-docs-havana
+      - periodic-ceilometer-python26-havana
+      - periodic-ceilometer-python27-havana
+
+  - name: stackforge/clouddocs-maven-plugin
+    check:
+      - gate-clouddocs-maven-plugin-build
+    gate:
+      - gate-clouddocs-maven-plugin-build
+    post:
+      - clouddocs-maven-plugin-localrepo-upload
+    release:
+      - clouddocs-maven-plugin-localrepo-upload:
+        - clouddocs-maven-plugin-mavencentral-upload
+
+  - name: stackforge/congress
+    check:
+      - gate-congress-pep8
+      - gate-congress-python27
+    gate:
+      - gate-congress-pep8
+      - gate-congress-python27
+
+  - name: stackforge/MRaaS
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/swiftsync
+    check:
+      - gate-swiftsync-pep8
+      - gate-swiftsync-python27
+    gate:
+      - gate-swiftsync-pep8
+      - gate-swiftsync-python27
+    post:
+      - swiftsync-branch-tarball
+    pre-release:
+      - swiftsync-tarball
+    release:
+      - swiftsync-tarball
+
+  - name: stackforge/tooz
+    check:
+      - gate-tooz-pep8
+      - gate-tooz-python26
+      - gate-tooz-python27
+      - gate-tooz-python33
+    gate:
+      - gate-tooz-pep8
+      - gate-tooz-python26
+      - gate-tooz-python27
+      - gate-tooz-python33
+    post:
+      - tooz-branch-tarball
+    pre-release:
+      - tooz-tarball
+    release:
+      - tooz-tarball
+
+  - name: stackforge/libra
+    check:
+      - gate-libra-pep8
+      - gate-libra-python27
+    gate:
+      - gate-libra-pep8
+      - gate-libra-python27
+    post:
+      - hook-libra-rtfd
+      - libra-branch-tarball
+    pre-release:
+      - hook-libra-rtfd
+      - libra-tarball
+    release:
+      - hook-libra-rtfd
+      - libra-tarball
+
+  - name: stackforge/python-libraclient
+    check:
+      - gate-python-libraclient-pep8
+      - gate-python-libraclient-python27
+    gate:
+      - gate-python-libraclient-pep8
+      - gate-python-libraclient-python27
+    post:
+      - hook-python-libraclient-rtfd
+      - python-libraclient-coverage
+      - python-libraclient-branch-tarball
+    pre-release:
+      - hook-python-libraclient-rtfd
+      - python-libraclient-tarball
+    release:
+      - hook-python-libraclient-rtfd
+      - python-libraclient-tarball:
+        - python-libraclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/healthnmon
+    check:
+      - gate-healthnmon-pep8
+      - gate-healthnmon-python27
+    gate:
+      - gate-healthnmon-pep8
+      - gate-healthnmon-python27
+
+  - name: openstack/heat
+    check:
+      - gate-heat-requirements
+      - gate-heat-pep8
+      - gate-heat-docs
+      - gate-heat-python26
+      - gate-heat-python27
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+    gate:
+      - gate-heat-requirements
+      - gate-heat-pep8
+      - gate-heat-docs
+      - gate-heat-python26
+      - gate-heat-python27
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+    experimental:
+      - gate-devstack-dsvm-cells
+    post:
+      - heat-branch-tarball
+      - heat-coverage
+      - heat-docs
+      - heat-upstream-translation-update
+    pre-release:
+      - heat-tarball
+    release:
+      - heat-tarball
+      - heat-docs
+      - heat-merge-release-tags
+    periodic:
+      - periodic-heat-docs-grizzly
+      - periodic-heat-python26-grizzly
+      - periodic-heat-python27-grizzly
+      - periodic-heat-docs-havana
+      - periodic-heat-python26-havana
+      - periodic-heat-python27-havana
+      - heat-propose-translation-update
+
+  - name: openstack/python-heatclient
+    check:
+      - gate-python-heatclient-requirements
+      - gate-python-heatclient-pep8
+      - gate-python-heatclient-python26
+      - gate-python-heatclient-python27
+      - gate-python-heatclient-python33
+      - gate-python-heatclient-pypy
+      - check-tempest-dsvm-full
+      - check-tempest-dsvm-postgres-full
+      - check-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+    gate:
+      - gate-python-heatclient-requirements
+      - gate-python-heatclient-pep8
+      - gate-python-heatclient-python26
+      - gate-python-heatclient-python27
+      - gate-python-heatclient-pypy
+      - gate-tempest-dsvm-full
+      - gate-tempest-dsvm-postgres-full
+      - gate-tempest-dsvm-neutron
+      - gate-tempest-dsvm-large-ops
+      - gate-tempest-dsvm-neutron-large-ops
+    experimental:
+      - gate-devstack-dsvm-cells
+    post:
+      - python-heatclient-branch-tarball
+      - python-heatclient-coverage
+    pre-release:
+      - python-heatclient-tarball
+    release:
+      - python-heatclient-tarball:
+        - python-heatclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - python-heatclient-docs
+
+  - name: openstack/heat-cfntools
+    check:
+      - gate-heat-cfntools-requirements
+      - gate-heat-cfntools-pep8
+      - gate-heat-cfntools-python26
+      - gate-heat-cfntools-python27
+    gate:
+      - gate-heat-cfntools-requirements
+      - gate-heat-cfntools-pep8
+      - gate-heat-cfntools-python26
+      - gate-heat-cfntools-python27
+    post:
+      - heat-cfntools-branch-tarball
+      - heat-cfntools-coverage
+    pre-release:
+      - heat-cfntools-tarball
+    release:
+      - heat-cfntools-tarball:
+        - heat-cfntools-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - heat-cfntools-docs
+
+  - name: openstack-dev/heat-cfnclient
+    check:
+      - gate-heat-cfnclient-pep8
+      - gate-heat-cfnclient-python26
+      - gate-heat-cfnclient-python27
+    gate:
+      - gate-heat-cfnclient-pep8
+      - gate-heat-cfnclient-python26
+      - gate-heat-cfnclient-python27
+
+  - name: openstack/heat-templates
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack/trove
+    check:
+      - gate-trove-requirements
+      - gate-trove-pep8
+      - gate-trove-docs
+      - gate-trove-python26
+      - gate-trove-python27
+    gate:
+      - gate-trove-requirements
+      - gate-trove-docs
+      - gate-trove-pep8
+      - gate-trove-python26
+      - gate-trove-python27
+    post:
+      - trove-branch-tarball
+      - trove-coverage
+      - trove-docs
+    pre-release:
+      - trove-tarball
+    release:
+      - trove-tarball
+      - trove-docs
+      - trove-merge-release-tags
+
+  - name: openstack/trove-integration
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack/python-troveclient
+    check:
+      - gate-python-troveclient-requirements
+      - gate-python-troveclient-pep8
+      - gate-python-troveclient-python26
+      - gate-python-troveclient-python27
+      - gate-python-troveclient-python33
+      - gate-python-troveclient-pypy
+    gate:
+      - gate-python-troveclient-requirements
+      - gate-python-troveclient-pep8
+      - gate-python-troveclient-python26
+      - gate-python-troveclient-python27
+      - gate-python-troveclient-python33
+      - gate-python-troveclient-pypy
+    post:
+      - python-troveclient-branch-tarball
+    pre-release:
+      - python-troveclient-tarball
+    release:
+      - python-troveclient-tarball:
+        - python-troveclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/marconi
+    check:
+      - gate-marconi-requirements
+      - gate-marconi-pep8
+      - gate-marconi-python26
+      - gate-marconi-python27
+      - gate-marconi-python33
+      - gate-marconi-pypy
+    gate:
+      - gate-marconi-requirements
+      - gate-marconi-pep8
+      - gate-marconi-python26
+      - gate-marconi-python27
+      - gate-marconi-python33
+      - gate-marconi-pypy
+    post:
+      - marconi-branch-tarball
+    pre-release:
+      - marconi-tarball
+    release:
+      - marconi-tarball
+      - marconi-docs
+
+  - name: stackforge/staccato
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/designate
+    check:
+      - gate-designate-pep8
+      - gate-designate-python26
+      - gate-designate-python27
+    gate:
+      - gate-designate-pep8
+      - gate-designate-python26
+      - gate-designate-python27
+    post:
+      - hook-designate-rtfd
+      - designate-coverage
+      - designate-branch-tarball
+    pre-release:
+      - designate-tarball
+    release:
+      - designate-tarball:
+        - designate-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/python-designateclient
+    check:
+      - gate-python-designateclient-pep8
+      - gate-python-designateclient-python26
+      - gate-python-designateclient-python27
+    gate:
+      - gate-python-designateclient-pep8
+      - gate-python-designateclient-python26
+      - gate-python-designateclient-python27
+    post:
+      - hook-python-designateclient-rtfd
+      - python-designateclient-coverage
+      - python-designateclient-branch-tarball
+    pre-release:
+      - python-designateclient-tarball
+    release:
+      - python-designateclient-tarball:
+        - python-designateclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/bindep
+    check:
+      - gate-bindep-pep8
+      - gate-bindep-python26
+      - gate-bindep-python27
+    gate:
+      - gate-bindep-pep8
+      - gate-bindep-python26
+      - gate-bindep-python27
+    post:
+      - bindep-branch-tarball
+      - bindep-coverage
+    pre-release:
+      - bindep-tarball
+    release:
+      - bindep-tarball:
+        - bindep-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/billingstack
+    check:
+      - gate-billingstack-pep8
+      - gate-billingstack-python26
+      - gate-billingstack-python27
+    gate:
+      - gate-billingstack-pep8
+      - gate-billingstack-python26
+      - gate-billingstack-python27
+    post:
+      - hook-billingstack-rtfd
+      - billingstack-coverage
+      - billingstack-branch-tarball
+    pre-release:
+      - billingstack-tarball
+    release:
+      - billingstack-tarball:
+        - billingstack-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+
+  - name: stackforge/bufunfa
+    check:
+      - gate-bufunfa-pep8
+      - gate-bufunfa-python26
+      - gate-bufunfa-python27
+    gate:
+      - gate-bufunfa-pep8
+      - gate-bufunfa-python26
+      - gate-bufunfa-python27
+    post:
+      - hook-bufunfa-rtfd
+
+  - name: openstack/openstack-doc-tools
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack/openstack-manuals
+    check:
+      - gate-openstack-manuals-validate-niceness
+      - gate-openstack-manuals-validate-syntax
+      - gate-openstack-manuals-validate-deletions
+      - gate-openstack-manuals-validate-build
+      - gate-openstack-manuals-validate
+    gate:
+      - gate-openstack-manuals-validate-syntax
+      - gate-openstack-manuals-validate-deletions
+      - gate-openstack-manuals-validate-build
+      - gate-openstack-manuals-validate
+    post:
+      - openstack-admin-guide-cloud
+      - openstack-block-storage-admin-old
+      - openstack-compute-admin-old
+      - openstack-network-connectivity-admin-old
+      - openstack-object-storage-admin-old
+      - openstack-basic-install-fedora-old
+      - openstack-basic-install-ubuntu-old
+      - openstack-glossary
+      - openstack-image-guide
+      - openstack-config-reference
+      - openstack-docs-site
+      - openstack-ha-guide
+      - openstack-install-deploy-guide-debian
+      - openstack-install-deploy-guide-fedora
+      - openstack-openstack-install-fedora-old
+      - openstack-install-deploy-guide-opensuse
+      - openstack-install-deploy-guide-ubuntu
+      - openstack-openstack-install-ubuntu-old
+      - openstack-security-guide
+      - openstack-user-guide
+      - openstack-user-guide-admin
+      - manuals-upstream-translation-update
+      - openstack-training-guides
+    periodic:
+      - manuals-propose-translation-update
+
+  - name: openstack/operations-guide
+    check:
+      - gate-openstack-manuals-operations-guide
+    gate:
+      - gate-openstack-manuals-operations-guide
+    post:
+      - openstack-operations-guide
+      - openstack-operations-guide-ja
+
+  - name: openstack/api-site
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - openstack-api-quick-start
+      - openstack-api-site
+      - openstack-api-ref
+
+  - name: openstack/compute-api
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - compute-api-v2.0
+      - compute-api-v2.0-wadl
+
+  - name: openstack/identity-api
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - identity-api-v2.0
+
+  - name: openstack/image-api
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - image-api-v1.1
+      - image-api-v2.0
+
+  - name: openstack/netconn-api
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - network-api-v1
+      - network-api-v2
+
+  - name: openstack/object-api
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - object-api-v1.0
+
+  - name: openstack/volume-api
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - block-api-v2.0
+
+  - name: openstack/openstack-chef
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-dev/openstack-nose
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-dev/openstack-qa
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - openstack-qa-docs
+    release:
+      - openstack-qa-docs
+
+  - name: openstack-infra/gitdm
+    check:
+      - gate-gitdm
+    gate:
+      - gate-gitdm
+    periodic:
+      - periodic-gitdm
+
+  - name: openstack-infra/git-review
+    check:
+      - gate-git-review-pep8
+      - gate-git-review-python26
+      - gate-git-review-python27
+      - gate-git-review-python33
+    gate:
+      - gate-git-review-pep8
+      - gate-git-review-python26
+      - gate-git-review-python27
+      - gate-git-review-python33
+    post:
+      - git-review-branch-tarball
+    pre-release:
+      - git-review-tarball
+    release:
+      - git-review-tarball:
+        - git-review-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/openstack-planet
+    check:
+      - gate-openstack-planet-unittest
+    gate:
+      - gate-openstack-planet-unittest
+
+  - name: openstack-dev/sandbox
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack/diskimage-builder
+    check:
+      - gate-diskimage-builder-requirements
+      - gate-diskimage-builder-pep8
+      - gate-diskimage-builder-python26
+      - gate-diskimage-builder-python27
+    gate:
+      - gate-diskimage-builder-requirements
+      - gate-diskimage-builder-pep8
+      - gate-diskimage-builder-python26
+      - gate-diskimage-builder-python27
+    post:
+      - diskimage-builder-coverage
+      - diskimage-builder-branch-tarball
+    pre-release:
+      - diskimage-builder-tarball
+    release:
+      - diskimage-builder-tarball:
+        - diskimage-builder-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/os-apply-config
+    check:
+      - gate-os-apply-config-requirements
+      - gate-os-apply-config-pep8
+      - gate-os-apply-config-python26
+      - gate-os-apply-config-python27
+    gate:
+      - gate-os-apply-config-requirements
+      - gate-os-apply-config-pep8
+      - gate-os-apply-config-python26
+      - gate-os-apply-config-python27
+    post:
+      - os-apply-config-coverage
+      - os-apply-config-branch-tarball
+    pre-release:
+      - os-apply-config-tarball
+    release:
+      - os-apply-config-tarball:
+        - os-apply-config-pypi-upload
+
+  - name: openstack/os-collect-config
+    check:
+      - gate-os-collect-config-requirements
+      - gate-os-collect-config-pep8
+      - gate-os-collect-config-python26
+      - gate-os-collect-config-python27
+    gate:
+      - gate-os-collect-config-requirements
+      - gate-os-collect-config-pep8
+      - gate-os-collect-config-python26
+      - gate-os-collect-config-python27
+    post:
+      - os-collect-config-coverage
+      - os-collect-config-branch-tarball
+    pre-release:
+      - os-collect-config-tarball
+    release:
+      - os-collect-config-tarball:
+        - os-collect-config-pypi-upload
+
+  - name: openstack/os-refresh-config
+    check:
+      - gate-os-refresh-config-requirements
+      - gate-os-refresh-config-pep8
+      - gate-os-refresh-config-python26
+      - gate-os-refresh-config-python27
+    gate:
+      - gate-os-refresh-config-requirements
+      - gate-os-refresh-config-pep8
+      - gate-os-refresh-config-python26
+      - gate-os-refresh-config-python27
+    post:
+      - os-refresh-config-coverage
+      - os-refresh-config-branch-tarball
+    pre-release:
+      - os-refresh-config-tarball
+    release:
+      - os-refresh-config-tarball:
+        - os-refresh-config-pypi-upload
+
+  - name: openstack/tripleo-heat-templates
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - tripleo-heat-templates-branch-tarball
+    pre-release:
+      - tripleo-heat-templates-tarball
+    release:
+      - tripleo-heat-templates-tarball
+
+  - name: openstack/tripleo-image-elements
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+    post:
+      - tripleo-image-elements-branch-tarball
+    pre-release:
+      - tripleo-image-elements-tarball
+    release:
+      - tripleo-image-elements-tarball:
+        - tripleo-image-elements-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/tripleo-incubator
+    check:
+      - gate-tripleo-incubator-docs
+    gate:
+      - gate-tripleo-incubator-docs
+    post:
+      - tripleo-incubator-docs
+    pre-release:
+      - tripleo-incubator-docs
+    release:
+      - tripleo-incubator-docs
+    experimental:
+      - gate-tripleo-deploy
+
+  - name: stackforge/climate
+    check:
+      - gate-climate-pep8
+      - gate-climate-python26
+      - gate-climate-python27
+      - gate-climate-requirements
+      - gate-climate-devstack-dsvm
+    gate:
+      - gate-climate-pep8
+      - gate-climate-python26
+      - gate-climate-python27
+      - gate-climate-requirements
+      - gate-climate-devstack-dsvm
+
+  - name: stackforge/climate-nova
+    check:
+      - gate-climate-nova-pep8
+      - gate-climate-nova-python26
+      - gate-climate-nova-python27
+      - gate-climate-nova-requirements
+    gate:
+      - gate-climate-nova-pep8
+      - gate-climate-nova-python26
+      - gate-climate-nova-python27
+      - gate-climate-nova-requirements
+
+  - name: stackforge/kwapi
+    check:
+      - gate-kwapi-pep8
+    gate:
+      - gate-kwapi-pep8
+
+  - name: openstack-infra/gear
+    check:
+      - gate-gear-pep8
+      - gate-gear-docs
+      - gate-gear-python26
+      - gate-gear-python27
+    gate:
+      - gate-gear-pep8
+      - gate-gear-docs
+      - gate-gear-python26
+      - gate-gear-python27
+    post:
+      - gear-branch-tarball
+      - gear-coverage
+      - hook-gear-rtfd
+    pre-release:
+      - gear-tarball
+      - hook-gear-rtfd
+    release:
+      - hook-gear-rtfd
+      - gear-tarball:
+        - gear-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack-infra/gearman-plugin
+    check:
+      - gate-gearman-plugin-build
+    gate:
+      - gate-gearman-plugin-build
+    post:
+      - gearman-plugin-hpi-artifact
+    release:
+      - gearman-plugin-hpi-artifact:
+        - gearman-plugin-jenkinsci-upload
+
+  - name: openstack-infra/zmq-event-publisher
+    check:
+      - gate-zmq-event-publisher-build
+    gate:
+      - gate-zmq-event-publisher-build
+    post:
+      - zmq-event-publisher-hpi-artifact
+    release:
+      - zmq-event-publisher-hpi-artifact:
+        - zmq-event-publisher-jenkinsci-upload
+
+  - name: openstack/database-api
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/packstack
+    check:
+      - gate-packstack-pep8
+      - gate-packstack-python26
+      - gate-packstack-python27
+    gate:
+      - gate-packstack-pep8
+      - gate-packstack-python26
+      - gate-packstack-python27
+
+  - name: stackforge/anvil
+    check:
+      - gate-anvil-pep8
+      - gate-anvil-python26
+      - gate-anvil-python27
+    gate:
+      - gate-anvil-pep8
+      - gate-anvil-python26
+      - gate-anvil-python27
+
+  - name: openstack/savanna
+    check:
+      - gate-savanna-docs
+      - gate-savanna-pep8
+      - gate-savanna-pylint
+      - gate-savanna-python26
+      - gate-savanna-python27
+      - gate-savanna-requirements
+      - check-tempest-dsvm-savanna-full
+      - check-tempest-dsvm-savanna-postgres-full
+      - check-tempest-dsvm-savanna-neutron
+    gate:
+      - gate-savanna-docs
+      - gate-savanna-pep8
+      - gate-savanna-python26
+      - gate-savanna-python27
+      - gate-savanna-requirements
+      - gate-tempest-dsvm-savanna-full
+      - gate-tempest-dsvm-savanna-postgres-full
+      - gate-tempest-dsvm-savanna-neutron
+    post:
+      - savanna-docs
+      - savanna-branch-tarball
+      - hook-savanna-rtfd
+      - savanna-coverage
+      - savanna-upstream-translation-update
+    pre-release:
+      - savanna-tarball
+      - hook-savanna-rtfd
+    release:
+      - savanna-tarball:
+        - savanna-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - hook-savanna-rtfd
+      - savanna-docs
+      - savanna-merge-release-tags
+    periodic:
+      - savanna-propose-translation-update
+
+  - name: openstack/python-savannaclient
+    check:
+      - gate-python-savannaclient-pep8
+      - gate-python-savannaclient-python26
+      - gate-python-savannaclient-python27
+      - gate-python-savannaclient-requirements
+    gate:
+      - gate-python-savannaclient-pep8
+      - gate-python-savannaclient-python26
+      - gate-python-savannaclient-python27
+      - gate-python-savannaclient-requirements
+    post:
+      - python-savannaclient-branch-tarball
+      - python-savannaclient-coverage
+    pre-release:
+       - python-savannaclient-tarball
+    release:
+       - python-savannaclient-tarball:
+         - python-savannaclient-pypi-upload:
+           - post-mirror-python26
+           - post-mirror-python27
+           - post-mirror-python33
+    experimental:
+       - gate-python-savannaclient-python33
+       - gate-python-savannaclient-pypy
+
+  - name: openstack/savanna-dashboard
+    check:
+      - gate-savanna-dashboard-pep8
+      - gate-savanna-dashboard-python26
+      - gate-savanna-dashboard-python27
+      - gate-savanna-dashboard-requirements
+    gate:
+      - gate-savanna-dashboard-pep8
+      - gate-savanna-dashboard-python26
+      - gate-savanna-dashboard-python27
+      - gate-savanna-dashboard-requirements
+    post:
+      - savanna-dashboard-branch-tarball
+      - savanna-dashboard-coverage
+    pre-release:
+      - savanna-dashboard-tarball
+    release:
+      - savanna-dashboard-tarball:
+        - savanna-dashboard-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/savanna-extra
+    check:
+      - gate-savanna-extra-pep8
+      - gate-savanna-extra-requirements
+    gate:
+      - gate-savanna-extra-pep8
+      - gate-savanna-extra-requirements
+    post:
+      - savanna-extra-branch-tarball
+    pre-release:
+      - savanna-extra-tarball
+    release:
+      - savanna-extra-tarball
+
+  - name: openstack/savanna-image-elements
+    check:
+      - gate-savanna-image-elements-pep8
+      - gate-savanna-image-elements-requirements
+    gate:
+      - gate-savanna-image-elements-pep8
+      - gate-savanna-image-elements-requirements
+    post:
+      - savanna-image-elements-branch-tarball
+    pre-release:
+      - savanna-image-elements-tarball
+    release:
+      - savanna-image-elements-tarball:
+        - savanna-image-elements-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/sqlalchemy-migrate
+    check:
+      - gate-sqlalchemy-migrate-python26
+      - gate-sqlalchemy-migrate-python27
+      - gate-sqlalchemy-migrate-unittests-26sa07
+      - gate-sqlalchemy-migrate-unittests-27sa07
+    gate:
+      - gate-sqlalchemy-migrate-python26
+      - gate-sqlalchemy-migrate-python27
+      - gate-sqlalchemy-migrate-unittests-26sa07
+      - gate-sqlalchemy-migrate-unittests-27sa07
+    post:
+      - sqlalchemy-migrate-branch-tarball
+      - hook-sqlalchemy-migrate-rtfd
+    pre-release:
+      - sqlalchemy-migrate-tarball
+      - hook-sqlalchemy-migrate-rtfd
+    release:
+      - sqlalchemy-migrate-tarball:
+        - sqlalchemy-migrate-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - hook-sqlalchemy-migrate-rtfd
+
+  - name: stackforge/puppet-ceilometer
+    check:
+      - gate-puppet-ceilometer-puppet-lint
+      - gate-puppet-ceilometer-puppet-syntax
+      - gate-puppet-ceilometer-puppet-unit-2.7
+      - gate-puppet-ceilometer-puppet-unit-3.0
+      - gate-puppet-ceilometer-puppet-unit-3.1
+      - gate-puppet-ceilometer-puppet-unit-3.2
+      - gate-puppet-ceilometer-puppet-unit-3.3
+    gate:
+      - gate-puppet-ceilometer-puppet-lint
+      - gate-puppet-ceilometer-puppet-syntax
+      - gate-puppet-ceilometer-puppet-unit-2.7
+      - gate-puppet-ceilometer-puppet-unit-3.0
+      - gate-puppet-ceilometer-puppet-unit-3.1
+      - gate-puppet-ceilometer-puppet-unit-3.2
+      - gate-puppet-ceilometer-puppet-unit-3.3
+
+  - name: stackforge/puppet-cinder
+    check:
+      - gate-puppet-cinder-puppet-lint
+      - gate-puppet-cinder-puppet-syntax
+      - gate-puppet-cinder-puppet-unit-2.7
+      - gate-puppet-cinder-puppet-unit-3.0
+      - gate-puppet-cinder-puppet-unit-3.1
+      - gate-puppet-cinder-puppet-unit-3.2
+      - gate-puppet-cinder-puppet-unit-3.3
+    gate:
+      - gate-puppet-cinder-puppet-lint
+      - gate-puppet-cinder-puppet-syntax
+      - gate-puppet-cinder-puppet-unit-2.7
+      - gate-puppet-cinder-puppet-unit-3.0
+      - gate-puppet-cinder-puppet-unit-3.1
+      - gate-puppet-cinder-puppet-unit-3.2
+      - gate-puppet-cinder-puppet-unit-3.3
+
+  - name: stackforge/puppet-designate
+    check:
+      - gate-puppet-designate-puppet-lint
+      - gate-puppet-designate-puppet-syntax
+      - gate-puppet-designate-puppet-unit-2.7
+      - gate-puppet-designate-puppet-unit-3.0
+      - gate-puppet-designate-puppet-unit-3.1
+      - gate-puppet-designate-puppet-unit-3.2
+      - gate-puppet-designate-puppet-unit-3.3
+    gate:
+      - gate-puppet-designate-puppet-lint
+      - gate-puppet-designate-puppet-syntax
+      - gate-puppet-designate-puppet-unit-2.7
+      - gate-puppet-designate-puppet-unit-3.0
+      - gate-puppet-designate-puppet-unit-3.1
+      - gate-puppet-designate-puppet-unit-3.2
+      - gate-puppet-designate-puppet-unit-3.3
+
+  - name: stackforge/puppet-glance
+    check:
+      - gate-puppet-glance-puppet-lint
+      - gate-puppet-glance-puppet-syntax
+      - gate-puppet-glance-puppet-unit-2.7
+      - gate-puppet-glance-puppet-unit-3.0
+      - gate-puppet-glance-puppet-unit-3.1
+      - gate-puppet-glance-puppet-unit-3.2
+      - gate-puppet-glance-puppet-unit-3.3
+    gate:
+      - gate-puppet-glance-puppet-lint
+      - gate-puppet-glance-puppet-syntax
+      - gate-puppet-glance-puppet-unit-2.7
+      - gate-puppet-glance-puppet-unit-3.0
+      - gate-puppet-glance-puppet-unit-3.1
+      - gate-puppet-glance-puppet-unit-3.2
+      - gate-puppet-glance-puppet-unit-3.3
+
+  - name: stackforge/puppet-heat
+    check:
+      - gate-puppet-heat-puppet-lint
+      - gate-puppet-heat-puppet-syntax
+      - gate-puppet-heat-puppet-unit-2.7
+      - gate-puppet-heat-puppet-unit-3.0
+      - gate-puppet-heat-puppet-unit-3.1
+      - gate-puppet-heat-puppet-unit-3.2
+      - gate-puppet-heat-puppet-unit-3.3
+    gate:
+      - gate-puppet-heat-puppet-lint
+      - gate-puppet-heat-puppet-syntax
+      - gate-puppet-heat-puppet-unit-2.7
+      - gate-puppet-heat-puppet-unit-3.0
+      - gate-puppet-heat-puppet-unit-3.1
+      - gate-puppet-heat-puppet-unit-3.2
+      - gate-puppet-heat-puppet-unit-3.3
+
+  - name: stackforge/puppet-horizon
+    check:
+      - gate-puppet-horizon-puppet-lint
+      - gate-puppet-horizon-puppet-syntax
+      - gate-puppet-horizon-puppet-unit-2.7
+      - gate-puppet-horizon-puppet-unit-3.0
+      - gate-puppet-horizon-puppet-unit-3.1
+      - gate-puppet-horizon-puppet-unit-3.2
+      - gate-puppet-horizon-puppet-unit-3.3
+    gate:
+      - gate-puppet-horizon-puppet-lint
+      - gate-puppet-horizon-puppet-syntax
+      - gate-puppet-horizon-puppet-unit-2.7
+      - gate-puppet-horizon-puppet-unit-3.0
+      - gate-puppet-horizon-puppet-unit-3.1
+      - gate-puppet-horizon-puppet-unit-3.2
+      - gate-puppet-horizon-puppet-unit-3.3
+
+  - name: stackforge/puppet-ironic
+    check:
+      - gate-puppet-ironic-puppet-lint
+      - gate-puppet-ironic-puppet-syntax
+      - gate-puppet-ironic-puppet-unit-2.7
+      - gate-puppet-ironic-puppet-unit-3.0
+      - gate-puppet-ironic-puppet-unit-3.1
+      - gate-puppet-ironic-puppet-unit-3.2
+      - gate-puppet-ironic-puppet-unit-3.3
+    gate:
+      - gate-puppet-ironic-puppet-lint
+      - gate-puppet-ironic-puppet-syntax
+      - gate-puppet-ironic-puppet-unit-2.7
+      - gate-puppet-ironic-puppet-unit-3.0
+      - gate-puppet-ironic-puppet-unit-3.1
+      - gate-puppet-ironic-puppet-unit-3.2
+      - gate-puppet-ironic-puppet-unit-3.3
+
+  - name: stackforge/puppet-keystone
+    check:
+      - gate-puppet-keystone-puppet-lint
+      - gate-puppet-keystone-puppet-syntax
+      - gate-puppet-keystone-puppet-unit-2.7
+      - gate-puppet-keystone-puppet-unit-3.0
+      - gate-puppet-keystone-puppet-unit-3.1
+      - gate-puppet-keystone-puppet-unit-3.2
+      - gate-puppet-keystone-puppet-unit-3.3
+    gate:
+      - gate-puppet-keystone-puppet-lint
+      - gate-puppet-keystone-puppet-syntax
+      - gate-puppet-keystone-puppet-unit-2.7
+      - gate-puppet-keystone-puppet-unit-3.0
+      - gate-puppet-keystone-puppet-unit-3.1
+      - gate-puppet-keystone-puppet-unit-3.2
+      - gate-puppet-keystone-puppet-unit-3.3
+
+  - name: stackforge/puppet-nova
+    check:
+      - gate-puppet-nova-puppet-lint
+      - gate-puppet-nova-puppet-syntax
+      - gate-puppet-nova-puppet-unit-2.7
+      - gate-puppet-nova-puppet-unit-3.0
+      - gate-puppet-nova-puppet-unit-3.1
+      - gate-puppet-nova-puppet-unit-3.2
+      - gate-puppet-nova-puppet-unit-3.3
+    gate:
+      - gate-puppet-nova-puppet-lint
+      - gate-puppet-nova-puppet-syntax
+      - gate-puppet-nova-puppet-unit-2.7
+      - gate-puppet-nova-puppet-unit-3.0
+      - gate-puppet-nova-puppet-unit-3.1
+      - gate-puppet-nova-puppet-unit-3.2
+      - gate-puppet-nova-puppet-unit-3.3
+
+  - name: stackforge/puppet-neutron
+    check:
+      - gate-puppet-neutron-puppet-lint
+      - gate-puppet-neutron-puppet-syntax
+      - gate-puppet-neutron-puppet-unit-2.7
+      - gate-puppet-neutron-puppet-unit-3.0
+      - gate-puppet-neutron-puppet-unit-3.1
+      - gate-puppet-neutron-puppet-unit-3.2
+      - gate-puppet-neutron-puppet-unit-3.3
+    gate:
+      - gate-puppet-neutron-puppet-lint
+      - gate-puppet-neutron-puppet-syntax
+      - gate-puppet-neutron-puppet-unit-2.7
+      - gate-puppet-neutron-puppet-unit-3.0
+      - gate-puppet-neutron-puppet-unit-3.1
+      - gate-puppet-neutron-puppet-unit-3.2
+      - gate-puppet-neutron-puppet-unit-3.3
+
+  - name: stackforge/puppet-openstack
+    check:
+      - gate-puppet-openstack-puppet-lint
+      - gate-puppet-openstack-puppet-syntax
+      - gate-puppet-openstack-puppet-unit-2.7
+      - gate-puppet-openstack-puppet-unit-3.0
+      - gate-puppet-openstack-puppet-unit-3.1
+      - gate-puppet-openstack-puppet-unit-3.2
+      - gate-puppet-openstack-puppet-unit-3.3
+    gate:
+      - gate-puppet-openstack-puppet-lint
+      - gate-puppet-openstack-puppet-syntax
+      - gate-puppet-openstack-puppet-unit-2.7
+      - gate-puppet-openstack-puppet-unit-3.0
+      - gate-puppet-openstack-puppet-unit-3.1
+      - gate-puppet-openstack-puppet-unit-3.2
+      - gate-puppet-openstack-puppet-unit-3.3
+
+  - name: stackforge/puppet-savanna
+    check:
+      - gate-puppet-savanna-puppet-lint
+      - gate-puppet-savanna-puppet-syntax
+      - gate-puppet-savanna-puppet-unit-2.7
+      - gate-puppet-savanna-puppet-unit-3.0
+      - gate-puppet-savanna-puppet-unit-3.1
+      - gate-puppet-savanna-puppet-unit-3.2
+      - gate-puppet-savanna-puppet-unit-3.3
+    gate:
+      - gate-puppet-savanna-puppet-lint
+      - gate-puppet-savanna-puppet-syntax
+      - gate-puppet-savanna-puppet-unit-2.7
+      - gate-puppet-savanna-puppet-unit-3.0
+      - gate-puppet-savanna-puppet-unit-3.1
+      - gate-puppet-savanna-puppet-unit-3.2
+      - gate-puppet-savanna-puppet-unit-3.3
+
+  - name: stackforge/puppet-swift
+    check:
+      - gate-puppet-swift-puppet-lint
+      - gate-puppet-swift-puppet-syntax
+      - gate-puppet-swift-puppet-unit-2.7
+      - gate-puppet-swift-puppet-unit-3.0
+      - gate-puppet-swift-puppet-unit-3.1
+      - gate-puppet-swift-puppet-unit-3.2
+      - gate-puppet-swift-puppet-unit-3.3
+    gate:
+      - gate-puppet-swift-puppet-lint
+      - gate-puppet-swift-puppet-syntax
+      - gate-puppet-swift-puppet-unit-2.7
+      - gate-puppet-swift-puppet-unit-3.0
+      - gate-puppet-swift-puppet-unit-3.1
+      - gate-puppet-swift-puppet-unit-3.2
+      - gate-puppet-swift-puppet-unit-3.3
+
+  - name: stackforge/puppet-tempest
+    check:
+      - gate-puppet-tempest-puppet-lint
+      - gate-puppet-tempest-puppet-syntax
+      - gate-puppet-tempest-puppet-unit-2.7
+      - gate-puppet-tempest-puppet-unit-3.0
+      - gate-puppet-tempest-puppet-unit-3.1
+      - gate-puppet-tempest-puppet-unit-3.2
+      - gate-puppet-tempest-puppet-unit-3.3
+    gate:
+      - gate-puppet-tempest-puppet-lint
+      - gate-puppet-tempest-puppet-syntax
+      - gate-puppet-tempest-puppet-unit-2.7
+      - gate-puppet-tempest-puppet-unit-3.0
+      - gate-puppet-tempest-puppet-unit-3.1
+      - gate-puppet-tempest-puppet-unit-3.2
+      - gate-puppet-tempest-puppet-unit-3.3
+
+  - name: stackforge/puppet-vswitch
+    check:
+      - gate-puppet-vswitch-puppet-lint
+      - gate-puppet-vswitch-puppet-syntax
+      - gate-puppet-vswitch-puppet-unit-2.7
+      - gate-puppet-vswitch-puppet-unit-3.0
+      - gate-puppet-vswitch-puppet-unit-3.1
+    gate:
+      - gate-puppet-vswitch-puppet-unit-2.7
+      - gate-puppet-vswitch-puppet-unit-3.0
+      - gate-puppet-vswitch-puppet-unit-3.1
+
+  - name: stackforge/puppet-ceph
+    check:
+      - gate-puppet-ceph-puppet-lint
+      - gate-puppet-ceph-puppet-syntax
+      - gate-puppet-ceph-puppet-unit-2.7
+      - gate-puppet-ceph-puppet-unit-3.0
+      - gate-puppet-ceph-puppet-unit-3.1
+    gate:
+      - gate-puppet-ceph-puppet-lint
+      - gate-puppet-ceph-puppet-syntax
+      - gate-puppet-ceph-puppet-unit-2.7
+      - gate-puppet-ceph-puppet-unit-3.0
+      - gate-puppet-ceph-puppet-unit-3.1
+
+  - name: stackforge/puppet-openstack_dev_env
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/puppet_openstack_builder
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/mistral
+    check:
+      - gate-mistral-pep8
+      - gate-mistral-python26
+      - gate-mistral-python27
+      - gate-mistral-python33
+      - gate-mistral-docs
+    gate:
+      - gate-mistral-pep8
+      - gate-mistral-python26
+      - gate-mistral-python27
+      - gate-mistral-docs
+    post:
+      - mistral-branch-tarball
+    pre-release:
+      - mistral-tarball
+    release:
+      - mistral-tarball:
+        - mistral-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/murano-agent
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/murano-api
+    check:
+      - gate-murano-api-pep8
+      - gate-murano-api-python26
+      - gate-murano-api-python27
+    gate:
+      - gate-murano-api-pep8
+      - gate-murano-api-python26
+      - gate-murano-api-python27
+    post:
+      - murano-api-branch-tarball
+    pre-release:
+      - murano-api-tarball
+    release:
+      - murano-api-tarball
+
+  - name: stackforge/murano-conductor
+    check:
+      - gate-murano-conductor-pep8
+      - gate-murano-conductor-python26
+      - gate-murano-conductor-python27
+    gate:
+      - gate-murano-conductor-pep8
+      - gate-murano-conductor-python26
+      - gate-murano-conductor-python27
+    post:
+      - murano-conductor-branch-tarball
+    pre-release:
+      - murano-conductor-tarball
+    release:
+      - murano-conductor-tarball
+
+  - name: stackforge/murano-dashboard
+    check:
+      - gate-murano-dashboard-pep8
+      - gate-murano-dashboard-python26
+      - gate-murano-dashboard-python27
+    gate:
+      - gate-murano-dashboard-pep8
+      - gate-murano-dashboard-python26
+      - gate-murano-dashboard-python27
+    post:
+      - murano-dashboard-branch-tarball
+    pre-release:
+      - murano-dashboard-tarball
+    release:
+      - murano-dashboard-tarball
+
+  - name: stackforge/murano-deployment
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/murano-docs
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/murano-tests
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/python-muranoclient
+    check:
+      - gate-python-muranoclient-pep8
+      - gate-python-muranoclient-python26
+      - gate-python-muranoclient-python27
+      - gate-python-muranoclient-python33
+    gate:
+      - gate-python-muranoclient-pep8
+      - gate-python-muranoclient-python26
+      - gate-python-muranoclient-python27
+    post:
+      - python-muranoclient-branch-tarball
+    pre-release:
+      - python-muranoclient-tarball
+    release:
+      - python-muranoclient-tarball:
+        - python-muranoclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/murano-common
+    check:
+      - gate-murano-common-pep8
+      - gate-murano-common-python26
+      - gate-murano-common-python27
+      - gate-murano-common-python33
+    gate:
+      - gate-murano-common-pep8
+      - gate-murano-common-python26
+      - gate-murano-common-python27
+    post:
+      - murano-common-branch-tarball
+    pre-release:
+      - murano-common-tarball
+    release:
+      - murano-common-tarball:
+        - murano-common-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/murano-repository
+    check:
+      - gate-murano-repository-pep8
+      - gate-murano-repository-python26
+      - gate-murano-repository-python27
+      - gate-murano-repository-python33
+    gate:
+      - gate-murano-repository-pep8
+      - gate-murano-repository-python26
+      - gate-murano-repository-python27
+    post:
+      - murano-repository-branch-tarball
+    pre-release:
+      - murano-repository-tarball
+    release:
+      - murano-repository-tarball:
+        - murano-repository-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/murano-metadataclient
+    check:
+      - gate-murano-metadataclient-pep8
+      - gate-murano-metadataclient-python26
+      - gate-murano-metadataclient-python27
+      - gate-murano-metadataclient-python33
+    gate:
+      - gate-murano-metadataclient-pep8
+      - gate-murano-metadataclient-python26
+      - gate-murano-metadataclient-python27
+    post:
+      - murano-metadataclient-branch-tarball
+    pre-release:
+      - murano-metadataclient-tarball
+    release:
+      - murano-metadataclient-tarball:
+        - murano-metadataclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/opencafe
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/cloudcafe
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/cloudroast
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/openvz-nova-driver
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/python-barbicanclient
+    check:
+      - gate-python-barbicanclient-pep8
+      - gate-python-barbicanclient-python26
+      - gate-python-barbicanclient-python27
+    gate:
+      - gate-python-barbicanclient-pep8
+      - gate-python-barbicanclient-python26
+      - gate-python-barbicanclient-python27
+    post:
+      - python-barbicanclient-branch-tarball
+
+  - name: stackforge/python-climateclient
+    check:
+      - gate-python-climateclient-requirements
+    gate:
+      - gate-python-climateclient-requirements
+
+  - name: openstack/python-marconiclient
+    check:
+      - gate-python-marconiclient-requirements
+      - gate-python-marconiclient-pep8
+      - gate-python-marconiclient-python26
+      - gate-python-marconiclient-python27
+      - gate-python-marconiclient-python33
+      - gate-python-marconiclient-pypy
+    gate:
+      - gate-python-marconiclient-requirements
+      - gate-python-marconiclient-pep8
+      - gate-python-marconiclient-python26
+      - gate-python-marconiclient-python27
+      - gate-python-marconiclient-python33
+      - gate-python-marconiclient-pypy
+    post:
+      - python-marconiclient-branch-tarball
+    pre-release:
+      - python-marconiclient-tarball
+    release:
+      - python-marconiclient-tarball:
+        - python-marconiclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/cookbook-openstack-block-storage
+    check:
+      - gate-cookbook-openstack-block-storage-chef-lint
+      - gate-cookbook-openstack-block-storage-chef-unit
+    gate:
+      - gate-cookbook-openstack-block-storage-chef-lint
+      - gate-cookbook-openstack-block-storage-chef-unit
+
+  - name: stackforge/openstack-chef-repo
+    check:
+      - gate-openstack-chef-repo
+    gate:
+      - gate-openstack-chef-repo
+
+  - name: stackforge/cookbook-openstack-common
+    check:
+      - gate-cookbook-openstack-common-chef-lint
+      - gate-cookbook-openstack-common-chef-unit
+    gate:
+      - gate-cookbook-openstack-common-chef-lint
+      - gate-cookbook-openstack-common-chef-unit
+
+  - name: stackforge/cookbook-openstack-compute
+    check:
+      - gate-cookbook-openstack-compute-chef-lint
+      - gate-cookbook-openstack-compute-chef-style
+      - gate-cookbook-openstack-compute-chef-unit
+    gate:
+      - gate-cookbook-openstack-compute-chef-lint
+      - gate-cookbook-openstack-compute-chef-style
+      - gate-cookbook-openstack-compute-chef-unit
+
+  - name: stackforge/cookbook-openstack-dashboard
+    check:
+      - gate-cookbook-openstack-dashboard-chef-lint
+      - gate-cookbook-openstack-dashboard-chef-unit
+    gate:
+      - gate-cookbook-openstack-dashboard-chef-lint
+      - gate-cookbook-openstack-dashboard-chef-unit
+
+  - name: stackforge/cookbook-openstack-identity
+    check:
+      - gate-cookbook-openstack-identity-chef-lint
+      - gate-cookbook-openstack-identity-chef-unit
+    gate:
+      - gate-cookbook-openstack-identity-chef-lint
+      - gate-cookbook-openstack-identity-chef-unit
+
+  - name: stackforge/cookbook-openstack-image
+    check:
+      - gate-cookbook-openstack-image-chef-lint
+      - gate-cookbook-openstack-image-chef-unit
+    gate:
+      - gate-cookbook-openstack-image-chef-lint
+      - gate-cookbook-openstack-image-chef-unit
+
+  - name: stackforge/cookbook-openstack-metering
+    check:
+      - gate-cookbook-openstack-metering-chef-lint
+      - gate-cookbook-openstack-metering-chef-unit
+
+    gate:
+      - gate-cookbook-openstack-metering-chef-lint
+      - gate-cookbook-openstack-metering-chef-unit
+
+  - name: stackforge/cookbook-openstack-network
+    check:
+      - gate-cookbook-openstack-network-chef-lint
+      - gate-cookbook-openstack-network-chef-unit
+    gate:
+      - gate-cookbook-openstack-network-chef-lint
+      - gate-cookbook-openstack-network-chef-unit
+
+  - name: stackforge/cookbook-openstack-object-storage
+    check:
+      - gate-cookbook-openstack-object-storage-chef-lint
+      - gate-cookbook-openstack-object-storage-chef-unit
+    gate:
+      - gate-cookbook-openstack-object-storage-chef-lint
+      - gate-cookbook-openstack-object-storage-chef-unit
+
+  - name: stackforge/cookbook-openstack-orchestration
+    check:
+      - gate-cookbook-openstack-orchestration-chef-lint
+      - gate-cookbook-openstack-orchestration-chef-unit
+    gate:
+      - gate-cookbook-openstack-orchestration-chef-lint
+      - gate-cookbook-openstack-orchestration-chef-unit
+
+  - name: stackforge/cookbook-openstack-ops-database
+    check:
+      - gate-cookbook-openstack-ops-database-chef-lint
+      - gate-cookbook-openstack-ops-database-chef-unit
+    gate:
+      - gate-cookbook-openstack-ops-database-chef-lint
+      - gate-cookbook-openstack-ops-database-chef-unit
+
+  - name: stackforge/cookbook-openstack-ops-messaging
+    check:
+      - gate-cookbook-openstack-ops-messaging-chef-lint
+      - gate-cookbook-openstack-ops-messaging-chef-unit
+    gate:
+      - gate-cookbook-openstack-ops-messaging-chef-lint
+      - gate-cookbook-openstack-ops-messaging-chef-unit
+
+  - name: openstack/ironic
+    check:
+      - gate-ironic-requirements
+      - gate-ironic-docs
+      - gate-ironic-pep8
+      - gate-ironic-python26
+      - gate-ironic-python27
+    gate:
+      - gate-ironic-requirements
+      - gate-ironic-docs
+      - gate-ironic-pep8
+      - gate-ironic-python26
+      - gate-ironic-python27
+    post:
+      - ironic-branch-tarball
+      - ironic-coverage
+      - ironic-docs
+      - ironic-upstream-translation-update
+    pre-release:
+      - ironic-tarball
+    release:
+      - ironic-tarball
+      - ironic-docs
+      - ironic-merge-release-tags
+    periodic:
+      - ironic-propose-translation-update
+
+  - name: openstack/python-ironicclient
+    check:
+      - gate-python-ironicclient-pep8
+      - gate-python-ironicclient-python26
+      - gate-python-ironicclient-python27
+      - gate-python-ironicclient-python33
+      - gate-python-ironicclient-pypy
+    gate:
+      - gate-python-ironicclient-pep8
+      - gate-python-ironicclient-python26
+      - gate-python-ironicclient-python27
+      - gate-python-ironicclient-python33
+      - gate-python-ironicclient-pypy
+    post:
+      - python-ironicclient-branch-tarball
+      - python-ironicclient-coverage
+    pre-release:
+      - python-ironicclient-tarball
+    release:
+      - python-ironicclient-tarball:
+        - python-ironicclient-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/inception
+    check:
+      - gate-inception-pep8
+    gate:
+      - gate-inception-pep8
+
+  - name: stackforge/occi-os
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/golang-client
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/barbican
+    check:
+      - gate-barbican-pep8
+      - gate-barbican-python27
+    gate:
+      - gate-barbican-pep8
+      - gate-barbican-python27
+    post:
+      - barbican-branch-tarball
+
+  - name: stackforge/taskflow
+    check:
+      - gate-taskflow-pep8
+      - gate-taskflow-python26
+      - gate-taskflow-python27
+      - gate-taskflow-python33
+    gate:
+      - gate-taskflow-pep8
+      - gate-taskflow-python26
+      - gate-taskflow-python27
+      - gate-taskflow-python33
+    post:
+      - taskflow-coverage
+      - taskflow-branch-tarball
+    pre-release:
+      - taskflow-tarball
+    release:
+      - taskflow-tarball:
+        - taskflow-pypi-upload
+
+  - name: stackforge/novaimagebuilder
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/cl-openstack-client
+    check:
+      - gate-cl-openstack-client-run-tests
+    gate:
+      - gate-cl-openstack-client-run-tests
+
+  - name: stackforge/stackalytics
+    check:
+      - gate-stackalytics-docs
+      - gate-stackalytics-pep8
+      - gate-stackalytics-python26
+      - gate-stackalytics-python27
+    gate:
+      - gate-stackalytics-docs
+      - gate-stackalytics-pep8
+      - gate-stackalytics-python26
+      - gate-stackalytics-python27
+    post:
+      - stackalytics-branch-tarball
+      - hook-stackalytics-rtfd
+    pre-release:
+      - stackalytics-tarball
+      - hook-stackalytics-rtfd
+    release:
+      - stackalytics-tarball
+      - hook-stackalytics-rtfd
+
+  - name: stackforge/pyghmi
+    check:
+      - gate-pyghmi-pep8
+    gate:
+      - gate-pyghmi-pep8
+
+  - name: openstack-infra/tripleo-ci
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/pycadf
+    check:
+      - gate-pycadf-pep8
+      - gate-pycadf-python26
+      - gate-pycadf-python27
+    gate:
+      - gate-pycadf-pep8
+      - gate-pycadf-python26
+      - gate-pycadf-python27
+    post:
+      - pycadf-branch-tarball
+    pre-release:
+      - pycadf-tarball
+    release:
+      - pycadf-tarball:
+        - pycadf-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/tuskar
+    check:
+      - gate-tuskar-pep8
+      - gate-tuskar-python26
+      - gate-tuskar-python27
+    gate:
+      - gate-tuskar-pep8
+      - gate-tuskar-python26
+      - gate-tuskar-python27
+    post:
+      - tuskar-branch-tarball
+    pre-release:
+      - tuskar-tarball
+    release:
+      - tuskar-tarball:
+        - tuskar-pypi-upload
+
+  - name: openstack/python-tuskarclient
+    check:
+      - gate-python-tuskarclient-pep8
+      - gate-python-tuskarclient-python26
+      - gate-python-tuskarclient-python27
+      - gate-python-tuskarclient-python33
+    gate:
+      - gate-python-tuskarclient-pep8
+      - gate-python-tuskarclient-python26
+      - gate-python-tuskarclient-python27
+    post:
+      - python-tuskarclient-branch-tarball
+      - python-tuskarclient-coverage
+    pre-release:
+      - python-tuskarclient-tarball
+    release:
+      - python-tuskarclient-tarball:
+        - python-tuskarclient-pypi-upload
+
+  - name: openstack/tuskar-ui
+    check:
+      - gate-tuskar-ui-pep8
+      - gate-tuskar-ui-python26
+      - gate-tuskar-ui-python27
+    gate:
+      - gate-tuskar-ui-pep8
+      - gate-tuskar-ui-python26
+      - gate-tuskar-ui-python27
+    post:
+      - tuskar-ui-branch-tarball
+    pre-release:
+      - tuskar-ui-tarball
+    release:
+      - tuskar-ui-tarball:
+        - tuskar-ui-pypi-upload
+
+  - name: stackforge/pecan
+    check:
+      - gate-pecan-pep8
+      - gate-pecan-python26
+      - gate-pecan-python27
+      - gate-pecan-python33
+      - gate-pecan-tox-wsme-stable
+      - gate-pecan-tox-wsme-tip
+      - gate-pecan-tox-ceilometer-stable
+      - gate-pecan-tox-ceilometer-tip
+      - gate-pecan-tox-ironic-tip
+    gate:
+      - gate-pecan-pep8
+      - gate-pecan-python26
+      - gate-pecan-python27
+      - gate-pecan-python33
+      - gate-pecan-tox-wsme-stable
+      - gate-pecan-tox-wsme-tip
+      - gate-pecan-tox-ceilometer-stable
+      - gate-pecan-tox-ceilometer-tip
+      - gate-pecan-tox-ironic-tip
+    post:
+      - pecan-branch-tarball
+    pre-release:
+      - pecan-tarball
+      - hook-pecan-rtfd
+    release:
+      - pecan-tarball:
+        - pecan-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - hook-pecan-rtfd
+
+  - name: stackforge/stevedore
+    check:
+      - gate-stevedore-pep8
+      - gate-stevedore-python26
+      - gate-stevedore-python27
+      - gate-stevedore-python33
+    gate:
+      - gate-stevedore-pep8
+      - gate-stevedore-python26
+      - gate-stevedore-python27
+      - gate-stevedore-python33
+    post:
+      - stevedore-branch-tarball
+    pre-release:
+      - stevedore-tarball
+      - hook-stevedore-rtfd
+    release:
+      - stevedore-tarball:
+        - stevedore-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+      - hook-stevedore-rtfd
+
+  - name: openstack-infra/groups
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/wsme
+    check:
+      - gate-wsme-python26
+      - gate-wsme-python27
+      - gate-wsme-python33
+      - gate-wsme-pep8
+    gate:
+      - gate-wsme-python26
+      - gate-wsme-python27
+      - gate-wsme-python33
+      - gate-wsme-pep8
+    post:
+      - wsme-branch-tarball
+    pre-release:
+      - wsme-tarball:
+          - wsme-pypi-upload:
+              - post-mirror-python26
+              - post-mirror-python27
+              - post-mirror-python33
+    release:
+      - wsme-tarball:
+        - wsme-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: openstack/governance
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: openstack-infra/activity-board
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-main
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-provision
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-web
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-astute
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-ostf
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-ostf-plugin
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-docs
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-library
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/fuel-devops
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/rally
+    check:
+      - gate-rally-pep8
+      - gate-rally-python26
+      - gate-rally-python27
+    gate:
+      - gate-rally-pep8
+      - gate-rally-python26
+      - gate-rally-python27
+    post:
+      - rally-branch-tarball
+    pre-release:
+      - rally-tarball
+    release:
+      - rally-tarball
+
+  - name: stackforge/manila
+    check:
+      - gate-manila-pep8
+      - gate-manila-python26
+      - gate-manila-python27
+      - gate-manila-devstack-dsvm
+    gate:
+      - gate-manila-pep8
+      - gate-manila-python26
+      - gate-manila-python27
+      - gate-manila-devstack-dsvm
+    post:
+      - manila-branch-tarball
+      - manila-coverage
+
+  - name: stackforge/python-manilaclient
+    check:
+      - gate-python-manilaclient-pep8
+      - gate-python-manilaclient-python26
+      - gate-python-manilaclient-python27
+    gate:
+      - gate-python-manilaclient-pep8
+      - gate-python-manilaclient-python26
+      - gate-python-manilaclient-python27
+    post:
+      - python-manilaclient-branch-tarball
+      - python-manilaclient-coverage
+
+  - name: stackforge/rubick
+    check:
+      - gate-rubick-pep8
+      - gate-rubick-python27
+      - gate-rubick-python33
+    gate:
+      - gate-rubick-pep8
+      - gate-rubick-python27
+    post:
+      - rubick-coverage
+
+  - name: stackforge/solum
+    check:
+      - gate-solum-pep8
+      - gate-solum-python26
+      - gate-solum-python27
+      - gate-solum-python33
+      - gate-solum-pypy
+      - gate-solum-docs
+      - gate-solum-devstack-dsvm
+    gate:
+      - gate-solum-pep8
+      - gate-solum-python26
+      - gate-solum-python27
+      - gate-solum-python33
+      - gate-solum-pypy
+      - gate-solum-docs
+      - gate-solum-devstack-dsvm
+    post:
+      - solum-coverage
+      - hook-solum-rtfd
+
+  - name: stackforge/sphinxcontrib-docbookrestapi
+    check:
+      - gate-sphinxcontrib-docbookrestapi-pep8
+    gate:
+      - gate-sphinxcontrib-docbookrestapi-pep8
+    pre-release:
+      - sphinxcontrib-docbookrestapi-tarball
+    release:
+      - sphinxcontrib-docbookrestapi-tarball:
+        - sphinxcontrib-docbookrestapi-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+          - post-mirror-python33
+
+  - name: stackforge/tomograph
+    check:
+      - gate-tomograph-pep8
+      - gate-tomograph-python26
+      - gate-tomograph-python27
+      - gate-tomograph-python33
+      - gate-tomograph-docs
+    gate:
+      - gate-tomograph-pep8
+      - gate-tomograph-python26
+      - gate-tomograph-python27
+    post:
+      - tomograph-branch-tarball
+    pre-release:
+      - tomograph-tarball
+    release:
+      - tomograph-tarball:
+        - tomograph-pypi-upload:
+          - post-mirror-python26
+          - post-mirror-python27
+
+  - name: stackforge/turbo-hipster
+    check:
+      - gate-turbo-hipster-docs
+      - gate-turbo-hipster-pep8
+      - gate-turbo-hipster-python27
+    gate:
+      - gate-turbo-hipster-docs
+      - gate-turbo-hipster-pep8
+      - gate-turbo-hipster-python27
+    post:
+      - turbo-hipster-coverage
+
+  - name: stackforge/python-solumclient
+    check:
+      - gate-python-solumclient-pep8
+      - gate-python-solumclient-python26
+      - gate-python-solumclient-python27
+      - gate-python-solumclient-python33
+      - gate-python-solumclient-pypy
+      - gate-python-solumclient-docs
+    gate:
+      - gate-python-solumclient-pep8
+      - gate-python-solumclient-python26
+      - gate-python-solumclient-python27
+      - gate-python-solumclient-python33
+      - gate-python-solumclient-pypy
+      - gate-python-solumclient-docs
+    post:
+      - python-solumclient-coverage
+
+  - name: openstack-infra/release-tools
+    check:
+      - gate-release-tools-pep8
+      - gate-release-tools-python26
+      - gate-release-tools-python27
+      - gate-release-tools-pypy
+    gate:
+      - gate-release-tools-pep8
+      - gate-release-tools-python26
+      - gate-release-tools-python27
+      - gate-release-tools-pypy
+
+  - name: stackforge/milk
+    check:
+      - gate-noop
+    gate:
+      - gate-noop
+
+  - name: stackforge/entropy
+    check:
+      - gate-entropy-docs
+      - gate-entropy-pep8
+      - gate-entropy-python26
+      - gate-entropy-python27
+      - gate-entropy-python33
+    gate:
+      - gate-entropy-docs
+      - gate-entropy-pep8
+      - gate-entropy-python26
+      - gate-entropy-python27
+      - gate-entropy-python33
+    post:
+      - entropy-coverage

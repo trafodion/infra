@@ -1,0 +1,15 @@
+- job:
+    name: gate-noop
+    node: master
+
+- job:
+    name: node-test
+
+    parameters:
+      - label:
+          name: NODE
+          description: Node to test
+
+    builders:
+      - shell: 'echo ok'
+

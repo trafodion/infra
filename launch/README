@@ -1,0 +1,85 @@
+Create Server
+=============
+
+Note that these instructions assume you're working from this
+directory on an updated local clone of the repository on the
+puppetmaster, and that your account is a member of the admin, puppet
+and salt groups for access to their respective keys::
+
+  sudo adduser $(whoami) admin
+  sudo adduser $(whoami) puppet
+  sudo adduser $(whoami) salt
+
+(Remember to log out and back into your shell if you add yourself
+to a group.)
+
+To launch a node in the OpenStack CI account (production servers)::
+
+  . ~root/ci-launch/openstackci-rs-nova.sh
+  export FQDN=servername.openstack.org
+  sudo puppet cert generate $FQDN
+  ./launch-node.py $FQDN
+
+To launch a node in the OpenStack Jenkins account (slave nodes)::
+
+  . ~root/ci-launch/openstackjenkins-rs-nova.sh
+  export FQDN=slavename.slave.openstack.org
+  nova image-list
+  export IMAGE='Ubuntu 12.04 LTS (Precise Pangolin)'
+  nova flavor-list
+  export RAM=8192
+  sudo puppet cert generate $FQDN
+  ./launch-node.py $FQDN --image "$IMAGE" --ram $RAM --salt
+
+The --salt option tells the script to automatically configure and enroll
+the server as a minion on the salt master.
+
+If you are launching a replacement server, you may skip the generate
+step and specify the name of an existing puppet cert (as long as the
+private key is on this host).
+
+The server name and cert names may be different and the latter can be
+specified with --cert if needed (older Jenkins slave types still use
+shared certs), but launch-node.py will assume they are the same unless
+specified.
+
+Manually add the hostname to DNS (the launch script does not do so
+automatically). Note that this example assumes you've already
+exported a relevant FQDN and sourced the appropriate API credentials
+above.
+
+When running outside the official OpenStack CI infrastructure, you
+will want to pass --server ci-puppetmaster.example.com otherwise the
+new node wil try to register with ci-puppetmaster.openstack.org - and
+fail hilariously.
+
+Add DNS Records
+===============
+
+There are no scripts to automatically handle DNS at the moment due to
+a lack of library support for the new Rackspace Cloud DNS (with IPv6).
+However, the launch-node script will print the commands needed to be
+run to configure DNS for a newly launched server.  To see the commands
+for an existing server, run:
+
+  ./dns.py $FQDN
+
+Activate Puppet Agent
+=====================
+
+If this is a Jenkins slave, Puppet configuration is applied through
+an already installed cron job, so you can ignore this section. If
+this is ''not'' a Jenkins slave, you'll want to log into it via SSH
+and turn on the Puppet agent so it will start checking into the
+master on its own. on Debian/Ubuntu::
+
+  sudo sed -i 's/^START=.*/START=yes/' /etc/default/puppet
+  sudo su -c 'invoke-rc.d puppet start'
+
+...or on CentOS/Fedora/RHEL::
+
+  sudo chkconfig puppet on
+  sudo su -c 'service puppet start'
+
+You should be able to tell from the Puppet Dashboard when it begins
+to check in, which normally happens at 10-minute intervals.

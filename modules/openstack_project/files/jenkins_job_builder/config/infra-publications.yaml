@@ -1,0 +1,42 @@
+# simply copy the contents of the repository to the server, no building needed
+- job:
+    name: infra-publications-publish
+    concurrent: false
+    node: precise
+
+    builders:
+      - gerrit-git-prep
+
+    publishers:
+      - ftp:
+          site: docs.openstack.org
+          source: '**'
+          target: 'infra/publications/$ZUUL_REF/'
+          remove-prefix: ''
+          excludes: ''
+      - console-log
+
+- job:
+    name: infra-publications-publish-index
+    concurrent: false
+    node: precise
+
+    builders:
+      - gerrit-git-prep
+      - shell: |
+          #!/bin/bash -xe
+          git reset --hard remotes/origin/master
+          if ! git clean -x -f -d -q ; then
+              sleep 1
+              git clean -x -f -d -q
+          fi
+          ./make-index
+
+    publishers:
+      - ftp:
+          site: docs.openstack.org
+          source: 'output/**'
+          target: 'infra/publications/'
+          remove-prefix: 'output/'
+          excludes: ''
+      - console-log
