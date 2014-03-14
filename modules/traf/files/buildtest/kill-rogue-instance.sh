@@ -2,7 +2,7 @@
 
 # Look for the usual suspects
 # might need to get more agressive
-Instance=$(pgrep -u jenkins 'mpirun|monitor|sqwatchdog|mxosrvr')
+Instance=$(pgrep -u jenkins -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci')
 
 if [[ -z "$Instance" ]]
 then
@@ -19,7 +19,7 @@ do
   kill -9 $Instance
   sleep 3
 
-  Instance=$(pgrep -u jenkins 'mpirun|monitor|sqwatchdog|mxosrvr')
+  Instance=$(pgrep -u jenkins -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty')
   if [[ -z "$Instance" ]]    
   then
     echo "Post-kill processes:"

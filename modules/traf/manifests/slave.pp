@@ -22,6 +22,7 @@ class traf::slave (
   }
 
   include traf::tpcds
+  include traf::python276
 
   class { 'traf::server':
     iptables_public_tcp_ports => [40010],
@@ -31,7 +32,7 @@ class traf::slave (
   class { 'jenkins::slave':
     bare         => $bare,
     ssh_key      => $traf::jenkins_ssh_key,
-    sudo         => true,
+    sudo         => false,
     python3      => $python3,
     include_pypy => $include_pypy,
   }

@@ -107,7 +107,7 @@ pipelines:
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
-  - name: traf-regress
+  - name: traf-regress-[A-Z]
     voting: true
   - name: traf-regress-experimental
     voting: false
@@ -118,6 +118,8 @@ jobs:
   - name: pyodbc_test
     voting: true
   - name: pyodbc_test-experimental
+    voting: false
+  - name: gate-infra-puppet-lint
     voting: false
 
 projects:
@@ -132,11 +134,13 @@ projects:
 
   - name: trafodion/core
     check:
-      - traf-regress
+      - traf-regress-A
+      - traf-regress-B
       - gate-core-check-for-binary
       - phoenix_test
     gate:
-      - traf-regress
+      - traf-regress-A
+      - traf-regress-B
       - gate-core-check-for-binary
       - phoenix_test
     pre-release:
@@ -147,11 +151,12 @@ projects:
       - gate-dcs-check-for-binary
       - dcs-build
       - phoenix_test
+      - pyodbc_test
+      - pyodbc_test-experimental
     gate:
       - gate-dcs-check-for-binary
       - dcs-build
       - phoenix_test
-    experimental:
       - pyodbc_test
       - pyodbc_test-experimental
 
@@ -180,8 +185,3 @@ projects:
       - phoenix_test
       - phoenix_test-experimental
 
-  - name: trafodion/installer
-    check:
-      - gate-installer-check-for-binary
-    gate:
-      - gate-installer-check-for-binary

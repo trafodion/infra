@@ -39,11 +39,28 @@ class traf::buildtest {
       'ant','ant-nodeps',
       'dos2unix','expect',
       'unixODBC.x86_64', 'unixODBC-devel.x86_64',
+      'zlib-devel', 'bzip2-devel', 'ncurses-devel', 'tk-devel', 'gdbm-devel', 'db4-devel', 'libpcap-devel',
     ]
+
+    # Use exec to run yum groupinstall since it is not
+    # supported by the package type
+    file { '/tmp/Development_Tools_Installed.out':
+        mode   => '0644',
+        source => "puppet:///modules/traf/Development_Tools_Installed.out",
+    }
+
+    exec { 'install_Development_Tools':
+        path    => "/usr/bin:/bin:/usr/local/bin",
+        command => 'yum groupinstall "Development Tools"',
+        unless  => 'yum grouplist "Development Tools" > /tmp/Development_Tools_Installed.run.out; diff -wq /tmp/Development_Tools_Installed.run.out /tmp/Development_Tools_Installed.out',
+        require => File['/tmp/Development_Tools_Installed.out'],
+    }
 
     package { $packages:
         ensure => present,
+   	require => [ Exec['install_Development_Tools'] ]
     }
+
     # Remove bug reporting tool, so we can specify core file pattern
     package {['abrt-cli','abrt-addon-python','abrt-addon-ccpp','abrt-addon-kerneloops','abrt',] :
         ensure => absent,
@@ -66,11 +83,12 @@ class traf::buildtest {
 	    unless    => '[[ $(/sbin/sysctl -n fs.aio-max-nr) == "262144" ]]',
     }
 
-    # This top level dir holds both tar'd up build tool binaries and the untar'd tools
+    # This top level dir holds both tar'd up build tool binaries and the untar'd tools.
+    # Jenkins write rsync output to this dir.
     file { '/opt/traf' :
        ensure => directory,
-       owner  => 'root',
-       group  => 'root',
+       owner  => 'jenkins',
+       group  => 'jenkins',
        mode   => '0755',
     }
 
@@ -84,7 +102,8 @@ class traf::buildtest {
        require => File['/opt/traf'],
     }
 
-    # This dir contains the tools that are used to build Trafodion
+    # This dir contains the tools that are used to build Trafodion.
+    # We only want root to be able to update this directory.
     file { '/opt/traf/tools' :
        ensure  => directory,
        owner   => 'root',
@@ -95,7 +114,7 @@ class traf::buildtest {
 
     # This file is created by the rsync-build-tool-tgz step and we don't want rsync
     # to append to an existing output file so we make sure to remove any old copy.
-    file { '/opt/traf/build-tool-tgz/rsync.out' :
+    file { '/opt/traf/rsync.out' :
        ensure  => absent,
        require => File['/opt/traf'],
     }
@@ -103,25 +122,20 @@ class traf::buildtest {
     # Sync /opt/traf/tools directory, output gets saved so later we know which files were sync'd.
     # We only untar the files that were sync'd.  That's done in the next step.
     exec { 'rsync-build-tool-tgz' :
-        command   => '/usr/bin/rsync -havS --log-file=/opt/traf/build-tool-tgz/rsync.out --log-file-format="%o --- %n" --del -e "ssh -o StrictHostKeyChecking=no" jenkins@static.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf',
+        command   => "/usr/bin/rsync -havS --log-file=/opt/traf/rsync.out --log-file-format=\"%o --- %n\" --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@static.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf",
 	    user      => jenkins,
 	    provider  => shell,
-	    require   => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'], File['/opt/traf/build-tool-tgz/rsync.out'] ],
+	    require   => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'], File['/opt/traf/rsync.out'] ],
     }
 
     # Un-tar the build tool tarballs, only when tarball has been updated by rsync
     exec { 'untar-build-tool-tgz' :
-        command   => '/usr/local/bin/untar_updated_tools.pl -d /opt/traf -f /opt/traf/build-tool-tgz/rsync.out',
+        command   => '/usr/local/bin/untar_updated_tools.pl -d /opt/traf -f /opt/traf/rsync.out',
 	    user      => root,
 	    provider  => shell,
 	    require   => Exec['rsync-build-tool-tgz'],
     }
     
-    # python libraries needed by Python Tests
-    package { ['unittest2', 'nose', 'pyodbc', 'xmlrunner']:
-        ensure   => latest,
-        provider => pip,
-    }
     
   }
 }

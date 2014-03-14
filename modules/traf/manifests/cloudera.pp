@@ -58,6 +58,7 @@ class traf::cloudera (
       'hbase-master',
       'hbase-thrift',
       'hive',
+      'zookeeper',
       'zookeeper-server',
     ]
 
@@ -159,6 +160,7 @@ class traf::cloudera (
        group => 'yarn',
        mode  => '0755',
        ensure => directory,
+       require => Package['hadoop-yarn'],
   }
   $hdfs_services = ['hadoop-hdfs-datanode','hadoop-hdfs-namenode']
   $yarn_services = ['hadoop-yarn-resourcemanager','hadoop-yarn-nodemanager']
@@ -218,6 +220,12 @@ class traf::cloudera (
       unless  => '/usr/bin/hadoop fs -ls -d /user/jenkins',
       user    => 'hdfs',
       require => [ Service[$hdfs_services],User['jenkins'] ]
+  }
+  exec { 'zookeeper-init':
+      command => 
+          '/sbin/service zookeeper-server init',
+     creates  => '/var/lib/zookeeper/version-2',
+     require  => Package['zookeeper-server'],
   }
 }
 

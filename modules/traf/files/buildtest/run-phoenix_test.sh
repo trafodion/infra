@@ -31,15 +31,12 @@ cd $WORKSPACE
 /usr/local/bin/start-traf-instance.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
 set +x
 
-echo "INFO: Waiting 2 minutes and check mxosrvr"
+echo "INFO: Waiting 2 minutes and check DcsServer"
 sleep 120
+
 set -x
-
-cd $WORKSPACE/$TRAF_DIR/sqf
-source_env
-
-if [ $(sqps | grep -c mxosrvr) -ne 6 ]; then 
-  echo "ERROR: No mxosrvr found. Please check your DCS setup."
+if [ $(jps | grep -c DcsServer) -ne 6 ]; then 
+  echo "ERROR: No DcsServer found. Please check your DCS setup."
   exit 1 
 fi
 echo ""
@@ -47,11 +44,14 @@ echo ""
 # run phoenix_test
 cd "$WORKSPACE/$TEST_DIR"
 if [ -z "$TESTS" ]; then
-  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/hpt4jdbc.jar
+  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar
 elif [ "$TESTS" = "DONT_RUN_TESTS" ]; then
   echo "INFO: Will NOT run any phoenix tests as requested. You should not see this message in the normal Jenkins job phoenix_test! This should only be used to turn off testing of the experimetal jobs."
 else 
-  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/hpt4jdbc.jar --tests=$TESTS
+  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar --tests=$TESTS
 fi
 
-/usr/local/bin/stop-traf-instance.sh 
+cd $WORKSPACE
+/usr/local/bin/stop-traf-instance.sh "$TRAF_DIR/sqf"
+
+set +x

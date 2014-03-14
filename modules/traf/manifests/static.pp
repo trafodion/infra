@@ -217,7 +217,7 @@ class traf::static (
     owner  => 'root',
     group  => 'root',
     mode   => '0744',
-    source => 'puppet:///modules/openstack_project/log_archive_maintenance.sh',
+    source => 'puppet:///modules/traf/log_archive_maintenance.sh',
   }
 
   cron { 'gziprmlogs':

@@ -34,9 +34,18 @@ set -x
 
 
 CONFIGURE_DCS() {
+    # install DCS from target build
     set -x
-    cd $TRAF_DIR/sqf
-    modify_env "export DCS_INSTALL_DIR=\"$WORKSPACE/$DCS_INSTALL_DIR\""
+    pkg=$(ls $WORKSPACE/$DCS_DIR/target/dcs*gz)
+    rm -rf $WORKSPACE/dcs || exit 1
+    mkdir -p $WORKSPACE/dcs
+    cd $WORKSPACE/dcs || exit 1
+    tar xf $pkg || exit 1
+    installdir=$(ls -d $WORKSPACE/dcs/*)
+    
+    # configure traf environemnt to point to dcs we just unpackaged
+    cd $WORKSPACE/$TRAF_DIR/sqf || exit 1
+    modify_env "export DCS_INSTALL_DIR=\"$installdir\""
     set +x
 
     echo ""
@@ -44,7 +53,7 @@ CONFIGURE_DCS() {
 
     set -x
     # configure DCS to NOT manage zookeeper
-    cd "$WORKSPACE/$DCS_INSTALL_DIR"
+    cd "$installdir" || exit 1
     if [ $(grep -v '#' conf/dcs-env.sh | grep -c 'DCS_MANAGES_ZK=false') -eq 0 ]; then
         sed -i".bak" -e 's/# export DCS_MANAGES_ZK=.*/export DCS_MANAGES_ZK=false/' conf/dcs-env.sh
     fi
@@ -76,7 +85,7 @@ CONFIGURE_DCS() {
     set +x
 
     echo ""
-    echo "INFO: Configure a total of 6 DCS servers"
+    echo "INFO: Configure a total of $DCS_NUM_SERVERS DCS servers"
 
     set -x
     cat /dev/null > conf/servers            # zero out the conf/servers file
@@ -153,7 +162,7 @@ if [ $# -eq 1 ]; then
     export TRAF_DIR="$1"
 elif [ $# -eq 3 ]; then
     export TRAF_DIR="$1"
-    export DCS_INSTALL_DIR="$2"
+    export DCS_DIR="$2"
     export DCS_NUM_SERVERS="$3"
 
     CONFIGURE_DCS

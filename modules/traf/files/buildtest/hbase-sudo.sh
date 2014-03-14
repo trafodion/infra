@@ -33,6 +33,13 @@ then
   echo "Starting hbase-master"
   /sbin/service hbase-master start
   echo "Return code $?"
+  # Work around hbase-trx bug
+  sleep 15
+  if [[ -d /tmp/hbase-hbase/hbase/recovered.edits ]]
+  then
+    echo "WARNING: found /tmp/hbase-hbase/hbase/recovered.edits directory (LP 1290610). Deleting..."
+    rmdir /tmp/hbase-hbase/hbase/recovered.edits || exit 2
+  fi
 
   exit 0
 fi

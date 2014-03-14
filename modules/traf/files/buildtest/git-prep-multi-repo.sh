@@ -11,8 +11,12 @@ GIT_ZUUL="${ZUUL_SITE}/p"
 
 if [ -z "$ZUUL_REF" ]
 then
-    echo "This job may only be triggered by Zuul."
-    exit 1
+    echo "******************************************"
+    echo "Warning: Job not triggered by Zuul."
+    echo "         Defaulting to master branch."
+    echo "******************************************"
+    ZUUL_BRANCH="master"
+    ZUUL_REF="master"
 fi
 
 if [ ! -z "$ZUUL_CHANGE" ]

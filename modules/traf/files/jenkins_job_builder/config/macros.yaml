@@ -182,6 +182,16 @@
               copy-after-failure: true
           
 - publisher:
+    name: pyodbc_test-log
+    publishers:
+      - scp:
+          site: 'static.trafodion.org'
+          files:
+            - target: 'logs/$LOG_PATH/logs'
+              source: 'trafodion/dcs/src/test/pytests/logs/**'
+              copy-after-failure: true
+          
+- publisher:
     name: console-log
     publishers:
       - scp:

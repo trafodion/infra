@@ -24,7 +24,7 @@
 
     jobs:
       - traf-pub
-      - traf-regress
+      - traf-regress-sets
       - traf-regress-experimental
       - gate-{name}-check-for-binary
       - phoenix_test
@@ -53,11 +53,4 @@
       - gate-{name}-check-for-binary
       - dcs-build
       - phoenix_test
-
-- project:
-    name: installer
-    github-org: trafodion
-
-    jobs:
-      - gate-{name}-check-for-binary
 

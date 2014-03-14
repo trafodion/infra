@@ -26,6 +26,7 @@ done
 echo "Copying generated data to HDFS..."
 for t in $TABLES
 do
+  /usr/bin/hdfs dfs -rm -r -f /hive/tpcds/$t
   /usr/bin/hdfs dfs -mkdir /hive/tpcds/$t
   /usr/bin/hdfs dfs -put $TEMP_DATA_DIR/${t}.dat /hive/tpcds/$t
 done

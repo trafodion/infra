@@ -159,12 +159,6 @@ class jenkins::slave(
     }
   }
 
-  package { 'python-subunit':
-    ensure   => absent,
-    provider => pip,
-    require  => Class[pip],
-  }
-
   package { 'git-review':
     ensure   => '1.17',
     provider => pip,

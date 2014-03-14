@@ -1,5 +1,15 @@
-- job:
-    name: 'traf-regress'
+- job-group:
+    name: 'traf-regress-sets'
+    jobs:
+      - traf-regress-{set}:
+         set: 'A'
+         suites: "charsets executor qat core"
+      - traf-regress-{set}:
+         set: 'B'
+         suites: "compGeneral seabase hive"
+
+- job-template:
+    name: 'traf-regress-{set}'
     node: redhat
 
     wrappers:
@@ -16,7 +26,7 @@
            flavor: "debug"
       - sql-regress:
            dir: "./trafodion/core"
-           suites: "charsets compGeneral core executor qat seabase hive"
+           suites: "{suites}"
       - link-logs
 
     publishers:
@@ -157,13 +167,16 @@
       - git-log
       - phoenix_test-log
 
+# For pyodbc_test* jobs parameter tests1 should contain a list of tests seperated by a space. For instance : test_p2.ConnectTest.test11 test_p2.ConnectTest.test12
+# If parameter tests1 is "" then all tests will be run
+# If parameter tests1 = DONT_RUN_TESTS then none of the pyodbc tests will run.  This should only be used in pyodbc_test-experimental if pyodbc_test is running all tests.
 - job:
     name: 'pyodbc_test-experimental'
     node: redhat
 
     wrappers:
       - timeout:
-          timeout: 240
+          timeout: 30
           fail: true
       - timestamps
 
@@ -179,13 +192,16 @@
       - run-pyodbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
-           testDir: "trafodion/phoenix_test"
-           tests1: ""
+           testDir: "trafodion/dcs/src/test/pytests"
+           tests1: "DONT_RUN_TESTS"
       - link-logs
 
     publishers:
+      - junit:
+           results: "trafodion/dcs/src/test/pytests/logs/test_report.xml"
       - console-log
       - git-log
+      - pyodbc_test-log
 
 - job:
     name: 'pyodbc_test'
@@ -193,7 +209,7 @@
 
     wrappers:
       - timeout:
-          timeout: 240
+          timeout: 30
           fail: true
       - timestamps
 
@@ -214,8 +230,11 @@
       - link-logs
 
     publishers:
+      - junit:
+           results: "trafodion/dcs/src/test/pytests/logs/test_report.xml"
       - console-log
       - git-log
+      - pyodbc_test-log
 
 
 # Simple file type check can run on master

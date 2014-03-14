@@ -9,8 +9,10 @@ size_limit=80000  #image file limit in bytes
 listcmd="git show --pretty=format:%n --name-only HEAD"
 
 echo "File list command: $listcmd"
+$listcmd > BinaryCheckFileList
+
 echo "'file' command reports:"
-$listcmd | while read fName
+while read fName
 do
   if [ -n "$fName" ]; then
     ftype=$(file -b $fName)
@@ -35,7 +37,7 @@ do
       rc=1
     fi
   fi
-done 
+done < BinaryCheckFileList
 
 
 exit $rc

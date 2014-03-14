@@ -9,7 +9,39 @@
       - label:
           name: NODE
           description: Node to test
+      - string:
+          name: LOG_PATH
+          default: node_test/$BUILD_NUMBER
+          description: path on log server
+
+    wrappers:
+      - timeout:
+          timeout: 100
+          fail: true
+      - timestamps
 
     builders:
-      - shell: 'echo ok'
+      - kill-traf
+      - multi-git-prep:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
+      - make-traf:
+           flavor: "debug"
+      - sql-regress:
+           dir: "./trafodion/core"
+           suites: "hive"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - run-phoenix_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/phoenix_test"
+           tests1: "ExtendedQueryExecTest,ProductMetricsTest"
+           tests2: ""
+           tests3: ""
+           tests4: ""
+
+    publishers:
+      - console-log
+      - git-log
+      - traf-make-log
 

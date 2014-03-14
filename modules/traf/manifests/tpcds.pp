@@ -53,6 +53,7 @@ class traf::tpcds {
                    Service['hadoop-hdfs-datanode'] ],
      command  => "/usr/local/bin/load_tpcds_data.sh",
      user     => 'hdfs',
+     timeout  => 600,
      cwd      => "$tools_dir/tools",
      unless   => "/usr/bin/hdfs dfs -ls -d /hive/tpcds",
   }
