@@ -128,6 +128,7 @@
       - junit:
            results: "trafodion/phoenix_test/target/surefire-reports/*.xml"
       - console-log
+      - traf-make-log
       - git-log
       - phoenix_test-log
 
