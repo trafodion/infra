@@ -16,7 +16,7 @@ then
     echo "         Defaulting to master branch."
     echo "******************************************"
     ZUUL_BRANCH="master"
-    ZUUL_REF="master"
+    ZUUL_REF="None"
 fi
 
 if [ ! -z "$ZUUL_CHANGE" ]
