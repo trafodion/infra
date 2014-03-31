@@ -16,7 +16,7 @@ class traf::base(
   }
 
   package { 'popularity-contest':
-    ensure => purged,
+    ensure => absent,
   }
 
   if ($::lsbdistcodename == 'oneiric') {
