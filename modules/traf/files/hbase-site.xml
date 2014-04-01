@@ -2,6 +2,10 @@
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
   <property>
+    <name>hbase.tmp.dir</name>
+    <value>/var/hbase</value>
+  </property>
+  <property>
     <name>hbase.client.scanner.caching</name>
     <value>100</value>
   </property>

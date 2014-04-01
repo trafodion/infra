@@ -134,6 +134,14 @@ class traf::cloudera (
        target  => '/usr/share/java/mysql-connector-java.jar',
        require => [ Package['mysql-connector-java'], Package['hive'] ],
   }
+  # as specified in hbase-site.xml
+  file { ['/var/hbase']:
+       owner => 'hbase',
+       group => 'hbase',
+       mode  => '0755',
+       ensure => directory,
+       require => Package['hbase'],
+  }
   # as specified in hdfs-site.xml
   file { ['/data/dfs/name','/data/dfs/data']:
        owner => 'hdfs',
