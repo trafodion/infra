@@ -25,6 +25,8 @@ fi
 
 if [[ "$action" == "start" ]]
 then
+  echo "Make sure zookeeper-server is not running"
+  /sbin/service zookeeper-server stop
   echo "Initializing /etc/hbase/conf/hbase-env.sh"
   /bin/cp -f /etc/hbase/conf.dist/hbase-env.sh /etc/hbase/conf.localtest/hbase-env.sh || exit 3
   echo "Adding HBASE_CLASSPATH = $jarpath"
