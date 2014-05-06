@@ -92,9 +92,12 @@
     publishers:
       - console-log
 
-# For phoenix_test* jobs parameters tests1-4 should contain a list of tests seperated by a comma and NO space. For instance : ExtendedQueryExecTest,ProductMetricsTest
+# For phoenix_test* jobs parameters tests1-4 should contain a list of tests seperated by a comma and NO space. 
+# For instance : ExtendedQueryExecTest,ProductMetricsTest
+# If using multiple testsX parameters, be sure to include trailing comma on all but the last one.
 # If parameters tests1-4 are all "" then all tests will be run
-# If parameter tests1 = DONT_RUN_TESTS then none of the phoenix tests will run.  This should only be used in phoenix_test-experimental if phoenix_test is running all tests.
+# If parameter tests1 = DONT_RUN_TESTS then none of the phoenix tests will run.  
+# This should only be used in phoenix_test-experimental if phoenix_test is running all tests.
 - job:
     name: 'phoenix_test-experimental'
     node: redhat
@@ -118,9 +121,9 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
-           tests1: "DONT_RUN_TESTS"
-           tests2: ""
-           tests3: ""
+           tests1: "ArithmeticQueryTest,BinaryRowKeyTest,ExecuteStatementsTest,"
+           tests2: "IndexTest,SaltedTableUpsertSelectTest,StatementHintsTest,"
+           tests3: "ToCharFunctionTest,ToNumberFunctionTest,UpsertSelectTest"
            tests4: ""
       - link-logs
 
@@ -155,10 +158,10 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
-           tests1: ""
-           tests2: ""
-           tests3: ""
-           tests4: ""
+           tests1: "AlterTableTest,AutoCommitTest,CoalesceFunctionTest,CompareDecimalToLongTest,CreateTableTest,CustomEntityDataTest,DeleteRangeTest,"
+           tests2: "DescColumnSortOrderTest,DistinctCountTest,ExtendedQueryExecTest,FunkyNamesTest,GroupByCaseTest,IsNullTest,KeyOnlyTest,MultiCfQueryExecTest,OrderByTest,"
+           tests3: "ProductMetricsTest,QueryExecTest,QueryExecWithoutSCNTest,QueryPlanTest,ReadIsolationLevelTest,SaltedTableTest,SaltedTableVarLengthRowKeyTest,"
+           tests4: "ServerExceptionTest,SkipScanQueryTest,StddevTest,TopNTest,UpsertBigValuesTest,UpsertSelectAutoCommitTest,UpsertValuesTest,VariableLengthPKTest"
       - link-logs
 
     publishers:

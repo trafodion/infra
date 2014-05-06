@@ -17,6 +17,7 @@ source_env
 
 # run SQL regression tests
 cd ../sql/regress
+echo "Saving output in Regress.log"
 ./tools/runallsb $SUITES > Regress.log 2>&1
 echo "Return code $?"
 
@@ -45,19 +46,16 @@ do
     cat $dir/runregr-sb.log
     if grep -q FAIL "$dir/runregr-sb.log" 
     then
+      echo "Found failures -- saving $dir logs."
       mkdir $logarchive/$dir
-      if [[ "$dir" == "qat" ]]
-      then
-        cp $dir/d* $logarchive/$dir/
-      else
-        cp $dir/DIFF* $logarchive/$dir/
-      fi
+      cp $dir/* $logarchive/$dir/
     fi
   else
     echo "Failed -- No tests run"
     missed=1
   fi
 done
+cp $workspace/$DIR/sql/regress/Regress.log $logarchive/
 echo "========================"
 fail=$(grep FAIL */runregr*.log | wc -l)
 pass=$(grep PASS */runregr*.log | wc -l)

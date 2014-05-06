@@ -6,6 +6,7 @@ export TRAF_DIR="$1"                   # location of trafodion/core
 export DCS_INSTALL_DIR="$2"            # location of trafodion/dcs
 export JAVA_HOME="$3"                  # Java SDK Home Directory 
 export TEST_DIR="$4"                   # location of trafodion/phoenix_test
+export PATH=$JAVA_HOME/bin:$PATH       # add $JAVA_HOME/bin to the path
 
 # check number of parameters
 # if more than 4 parameters then we are also passing in tests to run
@@ -45,13 +46,18 @@ echo ""
 cd "$WORKSPACE/$TEST_DIR"
 if [ -z "$TESTS" ]; then
   ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar
+  phoenixRes=$?
 elif [ "$TESTS" = "DONT_RUN_TESTS" ]; then
   echo "INFO: Will NOT run any phoenix tests as requested. You should not see this message in the normal Jenkins job phoenix_test! This should only be used to turn off testing of the experimetal jobs."
+  phoenixRes=0
 else 
   ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar --tests=$TESTS
+  phoenixRes=$?
 fi
 
 cd $WORKSPACE
 /usr/local/bin/stop-traf-instance.sh "$TRAF_DIR/sqf"
 
-set +x
+# exit with phoenix_test.py return code
+exit $phoenixRes
+

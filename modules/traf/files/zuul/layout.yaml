@@ -107,8 +107,10 @@ pipelines:
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
-  - name: traf-regress-[A-Z]
+  - name: traf-regress-A
     voting: true
+  - name: traf-regress-B
+    voting: false
   - name: traf-regress-experimental
     voting: false
   - name: phoenix_test
@@ -138,6 +140,7 @@ projects:
       - traf-regress-B
       - gate-core-check-for-binary
       - phoenix_test
+      - phoenix_test-experimental
     gate:
       - traf-regress-A
       - traf-regress-B
@@ -151,6 +154,7 @@ projects:
       - gate-dcs-check-for-binary
       - dcs-build
       - phoenix_test
+      - phoenix_test-experimental
       - pyodbc_test
       - pyodbc_test-experimental
     gate:

@@ -27,7 +27,7 @@
              SSLCertificateFile      <%= scope.lookupvar("::jenkins::master::ssl_cert_file") %>
              SSLCertificateKeyFile   <%= scope.lookupvar("::jenkins::master::ssl_key_file") %>
              <% if scope.lookupvar("::jenkins::master::ssl_chain_file") != "" %>
-               SSLCertificateChainFile <%= scope.lookupvar("::jenkins::master::ssl_chain_file") %>
+             SSLCertificateChainFile <%= scope.lookupvar("::jenkins::master::ssl_chain_file") %>
              <% end %>
 
              BrowserMatch "MSIE [2-6]" \
@@ -42,6 +42,16 @@
 
              RewriteRule /zuul/status http://127.0.0.1:8001/status [P]
 
-             ProxyPass / http://127.0.0.1:8080/ retry=0
+             ProxyPass / http://127.0.0.1:8080/ retry=0 nocanon
              ProxyPassReverse / http://127.0.0.1:8080/
+             ProxyPreserveHost On
+             ProxyRequests Off
+             AllowEncodedSlashes NoDecode
+
+             # Local reverse proxy authorization override
+             # Most unix distribution deny proxy by default (ie /etc/apache2/mods-enabled/proxy.conf in Ubuntu)
+             <Proxy http://127.0.0.1:8080/*>
+                 Order deny,allow
+                 Allow from all
+             </Proxy>
 </VirtualHost>

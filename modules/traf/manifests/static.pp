@@ -200,17 +200,18 @@ class traf::static (
     source  => 'puppet:///modules/openstack_project/logs/htmlify-screen-log.py',
   }
 
-  file { '/srv/static/logs/help':
-    ensure  => directory,
-    recurse => true,
-    purge   => true,
-    force   => true,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    source  => 'puppet:///modules/traf/logs/help',
-    require => File['/srv/static/logs'],
-  }
+#  No log help files for Trafodion.
+#  file { '/srv/static/logs/help':
+#    ensure  => directory,
+#    recurse => true,
+#    purge   => true,
+#    force   => true,
+#    owner   => 'root',
+#    group   => 'root',
+#    mode    => '0755',
+#    source  => 'puppet:///modules/traf/logs/help',
+#    require => File['/srv/static/logs'],
+#  }
 
   file { '/usr/local/sbin/log_archive_maintenance.sh':
     ensure => present,
@@ -224,7 +225,7 @@ class traf::static (
     user        => 'root',
     minute      => '0',
     hour        => '7',
-    weekday     => '6',
+    weekday     => '*',
     command     => 'bash /usr/local/sbin/log_archive_maintenance.sh',
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin',
     require     => File['/usr/local/sbin/log_archive_maintenance.sh'],

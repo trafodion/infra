@@ -6,6 +6,10 @@
     <value>/var/hbase</value>
   </property>
   <property>
+    <name>hbase.rootdir</name>
+    <value>file:///var/hbase/hbase</value>
+  </property>
+  <property>
     <name>hbase.client.scanner.caching</name>
     <value>100</value>
   </property>
@@ -14,8 +18,12 @@
     <value>60000</value>
   </property>
   <property>
+    <name>hbase.snapshot.enabled</name>
+    <value>true</value>
+  </property>
+  <property>
     <name>hbase.coprocessor.region.classes</name>
-    <value>org.apache.hadoop.hbase.coprocessor.AggregateImplementation</value>
+    <value>org.apache.hadoop.hbase.regionserver.transactional.TransactionalAggregateImpl</value>
   </property>
   <property>
     <name>hbase.regionserver.class</name>

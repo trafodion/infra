@@ -92,5 +92,7 @@ then
   cp unix_odbc.trc logs
   cp -rp .testrepository logs
 fi
-set +x
+
+# exit with tox return code
+exit $toxRes
 

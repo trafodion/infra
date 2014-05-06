@@ -143,14 +143,14 @@ class traf::cloudera (
        require => Package['hbase'],
   }
   # as specified in hdfs-site.xml
-  file { ['/data/dfs/name','/data/dfs/data']:
+  file { ['/data/dfs','/data/dfs/data']:
        owner => 'hdfs',
        group => 'hdfs',
-       mode  => '0700',
+       mode  => '0770',
        ensure => directory,
        require => Package['hadoop-hdfs'],
   }
-  file { ['/data','/data/dfs']:
+  file { ['/data']:
        owner => 'root',
        group => 'root',
        mode  => '0755',
@@ -160,8 +160,8 @@ class traf::cloudera (
   exec { 'namenode-format':
        command   => '/usr/bin/hdfs namenode -format -force',
        user      => 'hdfs',
-       subscribe => File['/data/dfs/name'],
-       refreshonly => true,
+       require   => File['/data/dfs'],
+       creates  => '/data/dfs/name',
   }
   file { ['/var/log/hadoop-yarn','/var/log/hadoop-yarn/containers','/var/log/hadoop-yarn/apps']:
        owner => 'yarn',
@@ -226,6 +226,14 @@ class traf::cloudera (
           '/usr/bin/hadoop fs -mkdir -p /user/jenkins
 	   /usr/bin/hadoop fs -chown jenkins /user/jenkins',
       unless  => '/usr/bin/hadoop fs -ls -d /user/jenkins',
+      user    => 'hdfs',
+      require => [ Service[$hdfs_services],User['jenkins'] ]
+  }
+  exec { 'hdfs-hive-dir':
+      command => 
+          '/usr/bin/hadoop fs -mkdir -p /user/hive
+	   /usr/bin/hadoop fs -chown jenkins /user/hive',
+      unless  => '/usr/bin/hadoop fs -ls -d /user/hive',
       user    => 'hdfs',
       require => [ Service[$hdfs_services],User['jenkins'] ]
   }

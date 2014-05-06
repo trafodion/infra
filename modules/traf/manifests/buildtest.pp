@@ -38,7 +38,8 @@ class traf::buildtest {
       'java-1.6.0-openjdk-devel', 'java-1.7.0-openjdk-devel',
       'ant','ant-nodeps',
       'dos2unix','expect',
-      'unixODBC.x86_64', 'unixODBC-devel.x86_64',
+      'unixODBC', 'unixODBC-devel', 'libiodbc', 'libiodbc-devel',
+      'protobuf-compiler', 'protobuf-devel', 'xerces-c-devel',
       'zlib-devel', 'bzip2-devel', 'ncurses-devel', 'tk-devel', 'gdbm-devel', 'db4-devel', 'libpcap-devel',
     ]
 

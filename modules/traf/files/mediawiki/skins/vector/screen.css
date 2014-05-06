@@ -698,6 +698,12 @@ ul {
 	list-style-image: url(images/bullet-icon.png);
 }
 
+ul.box {
+    list-style-type: square;
+    /* @embed */
+    list-style-image: url(images/box-icon.png);
+}
+
 pre, .mw-code {
 	line-height: 1.3em;
 }
