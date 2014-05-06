@@ -7,6 +7,7 @@
 <VirtualHost *:80>
         ServerAdmin infra@trafodion.org
         ServerName <%= scope.lookupvar("mediawiki::site_hostname") %>
+        ServerSignature Off
 
         DocumentRoot /var/www
         <Directory />
@@ -19,6 +20,15 @@
                 Order allow,deny
                 allow from all
         </Directory>
+
+        <IfModule mod_headers.c>
+                Header unset ETag
+                Header set X-Frame-Options: sameorigin
+                Header set X-XSS-Protection: "1; mode=block"
+                Header set X-Content-Type-Options: nosniff
+                Header set X-WebKit-CSP: "default-src 'self'"
+                Header set X-Permitted-Cross-Domain-Policies: "master-only"
+        </IfModule>
 
         RewriteEngine on
         RewriteCond %{SERVER_PORT} !^443$
@@ -37,6 +47,7 @@
 <VirtualHost *:443>
         ServerAdmin infra@trafodion.org
         ServerName <%= scope.lookupvar("mediawiki::site_hostname") %>
+        ServerSignature Off
 
         SSLEngine on
         SSLCertificateFile      <%= scope.lookupvar("mediawiki::ssl_cert_file") %>
@@ -68,6 +79,17 @@
 		# Don't run arbitrary PHP code.
 		php_admin_flag engine off
 	</Directory>
+
+    <IfModule mod_headers.c>
+        Header unset ETag
+        Header set Strict-Transport-Security "max-age=15768000; includeSubDomains"
+        Header set X-Frame-Options: sameorigin
+        Header set X-XSS-Protection: "1; mode=block"
+        Header set X-Content-Type-Options: nosniff
+        Header set X-WebKit-CSP: "default-src 'self'"
+        Header set X-Permitted-Cross-Domain-Policies: "master-only"
+    </IfModule>
+
 	<IfModule mod_expires.c>
 		ExpiresActive On
 		<Directory "<%= scope.lookupvar('mediawiki::mediawiki_location') %>">

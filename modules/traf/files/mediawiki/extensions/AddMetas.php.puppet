@@ -21,22 +21,31 @@ $wgHooks['OutputPageBeforeHTML'][] = 'wfAddMetas';
  
 function wfAddMetas( &$out, &$text ) {
   global $wgTitle, $wgParser, $wgRequest, $action;
-  if(
+  if( (
+          $action !== 'edit'
+       && $action !== 'history'
+       && $action !== 'delete'
+       && $action !== 'watch'
+       && $wgParser->mTitle === NULL
+      )
+      ||
+      (
           $action !== 'edit'
        && $action !== 'history'
        && $action !== 'delete'
        && $action !== 'watch'
        && strpos( $wgParser->mTitle->mPrefixedText, 'Special:' ) === false
        && $wgParser->mTitle->mNamespace !== 8
+      )
   )
   {
     $name = $wgTitle->getPrefixedDBKey();
  
     $out->addMeta( 'bu', 'CORP');
-    $out->addMeta( 'description', 'Project Trafodion is a joint HP Labs / HP-IT research project to develop operational SQL database management capabilities on Hadoop. Trafodion provides transactional SQL capabilities built on top of Hadoop HBase software.');
+    $out->addMeta( 'description', 'Project Trafodion is a joint HP Labs / HP-IT research project to develop operational SQL-on-Hadoop software.');
     $out->addMeta( 'hp_design_version', 'hpweb.1.2a');
     $out->addMeta( 'keywords', 'trafodion, Hadoop, Hive, HBase, SQL, database, transactional SQL');
-    $out->addMeta( "lifecycle", "applied_use");
+    $out->addMeta( "lifecycle", "presales.consideration");
     $out->addMeta( "page_content", "Products");
     $out->addMeta( "robots", "noindex,nofollow,noarchive");
     $out->addMeta( 'segment', 'Segment Neutral');

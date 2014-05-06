@@ -18,11 +18,18 @@ if ( !defined( 'MEDIAWIKI' ) ) {
     exit;
 }
 
+# Raise PHP's memory limit
+$wgMemoryLimit = "500M";
+
+# # Maximum amount of virtual memory available to shell processes under Linux, in KB
+$wgMaxShellMemory = 507200;
+
 ## Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
 
 $wgSitename = "Trafodion";
 $wgMetaNamespace = "Project";
+$wgFavicon = '/favicon.png';
 
 ## The URL base path to the directory containing the wiki;
 ## defaults for all runtime URL paths are based off of this.
@@ -153,4 +160,10 @@ $wgFileExtensions = array_merge( $wgFileExtensions, array( 'pdf', 'ppt', 'pptx',
 
 # enable metadata
 require_once("$IP/extensions/AddMetas.php");
+
+# Disable links to talk pages of anonymous users (IPs) in listings on special pages like page history, Special:Recentchanges, etc.
+$wgDisableAnonTalk = true;
+
+# Disable the talk page itself and remove the Talk link for anonymous visitors (IPs) at the top of every page
+$wgShowIPinHeader = false;
 

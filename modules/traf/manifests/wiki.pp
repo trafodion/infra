@@ -58,6 +58,24 @@ class traf::wiki (
       require => Vcsrepo['/srv/mediawiki/w'],
   }
 
+  file { '/srv/mediawiki/w/favicon.ico':
+    ensure => present,
+    mode   => 644,
+    owner  => www-data,
+    group  => www-data,
+    source => 'puppet:///modules/traf/favicon.ico',
+    require => Vcsrepo['/srv/mediawiki/w'],
+  }
+
+  file { '/srv/mediawiki/w/favicon.png':
+    ensure => present,
+    mode   => 644,
+    owner  => www-data,
+    group  => www-data,
+    source => 'puppet:///modules/traf/favicon.png',
+    require => Vcsrepo['/srv/mediawiki/w'],
+  }
+
   # configure mediawiki with default except for the following
   # installdbuser, installdbpass, pass (admin password)
   exec { 'install-mediawiki':
@@ -210,6 +228,23 @@ class traf::wiki (
     ensure  => absent,
     force   => true,
     require => File['/srv'],
+  }
+
+
+  # update apache2 security configuration
+  exec { 'update security':
+    cwd     => "/etc/apache2/conf.d",
+    command => "/bin/sed -i.bak -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
+    unless  => "/bin/grep -E '^ServerTokens Prod' security",
+    notify  => Service[apache2],
+  }
+
+  # update php.ini configuration
+  exec { 'update php.ini':
+    cwd     => "/etc/php5/apache2",
+    command => "/bin/sed -i.bak -e 's/^expose_php = .*/expose_php = Off/g' php.ini",
+    unless  => "/bin/grep -E '^expose_php = Off' php.ini",
+    notify  => Service[apache2],
   }
 
 

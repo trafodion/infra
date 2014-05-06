@@ -67,6 +67,9 @@ class mediawiki(
     a2mod { 'expires':
       ensure => present,
     }
+    a2mod { 'headers':
+      ensure => present,
+    }
   }
   if ($role == 'image-scaler' or $role == 'all') {
     include mediawiki::image_scaler
