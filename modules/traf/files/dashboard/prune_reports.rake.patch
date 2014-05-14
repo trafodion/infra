@@ -1,0 +1,14 @@
+--- /usr/share/puppet-dashboard/lib/tasks/prune_reports.rake        2011-09-08 12:42:54.433928840 -0700
++++ /usr/share/puppet-dashboard/lib/tasks/prune_reports.rake-new        2011-09-08 12:44:01.928583735 -0700
+@@ -52,5 +52,11 @@
+     puts "Deleting reports before #{cutoff}..."
+     deleted_count = Report.delete_all(['time < ?', cutoff])
+     puts "Deleted #{deleted_count} reports."
++
++    # inserted to clean up resource_statuses table simultaneously
++    puts "Deleting resource_statuses records before #{cutoff}..."
++    deleted_count = ResourceStatus.delete_all(['time < ?', cutoff])
++    puts "Deleted #{deleted_count} resource_status records."
++
+   end
+ end
