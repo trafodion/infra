@@ -100,6 +100,12 @@ class traf::base(
     replace => true,
   }
 
+  exec { 'disable TCP timestamp responses':
+    command   => '/sbin/sysctl -w net.ipv4.tcp_timestamps=0',
+    provider  => shell,
+    unless    => '[[ $(/sbin/sysctl -n net.ipv4.tcp_timestamps) == "0" ]]',
+  }
+
 }
 
 # vim:sw=2:ts=2:expandtab:textwidth=79
