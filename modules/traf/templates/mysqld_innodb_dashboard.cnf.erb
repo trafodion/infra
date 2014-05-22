@@ -1,4 +1,7 @@
 [mysqld]
 innodb_buffer_pool_size=<%= mysql_innodb_buffer_pool_size %>
 innodb_flush_method=O_DIRECT
+max_allowed_packet=32M
 
+[mysqldump]
+max_allowed_packet=32M

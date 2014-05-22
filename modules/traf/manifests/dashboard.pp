@@ -23,13 +23,6 @@ class traf::dashboard(
     passenger           => true,
   }
 
-  # Tune MySQL max_allowed_packet to 32M or greater
-  exec { 'up mysql max_allowed_packet':
-    command => "/bin/sed -i.bak -e 's/^max_allowed_packet =.*/max_allowed_packet = 32M/g' /etc/mysql/my.cnf",
-    unless  => "/bin/grep -E '^max_allowed_packet = ([3456789][23456789]|[1-9][0-9]{2,})M' /etc/mysql/my.cnf",
-    require => File['/etc/mysql/my.cnf'],
-  }
-
   file { '/etc/mysql/conf.d/mysqld_innodb_dashboard.cnf':
     ensure  => present,
     owner   => 'root',
