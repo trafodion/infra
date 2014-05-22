@@ -25,11 +25,9 @@ class traf::dashboard(
 
   # Tune MySQL max_allowed_packet to 32M or greater
   exec { 'up mysql max_allowed_packet':
-    cwd     => "/etc/mysql",
-    command => "/bin/sed -i.bak -e 's/^max_allowed_packet =.*/max_allowed_packet = 32M/g' my.cnf",
-    unless  => "/bin/grep -E '^max_allowed_packet = ([3456789][23456789]|[1-9][0-9]{2,})M' my.cnf",
-    require => Class['mysql::server'],
-    notify  => Service[mysql],
+    command => "/bin/sed -i.bak -e 's/^max_allowed_packet =.*/max_allowed_packet = 32M/g' /etc/mysql/my.cnf",
+    unless  => "/bin/grep -E '^max_allowed_packet = ([3456789][23456789]|[1-9][0-9]{2,})M' /etc/mysql/my.cnf",
+    require => File['/etc/mysql/my.cnf'],
   }
 
   file { '/etc/mysql/conf.d/mysqld_innodb_dashboard.cnf':
@@ -39,7 +37,6 @@ class traf::dashboard(
     mode    => '0644',
     content => template('traf/mysqld_innodb_dashboard.cnf.erb'),
     require => Class['mysql::server'],
-    notify  => Service[mysql],
   }
 
   file { '/etc/mysql/conf.d/mysqld_innodb_fpt.cnf':
@@ -63,11 +60,12 @@ class traf::dashboard(
 
   # patch /usr/share/puppet-dashboard/lib/tasks/prune_reports.rake to clean up resource_status table
   file { '/usr/share/puppet-dashboard/lib/tasks/prune_reports.rake.patch':
-    source => 'puppet:///modules/traf/dashboard/prune_reports.rake.patch',
-    notify => Exec['Apply prune_reports.rake.patch'],
+    source  => 'puppet:///modules/traf/dashboard/prune_reports.rake.patch',
+    require => Class['::dashboard'],
+    notify  => Exec['Apply prune_reports.rake.patch'],
   }
 
-  exec { 'apply prune_reports.rake.patch':
+  exec { 'Apply prune_reports.rake.patch':
     cwd         => "/usr/share/puppet-dashboard/lib/tasks",
     command     => "/usr/bin/patch -p0 -N < prune_reports.rake.patch",
     onlyif      => "/usr/bin/patch -p0 -N --dry-run --silent < prune_reports.rake.patch 2>/dev/null",
@@ -81,7 +79,7 @@ class traf::dashboard(
     group   => 'root',
     mode    => '0755',
     source  => 'puppet:///modules/traf/dashboard/purgeDashboardDB.sh',
-    require => File['/usr/share/puppet-dashboard/bin'],
+    require => Class['::dashboard'],
   }
 
   cron { 'purge-dashboard-db': 
