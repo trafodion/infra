@@ -22,7 +22,7 @@ node 'review.trafodion.org' {
     #gerritbot_password              => hiera('gerrit_gerritbot_password'),
     ssl_cert_file_contents          => hiera('gerrit_ssl_cert_file_contents'),
     ssl_key_file_contents           => hiera('gerrit_ssl_key_file_contents'),
-    ssl_chain_file_contents         => hiera('gerrit_ssl_chain_file_contents'),
+    ssl_chain_file_contents         => hiera('ssl_chain_file_contents'),
     ssh_dsa_key_contents            => hiera('gerrit_ssh_dsa_key_contents'),
     ssh_dsa_pubkey_contents         => hiera('gerrit_ssh_dsa_pubkey_contents'),
     ssh_rsa_key_contents            => hiera('gerrit_ssh_rsa_key_contents'),
