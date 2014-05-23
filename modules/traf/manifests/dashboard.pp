@@ -84,6 +84,15 @@ class traf::dashboard(
     ensure      => present,
     require     => File['/usr/share/puppet-dashboard/bin/purgeDashboardDB.sh'],
   }
+
+  # update apache2 security configuration
+  exec { 'update security':
+    cwd     => "/etc/apache2/conf.d",
+    command => "/bin/sed -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
+    unless  => "/bin/grep -E '^ServerTokens Prod' security",
+    notify  => Service[apache2],
+  }
+
 }
 
 # vim:sw=2:ts=2:expandtab:textwidth=79
