@@ -7,7 +7,6 @@ class traf::slave (
   $sysadmins = [],
   $python3 = false,
   $include_pypy = false,
-  $hive_sql_pw = '',
 ) {
   include traf
   include traf::buildtest
@@ -16,12 +15,6 @@ class traf::slave (
     origins => ['LP-PPA-saltstack-salt precise'],
   }
 
-
-  class { 'traf::cloudera':
-    hive_sql_pw => $hive_sql_pw,
-  }
-
-  include traf::tpcds
   include traf::python276
 
   class { 'traf::server':

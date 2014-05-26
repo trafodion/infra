@@ -9,7 +9,7 @@ if flock -n 7
 then
     pid=$$
     echo $pid 1>&7
-    
+
     # clean up dashboard database
     cd $DASHBOARD_DIR
     sudo -u www-data rake RAILS_ENV=production reports:prune upto=4 unit=wk     # remove reports

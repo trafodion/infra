@@ -10,6 +10,12 @@ workspace="$(pwd)"
 
 set -x
 
+# clean up any logs from previous runs
+# in case of test time-out we don't want to archive old logs
+logarchive="$workspace/sql-regress-logs"
+rm -rf $logarchive
+mkdir $logarchive
+
 /usr/local/bin/start-traf-instance.sh "$DIR" || exit 1
 
 cd $DIR/sqf
@@ -18,7 +24,7 @@ source_env
 # run SQL regression tests
 cd ../sql/regress
 echo "Saving output in Regress.log"
-./tools/runallsb $SUITES > Regress.log 2>&1
+./tools/runallsb $SUITES > $logarchive/Regress.log 2>&1
 echo "Return code $?"
 
 /usr/local/bin/stop-traf-instance.sh 
@@ -27,10 +33,6 @@ echo "Return code $?"
 cd ../../sqf/rundir
 
 set +x
-
-logarchive="$workspace/sql-regress-logs"
-rm -rf $logarchive
-mkdir $logarchive
 
 missed=0
 for dir in *
@@ -55,7 +57,6 @@ do
     missed=1
   fi
 done
-cp $workspace/$DIR/sql/regress/Regress.log $logarchive/
 echo "========================"
 fail=$(grep FAIL */runregr*.log | wc -l)
 pass=$(grep PASS */runregr*.log | wc -l)

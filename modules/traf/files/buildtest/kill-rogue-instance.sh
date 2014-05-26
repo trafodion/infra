@@ -2,7 +2,7 @@
 
 # Look for the usual suspects
 # might need to get more agressive
-Instance=$(pgrep -u jenkins -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci')
+Instance=$(pgrep -u jenkins -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts')
 
 if [[ -z "$Instance" ]]
 then

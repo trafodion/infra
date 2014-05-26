@@ -2,8 +2,8 @@
 
 rc=0   #so far, so good
 
-text_pat='ASCII|UTF-|empty|very short file \(no magic\)|Deleted|text'
-image_pat='image|icon'
+text_pat='ASCII|UTF-|FORTRAN|empty|very short file \(no magic\)|Deleted|text|symbolic link'
+image_pat='image|icon|data'
 size_limit=80000  #image file limit in bytes
 
 listcmd="git show --pretty=format:%n --name-status HEAD"
@@ -28,10 +28,10 @@ do
       fsize=$(stat -c %s "$fName")
       if [[ $fsize -gt $size_limit ]]
       then
-        echo "  ERROR: Image file size $fsize bytes greater than $size_limit"
+        echo "  ERROR: Image/data file size $fsize bytes greater than $size_limit"
 	rc=1
       else
-        echo "  Image file size $fsize bytes okay"
+        echo "  Image/data file size $fsize bytes okay"
       fi
     elif [[ ! ("$ftype" =~ $text_pat) ]]
     then

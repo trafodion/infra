@@ -36,7 +36,16 @@
     name: pkg-traf
     builders:
       - shell: "/usr/local/bin/build-traf.sh {flavor} package"
-      - shell: "/usr/local/bin/stage-traf.sh"
+
+- builder:
+    name: pkg-install
+    builders:
+      - shell: "cd ./trafodion/install && make all"
+
+- builder:
+    name: stage-traf
+    builders:
+      - shell: "/usr/local/bin/stage-traf.sh {flavor}"
 
 - builder:
     name: sql-regress
@@ -218,12 +227,11 @@
           site: 'static.trafodion.org'
           files:
             - target: 'downloads/trafodion'
-              source: 'release/**'
+              source: 'publish/**'
               keep-hierarchy: true
       - scp:
           site: 'static.trafodion.org'
           files:
-            - target: 'downloads/trafodion'
-              source: 'pre-release/**'
-              keep-hierarchy: true
+            - target: 'logs/buildvers'
+              source: 'Versions-*'
           

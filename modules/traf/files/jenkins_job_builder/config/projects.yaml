@@ -23,9 +23,8 @@
     github-org: trafodion
 
     jobs:
-      - traf-pub
-      - traf-regress-sets
-      - traf-regress-experimental
+      - traf-publish
+      - core-regress-suites
       - gate-{name}-check-for-binary
       - phoenix_test
 
@@ -53,4 +52,19 @@
       - gate-{name}-check-for-binary
       - dcs-build
       - phoenix_test
+
+- project:
+    name: install
+    github-org: trafodion
+
+    jobs:
+      - gate-{name}-check-for-binary
+      - installer-build
+
+- project:
+    name: win-odbc64
+    github-org: trafodion
+
+    jobs:
+      - gate-{name}-check-for-binary
 

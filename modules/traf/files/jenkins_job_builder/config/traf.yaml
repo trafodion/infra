@@ -1,24 +1,35 @@
 - job-group:
-    name: 'traf-regress-sets'
+    name: 'core-regress-suites'
     jobs:
-      - traf-regress-{set}:
-         set: 'A'
-         suites: "charsets executor qat core"
-      - traf-regress-{set}:
-         set: 'B'
-         suites: "compGeneral seabase hive"
+      - core-regress-{suite}:
+         suite: "charsets"
+      - core-regress-{suite}:
+         suite: "core"
+      - core-regress-{suite}:
+         suite: "executor"
+      - core-regress-{suite}:
+         suite: "qat"
+      - core-regress-{suite}:
+         suite: "seabase"
+      - core-regress-{suite}:
+         suite: "hive"
+      - core-regress-{suite}:
+         suite: "compGeneral"
+      - core-regress-{suite}:
+         suite: "udr"
 
 - job-template:
-    name: 'traf-regress-{set}'
+    name: 'core-regress-{suite}'
     node: redhat
 
     wrappers:
       - timeout:
-          timeout: 240
+          timeout: 180
           fail: true
       - timestamps
 
     builders:
+      - link-logs
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core"
@@ -26,8 +37,7 @@
            flavor: "debug"
       - sql-regress:
            dir: "./trafodion/core"
-           suites: "{suites}"
-      - link-logs
+           suites: "{suite}"
 
     publishers:
       - console-log
@@ -35,43 +45,30 @@
       - traf-make-log
       - traf-regress-log
 
-- job:
-    name: 'traf-regress-experimental'
+- job-group:
+    name: 'traf-publish'
+    jobs:
+      - traf-pub-{flavor}:
+         flavor: "release"
+      - traf-pub-{flavor}:
+         flavor: "debug"
+
+
+- job-template:
+    name: 'traf-pub-{flavor}'
     node: redhat
 
-    wrappers:
-      - timeout:
-          timeout: 240
-          fail: true
-      - timestamps
-
     builders:
-      - kill-traf
-      - multi-git-prep:
-           repos: "trafodion/core"
-      - make-traf:
-           flavor: "debug"
-      - sql-regress:
-           dir: "./trafodion/core"
-           suites: "NONE"
       - link-logs
-
-    publishers:
-      - console-log
-      - git-log
-      - traf-make-log
-      - traf-regress-log
-
-- job:
-    name: 'traf-pub'
-    node: redhat
-
-    builders:
       - multi-git-prep:
-           repos: "trafodion/core"
+           repos: "trafodion/core trafodion/install trafodion/dcs"
       - pkg-traf:
-           flavor: "release"
-      - link-logs
+           flavor: "{flavor}"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - pkg-install
+      - stage-traf:
+           flavor: "{flavor}"
 
     publishers:
       - console-log
@@ -80,14 +77,27 @@
       - traf-release-tar
 
 - job:
+    name: 'installer-build'
+    node: redhat
+
+    builders:
+      - link-logs
+      - multi-git-prep:
+           repos: "trafodion/install"
+      - pkg-install
+
+    publishers:
+      - console-log
+
+- job:
     name: 'dcs-build'
     node: redhat
 
     builders:
+      - link-logs
       - gerrit-git-prep
       - maven-package:
            buildDir: "."
-      - link-logs
 
     publishers:
       - console-log
@@ -104,11 +114,12 @@
 
     wrappers:
       - timeout:
-          timeout: 240
+          timeout: 200
           fail: true
       - timestamps
 
     builders:
+      - link-logs
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
@@ -121,11 +132,10 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
-           tests1: "ArithmeticQueryTest,BinaryRowKeyTest,ExecuteStatementsTest,"
-           tests2: "IndexTest,SaltedTableUpsertSelectTest,StatementHintsTest,"
-           tests3: "ToCharFunctionTest,ToNumberFunctionTest,UpsertSelectTest"
+           tests1: "DONT_RUN_TESTS"
+           tests2: ""
+           tests3: ""
            tests4: ""
-      - link-logs
 
     publishers:
       - junit:
@@ -146,6 +156,7 @@
       - timestamps
 
     builders:
+      - link-logs
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
@@ -158,16 +169,16 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
-           tests1: "AlterTableTest,AutoCommitTest,CoalesceFunctionTest,CompareDecimalToLongTest,CreateTableTest,CustomEntityDataTest,DeleteRangeTest,"
-           tests2: "DescColumnSortOrderTest,DistinctCountTest,ExtendedQueryExecTest,FunkyNamesTest,GroupByCaseTest,IsNullTest,KeyOnlyTest,MultiCfQueryExecTest,OrderByTest,"
-           tests3: "ProductMetricsTest,QueryExecTest,QueryExecWithoutSCNTest,QueryPlanTest,ReadIsolationLevelTest,SaltedTableTest,SaltedTableVarLengthRowKeyTest,"
-           tests4: "ServerExceptionTest,SkipScanQueryTest,StddevTest,TopNTest,UpsertBigValuesTest,UpsertSelectAutoCommitTest,UpsertValuesTest,VariableLengthPKTest"
-      - link-logs
+           tests1: ""
+           tests2: ""
+           tests3: ""
+           tests4: ""
 
     publishers:
       - junit:
            results: "trafodion/phoenix_test/target/surefire-reports/*.xml"
       - console-log
+      - traf-make-log
       - git-log
       - phoenix_test-log
 
@@ -185,6 +196,7 @@
       - timestamps
 
     builders:
+      - link-logs
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs"
@@ -198,7 +210,6 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/dcs/src/test/pytests"
            tests1: "DONT_RUN_TESTS"
-      - link-logs
 
     publishers:
       - junit:
@@ -218,6 +229,7 @@
       - timestamps
 
     builders:
+      - link-logs
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs"
@@ -231,7 +243,6 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/dcs/src/test/pytests"
            tests1: ""
-      - link-logs
 
     publishers:
       - junit:
@@ -248,9 +259,9 @@
     node: master
 
     builders:
+      - link-logs
       - gerrit-git-prep
       - assert-no-binary-files
-      - link-logs
 
     publishers:
       - console-log

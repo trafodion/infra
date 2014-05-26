@@ -145,7 +145,7 @@ node 'graphite.trafodion.org' {
 node 'slave01.novaclient' {
   include traf
   include traf::puppet_cron
-  class { 'traf::slave':
+  class { 'traf::cloudera_slave':
     certname  => 'slave01.novaclient',
     ssh_key   => $traf::jenkins_ssh_key,
     sysadmins => hiera('sysadmins'),

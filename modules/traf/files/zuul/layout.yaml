@@ -4,7 +4,7 @@ includes:
 pipelines:
   - name: check
     description: Newly uploaded patchsets enter this pipeline to receive an initial +/-1 Verified vote from Jenkins.
-    failure-message: Build failed.  For information on how to proceed, see https://wiki.trafodion.org/wiki/Code_Reviews#Test_Failures
+    failure-message: Build failed.  https://wiki.trafodion.org/wiki/index.php/Code_Reviews#Test_Failures
     manager: IndependentPipelineManager
     precedence: low
     trigger:
@@ -22,7 +22,7 @@ pipelines:
 
   - name: gate
     description: Changes that have been approved by core developers are enqueued in order in this pipeline, and if they pass tests in Jenkins, will be merged.
-    failure-message: Build failed.  For information on how to proceed, see https://wiki.trafodion.org/wiki/Code_Reviews#Test_Failures
+    failure-message: Build failed.  https://wiki.trafodion.org/wiki/index.php/Code_Reviews#Test_Failures
     manager: DependentPipelineManager
     precedence: low
     trigger:
@@ -95,23 +95,25 @@ pipelines:
       gerrit:
         force-message: true
 
-#  - name: periodic
-#    description: Jobs in this queue are triggered on a timer.
-#    manager: IndependentPipelineManager
-#    precedence: low
-#    trigger:
-#      timer:
-#        - time: '0 6 * * *'
+  - name: daily
+    description: Jobs in this queue are triggered daily.
+    manager: IndependentPipelineManager
+    precedence: low
+    trigger:
+      timer:
+        - time: '30 8 * * *'
 
 
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
-  - name: traf-regress-A
-    voting: true
-  - name: traf-regress-B
+  - name: core-regress-compGeneral
     voting: false
-  - name: traf-regress-experimental
+  - name: core-regress-executor
+    voting: false
+  - name: core-regress-hive
+    voting: false
+  - name: core-regress-seabase
     voting: false
   - name: phoenix_test
     voting: true
@@ -136,25 +138,40 @@ projects:
 
   - name: trafodion/core
     check:
-      - traf-regress-A
-      - traf-regress-B
-      - gate-core-check-for-binary
       - phoenix_test
-      - phoenix_test-experimental
+      - core-regress-core
+      - core-regress-charsets
+      - core-regress-compGeneral
+      - core-regress-executor
+      - core-regress-hive
+      - core-regress-qat
+      - core-regress-seabase
+      - core-regress-udr
+      - gate-core-check-for-binary
     gate:
-      - traf-regress-A
-      - traf-regress-B
-      - gate-core-check-for-binary
       - phoenix_test
+      - core-regress-core
+      - core-regress-charsets
+      - core-regress-compGeneral
+      - core-regress-executor
+      - core-regress-hive
+      - core-regress-qat
+      - core-regress-seabase
+      - core-regress-udr
+      - gate-core-check-for-binary
+    daily:
+      - traf-pub-release
+      - traf-pub-debug
+    release:
+      - traf-pub-release
     pre-release:
-      - traf-pub
+      - traf-pub-release
 
   - name: trafodion/dcs
     check:
       - gate-dcs-check-for-binary
       - dcs-build
       - phoenix_test
-      - phoenix_test-experimental
       - pyodbc_test
       - pyodbc_test-experimental
     gate:
@@ -166,9 +183,11 @@ projects:
 
   - name: trafodion/infra
     check:
+      - gate-infra-check-for-binary
       - gate-infra-puppet-lint
       - gate-infra-puppet-syntax
     gate:
+      - gate-infra-check-for-binary
       - gate-infra-puppet-lint
       - gate-infra-puppet-syntax
 
@@ -182,10 +201,22 @@ projects:
     check:
       - gate-phoenix_test-check-for-binary
       - phoenix_test
-      - phoenix_test-experimental
 
     gate:
       - gate-phoenix_test-check-for-binary
       - phoenix_test
-      - phoenix_test-experimental
+
+  - name: trafodion/install
+    check:
+      - gate-install-check-for-binary
+      - installer-build
+    gate:
+      - gate-install-check-for-binary
+      - installer-build
+
+  - name: trafodion/win-odbc64
+    check:
+      - gate-win-odbc64-check-for-binary
+    gate:
+      - gate-win-odbc64-check-for-binary
 
