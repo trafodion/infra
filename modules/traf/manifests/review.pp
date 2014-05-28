@@ -185,6 +185,27 @@ class traf::review (
     mode    => '0700',
     require => User['gerrit2'],
   }
+  file {'/home/gerrit2/.ssh/config':
+    ensure => present,
+    source  => 'puppet:///modules/traf/gerrit/ssh_config',
+    owner   => 'gerrit2',
+    group   => 'gerrit2',
+    require => User['gerrit2'],
+  }
+  file {'/home/gerrit2/.ssh/launchpadsync_rsa':
+    owner   => 'gerrit2',
+    group   => 'gerrit2',
+    mode    => '0600',
+    content => hiera('gerrit_lp_sync_key'),
+    require => User['gerrit2'],
+  }
+  file {'/home/gerrit2/.ssh/launchpadsync_rsa.pub':
+    owner   => 'gerrit2',
+    group   => 'gerrit2',
+    mode    => '0644',
+    content => hiera('gerrit_lp_sync_pubkey'),
+    require => User['gerrit2'],
+  }
   file { '/home/gerrit2/.launchpadlib':
     ensure  => directory,
     owner   => 'gerrit2',
@@ -201,6 +222,21 @@ class traf::review (
     replace => true,
     require => User['gerrit2'],
   }
+  file { '/home/gerrit2/dbupdates':
+    ensure  => directory,
+    owner   => 'gerrit2',
+    group   => 'gerrit2',
+    mode    => '0775',
+    require => User['gerrit2'],
+  }
+  file { '/home/gerrit2/.sync_logging.conf':
+    ensure  => present,
+    source  => 'puppet:///modules/traf/gerrit/launchpad_sync_logging.conf',
+    owner   => 'gerrit2',
+    group   => 'gerrit2',
+    require => User['gerrit2'],
+  }
+
 
   #### Back up -- to be added later
   #include bup

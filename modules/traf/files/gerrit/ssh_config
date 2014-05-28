@@ -1,0 +1,6 @@
+Host github.com
+    User git
+    IdentityFile /home/gerrit2/review_site/etc/ssh_host_rsa_key
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    PreferredAuthentications publickey
