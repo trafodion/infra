@@ -6,7 +6,7 @@ pipelines:
     description: Newly uploaded patchsets enter this pipeline to receive an initial +/-1 Verified vote from Jenkins.
     failure-message: Build failed.  https://wiki.trafodion.org/wiki/index.php/Code_Reviews#Test_Failures
     manager: IndependentPipelineManager
-    precedence: low
+    precedence: high
     trigger:
       gerrit:
         - event: patchset-created
@@ -24,7 +24,7 @@ pipelines:
     description: Changes that have been approved by core developers are enqueued in order in this pipeline, and if they pass tests in Jenkins, will be merged.
     failure-message: Build failed.  https://wiki.trafodion.org/wiki/index.php/Code_Reviews#Test_Failures
     manager: DependentPipelineManager
-    precedence: low
+    precedence: high
     trigger:
       gerrit:
         - event: comment-added
@@ -80,14 +80,14 @@ pipelines:
         - event: comment-added
           comment_filter: (?i)^\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
 
-  - name: experimental
-    description: On-demand pipeline for requesting a run against a set of jobs that are not yet gating. Leave review comment of "check experimental" to run jobs in this pipeline.
+  - name: check-full
+    description: On-demand extensive check testing. Leave review comment "run check-full".
     manager: IndependentPipelineManager
     precedence: low
     trigger:
       gerrit:
         - event: comment-added
-          comment_filter: (?i)^\s*check experimental\s*$
+          comment_filter: (?i)^\s*run check-full\s*$
     success:
       gerrit:
         force-message: true
@@ -101,20 +101,22 @@ pipelines:
     precedence: low
     trigger:
       timer:
-        - time: '30 8 * * *'
+        - time: '30 2 * * *'
+    success:
+      smtp:
+        from: zuul@trafodion.org
+        to: trafodion-firefighters@lists.launchpad.net
+        subject: Daily Build -- Passed All Tests
+    failure:
+      smtp:
+        from: zuul@trafodion.org
+        to: trafodion-firefighters@lists.launchpad.net
+        subject: Daily Build -- Test Failures
 
 
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
-  - name: core-regress-compGeneral
-    voting: false
-  - name: core-regress-executor
-    voting: false
-  - name: core-regress-hive
-    voting: false
-  - name: core-regress-seabase
-    voting: false
   - name: phoenix_test
     voting: true
   - name: phoenix_test-experimental
@@ -138,30 +140,36 @@ projects:
 
   - name: trafodion/core
     check:
-      - phoenix_test
+      - phoenix_quick
       - core-regress-core
-      - core-regress-charsets
-      - core-regress-compGeneral
-      - core-regress-executor
-      - core-regress-hive
-      - core-regress-qat
-      - core-regress-seabase
-      - core-regress-udr
       - gate-core-check-for-binary
-    gate:
+    check-full:
       - phoenix_test
-      - core-regress-core
       - core-regress-charsets
+      - core-regress-qat
+      - core-regress-udr
+      - core-regress-catman1
       - core-regress-compGeneral
       - core-regress-executor
       - core-regress-hive
-      - core-regress-qat
       - core-regress-seabase
-      - core-regress-udr
+    gate:
+      - phoenix_quick
+      - core-regress-core
       - gate-core-check-for-binary
     daily:
       - traf-pub-release
       - traf-pub-debug
+      - phoenix_test
+      - core-regress-core
+      - core-regress-charsets
+      - core-regress-qat
+      - core-regress-udr
+      - core-regress-catman1
+      - core-regress-compGeneral
+      - core-regress-executor
+      - core-regress-hive
+      - core-regress-seabase
     release:
       - traf-pub-release
     pre-release:
@@ -171,15 +179,17 @@ projects:
     check:
       - gate-dcs-check-for-binary
       - dcs-build
-      - phoenix_test
+      - phoenix_quick
       - pyodbc_test
       - pyodbc_test-experimental
     gate:
       - gate-dcs-check-for-binary
       - dcs-build
-      - phoenix_test
+      - phoenix_quick
       - pyodbc_test
       - pyodbc_test-experimental
+    check-full:
+      - phoenix_test
 
   - name: trafodion/infra
     check:

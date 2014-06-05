@@ -28,19 +28,20 @@
            flavor: "debug"
       - sql-regress:
            dir: "./trafodion/core"
-           suites: "hive"
+           suites: "udr"
       - maven-package:
            buildDir: "trafodion/dcs"
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
-           tests1: "ExtendedQueryExecTest,ProductMetricsTest"
+           tests1: "ProductMetricsTest"
            tests2: ""
            tests3: ""
            tests4: ""
 
     publishers:
+      - phoenix-xunit
       - console-log
       - git-log
       - traf-make-log

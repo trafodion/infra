@@ -17,6 +17,8 @@
          suite: "compGeneral"
       - core-regress-{suite}:
          suite: "udr"
+      - core-regress-{suite}:
+         suite: "catman1"
 
 - job-template:
     name: 'core-regress-{suite}'
@@ -138,8 +140,7 @@
            tests4: ""
 
     publishers:
-      - junit:
-           results: "trafodion/phoenix_test/target/surefire-reports/*.xml"
+      - phoenix-xunit
       - console-log
       - traf-make-log
       - git-log
@@ -151,7 +152,7 @@
 
     wrappers:
       - timeout:
-          timeout: 240
+          timeout: 200
           fail: true
       - timestamps
 
@@ -175,8 +176,43 @@
            tests4: ""
 
     publishers:
-      - junit:
-           results: "trafodion/phoenix_test/target/surefire-reports/*.xml"
+      - phoenix-xunit
+      - console-log
+      - traf-make-log
+      - git-log
+      - phoenix_test-log
+
+- job:
+    name: 'phoenix_quick'
+    node: redhat
+
+    wrappers:
+      - timeout:
+          timeout: 60
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - kill-traf
+      - multi-git-prep:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
+      - make-traf:
+           flavor: "debug"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - kill-traf
+      - run-phoenix_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/phoenix_test"
+           tests1: "AlterTableTest,ArithmeticQueryTest,AutoCommitTest,BinaryRowKeyTest,CoalesceFunctionTest"
+           tests2: ",CompareDecimalToLongTest,CreateTableTest,CustomEntityDataTest,DeleteRangeTest"
+           tests3: ",DistinctCountTest,ExecuteStatementsTest,ExtendedQueryExecTest,FunkyNamesTest"
+           tests4: ",GroupByCaseTest,IndexTest,IsNullTest,KeyOnlyTest,MultiCfQueryExecTest,OrderByTest"
+
+    publishers:
+      - phoenix-xunit
       - console-log
       - traf-make-log
       - git-log
@@ -212,8 +248,6 @@
            tests1: "DONT_RUN_TESTS"
 
     publishers:
-      - junit:
-           results: "trafodion/dcs/src/test/pytests/logs/test_report.xml"
       - console-log
       - git-log
       - pyodbc_test-log
@@ -245,8 +279,6 @@
            tests1: ""
 
     publishers:
-      - junit:
-           results: "trafodion/dcs/src/test/pytests/logs/test_report.xml"
       - console-log
       - git-log
       - pyodbc_test-log

@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 source "/usr/local/bin/traf-functions.sh"
 
@@ -24,10 +24,12 @@ source_env
 # run SQL regression tests
 cd ../sql/regress
 echo "Saving output in Regress.log"
-./tools/runallsb $SUITES > $logarchive/Regress.log 2>&1
-echo "Return code $?"
+./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \
+   sed  --unbuffered    -r -es':(^diff |^cp )([a-zA-Z]*[0-9]*)(.*):\2:' | \
+   grep --line-buffered -C1 -E '### PASS |### FAIL '
+echo "Return code ${PIPESTATUS[0]}"
 
-/usr/local/bin/stop-traf-instance.sh 
+/usr/local/bin/stop-traf-instance.sh
 
 # evaluate tests
 cd ../../sqf/rundir
@@ -46,7 +48,7 @@ do
   if [[ -f "$dir/runregr-sb.log" ]]
   then
     cat $dir/runregr-sb.log
-    if grep -q FAIL "$dir/runregr-sb.log" 
+    if grep -q FAIL "$dir/runregr-sb.log"
     then
       echo "Found failures -- saving $dir logs."
       mkdir $logarchive/$dir

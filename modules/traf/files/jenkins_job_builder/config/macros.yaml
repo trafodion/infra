@@ -191,6 +191,25 @@
               copy-after-failure: true
           
 - publisher:
+    name: phoenix-xunit
+    publishers:
+      - xunit:
+          thresholds:
+            - failed:
+                unstable: '0'
+                unstablenew: '0'
+                failure: '0'
+                failurenew: '0'
+            - skipped:
+                unstable: '0'
+                unstablenew: '0'
+                failure: '0'
+                failurenew: '0'
+          types:
+            - junit:
+                pattern: "trafodion/phoenix_test/target/surefire-reports/*.xml"
+
+- publisher:
     name: pyodbc_test-log
     publishers:
       - scp:
@@ -199,6 +218,21 @@
             - target: 'logs/$LOG_PATH/logs'
               source: 'trafodion/dcs/src/test/pytests/logs/**'
               copy-after-failure: true
+      - xunit:
+          thresholds:
+            - failed:
+                unstable: '0'
+                unstablenew: '0'
+                failure: '0'
+                failurenew: '0'
+            - skipped:
+                unstable: '0'
+                unstablenew: '0'
+                failure: '0'
+                failurenew: '0'
+          types:
+            - junit:
+                pattern: "trafodion/dcs/src/test/pytests/logs/test_report.xml"
           
 - publisher:
     name: console-log

@@ -15,7 +15,7 @@ else
   DestFile="trafodion-$BLD.tar.gz"
 fi
 
-DestDir="publish/$BLD/$ZUUL_PIPELINE"
+DestDir="publish/$ZUUL_PIPELINE/$BLD"
 
 set +x
 

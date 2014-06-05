@@ -27,6 +27,7 @@
       - core-regress-suites
       - gate-{name}-check-for-binary
       - phoenix_test
+      - phoenix_quick
 
 - project:
     name: manuals
@@ -52,6 +53,7 @@
       - gate-{name}-check-for-binary
       - dcs-build
       - phoenix_test
+      - phoenix_quick
 
 - project:
     name: install

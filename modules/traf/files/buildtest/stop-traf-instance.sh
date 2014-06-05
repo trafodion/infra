@@ -47,8 +47,15 @@ elif [ $# -gt 1 ]; then
     exit 1
 fi
 
-sqstop
-echo "Return code $?"
+timeout 5m sqstop
+ret=$?
+if [[ $ret == 124 ]]
+then
+  echo "ERROR: sqstop timed-out -- see bug 1324370"
+else
+  echo "Return code $ret"
+fi
+
 sudo /usr/local/bin/hbase-sudo.sh stop
 echo "Return code $?"
 
