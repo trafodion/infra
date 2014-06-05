@@ -22,7 +22,7 @@
 
 - job-template:
     name: 'core-regress-{suite}'
-    node: redhat
+    node: redhat_cdh4.4
 
     wrappers:
       - timeout:
@@ -58,7 +58,7 @@
 
 - job-template:
     name: 'traf-pub-{flavor}'
-    node: redhat
+    node: redhat_cdh4.4
 
     builders:
       - link-logs
@@ -80,7 +80,7 @@
 
 - job:
     name: 'installer-build'
-    node: redhat
+    node: redhat_cdh4.4
 
     builders:
       - link-logs
@@ -93,7 +93,7 @@
 
 - job:
     name: 'dcs-build'
-    node: redhat
+    node: redhat_cdh4.4
 
     builders:
       - link-logs
@@ -112,7 +112,7 @@
 # This should only be used in phoenix_test-experimental if phoenix_test is running all tests.
 - job:
     name: 'phoenix_test-experimental'
-    node: redhat
+    node: redhat_cdh4.4
 
     wrappers:
       - timeout:
@@ -148,7 +148,7 @@
 
 - job:
     name: 'phoenix_test'
-    node: redhat
+    node: redhat_cdh4.4
 
     wrappers:
       - timeout:
@@ -184,7 +184,7 @@
 
 - job:
     name: 'phoenix_quick'
-    node: redhat
+    node: redhat_cdh4.4 
 
     wrappers:
       - timeout:
@@ -223,7 +223,7 @@
 # If parameter tests1 = DONT_RUN_TESTS then none of the pyodbc tests will run.  This should only be used in pyodbc_test-experimental if pyodbc_test is running all tests.
 - job:
     name: 'pyodbc_test-experimental'
-    node: redhat
+    node: redhat_cdh4.4
 
     wrappers:
       - timeout:
@@ -254,7 +254,7 @@
 
 - job:
     name: 'pyodbc_test'
-    node: redhat
+    node: redhat_cdh4.4
 
     wrappers:
       - timeout:
