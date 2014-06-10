@@ -87,7 +87,7 @@ function footer() {
 //  ' <li><a href="http://static.trafodion.org/brand/">Logos &amp; Guidelines</a></li>'+
 //  ' <li><a href="http://static.trafodion.org/brand/trafodion-trademark-policy/">Trademark Policy</a></li>'+
   ' <li><a href="http://www8.hp.com/us/en/privacy/privacy.html">Privacy Policy</a></li>'+
-  ' <li><a href="https://review.trafodion.org/#/settings/agreements">Trafodion CLA</a></li>'+
+  ' <li><a href="https://review.trafodion.org/static/cla.html">Trafodion CLA</a></li>'+
   '</ul>'+
   '</div>'+
   '</div>'+
