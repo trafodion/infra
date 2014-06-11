@@ -16,6 +16,10 @@ class traf::users {
   $sjohnson_sshkey = "AAAAB3NzaC1yc2EAAAABIwAAAQEA1m3jYI3OQ269m+9Qd8/qK1yCeRL5hrihrgFkpnNP1rcZUhBp3cfRYT4acINo0aqoX+Z+sTubWkKFgKEhPVKSE8Wi2XlUhIxXACTBi3/GpJOoiib9Y2bobqCT6o0/OzxQ4Gl4CbieSLhaHeE7BucNIYXbodq9UYM3HGL2Ba8KJA90aKK50TfOgZXEiWlOkdElGCD/XXero2TAdYj0Ehxhlalf8poDWVQ0QhGVt4PxfLrWYf9aDQP6FN3YU/CL0IvqSCY14pJcUHY6gwfKuDKQt3dFt2h6gUJy5eFBwK4NqZuJmc3WdSK2vX9cKibim3Ti1riuC16+bEc6D2vlRtoCmw=="
 
   $csheedy_sshkey = "AAAAB3NzaC1kc3MAAACBALyONTFvWz0PFIfVFMQGTIIVPDKYnNlbRHbnhhwhvWHqsbf97enOjtb41OsYTniKO5ngRz74ezklOgXvDiCosEd8GEbmbJIHPBGr3DVoPKFSOa3QOCZXkpnQ8uALxoGnlSy0nTMT84/PSyYldyBcTF11xsXVG/BerLfIcnaIzly/AAAAFQCAFYPNw9LHgY6dFqrdAXB0pkzcKQAAAIA5cB4inCFT3WfwkV+69Wd5VK0tSiKGBFMGBPt1Ui3yHkGaEHmuImZeQk8GLCBfLBMznigXsNRAl9I3wqOTsIQFNY94d0T5Bifa8/ebW/v8U7WZan5ON3nZPYFqjVNaYFFIbSAKDZvL1ooii3O5xHixubvhlAbYYVVjS0akcC/NGgAAAIA5RGYtJH/OYyN0r6zkm/JRa5lv3hXDQifAZu3pBeOqu/d2Lsv4CvajejsUBMJMceOek0OG41g+gUeSMjXfvPh4tXHYi4NW9fqq8h7YsAX+yroUjZ8/yYLNEB8ApWURP3MzX9enjkwhjBdv3CbrzDq3i9K8t/aIzMY3AbF2fBDVdw=="
+
+  $creynaga_sshkey = "AAAAB3NzaC1yc2EAAAABIwAAAQEAwrQF+moD2CMfnHCjq55LCipR+vX+ufxPqIQtCPv+VM2/2+TQ7HF/W+ZcAOkA/EdfSkGQ6ID1tcqqKIYBg1DuGiF2wrhF+rKAjCcgF/yc+fbm+GpTOhB5eANPOXE0KcoSLf3b2MOejQG2ROThKqmu34EMg20T/JPSIktgYoNKnBiIR1y0f2V3vh0EThehNq2aZwoHo+HcQUMwsyo33tmy/vO8Joeqn1DnuH8vBiUKPH6z1pOsFePZ2A37DoPKSVo19QRZ7xC74FIQKb++kc7yRnVh6byu88kwPNNHKg6urQnYLDNCAcLzQyyvcxfB+5Bzt1PAkBa6D2TvF5W6/5Pw1w=="
+
+
   
   @user::virtual::localuser { 'svarnau':
     realname => 'Steve Varnau',
@@ -51,4 +55,8 @@ class traf::users {
     realname => 'Chris Sheedy',
     sshkeys  => "ssh-dss $csheedy_sshkey csheedy\n",
   }  
+  @user::virtual::localuser { 'creynaga':
+    realname => 'Carlos Reynaga',
+    sshkeys  => "ssh-rsa $creynaga_sshkey creynaga\n",
+  }
 }

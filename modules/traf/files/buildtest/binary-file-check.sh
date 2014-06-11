@@ -3,7 +3,7 @@
 rc=0   #so far, so good
 
 text_pat='ASCII|UTF-|FORTRAN|empty|very short file \(no magic\)|Deleted|text|symbolic link'
-image_pat='image|icon|data'
+image_pat='image|icon|data|PC bitmap'
 size_limit=80000  #image file limit in bytes
 
 listcmd="git show --pretty=format:%n --name-status HEAD"

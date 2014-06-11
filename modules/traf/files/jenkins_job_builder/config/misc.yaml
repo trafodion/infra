@@ -21,6 +21,7 @@
       - timestamps
 
     builders:
+      - link-logs
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
@@ -39,10 +40,17 @@
            tests2: ""
            tests3: ""
            tests4: ""
+      - run-pyodbc_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/dcs/src/test/pytests"
+           tests1: "test_p2.SQLTest.test21"
+
 
     publishers:
       - phoenix-xunit
       - console-log
       - git-log
       - traf-make-log
+      - pyodbc_test-log
 
