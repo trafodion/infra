@@ -25,7 +25,8 @@ source_env
 cd ../sql/regress
 echo "Saving output in Regress.log"
 ./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \
-   sed  --unbuffered    -r -es':(^diff |^cp )([a-zA-Z]*[0-9]*)(.*):\2:' | \
+   sed  --unbuffered -r -es':(^diff |^cp )([a-zA-Z]*[0-9]*)(.*):\2:' \
+			-es:^DIFF:TEST: -es:^EXPECTED:TEST: -es:^LOG:TEST: | \
    grep --line-buffered -C1 -E '### PASS |### FAIL '
 echo "Return code ${PIPESTATUS[0]}"
 
