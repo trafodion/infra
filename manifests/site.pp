@@ -80,9 +80,9 @@ node 'wiki2.trafodion.org' {
     wiki_admin_password     => hiera('wiki_admin_password'),
     mysql_root_password     => hiera('wiki_db_password'),
     sysadmins               => hiera('sysadmins'),
-    ssl_cert_file_contents  => hiera('wiki2_ssl_cert_file_contents'),
-    ssl_key_file_contents   => hiera('wiki2_ssl_key_file_contents'),
-    ssl_chain_file_contents => hiera('ssl_chain_file_contents'),
+    ssl_cert_file_contents  => hiera('wiki_ssl_cert_file_contents'),
+    ssl_key_file_contents   => hiera('wiki_ssl_key_file_contents'),
+    ssl_chain_file_contents => hiera('wiki_chain_file_contents'),
   }
 }
 
@@ -98,15 +98,28 @@ node 'dashboard.trafodion.org' {
 
 node 'zuul.trafodion.org' {
   class { 'traf::zuul_prod':
-    gerrit_server        => 'review.trafodion.org',
-    gerrit_user          => 'zuul',
-    zuul_ssh_private_key => hiera('zuul_ssh_private_key_contents'),
-    url_pattern          => 'http://static.trafodion.org/logs/{build.parameters[LOG_PATH]}',
-    zuul_url             => 'http://zuul.trafodion.org/p',
-    sysadmins            => hiera('sysadmins'),
-    #statsd_host          => 'graphite.openstack.org',
-    gearman_workers      => [
-      'jenkins01.trafodion.org',
+    gerrit_server                  => 'review.trafodion.org',
+    gerrit_user                    => 'jenkins',
+    gerrit_ssh_host_key            => hiera('gerrit_ssh_rsa_pubkey_contents', 'XXX'),
+    zuul_ssh_private_key           => hiera('zuul_ssh_private_key_contents', 'XXX'),
+    url_pattern                    => 'http://logs.trafodion.org/logs/{build.parameters[LOG_PATH]}',
+    #swift_authurl                  => 'https://identity.api.rackspacecloud.com/v2.0/',
+    #swift_user                     => 'infra-files-rw',
+    #swift_key                      => hiera('infra_files_rw_password', 'XXX'),
+    #swift_tenant_name              => hiera('infra_files_tenant_name', 'tenantname'),
+    #swift_region_name              => 'DFW',
+    #swift_default_container        => 'infra-files',
+    swift_default_logserver_prefix => 'http://logs.trafodion.org/',
+    zuul_url                       => 'http://zuul.trafodion.org/p',
+    sysadmins                      => hiera('sysadmins', ['admin']),
+    #statsd_host                    => 'graphite.trafodion.org',
+    gearman_workers                => [
+      '15.125.67.186',
+      '192.168.0.34',
+    ],
+    gearman6_workers               => [
+      '0:0:0:0:0:ffff:f7d:43ba',
+      '0:0:0:0:0:ffff:c0a8:22'
     ],
   }
 }

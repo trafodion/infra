@@ -39,6 +39,9 @@
 .container {
     width: 1024px;
 }
+label {
+    font-weight: normal;
+}
 #pipeline-container {
     margin: 0 auto;
 }
@@ -82,7 +85,7 @@ td.tree {
 .change > .header {
     background: #E2ECEF;
     color: black;
-    margin: -2px -2px 2px -2px;
+    margin: -2px;
     padding: 4px;
 }
 .change > .header > .changeid {
@@ -90,6 +93,12 @@ td.tree {
 }
 .change > .header > .time {
     float: right;
+}
+.change > .hover {
+    background: #F3FDFF;
+}
+.jobs {
+    padding-top: 4px;
 }
 .jobwrapper {
     display: table;
@@ -105,17 +114,24 @@ td.tree {
 .result_success {
     color: #007f00;
 }
+
+.queue_bad,
 .result_failure {
     color: #cf2f19;
 }
+.queue_warn,
 .result_unstable {
     color: #e39f00;
 }
-#graph-container img {
-    margin-left: 10px;
+.queue_good {
+    color: #888888;
 }
-#graph-container img:first-of-type {
-    margin-left: 0px;
+#graph-container img {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+#zuul_info_container {
+    margin-top: 12px;
 }
 a:link {
     color: #204A87;
@@ -137,32 +153,37 @@ a:link {
     /* because other wise this floats up off the line */
     margin-top: 0.25em;
 }
-.projects_filter_container {
+.filter_container {
     display: inline-block;
     position: relative;
     top: 1.5em;
     padding-left: .5em;
 }
-.projects_filter_container input#projects_filter {
+.filter_container input#filter {
     display: inline-block;
 }
-.projects_filter_container sub {
+.filter_container sub {
     padding: .5em 0;
     display: block;
 }
-.projects_filter_container sub a.save-filter {
+.filter_container sub a.save-filter {
     text-decoration: underline;
 }
-.projects_filter_container .hidden {
+.filter_container .hidden {
     visibility: hidden;
 }
-.projects_filter_container img.filter-saved {
+.filter_container img.filter-saved {
     display: inline-block;
     position: relative;
     top: 3px;
 }
-.projects_filter_container img.filter-saved.hidden {
+.filter_container img.filter-saved.hidden {
     display: none;
+}
+
+.loading_message {
+    text-align: center;
+    font-size: 16pt;
 }
 
 /** Theming for the progress bars to get them consisten across browers:
@@ -246,9 +267,9 @@ progress[aria-valuenow]:before  {
       Queue lengths: <span id="trigger_event_queue_length"></span> events,
       <span id="result_event_queue_length"></span> results.
       &nbsp;&nbsp;&nbsp;&nbsp;
-      Filter projects:
-      <span class="projects_filter_container">
-        <input type="text" id="projects_filter" />
+      <label for="filter">Filters:</label>
+      <span class="filter_container">
+        <input title="project(s) or review(s) separated by comma" type="text" id="filter" />
         <!--
         An embedded 'approved' image.
         From the famfamfam "Silk" icon set, Creative Commons Attribution 2.5.
@@ -259,6 +280,11 @@ progress[aria-valuenow]:before  {
           <a href="#" class="save-filter hidden">Save Filter</a>
         </sub>
       </span>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <label for="expandByDefault">Expand by default:</label>
+      <span class="expand_by_default_container">
+        <input type="checkbox" id="expandByDefault" onchange="toggle_expand_by_default(this)"/>
+      </span>
       </p>
     </div>
 
@@ -267,6 +293,7 @@ progress[aria-valuenow]:before  {
     </div>
 
     <div id="pipeline-container">
+        <p class="loading_message">Loading...</p>
     </div>
 
     <div class="container" id="graph-container">
@@ -283,10 +310,10 @@ $("#graph-container").append($(new Image()).addClass('graph').graphite({
     fgcolor: '000000',
     areaMode: 'stacked',
     target: [
-        "color(alias(sumSeries(stats.gauges.nodepool.target.*.*.*.building), 'Building'), 'ffbf52')",
-        "color(alias(sumSeries(stats.gauges.nodepool.target.*.*.*.ready), 'Available'), '00c868')",
-        "color(alias(sumSeries(stats.gauges.nodepool.target.*.*.*.used), 'In Use'), '6464ff')",
-        "color(alias(sumSeries(stats.gauges.nodepool.target.*.*.*.delete), 'Deleting'), 'c864ff')",
+        "color(alias(sumSeries(stats.gauges.nodepool.target.building), 'Building'), 'ffbf52')",
+        "color(alias(sumSeries(stats.gauges.nodepool.target.ready), 'Available'), '00c868')",
+        "color(alias(sumSeries(stats.gauges.nodepool.target.used), 'In Use'), '6464ff')",
+        "color(alias(sumSeries(stats.gauges.nodepool.target.delete), 'Deleting'), 'c864ff')",
     ],
     title: "Test Nodes"
 }));
@@ -316,7 +343,50 @@ $("#graph-container").append($(new Image()).addClass('graph').graphite({
     ],
     title: "Gerrit Events (per Hour)"
 }));
+
+$("#graph-container").append($(new Image()).addClass('graph').graphite({
+    from: "-24hours",
+    width: 334,
+    height: 180,
+    bgcolor: 'ffffff',
+    fgcolor: '000000',
+    target: [
+        "color(alias(stats.gauges.zuul.geard.queue.running, 'Running'), 'blue')",
+        "color(alias(stats.gauges.zuul.geard.queue.waiting, 'Waiting'), 'red')",
+        "color(alias(stats.gauges.zuul.geard.queue.total, 'Total Jobs'), '888888')",
+        "color(alias(stats.gauges.zuul.geard.workers, 'Workers'), 'green')",
+    ],
+    title: "Zuul Job Queue"
+}));
+
+$("#graph-container").append($(new Image()).addClass('graph').graphite({
+    from: "-24hours",
+    width: 334,
+    height: 180,
+    bgcolor: 'ffffff',
+    fgcolor: '000000',
+    target: [
+        "color(alias(stats.gauges.logstash.geard.queue.running, 'Running'), 'blue')",
+        "color(alias(stats.gauges.logstash.geard.queue.waiting, 'Waiting'), 'red')",
+        "color(alias(stats.gauges.logstash.geard.queue.total, 'Total Jobs'), '888888')",
+        "color(alias(stats.gauges.logstash.geard.workers, 'Workers'), 'green')",
+    ],
+    title: "Logstash Job Queue"
+}));
+
       </script>
+    </div>
+
+    <div class="container" id="zuul_info_container">
+        <h2>Zuul info</h2>
+        <p>
+            Zuul version:
+            <span id="zuul-version"></span>
+        </p>
+        <p>
+            Last reconfigured:
+            <span id="last-reconfigured-span"></span>
+        </p>
     </div>
 
     <script type="text/javascript">footer();</script>
