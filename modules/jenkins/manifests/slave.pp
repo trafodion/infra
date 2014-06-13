@@ -119,20 +119,6 @@ class jenkins::slave(
     }
   }
 
-  if ($bare == false) {
-    $gem_packages = [
-      'bundler',
-      'puppet-lint',
-      'puppetlabs_spec_helper',
-    ]
-
-    package { $gem_packages:
-      ensure   => latest,
-      provider => gem,
-      require  => Package['rubygems'],
-    }
-  }
-
   # Packages that need to be installed from pip
   $pip_packages = [
     'setuptools-git',
