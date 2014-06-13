@@ -47,7 +47,8 @@ function wfAddMetas( &$out, &$text ) {
     $out->addMeta( 'keywords', 'trafodion, Hadoop, Hive, HBase, SQL, database, transactional SQL');
     $out->addMeta( "lifecycle", "presales.consideration");
     $out->addMeta( "page_content", "Products");
-    $out->addMeta( "robots", "noindex,nofollow,noarchive");
+    # we want search engines to index our wiki
+    #$out->addMeta( "robots", "noindex,nofollow,noarchive");
     $out->addMeta( 'segment', 'Segment Neutral');
     $out->addMeta( 'target_country', 'us');
     $out->addMeta( 'web_section_id', 'R11824' );
