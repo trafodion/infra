@@ -31,7 +31,6 @@ class traf::buildtest {
       'perl-Math-Calc-Units','perl-Params-Validate','perl-Parse-RecDescent','perl-TermReadKey',
       'python-qpid', 'python-qpid-qmf', 'qpid-cpp-client','qpid-cpp-client-ssl',
       'qpid-cpp-server','qpid-cpp-server-ssl','qpid-qmf','qpid-tools',
-      'qpid-cpp-client-devel',
       'saslwrapper', 'tog-pegasus', 'uuid-perl','xinetd',
       'readline-devel','alsa-lib-devel',
       'openssl-static','libdrizzle-devel',
@@ -60,6 +59,12 @@ class traf::buildtest {
     package { $packages:
         ensure => present,
    	require => [ Exec['install_Development_Tools'] ]
+    }
+
+    # not available in latest CentOS distribution, but is in Vault repos
+    package { 'qpid-cpp-client-devel':
+        ensure => present,
+	install_options => '--enablerepo=C6.3-updates',
     }
 
     # Remove bug reporting tool, so we can specify core file pattern
