@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 source "/usr/local/bin/traf-functions.sh"
 
@@ -15,14 +15,14 @@ set +x
 
     Options :
         <Trafodion_PATH>        Location where Trafodion is is installed
-        <DCS_PATH>              Location where DCS is installed 
+        <DCS_PATH>              Location where DCS is installed
         <Num_DCS_Servers>       Number of DCS servers to configure
                                 NOTE: This parameter must be specified if <DCS_PATH> is specified
 
     NOTE: If relative PATHS are used for <Trafodion_PATH> and <DCS_PATH>, make sure the relative paths
           are specified from the same starting directory.
 
-    Examples : 
+    Examples :
         $PRG_NAME "trafodion/core"              # starts only trafodion using relative paths
         $PRG_NAME "/home/trafodion/core"        # starts only trafodion using absolute paths
         $PRG_NAME "trafodion/core" "trafodion/dcs" "6"  # configures/starts 6 DCS servers and starts trafodion
@@ -42,7 +42,7 @@ CONFIGURE_DCS() {
     cd $WORKSPACE/dcs || exit 1
     tar xf $pkg || exit 1
     installdir=$(ls -d $WORKSPACE/dcs/*)
-    
+
     # configure traf environemnt to point to dcs we just unpackaged
     cd $WORKSPACE/$TRAF_DIR/sqf || exit 1
     modify_env "export DCS_INSTALL_DIR=\"$installdir\""
@@ -69,7 +69,7 @@ CONFIGURE_DCS() {
     set -x
     # configure ip address of zookeeper and dns interface
     if [ $(grep -c 'zookeeper.quorum' conf/dcs-site.xml) -eq 0 ]; then
-        sed -i".bak" 's@</configuration>@@' conf/dcs-site.xml 
+        sed -i".bak" 's@</configuration>@@' conf/dcs-site.xml
 	cat - >>conf/dcs-site.xml <<-EOF
 	  <property>
 	    <name>dcs.zookeeper.quorum</name>
@@ -141,11 +141,11 @@ EOF
 
 
     # initialize meta-data
-    echo 'initialize trafodion; exit;' | sqlci > init_trafodion.log 2>&1 
+    echo 'initialize trafodion; exit;' | sqlci > init_trafodion.log 2>&1
     # Look for error other than 1392 - "already initialized"
     grep -v 1392 init_trafodion.log | grep -q ERROR
     if [[ $? == 0 ]]; then
-        echo "Initailize Trafodion failed."
+        echo "Initialize Trafodion failed."
         cat init_trafodion.log
         sqstop
         exit 2
