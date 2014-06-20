@@ -6,13 +6,62 @@ pipelines:
     description: Newly uploaded patchsets enter this pipeline to receive an initial +/-1 Verified vote from Jenkins.
     failure-message: Build failed.  https://wiki.trafodion.org/wiki/index.php/Code_Reviews#Test_Failures
     manager: IndependentPipelineManager
-    precedence: high
+    precedence: normal
+    require:
+      open: True
+      current-patchset: True
     trigger:
       gerrit:
         - event: patchset-created
         - event: change-restored
         - event: comment-added
-          comment_filter: (?i)^\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+          comment_filter: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+        # From openstack-infra/config SHA-1: 06aada389aa1ceba23bb04b2020689b0d9f06c44
+        # Rerun check on change if the results are > 3 days. This is triggered by any activity on the change
+        # (in the form of anyone or any bot leaving comments).This should help detect merge conflicts earlier and also let
+        # the author know when the patch has zero chances of merging see
+        # http://lists.openstack.org/pipermail/openstack-dev/2014-February/027425.html for background
+        - event: comment-added
+          require-approval:
+            - username: jenkins
+              older-than: 72h
+        # From openstack-infra/config SHA-1 :  20f5d2d0034641bc96e822c6846d3b5886dbe119
+        # To support the removing of non-integrated jobs (not integrated in 3 days) from gate where their failure is much more expensive.
+        # To prevent patches that have been approved with very old checks (older than 3 days) from going to gate where their failure is
+        # much more expensive (see http://lists.openstack.org/pipermail/openstack-dev/2014-February/027425.html for background)
+        - event: comment-added
+          require-approval:
+            - approved: 1
+            - username: jenkins
+              older-than: 72h
+        # Must use reverify bug # or reverify lp #. Reverify no bug has been disallowed. If it's failing at gate a bug number
+        # should be associated with the review even if this is an intermittent issue so it can be tracked.
+        # Reverify will now cause the job's check job to run. If the check job gets a +1 from Jenkins then the patch will
+        # automatically get re-enqueued in the gate pipeline see http://lists.openstack.org/pipermail/openstack-dev/2014-February/027425.html
+        # for background
+        - event: comment-added
+          comment_filter: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*reverify( (?:bug|lp)[\s#:]*(\d+))\s*$
+          require-approval:
+            - approved: 1
+            - username: jenkins
+        # From openstack-infra/config SHA-1 : 98b169f60030fed4b9a54bf7bd5d1476057bcdf5
+        # Have Zuul enqueue the change for check testing then move it to the gate pipeline if a verified +1 comes back from the check
+        # when a change has a -1 or -2 verified score on it from jenkins
+        - event: comment-added
+          require-approval:
+            - verified: -1
+              username: jenkins
+          approval:
+            - approved: 1
+        - event: comment-added
+          require-approval:
+            - verified: -2
+              username: jenkins
+          approval:
+            - approved: 1
+    start:
+      gerrit:
+        verified: 0
     success:
       gerrit:
         verified: 1
@@ -25,13 +74,35 @@ pipelines:
     failure-message: Build failed.  https://wiki.trafodion.org/wiki/index.php/Code_Reviews#Test_Failures
     manager: DependentPipelineManager
     precedence: high
+    require:
+      open: True
+      current-patchset: True
     trigger:
       gerrit:
+        # From openstack-infra/config SHA-1 : a78022f9d4bce9296b600dfb8992c1d4e063852e, 20f5d2d0034641bc96e822c6846d3b5886dbe119
+        # A change must have a positive check result in the last 24 hrs
+        # To support the removing of non-integrated jobs (not integrated in 24 hrs) from gate where their failure is much more expensive.
         - event: comment-added
+          require-approval:
+            - verified: 1
+              username: jenkins
+              newer-than: 72h
+          approval:
+            - approved: 1
+        # From openstack-infra/config SHA-1 : 8010041ed1d877d23105b2aad4fdb722b67df08f
+        # If a change ends up with a +2 from jenkins but no approval (because a core reviewer removed his or her vote), allow the change to be enqueued the next
+        # time someone approves it
+        - event: comment-added
+          require-approval:
+            - verified: 2
+              username: jenkins
+              newer-than: 72h
           approval:
             - approved: 1
         - event: comment-added
-          comment_filter: (?i)^\s*reverify(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+          approval:
+            - verified: 1
+          username_filter: jenkins
     start:
       gerrit:
         verified: 0
@@ -42,6 +113,8 @@ pipelines:
     failure:
       gerrit:
         verified: -2
+    window-floor: 20
+    window-increase-factor: 2
 
 #  - name: post
 #    description: This pipeline runs jobs that operate after each change is merged.
@@ -51,6 +124,15 @@ pipelines:
 #      gerrit:
 #        - event: ref-updated
 #          ref: ^(?!(devnull|refs/.*)).*$
+
+#  - name: tag
+#    description: This pipeline runs jobs in response to any tag event.
+#    manager: IndependentPipelineManager
+#    precedence: high
+#    trigger:
+#      gerrit:
+#        - event: ref-updated
+#          ref: ^refs/tags/.*$
 
   - name: pre-release
     description: This pipeline runs jobs on projects in response to pre-release tags.
@@ -78,7 +160,30 @@ pipelines:
       gerrit:
         - event: patchset-created
         - event: comment-added
-          comment_filter: (?i)^\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+          comment_filter: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
+
+#  - name: experimental
+#    description: On-demand pipeline for requesting a run against a set of jobs that are not yet gating. Leave review comment of "check experimental" to run jobs in this pipeline.
+#    manager: IndependentPipelineManager
+#    precedence: low
+#    trigger:
+#      gerrit:
+#        - event: comment-added
+#          comment_filter: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*check experimental\s*$
+#    success:
+#      gerrit:
+#        force-message: true
+#    failure:
+#      gerrit:
+#        force-message: true
+#
+#  - name: periodic
+#    description: Jobs in this queue are triggered on a timer.
+#    manager: IndependentPipelineManager
+#    precedence: low
+#    trigger:
+#      timer:
+#        - time: '0 6 * * *'
 
   - name: check-full
     description: On-demand extensive check testing. Leave review comment "run check-full".
@@ -104,14 +209,14 @@ pipelines:
         - time: '30 2 * * *'
     success:
       smtp:
-        from: zuul@trafodion.org
+        from: jenkins@trafodion.org
         to: trafodion-firefighters@lists.launchpad.net
-        subject: Daily Build -- Passed All Tests
+        subject: 'Daily build of {change.project} -- Passed All Tests'
     failure:
       smtp:
-        from: zuul@trafodion.org
+        from: jenkins@trafodion.org
         to: trafodion-firefighters@lists.launchpad.net
-        subject: Daily Build -- Test Failures
+        subject: 'Daily build of {change.project} -- Test Failures'
 
 
 jobs:

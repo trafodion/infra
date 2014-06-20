@@ -29,10 +29,22 @@ class zuul (
   $status_url = "https://${::fqdn}/",
   $zuul_url = '',
   $git_source_repo = 'https://git.openstack.org/openstack-infra/zuul',
-  $push_change_refs = false,
   $job_name_in_report = false,
   $revision = 'master',
-  $statsd_host = ''
+  $statsd_host = '',
+  $git_email = '',
+  $git_name = '',
+  $smtp_host = 'localhost',
+  $smtp_port = 25,
+  $smtp_default_from = "zuul@${::fqdn}",
+  $smtp_default_to = "zuul.reports@${::fqdn}",
+  $swift_authurl = '',
+  $swift_user = '',
+  $swift_key = '',
+  $swift_tenant_name = '',
+  $swift_region_name = '',
+  $swift_default_container = '',
+  $swift_default_logserver_prefix = '',
 ) {
   include apache
   include pip
@@ -45,6 +57,12 @@ class zuul (
 
   package { $packages:
     ensure => present,
+  }
+
+  package { 'yappi':
+    ensure   => present,
+    provider => pip,
+    require  => Class['pip'],
   }
 
   # A lot of things need yaml, be conservative requiring this package to avoid
@@ -63,6 +81,12 @@ class zuul (
 
   if ! defined(Package['python-daemon']) {
     package { 'python-daemon':
+      ensure => present,
+    }
+  }
+
+  if ! defined(Package['yui-compressor']) {
+    package { 'yui-compressor':
       ensure => present,
     }
   }
@@ -131,6 +155,13 @@ class zuul (
     require => User['zuul'],
   }
 
+  file { '/var/run/zuul-merger':
+    ensure  => directory,
+    owner   => 'zuul',
+    group   => 'zuul',
+    require => User['zuul'],
+  }
+
   file { '/var/lib/zuul':
     ensure  => directory,
     owner   => 'zuul',
@@ -175,6 +206,21 @@ class zuul (
                 Package['libjs-jquery']],
   }
 
+  vcsrepo { '/opt/twitter-bootstrap':
+    ensure   => latest,
+    provider => git,
+    revision => 'v3.1.1',
+    source   => 'https://github.com/twbs/bootstrap.git',
+  }
+
+  file { '/var/lib/zuul/www/bootstrap':
+    ensure  => link,
+    target  => '/opt/twitter-bootstrap/dist',
+    require => [File['/var/lib/zuul/www'],
+                Package['libjs-jquery'],
+                Vcsrepo['/opt/twitter-bootstrap']],
+  }
+
   vcsrepo { '/opt/jquery-visibility':
     ensure   => latest,
     provider => git,
@@ -182,17 +228,14 @@ class zuul (
     source   => 'https://github.com/mathiasbynens/jquery-visibility.git',
   }
 
-  exec { 'get-jquery-visibility.min':
-    command     => '/usr/bin/curl https://raw.github.com/mathiasbynens/jquery-visibility/v1.0.6/jquery-visibility.min.js > /opt/jquery-visibility/jquery-visibility.min.js',
-    cwd         => '/opt/jquery-visibility',
-    require     => Vcsrepo['/opt/jquery-visibility'],
-  }
-
-  file { '/var/lib/zuul/www/jquery-visibility.min.js':
-    ensure  => link,
-    target  => '/opt/jquery-visibility/jquery-visibility.min.js',
-    require => [File['/var/lib/zuul/www'],
-                Vcsrepo['/opt/jquery-visibility']],
+  exec { 'install-jquery-visibility':
+    command     => 'yui-compressor -o /var/lib/zuul/www/jquery-visibility.min.js /opt/jquery-visibility/jquery-visibility.js',
+    path        => 'bin:/usr/bin',
+    refreshonly => true,
+    subscribe   => Vcsrepo['/opt/jquery-visibility'],
+    require     => [File['/var/lib/zuul/www'],
+                    Package['yui-compressor'],
+                    Vcsrepo['/opt/jquery-visibility']],
   }
 
   file { '/var/lib/zuul/www/index.html':
@@ -201,17 +244,27 @@ class zuul (
     require => File['/var/lib/zuul/www'],
   }
 
-  file { '/var/lib/zuul/www/app.js':
+  file { '/var/lib/zuul/www/styles':
     ensure  => link,
-    target  => '/opt/zuul/etc/status/public_html/app.js',
+    target  => '/opt/zuul/etc/status/public_html/styles',
     require => File['/var/lib/zuul/www'],
   }
 
-  # add twitter-bootstrap v2.3.1 since it's needed by Zuul index.html
-  file { '/var/lib/zuul/www/bootstrap':
-    ensure  => directory,
-    recurse => true, 
-    source  => 'puppet:///modules/zuul/twitter-bootstrap/2.3.1',
+  file { '/var/lib/zuul/www/zuul.app.js':
+    ensure  => link,
+    target  => '/opt/zuul/etc/status/public_html/zuul.app.js',
+    require => File['/var/lib/zuul/www'],
+  }
+
+  file { '/var/lib/zuul/www/jquery.zuul.js':
+    ensure  => link,
+    target  => '/opt/zuul/etc/status/public_html/jquery.zuul.js',
+    require => File['/var/lib/zuul/www'],
+  }
+
+  file { '/var/lib/zuul/www/images':
+    ensure  => link,
+    target  => '/opt/zuul/etc/status/public_html/images',
     require => File['/var/lib/zuul/www'],
   }
 
@@ -223,28 +276,12 @@ class zuul (
     source => 'puppet:///modules/zuul/zuul.init',
   }
 
-  exec { 'zuul-reload':
-    command     => '/etc/init.d/zuul reload',
-    require     => File['/etc/init.d/zuul'],
-    refreshonly => true,
-  }
-
-  service { 'zuul':
-    name       => 'zuul',
-    enable     => true,
-    hasrestart => true,
-    require    => File['/etc/init.d/zuul'],
-  }
-
-  cron { 'zuul_repack':
-    user        => 'zuul',
-    weekday     => '0',
-    hour        => '4',
-    minute      => '7',
-    command     => 'find /var/lib/zuul/git/ -maxdepth 3 -type d -name ".git" -exec git --git-dir="{}" pack-refs --all \;',
-    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin',
-    require     => [User['zuul'],
-                    File['/var/lib/zuul/git']],
+  file { '/etc/init.d/zuul-merger':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/zuul/zuul-merger.init',
   }
 
   apache::vhost { $vhost_name:
@@ -253,14 +290,29 @@ class zuul (
     priority => '50',
     template => 'zuul/zuul.vhost.erb',
   }
-  a2mod { 'rewrite':
-    ensure => present,
+  if ! defined(A2mod['rewrite']) {
+    a2mod { 'rewrite':
+      ensure => present,
+    }
   }
-  a2mod { 'proxy':
-    ensure => present,
+  if ! defined(A2mod['proxy']) {
+    a2mod { 'proxy':
+      ensure => present,
+    }
   }
-  a2mod { 'proxy_http':
-    ensure => present,
+  if ! defined(A2mod['proxy_http']) {
+    a2mod { 'proxy_http':
+      ensure => present,
+    }
   }
-
+  if ! defined(A2mod['cache']) {
+    a2mod { 'cache':
+      ensure => present,
+    }
+  }
+  if ! defined(A2mod['mem_cache']) {
+    a2mod { 'mem_cache':
+      ensure => present,
+    }
+  }
 }
