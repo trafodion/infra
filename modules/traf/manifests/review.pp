@@ -92,7 +92,7 @@ class traf::review (
     ssh_rsa_pubkey_contents         => $ssh_rsa_pubkey_contents,
     ssh_project_rsa_key_contents    => $ssh_project_rsa_key_contents,
     ssh_project_rsa_pubkey_contents => $ssh_project_rsa_pubkey_contents,
-    email                           => 'trafodion-infra@lists.launchpad.net',
+    email                           => "gerrit@${::fqdn}",
       # 1 + 100 + 9 + 2 + 2 + 25 = 139(rounded up)
     database_poollimit              => '150',
     container_heaplimit             => '16g',
@@ -186,10 +186,11 @@ class traf::review (
     require => User['gerrit2'],
   }
   file {'/home/gerrit2/.ssh/config':
-    ensure => present,
-    source  => 'puppet:///modules/traf/gerrit/ssh_config',
+    ensure  => present,
     owner   => 'gerrit2',
     group   => 'gerrit2',
+    content => template('traf/gerrit_ssh_config.erb'),
+    replace => true,
     require => User['gerrit2'],
   }
   file {'/home/gerrit2/.ssh/launchpadsync_rsa':
@@ -244,9 +245,4 @@ class traf::review (
   #  backup_user   => 'bup-review',
   #  backup_server => 'ci-backup-rs-ord.trafodion.org',
   #}
-
-  # Launchpad API investigation
-  realize (
-      User::Virtual::Localuser['sjohnson'],
-  )
 }

@@ -13,7 +13,9 @@ class iptables(
   $rules4 = [],
   $rules6 = [],
   $public_tcp_ports = [],
-  $public_udp_ports = []
+  $public_udp_ports = [],
+  $blacklist_rules4 = [],
+  $blacklist_rules6 = []
 ) {
 
   include iptables::params

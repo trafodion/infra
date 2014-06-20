@@ -1,0 +1,2 @@
+Host *
+        IdentityFile /var/lib/recheckwatch/ssh/id_rsa

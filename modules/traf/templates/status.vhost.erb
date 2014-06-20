@@ -13,7 +13,7 @@ NameVirtualHost <%= vhost_name %>:<%= port %>
   DocumentRoot <%= docroot %>
 
   RewriteEngine on
-  RewriteRule ^/$ /status/index.html [L]
+  RewriteRule ^/$ /index.html [L]
 
   RewriteRule ^/rechecks$ /rechecks/ [R]
   RewriteRule ^/rechecks/$ http://zuul.trafodion.org/rechecks.html [P]
@@ -23,14 +23,14 @@ NameVirtualHost <%= vhost_name %>:<%= port %>
   </Location>
 
   RewriteRule ^/bugday$ /bugday/ [R]
-  RewriteRule ^/bugday/(.*)$ http://wiki.trafodion.org/bugday/$1 [P]
+  RewriteRule ^/bugday/(.*)$ https://wiki.trafodion.org/bugday/$1 [P]
   <Location /bugday/>
     Order allow,deny
     Allow from all
   </Location>
 
-  Alias /reviews /srv/static/reviewday
-  Alias /release /srv/static/release
+  Alias /reviews <%= server_path %>/reviewday
+  Alias /release <%= server_path %>/release
 
   <Directory <%= docroot %>>
     Options <%= options %>

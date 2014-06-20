@@ -26,7 +26,9 @@ class traf::wiki (
     role                      => 'all',
     mediawiki_location        => '/srv/mediawiki/w',
     mediawiki_images_location => '/srv/mediawiki/images',
+    server_admin              => 'trafodion-infrastructure@lists.launchpad.net',
     site_hostname             => $::fqdn,
+    site_hostname_alias       => "wiki2.${::domain}",
     ssl_cert_file             => "/etc/ssl/certs/${::fqdn}.pem",
     ssl_key_file              => "/etc/ssl/private/${::fqdn}.key",
     ssl_chain_file            => '/etc/ssl/certs/intermediate.pem',
@@ -90,8 +92,10 @@ class traf::wiki (
     ensure   => latest,
     provider => git,
     revision => 'master',
+    owner    => www-data,
+    group    => www-data,
     source   => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/OpenID.git',
-    require => Exec['install-mediawiki'],
+    require  => Exec['install-mediawiki'],
   }
 
   exec { 'install OpenId':
@@ -234,15 +238,24 @@ class traf::wiki (
   # update apache2 security configuration
   exec { 'update security':
     cwd     => "/etc/apache2/conf.d",
-    command => "/bin/sed -i.bak -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
+    command => "/bin/sed -i -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
     unless  => "/bin/grep -E '^ServerTokens Prod' security",
+    notify  => Service[apache2],
+  }
+
+  # update apache2 configuration
+  # configure MaxClients and MaxRequestsPerChild for 4GB server
+  exec { 'update apache2':
+    cwd     => "/etc/apache2",
+    command => "/bin/sed -i -e 's/^    MaxClients .*/    MaxClients 75/g' -e 's/^    MaxRequestsPerChild .*/    MaxRequestsPerChild 600/g' apache2.conf",
+    unless  => "/bin/grep -E '^    MaxClients 75' apache2.conf && /bin/grep -E '^    MaxRequestsPerChild 600' apache2.conf",
     notify  => Service[apache2],
   }
 
   # update php.ini configuration
   exec { 'update php.ini':
     cwd     => "/etc/php5/apache2",
-    command => "/bin/sed -i.bak -e 's/^expose_php = .*/expose_php = Off/g' php.ini",
+    command => "/bin/sed -i -e 's/^expose_php = .*/expose_php = Off/g' php.ini",
     unless  => "/bin/grep -E '^expose_php = Off' php.ini",
     notify  => Service[apache2],
   }

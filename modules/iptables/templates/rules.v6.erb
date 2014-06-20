@@ -1,27 +1,40 @@
 *filter
 :INPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
+:FORWARD DROP [0:0]
 :OUTPUT ACCEPT [0:0]
-:trafodion-INPUT - [0:0]
--A INPUT -j trafodion-INPUT
--A trafodion-INPUT -i lo -j ACCEPT
--A trafodion-INPUT -p icmpv6 -j ACCEPT
--A trafodion-INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+:BLACKLIST - [0:0]
+:LOGDROP - [0:0]
+:TRAF-INPUT - [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -j BLACKLIST
+-A INPUT -j TRAF-INPUT
+-A INPUT -m limit --limit 1/sec -j LOG --log-prefix drop_packet --log-level 7
+-A INPUT -j DROP
+<% blacklist_rules6.each do |blacklist| -%>
+-A BLACKLIST <%= blacklist %>
+<% end -%>
+# Log IP making more than 1 connection per second for SSH
+-A LOGDROP -p tcp -m tcp --dport 22 -m limit --limit 1/sec -j LOG --log-prefix ssh_blacklist --log-level 7
+-A LOGDROP -j REJECT --reject-with icmp6-adm-prohibited
+#-A TRAF-INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 128 -m limit --limit 1/sec -j ACCEPT
+#-A TRAF-INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 129 -m limit --limit 1/sec -j ACCEPT
 # SSH from anywhere
--A trafodion-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+-A TRAF-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 # SNMP from trafodion cacti
-#-A trafodion-INPUT -m udp -p udp --dport 161 -s 2001:4800:780d:0509:3bc3:d7f6:ff04:49de -j ACCEPT
+#-A TRAF-INPUT -m udp -p udp --dport 161 -s 0:0:0:0:0:ffff:f7d:43c7 -j ACCEPT
+#-A TRAF-INPUT -m udp -p udp --dport 161 -s  0:0:0:0:0:ffff:c0a8:63 -j ACCEPT
 # Public TCP ports
 <% public_tcp_ports.each do |port| -%>
--A trafodion-INPUT -m state --state NEW -m tcp -p tcp --dport <%= port %> -j ACCEPT
+-A TRAF-INPUT -m state --state NEW -m tcp -p tcp --dport <%= port %> -j ACCEPT
 <% end -%>
 # Public UDP ports
 <% public_udp_ports.each do |port| -%>
--A trafodion-INPUT -m udp -p udp --dport <%= port %> -j ACCEPT
+-A TRAF-INPUT -m udp -p udp --dport <%= port %> -j ACCEPT
 <% end -%>
 # Per-host rules
 <% rules6.each do |rule| -%>
--A trafodion-INPUT <%= rule %>
+-A TRAF-INPUT <%= rule %>
 <% end -%>
--A trafodion-INPUT -j REJECT --reject-with icmp6-adm-prohibited
+-A TRAF-INPUT -j REJECT --reject-with icmp6-adm-prohibited
 COMMIT

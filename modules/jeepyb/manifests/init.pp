@@ -40,7 +40,8 @@ class jeepyb (
   vcsrepo { '/opt/jeepyb':
     ensure   => latest,
     provider => git,
-    revision => 'master',
+    # pin version because of our setup can't deal with 2 seperate project config files yet
+    revision => 'ad2494b8d6f09ccdaf90dc171c20d48e9c76096d',
     source   => $git_source_repo,
   }
 

@@ -3,6 +3,8 @@
 class mediawiki(
   $role = '',
   $site_hostname = '',
+  $site_hostname_alias = '',
+  $server_admin = '',
   $mediawiki_location = '',
   $mediawiki_images_location = '',
   $ssl_cert_file = "/etc/ssl/certs/${::fqdn}.pem",

@@ -42,7 +42,7 @@ function wfAddMetas( &$out, &$text ) {
     $name = $wgTitle->getPrefixedDBKey();
  
     $out->addMeta( 'bu', 'CORP');
-    $out->addMeta( 'description', 'Project Trafodion is a joint HP Labs / HP-IT research project to develop operational SQL-on-Hadoop software.');
+    $out->addMeta( 'description', 'Project Trafodion is an open source software project sponsored by HP to develop operational SQL-on-Hadoop software.');
     $out->addMeta( 'hp_design_version', 'hpweb.1.2a');
     $out->addMeta( 'keywords', 'trafodion, Hadoop, Hive, HBase, SQL, database, transactional SQL');
     $out->addMeta( "lifecycle", "presales.consideration");

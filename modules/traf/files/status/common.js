@@ -16,17 +16,17 @@
 function header(activeTabName) {
   tabsName = new Array();
   tabsLink = new Array();
-  tabsName[0] = 'Status'; tabsLink[0] = 'http://static.trafodion.org/status/';
-  tabsName[1] = 'Zuul'; tabsLink[1] = 'http://static.trafodion.org/status/zuul/';
-  tabsName[2] = 'Rechecks'; tabsLink[2] = 'http://static.trafodion.org/rechecks/';
-//  tabsName[3] = 'Release'; tabsLink[3] = 'http://static.trafodion.org/release/';
-//  tabsName[4] = 'Reviews'; tabsLink[4] = 'http://static.trafodion.org/reviews/';
-//  tabsName[5] = 'Bugday'; tabsLink[5] = 'http://static.trafodion.org/bugday/';
+  tabsName[0] = 'Status'; tabsLink[0] = 'http://status.trafodion.org/';
+  tabsName[1] = 'Zuul'; tabsLink[1] = 'http://status.trafodion.org/zuul/';
+  tabsName[2] = 'Rechecks'; tabsLink[2] = 'http://status.trafodion.org/rechecks/';
+  tabsName[3] = 'Downloads'; tabsLink[3] = 'http://downloads.trafodion.org/';
+  tabsName[4] = 'Documentation'; tabsLink[4] = 'http://docs.trafodion.org';
+//  tabsName[5] = 'Bugday'; tabsLink[5] = 'http://status.trafodion.org/bugday/';
 
   document.write(
    '<div id="header" class="container">'+
    '<div class="span-5">'+
-   ' <h1 id="logo"><a href="http://static.trafodion.org/">Trafodion</a></h1>'+
+   ' <h1 id="logo"><a href="http://status.trafodion.org/">Trafodion</a></h1>'+
    '</div>\n'+
    '<div class="span-19 last blueLine">'+
    '<div id="navigation" class="span-19">'+
@@ -55,20 +55,20 @@ function footer() {
   '<div class="span-4">'+
   '<h3>Trafodion</h3>'+
   '<ul>'+
-  ' <li><a href="http://static.trafodion.org/projects/">Projects</a></li>'+
-//  ' <li><a href="http:/static.trafodion.org/trafodion-security/">Trafodion Security</a></li>'+
+  ' <li><a href="https://wiki.trafodion.org/wiki/index.php">Project</a></li>'+
+//  ' <li><a href="https:/wiki.trafodion.org/wiki/index.php/trafodion-security/">Trafodion Security</a></li>'+
   ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Software">Understanding the Software</a></li>'+
-//  ' <li><a href="http://static.trafodion.org/blog/">Blog</a></li>'+
+//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Blog">Blog</a></li>'+
   '</ul>'+
   '</div>\n'+
   '<div class="span-4">'+
   '<h3>Community</h3>'+
   '<ul>'+
   ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Community">About the Community</a></li>'+
-//  ' <li><a href="http://static.trafodion.org/community/">User Groups</a></li>'+
-//  ' <li><a href="http://static.trafodion.org/events/">Events</a></li>'+
-//  ' <li><a href="http://static.trafodion.org/jobs/">Jobs</a></li>'+
-//  ' <li><a href="http://static.trafodion.org/companies/">Companies</a></li>'+
+//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/User_Groups">User Groups</a></li>'+
+//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Events_Calendar">Events</a></li>'+
+//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/jobs/">Jobs</a></li>'+
+//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/companies/">Companies</a></li>'+
   ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Contributing_to_the_Software">Contribute</a></li>'+
   '</ul>'+
   '</div>\n'+
@@ -77,17 +77,17 @@ function footer() {
   '<ul>'+
   ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Documentation">Trafodion Documentation</a></li>'+
   ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Using_the_Software">Using the Software</a></li>'+
-  ' <li><a href="http://wiki.trafodion.org/">Wiki</a></li>'+
+  ' <li><a href="https://wiki.trafodion.org/">Trafodion Wiki</a></li>'+
   '</ul>'+
   '</div>\n'+
   '<div class="span-4 last">'+
   '<h3>Branding &amp; Legal</h3>'+
   '<ul>'+
   ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Legal_Information">Legal Information</a></li>'+
-//  ' <li><a href="http://static.trafodion.org/brand/">Logos &amp; Guidelines</a></li>'+
-//  ' <li><a href="http://static.trafodion.org/brand/trafodion-trademark-policy/">Trademark Policy</a></li>'+
+//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/brand/">Logos &amp; Guidelines</a></li>'+
+//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/brand/trafodion-trademark-policy/">Trademark Policy</a></li>'+
   ' <li><a href="http://www8.hp.com/us/en/privacy/privacy.html">Privacy Policy</a></li>'+
-  ' <li><a href="https://review.trafodion.org/static/cla.html">Trafodion CLA</a></li>'+
+//  ' <li><a href="https://review.trafodion.org/static/cla.html">Trafodion CLA</a></li>'+
   '</ul>'+
   '</div>'+
   '</div>'+

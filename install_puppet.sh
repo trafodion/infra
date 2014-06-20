@@ -16,6 +16,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+# Install pip using get-pip
+PIP_GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py
+
+curl -O $PIP_GET_PIP_URL || wget $PIP_GET_PIP_URL
+python get-pip.py
+
 # Install puppet version 2.7.x from puppetlabs.
 # The repo and preferences files are also managed by puppet, so be sure
 # to keep them in sync with this file.
@@ -31,6 +37,9 @@ if cat /etc/*release | grep -e "Fedora" &> /dev/null; then
 
     mkdir -p /etc/puppet/modules/
     ln -s /usr/local/share/gems/gems/hiera-puppet-* /etc/puppet/modules/
+
+    # Puppet is expecting the command to be pip-python on Fedora
+    ln -s /usr/bin/pip /usr/bin/pip-python
 
 elif cat /etc/*release | grep -e "CentOS" -e "Red Hat" &> /dev/null; then
     rpm -qi epel-release &> /dev/null || rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
@@ -54,18 +63,23 @@ EOF
     yum install -y redhat-lsb-core git puppet
 else
     #defaults to Ubuntu
-    # NB: keep in sync with openstack_project/files/00-puppet.pref
-    cat > /etc/apt/preferences.d/00-puppet.pref <<EOF
+
+    lsbdistcodename=`lsb_release -c -s`
+    if [ $lsbdistcodename != 'trusty' ] ; then
+        # NB: keep in sync with openstack_project/files/00-puppet.pref
+        cat > /etc/apt/preferences.d/00-puppet.pref <<EOF
 Package: puppet puppet-common puppetmaster puppetmaster-common puppetmaster-passenger
 Pin: version 2.7*
 Pin-Priority: 501
 
 Package: facter
-Pin: version 1.7*
+Pin: version 1.*
 Pin-Priority: 501
 EOF
-
-    lsbdistcodename=`lsb_release -c -s`
+        rubypkg=rubygems
+    else
+        rubypkg=ruby
+    fi
     puppet_deb=puppetlabs-release-${lsbdistcodename}.deb
     wget http://apt.puppetlabs.com/$puppet_deb -O $puppet_deb
     dpkg -i $puppet_deb
@@ -75,5 +89,5 @@ EOF
     DEBIAN_FRONTEND=noninteractive apt-get --option 'Dpkg::Options::=--force-confold' \
         --assume-yes dist-upgrade
     DEBIAN_FRONTEND=noninteractive apt-get --option 'Dpkg::Options::=--force-confold' \
-        --assume-yes install -y --force-yes puppet git rubygems
+        --assume-yes install -y --force-yes puppet git $rubypkg
 fi

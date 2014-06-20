@@ -1,20 +1,23 @@
 *filter
 :INPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
+:FORWARD DROP [0:0]
 :OUTPUT ACCEPT [0:0]
 :BLACKLIST - [0:0]
 :LOGDROP - [0:0]
 :TRAF-INPUT - [0:0]
--A INPUT  -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -i lo -j ACCEPT
 -A INPUT -j BLACKLIST
 -A INPUT -j TRAF-INPUT
 -A INPUT -m limit --limit 1/sec -j LOG --log-prefix drop_packet --log-level 7
 -A INPUT -j DROP
+<% blacklist_rules4.each do |blacklist| -%>
+-A BLACKLIST <%= blacklist %>
+<% end -%>
 # Log IP making more than 1 connection per second for SSH
 -A LOGDROP -p tcp -m tcp --dport 22 -m limit --limit 1/sec -j LOG --log-prefix ssh_blacklist --log-level 7
 -A LOGDROP -j REJECT --reject-with icmp-host-prohibited
--A TRAF-INPUT -p icmp -m limit --limit 1/sec -m icmp --icmp-type any -j ACCEPT
+#-A TRAF-INPUT -p icmp -m limit --limit 1/sec -m icmp --icmp-type any -j ACCEPT
 # SSH from anywhere
 -A TRAF-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 # SNMP from trafodion cacti

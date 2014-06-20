@@ -1,0 +1,100 @@
+<?php
+    // emit some headers
+    header('Pragma: no-cache, no-store');
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+    header("Expires: " . gmdate("D, d M Y H:i:s") . " GMT");
+
+    $scriptPath = __DIR__;
+    $salt = "<%= download_salt %>";
+    $cipher = "<%= download_cipher %>";
+    $token = $_POST["token"];
+
+    if (is_null($token)) {
+        header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+        exit;
+    }
+
+    $ivSize = openssl_cipher_iv_length($cipher);
+    $iv = substr($token, 0, $ivSize);
+    $fName = openssl_decrypt(substr($token, $ivSize), $cipher, $salt, 0, $iv);
+    $downloadPath = realpath($scriptPath . "/../downloads/trafodion/publish/" . $fName);
+
+    if (!file_exists($downloadPath)) {
+        header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+        exit;
+    } else {
+        // array of mime types
+        $mime_types = array(
+            'md5'    => 'text/plain',
+            'pdf'    => 'application/pdf',
+            'sha1'   => 'text/plain',
+            'txt'    => 'text/plain',
+            'pom'    => 'application/xml',
+            'ps'     => 'application/postscript',
+            'xml'    => 'application/xml',
+
+            // archives
+            'cab'    => 'application/vnd.ms-cab-compressed',
+            'exe'    => 'application/octet-stream',
+            'gz'     => 'application/x-gzip',
+            'gzip'   => 'application/x-gzip',
+            'jar'    => 'application/java-archive',
+            'msi'    => 'application/x-msdownload',
+            'tar'    => 'application/x-tar',
+            'tar.gz' => 'application/x-tar',
+            'tgz'    => 'application/x-tar',
+            'zip'    => 'application/zip',
+
+            // ms office
+            'doc'    => 'application/msword',
+            'docx'   => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'dotx'   => 'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+            'potx'   => 'application/vnd.openxmlformats-officedocument.presentationml.template',
+            'ppsx'   => 'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+            'ppt'    => 'application/vnd.ms-powerpoint',
+            'pptx'   => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'rtf'    => 'application/rtf',
+            'xlam'   => 'application/vnd.ms-excel.addin.macroEnabled.12',
+            'xls'    => 'application/vnd.ms-excel',
+            'xlsb'   => 'application/vnd.ms-excel.sheet.binary.macroEnabled.12',
+            'xlsx'   => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'xltx'   => 'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+            'vsd'    => 'application/x-visio',
+            'vsdx'   => 'application/vnd.ms-visio.drawing.main+xml',
+            'vst'    => 'application/x-visio',
+            'vstx'   => 'application/vnd.ms-visio.template.main+xml',
+            'vssx'   => 'application/vnd.ms-visio.stencil.main+xml',
+            'vsdm'   => 'application/vnd.ms-visio.drawing.macroEnabled.main+xml',
+            'vstm'   => 'application/vnd.ms-visio.template.macroEnabled.main+xml',
+            'vssm'   => 'application/vnd.ms-visio.stencil.macroEnabled.main+xml',
+            'vsw'    => 'application/x-visio',
+
+            // open office
+            'odt'    => 'application/vnd.oasis.opendocument.text',
+            'ods'    => 'application/vnd.oasis.opendocument.spreadsheet',
+        );
+
+        $extension = strtolower( pathinfo( basename( $downloadPath ), PATHINFO_EXTENSION ) );
+
+        // if extension is gz check to make sure it is not tar.gz
+        // mime type is slightly different between the two extensions
+        if ($extension === "gz") {
+            if (strpos(strtolower(basename($downloadPath)), '.tar.gz') !== false) {
+                $extension = "tar.gz";
+            }
+        }
+
+        // Set a default mime if we can't find it
+        if(!isset($mime_types[$extension])) {
+            $mime = 'application/octet-stream';
+        } else {
+            $mime = (is_array($mime_types[$extension])) ? $mime_types[$extension][0] : $mime_types[$extension];
+        }
+
+        header('Content-Type: "' . $mime . '"');
+        header('Content-Disposition: attachment; filename="' . basename($downloadPath) . '"');
+        header('X-Sendfile: ' . $downloadPath);
+    }
+?>

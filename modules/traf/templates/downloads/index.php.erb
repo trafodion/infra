@@ -1,0 +1,192 @@
+<?php
+    header('Pragma: no-cache, no-store');
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+    header("Expires: " . gmdate("D, d M Y H:i:s") . " GMT");
+?>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      lang="en">
+  <HEAD>
+    <TITLE>Trafodion Downloads</TITLE>
+    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-store, no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <script type="text/javascript" src="http://status.<%= domain %>/common.js"></script>
+    <script type="text/javascript" src="http://status.<%= domain %>/jquery.min.js"></script>
+    <script type="text/javascript">
+    /* <![CDATA[ */
+    (function($) {
+        $.fn.extend({
+            postlink: function() {
+                return this.each(function() {
+                    $(this).click(function(e) {
+                        var frm = $("<form>");
+                        frm.attr({'action': 'downloading.php', 'method': 'post'});
+                        frm.append('<input type="hidden" name="token" value="' + $(this).attr('token') + '" />');
+                        frm.appendTo("body");
+                        frm.submit();
+                        e.preventDefault();
+                    });
+                });
+            }
+        });
+    })(jQuery);
+    /* ]]> */
+    </script>
+    <script type="text/javascript">
+    /* <![CDATA[ */
+    $(document).ready(function() {
+        $(".postlink").postlink();
+    });
+    /* ]]> */
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="http://fonts.googleapis.com/css?family=PT+Sans&amp;subset=latin" rel="stylesheet" type="text/css">
+    <!-- Framework CSS -->
+    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/screen.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/print.css" type="text/css" media="print">
+    <!-- IE CSS -->
+    <!--[if lt IE 8]><link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    <!-- OpenStack Specific CSS -->
+    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/dropdown.css" type="text/css" media="screen, projection, print">
+    <!-- Page Specific CSS -->
+    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/home.css" type="text/css" media="screen, projection, print">
+    <link rel="stylesheet" type="text/css" href="http://status.<%= domain %>/themes/trafodion/css/main.css">
+    <style type="text/css">
+        #blurb-container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        .blurb {
+            float: left;
+            width: 25em;
+            padding: 4px;
+        }
+        a:link {
+            color: #204A87;
+        }
+    </style>
+  </HEAD>
+  <BODY>
+    <script type="text/javascript">header('Downloads');</script>
+    <div id="blurb-container">
+    <h1>Trafodion Downloads</h1>
+    <div id="message-container">
+        <div class="container">
+            <div class="span-24 last">
+                <p id="message"/>
+                For the best downloading experience please disable popups for this site.
+                </p>
+            </div>
+        </div>
+    </div>
+    <?php
+        // function to scan directory
+        function scanDirectory($dir, $onlyFiles = false, $fullPath = false) {
+            $pattern = '/\.(pdf|txt|pom|xml|cab|exe|gz|gzip|jar|msi|tar|tgz|zip|md5|sha1)$/';
+            if (isset($dir) && is_readable($dir)) {
+                $dlist = Array();
+                $dir = realpath($dir);
+                if ($onlyFiles) {
+                    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS));
+                } else {
+                    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
+                }
+
+                foreach($objects as $entry => $object) {
+                    if (!$fullPath) {
+                        $entry = str_replace($dir, '', $entry);
+                    }
+                    $dlist[] = $entry;
+                }
+
+                $mlist = preg_grep($pattern, $dlist);
+                return $mlist;
+            }
+        }
+
+        // callback function to match directory publish/release
+        function release($var) {
+            if (strpos($var, 'publish/release') !== false) {
+                return true;
+            }
+        }
+
+        // callback function to match directory publish/pre-release
+        function prerelease($var) {
+            if (strpos($var, 'publish/pre-release') !== false) {
+                return true;
+            }
+        }
+
+        // callback function to match directory publish/daily
+        function daily($var) {
+            if (strpos($var, 'publish/daily') !== false) {
+                return true;
+            }
+        }
+
+        // callback function to print links to files
+        function print_links($item, $key, $rType) {
+            if (is_file($item) === true) {
+                $shortFname = basename($item);
+                list($z, $shortPath) = split('trafodion/publish/' . $rType . '/', $item);
+                $fName = $rType . '/' . $shortPath;
+                $salt = "<%= download_salt %>";
+                $cipher = "<%= download_cipher %>";
+                $ivSize = openssl_cipher_iv_length($cipher);
+                $iv = bin2hex(openssl_random_pseudo_bytes($ivSize / 2));
+                $hashFname = openssl_encrypt($fName, $cipher, $salt, 0, $iv);
+                echo '<li><a class="postlink" href="#" token="' . $iv . $hashFname . '">' . $shortFname . '</a></li>' . PHP_EOL;
+            }
+        }
+
+        #
+        # main
+        #
+        $scriptPath = __DIR__;
+        $wPath = realpath($scriptPath . "/../downloads/trafodion/publish");
+
+        // call scanDirectory function to iterate through directory structure
+        $fArray = scanDirectory($wPath, true, true);
+        natsort($fArray);
+
+        // create array for release
+        echo '<div class="blurb">' . PHP_EOL;
+        echo '    <h2 class="subhead">Release</h2>' . PHP_EOL;
+        echo '    <p><ul>' . PHP_EOL;
+        $releaseArray = array_filter($fArray, "release");
+        array_walk($releaseArray, 'print_links', 'release');
+        echo '    </ul></p>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+
+        // create array for pre-release
+        echo '<div class="blurb">' . PHP_EOL;
+        echo '    <h2 class="subhead">Pre-Release</h2>' . PHP_EOL;
+        echo '    <p><ul>' . PHP_EOL;
+        $prereleaseArray = array_filter($fArray, "prerelease");
+        array_walk($prereleaseArray, 'print_links', 'pre-release');
+        echo '    </ul></p>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+
+        // create array for daily
+        echo '<div class="blurb">' . PHP_EOL;
+        echo '    <h2 class="subhead">Daily</h2>' . PHP_EOL;
+        echo '    <p><ul>' . PHP_EOL;
+        $dailyArray = array_filter($fArray, "daily");
+        array_walk($dailyArray, 'print_links', 'daily');
+        echo '    </ul></p>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+
+    ?>
+
+    </p></div>
+    <script type="text/javascript">footer();</script>
+  </BODY>
+</html>
+

@@ -11,5 +11,9 @@ NameVirtualHost *:80
 <%= " ServerAlias #{serveraliases}" %>
 <% end -%>
 
+  # turn off PHP
+  php_value engine off
+
+  # redirect permanently
   Redirect permanent / http://wiki.trafodion.org
 </VirtualHost>

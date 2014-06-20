@@ -9,6 +9,11 @@ class traf::static (
   $releasestatus_pubkey_contents = '',
   $releasestatus_gerrit_ssh_key = '',
   $er_state_dir = '/var/lib/elastic-recheck',
+  $server_path = '/srv/static',
+  $download_cipher = hiera('download_cipher'),
+  $download_salt = hiera('download_salt'),
+  $download_path = "${server_path}/downloads",
+
 ) {
 
   class { 'traf::server':
@@ -31,25 +36,38 @@ class traf::static (
 
   create_resources(jenkins::add_pub_key, $jenkins_auth_users)
 
-  # make sure Curl is installed
-  package { 'curl':
-    ensure => present,
-  }
-
   include apache
   include apache::mod::wsgi
 
+  # make sure Curl and PHP is installed
+  $packages = ['curl','php5','php5-cli','libapache2-mod-php5','php5-mcrypt','libapache2-mod-xsendfile','lvm2','libjs-jquery','yui-compressor']
+  package { $packages:
+    ensure => present,
+    require => Package['apache2'],
+  }
+
+  a2mod { 'expires':
+    ensure => present,
+    require => Package['apache2'],
+  }
+  a2mod { 'headers':
+    ensure => present,
+    require => Package['apache2'],
+  }
   a2mod { 'rewrite':
     ensure => present,
+    require => Package['apache2'],
   }
   a2mod { 'proxy':
     ensure => present,
+    require => Package['apache2'],
   }
   a2mod { 'proxy_http':
     ensure => present,
+    require => Package['apache2'],
   }
 
-  file { '/srv/static':
+  file { "${server_path}":
     ensure => directory,
   }
 
@@ -59,7 +77,7 @@ class traf::static (
   apache::vhost { 'www.trafodion.org':
     port          => 80,
     priority      => '01',
-    docroot       => '/srv/static',
+    docroot       => "${server_path}",
     serveraliases => ['trafodion.org', 'www.trafodion.com', 'trafodion.com', '15.125.67.182'],
     template      => 'traf/www.vhost.erb',
   }
@@ -70,17 +88,116 @@ class traf::static (
   # Downloads
 
   apache::vhost { 'downloads.trafodion.org':
-    port     => 80,
-    priority => '50',
-    docroot  => '/srv/static/downloads',
-    require  => File['/srv/static/downloads'],
+    port       => 80,
+    priority   => '50',
+    docroot    => "${server_path}/downloads-www",
+    template   => 'traf/downloads/downloads.vhost.erb',
+    require    => File["${server_path}/downloads"],
   }
 
-  file { '/srv/static/downloads':
+  # where download site resides
+  file { "${server_path}/downloads-www":
+    ensure  => directory,
+    owner   => 'www-data',
+    group   => 'www-data',
+  }
+
+  file { "${server_path}/downloads-www/favicon.ico":
+    ensure  => present,
+    owner   => 'www-data',
+    group   => 'www-data',
+    source  => 'puppet:///modules/traf/favicon.ico',
+    require => File["${server_path}/status"],
+  }
+
+  file { "${server_path}/downloads-www/favicon.png":
+    ensure  => present,
+    owner   => 'www-data',
+    group   => 'www-data',
+    source  => 'puppet:///modules/traf/favicon.png',
+    require => File["${server_path}/downloads-www"],
+  }
+
+  file { "${server_path}/downloads-www/index.php":
+    ensure  => file,
+    owner   => 'www-data',
+    group   => 'www-data',
+    content => template('traf/downloads/index.php.erb'),
+    require => File["${server_path}/downloads-www"],
+  }
+
+  file { "${server_path}/downloads-www/downloading.php":
+    ensure  => file,
+    owner   => 'www-data',
+    group   => 'www-data',
+    content => template('traf/downloads/downloading.php.erb'),
+    require => File["${server_path}/downloads-www"],
+  }
+
+  file { "${server_path}/downloads-www/getfile.php":
+    ensure  => file,
+    owner   => 'www-data',
+    group   => 'www-data',
+    content => template('traf/downloads/getfile.php.erb'),
+    require => File["${server_path}/downloads-www"],
+  }
+
+  # actual location of files to download
+  file { "$download_path":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     require => User['jenkins'],
+  }
+
+  file { "$download_path/trafodion":
+    ensure  => directory,
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    mode    => '0775',
+    require => [ User['jenkins'],
+                 File["$download_path"],
+               ]
+  }
+
+  file { "$download_path/trafodion/pre-release":
+    ensure  => directory,
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    mode    => '0775',
+    require => [ User['jenkins'],
+                 File["$download_path/trafodion"],
+               ]
+  }
+
+  file { "$download_path/trafodion/publish":
+    ensure  => directory,
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    mode    => '0775',
+    require => [ User['jenkins'],
+                 File["$download_path/trafodion"],
+               ]
+  }
+
+  file { "$download_path/build-tools-src":
+    ensure  => directory,
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    mode    => '0775',
+    require => [ User['jenkins'],
+                 File["$download_path"],
+               ]
+  }
+
+  file { "$download_path/build-tool-tgz":
+    ensure  => directory,
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    mode    => '0775',
+    require => [ User['jenkins'],
+                 File["$download_path"],
+               ]
   }
 
 
@@ -88,34 +205,13 @@ class traf::static (
   # Maven repository
 
   apache::vhost { 'mvnrepo.trafodion.org':
-    port     => 80,
-    priority => '50',
-    docroot  => '/srv/static/mvnrepo',
-    require  => File['/srv/static/mvnrepo'],
+    port       => 80,
+    priority   => '50',
+    docroot    => "${server_path}/mvnrepo",
+    require    => File["${server_path}/mvnrepo"],
   }
 
-  file { '/srv/static/mvnrepo':
-    ensure  => directory,
-    owner   => 'jenkins',
-    group   => 'jenkins',
-    require => User['jenkins'],
-  }
-
-  file { '/srv/static/downloads/mvnrepo':
-    ensure  => directory,
-    owner   => 'jenkins',
-    group   => 'jenkins',
-    require => User['jenkins'],
-  }
-
-  file { '/srv/static/downloads/mvnrepo/release':
-    ensure  => directory,
-    owner   => 'jenkins',
-    group   => 'jenkins',
-    require => User['jenkins'],
-  }
-
-  file { '/srv/static/downloads/mvnrepo/snapshots':
+  file { "${server_path}/mvnrepo":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
@@ -129,25 +225,34 @@ class traf::static (
   apache::vhost { 'docs.trafodion.org':
     port     => 80,
     priority => '50',
-    docroot  => '/srv/static/docs',
-    require  => File['/srv/static/docs'],
+    docroot  => "${server_path}/docs",
+    template => 'traf/docs/docs.vhost.erb',
+    require  => File["${server_path}/docs"],
   }
 
-  file { '/srv/static/docs':
+  file { "${server_path}/docs":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     require => User['jenkins'],
   }
 
-  file { '/srv/static/docs/robots.txt':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0444',
-    source  => 'puppet:///modules/openstack_project/disallow_robots.txt',
-    require => File['/srv/static/docs'],
-  }
+  # Not needed for now
+  #file { "${server_path}/docs/index.php":
+  #  ensure  => file,
+  #  owner   => 'jenkins',
+  #  group   => 'jenkins',
+  #  content => template('traf/docs/index.php.erb'),
+  #}
+  #
+  #file { "${server_path}/docs/robots.txt":
+  #  ensure  => present,
+  #  owner   => 'root',
+  #  group   => 'root',
+  #  mode    => '0444',
+  #  source  => 'puppet:///modules/openstack_project/disallow_robots.txt',
+  #  require => File["${server_path}/docs"],
+  #}
 
 
   ###########################################################
@@ -156,25 +261,25 @@ class traf::static (
   apache::vhost { 'logs.trafodion.org':
     port     => 80,
     priority => '50',
-    docroot  => '/srv/static/logs',
-    require  => File['/srv/static/logs'],
+    docroot  => "${server_path}/logs",
+    require  => File["${server_path}/logs"],
     template => 'openstack_project/logs.vhost.erb',
   }
 
-  file { '/srv/static/logs':
+  file { "${server_path}/logs":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     require => User['jenkins'],
   }
 
-  file { '/srv/static/logs/robots.txt':
+  file { "${server_path}/logs/robots.txt":
     ensure  => present,
     owner   => 'root',
     group   => 'root',
     mode    => '0444',
     source  => 'puppet:///modules/openstack_project/disallow_robots.txt',
-    require => File['/srv/static/logs'],
+    require => File["${server_path}/logs"],
   }
 
   vcsrepo { '/opt/os-loganalyze':
@@ -202,7 +307,7 @@ class traf::static (
   }
 
 #  No log help files for Trafodion.
-#  file { '/srv/static/logs/help':
+#  file { "${server_path}/logs/help":
 #    ensure  => directory,
 #    recurse => true,
 #    purge   => true,
@@ -211,7 +316,7 @@ class traf::static (
 #    group   => 'root',
 #    mode    => '0755',
 #    source  => 'puppet:///modules/traf/logs/help',
-#    require => File['/srv/static/logs'],
+#    require => File["${server_path}/logs"],
 #  }
 
   file { '/usr/local/sbin/log_archive_maintenance.sh':
@@ -238,45 +343,43 @@ class traf::static (
   apache::vhost { 'status.trafodion.org':
     port     => 80,
     priority => '50',
-    docroot  => '/srv/static/status',
-    template => 'openstack_project/status.vhost.erb',
-    require  => File['/srv/static/status'],
+    docroot  => "${server_path}/status",
+    template => 'traf/status.vhost.erb',
+    require  => File["${server_path}/status"],
   }
 
-  file { '/srv/static/status':
+  file { "${server_path}/status":
     ensure => directory,
   }
 
-  package { 'libjs-jquery':
-    ensure => present,
-  }
-
-  package { 'yui-compressor':
-    ensure => present,
-  }
-
-  file { '/srv/static/status/index.html':
+  file { "${server_path}/status/index.html":
     ensure  => present,
     source  => 'puppet:///modules/traf/status/index.html',
-    require => File['/srv/static/status'],
+    require => File["${server_path}/status"],
   }
 
-  file { '/srv/static/status/favicon.ico':
+  file { "${server_path}/status/favicon.ico":
     ensure  => present,
-    source  => 'puppet:///modules/traf/status/favicon.ico',
-    require => File['/srv/static/status'],
+    source  => 'puppet:///modules/traf/favicon.ico',
+    require => File["${server_path}/status"],
   }
 
-  file { '/srv/static/status/common.js':
+  file { "${server_path}/status/favicon.png":
+    ensure  => present,
+    source  => 'puppet:///modules/traf/favicon.png',
+    require => File["${server_path}/status"],
+  }
+
+  file { "${server_path}/status/common.js":
     ensure  => present,
     source  => 'puppet:///modules/traf/status/common.js',
-    require => File['/srv/static/status'],
+    require => File["${server_path}/status"],
   }
 
-  file { '/srv/static/status/jquery.min.js':
+  file { "${server_path}/status/jquery.min.js":
     ensure  => link,
     target  => '/usr/share/javascript/jquery/jquery.min.js',
-    require => [File['/srv/static/status'],
+    require => [File["${server_path}/status"],
                 Package['libjs-jquery']],
   }
 
@@ -288,11 +391,11 @@ class traf::static (
   }
 
   exec { 'install_jquery-visibility' :
-    command     => 'yui-compressor -o /srv/static/status/jquery-visibility.min.js /opt/jquery-visibility/jquery-visibility.js',
+    command     => "yui-compressor -o ${server_path}/status/jquery-visibility.min.js /opt/jquery-visibility/jquery-visibility.js",
     path        => '/bin:/usr/bin',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/jquery-visibility'],
-    require     => [File['/srv/static/status'],
+    require     => [File["${server_path}/status"],
                     Vcsrepo['/opt/jquery-visibility']],
   }
 
@@ -301,9 +404,10 @@ class traf::static (
     require     => [Package['curl'],
                     Vcsrepo['/opt/jquery-visibility']],
     cwd         => '/opt/jquery-visibility',
+    creates     => '/opt/jquery-visibility/jquery-visibility.min.js',
   }
 
-  file { '/srv/static/status/jquery-visibility.min.js':
+  file { "${server_path}/status/jquery-visibility.min.js":
     ensure  => link,
     target  => '/opt/jquery-visibility/jquery-visibility.min.js',
     require => Vcsrepo['/opt/jquery-visibility'],
@@ -316,10 +420,10 @@ class traf::static (
     source   => 'https://github.com/prestontimmons/graphitejs.git',
   }
 
-  file { '/srv/static/status/jquery-graphite.js':
+  file { "${server_path}/status/jquery-graphite.js":
     ensure  => link,
     target  => '/opt/jquery-graphite/jquery.graphite.js',
-    require => [File['/srv/static/status'],
+    require => [File["${server_path}/status"],
                 Vcsrepo['/opt/jquery-graphite']],
   }
 
@@ -331,11 +435,11 @@ class traf::static (
   }
 
   exec { 'install_flot' :
-    command     => 'yui-compressor -o \'.js$:.min.js\' /opt/flot/jquery.flot*.js; mv /opt/flot/jquery.flot*.min.js /srv/static/status',
+    command     => "yui-compressor -o '.js$:.min.js' /opt/flot/jquery.flot*.js; mv /opt/flot/jquery.flot*.min.js ${server_path}/status",
     path        => '/bin:/usr/bin',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/flot'],
-    require     => [File['/srv/static/status'],
+    require     => [File["${server_path}/status"],
                     Vcsrepo['/opt/flot']],
   }
 
@@ -356,87 +460,94 @@ class traf::static (
   ###########################################################
   # Status - zuul
 
-  file { '/srv/static/status/zuul':
+  file { "${server_path}/status/zuul":
     ensure => directory,
   }
 
-  file { '/srv/static/status/zuul/index.html':
+  file { "${server_path}/status/zuul/index.html":
     ensure  => present,
     source  => 'puppet:///modules/traf/zuul/status.html',
-    require => File['/srv/static/status/zuul'],
+    require => File["${server_path}/status/zuul"],
   }
 
-  file { '/srv/static/status/zuul/status.js':
+  file { "${server_path}/status/zuul/status.js":
     ensure  => present,
     source  => 'puppet:///modules/traf/zuul/status.js',
-    require => File['/srv/static/status/zuul'],
+    require => File["${server_path}/status/zuul"],
   }
 
-  file { '/srv/static/status/zuul/green.png':
+  file { "${server_path}/status/zuul/green.png":
     ensure  => present,
     source  => 'puppet:///modules/traf/zuul/green.png',
-    require => File['/srv/static/status/zuul'],
+    require => File["${server_path}/status/zuul"],
   }
 
-  file { '/srv/static/status/zuul/red.png':
+  file { "${server_path}/status/zuul/red.png":
     ensure  => present,
     source  => 'puppet:///modules/traf/zuul/red.png',
-    require => File['/srv/static/status/zuul'],
+    require => File["${server_path}/status/zuul"],
   }
 
-  file { '/srv/static/status/zuul/line-angle.png':
+  file { "${server_path}/status/zuul/line-angle.png":
     ensure  => present,
     source  => 'puppet:///modules/traf/zuul/line-angle.png',
-    require => File['/srv/static/status/zuul'],
+    require => File["${server_path}/status/zuul"],
   }
 
-  file { '/srv/static/status/zuul/line-t.png':
+  file { "${server_path}/status/zuul/line-t.png":
     ensure  => present,
     source  => 'puppet:///modules/traf/zuul/line-t.png',
-    require => File['/srv/static/status/zuul'],
+    require => File["${server_path}/status/zuul"],
   }
 
-  file { '/srv/static/status/zuul/line.png':
+  file { "${server_path}/status/zuul/line.png":
     ensure  => present,
     source  => 'puppet:///modules/traf/zuul/line.png',
-    require => File['/srv/static/status/zuul'],
+    require => File["${server_path}/status/zuul"],
+  }
+
+  file { "${server_path}/status/themes":
+    ensure  => link,
+    target  => "${server_path}/themes",
+    require => [File["${server_path}/status"],
+                File["${server_path}/themes"]],
   }
 
   ###########################################################
   # www 
 
-  file { '/srv/static/themes':
+  file { "${server_path}/themes":
     ensure  => directory,
     mode    => 0755,
     recurse => true,
   }
 
-  file { '/srv/static/themes/trafodion':
+  file { "${server_path}/themes/trafodion":
     ensure  => directory,
     mode    => 0755,
     recurse => true,
-    require => File['/srv/static/themes'],
+    require => File["${server_path}/themes"],
   }
 
-  file { '/srv/static/themes/trafodion/images':
+  file { "${server_path}/themes/trafodion/images":
     ensure  => directory,
     mode    => 0755,
     recurse => true,
     source  => 'puppet:///modules/traf/images/',
-    require => File['/srv/static/themes/trafodion'],
+    require => File["${server_path}/themes/trafodion"],
   }
 
-  file { '/srv/static/themes/trafodion/images/Trafodion.png':
+  file { "${server_path}/themes/trafodion/images/Trafodion.png":
     ensure  => present,
     source  => 'puppet:///modules/traf/Trafodion.png',
-    require => File['/srv/static/themes/trafodion/images'],
+    require => File["${server_path}/themes/trafodion/images"],
   }
 
-  file { '/srv/static/themes/trafodion/css':
+  file { "${server_path}/themes/trafodion/css":
     ensure  => directory,
     mode    => 0755,
     recurse => true,
-    require => File['/srv/static/themes/trafodion'],
+    require => File["${server_path}/themes/trafodion"],
   }
 
   vcsrepo { '/opt/blueprint-css':
@@ -446,34 +557,54 @@ class traf::static (
     source   => 'https://github.com/joshuaclayton/blueprint-css.git',
   }
 
-  file { '/srv/static/themes/trafodion/css/blueprint':
+  file { "${server_path}/themes/trafodion/css/blueprint":
     ensure  => link,
     target  => '/opt/blueprint-css/blueprint',
-    require => [File['/srv/static/themes/trafodion/css'],
+    require => [File["${server_path}/themes/trafodion/css"],
                 Vcsrepo['/opt/blueprint-css']],
   }
 
-  file { '/srv/static/themes/trafodion/css/dropdown.css':
+  file { "${server_path}/themes/trafodion/css/dropdown.css":
     ensure  => present,
     source  => 'puppet:///modules/traf/css/dropdown.css',
-    require => File['/srv/static/themes/trafodion/css'],
+    require => File["${server_path}/themes/trafodion/css"],
   }
 
-  file { '/srv/static/themes/trafodion/css/home.css':
+  file { "${server_path}/themes/trafodion/css/home.css":
     ensure  => present,
     source  => 'puppet:///modules/traf/css/home.css',
-    require => File['/srv/static/themes/trafodion/css'],
+    require => File["${server_path}/themes/trafodion/css"],
   }
 
-  file { '/srv/static/themes/trafodion/css/main.css':
+  file { "${server_path}/themes/trafodion/css/main.css":
     ensure  => present,
     source  => 'puppet:///modules/traf/css/main.css',
-    require => File['/srv/static/themes/trafodion/css'],
+    require => File["${server_path}/themes/trafodion/css"],
   }
 
-  # need LVM to manage the big directories like downloads
-  package { 'lvm2':
-    ensure => present,
+  # update apache2 security configuration
+  exec { 'update security':
+    cwd     => "/etc/apache2/conf.d",
+    command => "/bin/sed -i -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
+    unless  => "/bin/grep -E '^ServerTokens Prod' security",
+    notify  => Service[apache2],
+  }
+
+  # update apache2 configuration
+  # configure MaxClients and MaxRequestsPerChild for 4GB server
+  exec { 'update apache2':
+    cwd     => "/etc/apache2",
+    command => "/bin/sed -i -e 's/^    MaxClients .*/    MaxClients 75/g' -e 's/^    MaxRequestsPerChild .*/    MaxRequestsPerChild 600/g' apache2.conf",
+    unless  => "/bin/grep -E '^    MaxClients 75' apache2.conf && /bin/grep -E '^    MaxRequestsPerChild 600' apache2.conf",
+    notify  => Service[apache2],
+  }
+
+  # update php.ini configuration
+  exec { 'update php.ini':
+    cwd     => "/etc/php5/apache2",
+    command => "/bin/sed -i -e 's/^expose_php = .*/expose_php = Off/g' -e 's/^engine = .*/engine = Off/g' php.ini",
+    unless  => "/bin/grep -E '^expose_php = Off' php.ini && /bin/grep -E '^engine = Off' php.ini",
+    notify  => Service[apache2],
   }
 
 }

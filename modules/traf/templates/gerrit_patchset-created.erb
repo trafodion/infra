@@ -10,5 +10,5 @@ timeout -k 2m 10m /usr/local/bin/trivial-rebase \
     --role-user=<%= trivial_rebase_role_id %> "$@"
 
 # Notifications
-#timeout -k 2m 10m /usr/local/bin/notify-impact patchset-created "$@" --impact DocImpact --dest-address 'openstack-docs@lists.openstack.org'
-#timeout -k 2m 10m /usr/local/bin/notify-impact patchset-created "$@" --impact SecurityImpact --dest-address 'openstack-security@lists.openstack.org'
+#timeout -k 2m 10m /usr/local/bin/notify-impact patchset-created "$@" --impact DocImpact --dest-address 'trafodion-documentation@lists.launchpad.net'
+#timeout -k 2m 10m /usr/local/bin/notify-impact patchset-created "$@" --impact SecurityImpact --dest-address 'trafodion-development@lists.launchpad.net'

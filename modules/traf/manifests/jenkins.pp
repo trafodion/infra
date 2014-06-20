@@ -18,7 +18,7 @@ class traf::jenkins (
 
   $iptables_rule = regsubst ($zmq_event_receivers, '^(.*)$', '-m state --state NEW -m tcp -p tcp --dport 8888 -s \1 -j ACCEPT')
   class { 'traf::server':
-    iptables_public_tcp_ports => [80, 443],
+    iptables_public_tcp_ports => [80, 443, 8080],
     iptables_rules6           => $iptables_rule,
     iptables_rules4           => $iptables_rule,
     sysadmins                 => $sysadmins,
@@ -32,7 +32,7 @@ class traf::jenkins (
 
   class { '::jenkins::master':
     vhost_name              => $vhost_name,
-    serveradmin             => 'trafodion-infra@lists.launchpad.net',
+    serveradmin             => 'trafodion-infrastructure@lists.launchpad.net',
     logo                    => 'Trafodion.png',
     ssl_cert_file           => "/etc/ssl/certs/${vhost_name}.pem",
     ssl_key_file            => "/etc/ssl/private/${vhost_name}.key",
@@ -67,7 +67,7 @@ class traf::jenkins (
     version => '1.20',
   }
   jenkins::plugin { 'build-timeout':
-    version => '1.10',
+    version => '1.13',
   }
   jenkins::plugin { 'copyartifact':
     version => '1.22',

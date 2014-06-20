@@ -16,9 +16,9 @@ class traf::server (
     iptables_rules6           => $iptables_rules6,
     certname                  => $certname,
   }
-  class { 'exim':
-    sysadmin => $sysadmins,
-  }
+  #class { 'exim':
+  #  sysadmin => $sysadmins,
+  #}
 
   if $::osfamily == 'Debian' {
     # Custom rsyslog config to disable /dev/xconsole noise on Debuntu servers

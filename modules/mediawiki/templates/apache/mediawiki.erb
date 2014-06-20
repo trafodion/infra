@@ -1,12 +1,21 @@
 #####################################################################
-### THIS FILE IS MANAGED BY PUPPET
+###  THIS FILE IS MANAGED BY PUPPETlive On
 ### puppet:///files/apache/sites/labconsole.wikimedia.org
 #####################################################################
 # vim: filetype=apache
 
 <VirtualHost *:80>
-        ServerAdmin infra@trafodion.org
+        ServerAdmin <%= scope.lookupvar("mediawiki::server_admin") %>
         ServerName <%= scope.lookupvar("mediawiki::site_hostname") %>
+        ServerAlias <%= scope.lookupvar("mediawiki::site_hostname_alias") %>
+
+        # mitigate XSS
+        Header unset ETag
+        Header set X-Frame-Options: sameorigin
+        Header set X-XSS-Protection: "1; mode=block"
+        Header set X-Content-Type-Options: nosniff
+        Header set X-WebKit-CSP: "default-src 'self'"
+        Header set X-Permitted-Cross-Domain-Policies: "master-only"
 
         DocumentRoot /var/www
         <Directory />
@@ -20,18 +29,13 @@
                 allow from all
         </Directory>
 
-        <IfModule mod_headers.c>
-                Header unset ETag
-                Header set X-Frame-Options: sameorigin
-                Header set X-XSS-Protection: "1; mode=block"
-                Header set X-Content-Type-Options: nosniff
-                Header set X-WebKit-CSP: "default-src 'self'"
-                Header set X-Permitted-Cross-Domain-Policies: "master-only"
-        </IfModule>
-
         RewriteEngine on
         RewriteCond %{SERVER_PORT} !^443$
         RewriteRule ^/(.*)$ https://<%= scope.lookupvar("mediawiki::site_hostname") %>/$1 [L,R]
+
+        # Disable unused HTTP methods
+        RewriteCond %{REQUEST_METHOD} !^(GET|POST|HEAD)
+        RewriteRule .* - [R=405,L]
 
         ErrorLog /var/log/apache2/mediawiki-error.log
 
@@ -44,15 +48,39 @@
 
 </VirtualHost>
 <VirtualHost *:443>
-        ServerAdmin infra@trafodion.org
+        ServerAdmin <%= scope.lookupvar("mediawiki::server_admin") %>
         ServerName <%= scope.lookupvar("mediawiki::site_hostname") %>
+        ServerAlias <%= scope.lookupvar("mediawiki::site_hostname_alias") %>
 
+        # turn on SSL
         SSLEngine on
         SSLCertificateFile      <%= scope.lookupvar("mediawiki::ssl_cert_file") %>
         SSLCertificateKeyFile   <%= scope.lookupvar("mediawiki::ssl_key_file") %>
         <% if scope.lookupvar("mediawiki::ssl_chain_file") != "" %>
         SSLCertificateChainFile <%= scope.lookupvar("mediawiki::ssl_chain_file") %>
         <% end %>
+
+        # mitigate BREACH vulnerability
+        SetOutputFilter DEFLATE
+        BrowserMatch ^Mozilla/4 gzip-only-text/html
+        BrowserMatch ^Mozilla/4\.0[678] no-gzip
+        BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+        SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|zip|gz|tgz|htc)$ no-gzip dont-vary
+        SetEnvIfNoCase Referer .* self_referer=no
+        SetEnvIfNoCase Referer ^https://<%= scope.lookupvar("mediawiki::site_hostname").gsub(/\./, '\.') %>/ self_referer=yes
+        SetEnvIf self_referer ^no$ no-gzip
+        Header append Vary User-Agent env=!dont-vary
+        # if not running SSL on port 443 this needs adjustment
+        SetEnvIfNoCase Referer ^https://<%= scope.lookupvar("mediawiki::site_hostname").gsub(/\./, '\.') %>:10443/ self_referer=yes
+
+        # mitigate XSS
+        Header unset ETag
+        Header set Strict-Transport-Security "max-age=15768000; includeSubDomains"
+        Header set X-Frame-Options: sameorigin
+        Header set X-XSS-Protection: "1; mode=block"
+        Header set X-Content-Type-Options: nosniff
+        Header set X-WebKit-CSP: "default-src 'self'"
+        Header set X-Permitted-Cross-Domain-Policies: "master-only"
 
         RedirectMatch ^/$ http://<%= scope.lookupvar("mediawiki::site_hostname") %>/wiki/
 
@@ -77,16 +105,10 @@
 		        # Don't run arbitrary PHP code.
 		        php_admin_flag engine off
 	    </Directory>
-
-        <IfModule mod_headers.c>
-                Header unset ETag
-                Header set Strict-Transport-Security "max-age=15768000; includeSubDomains"
-                Header set X-Frame-Options: sameorigin
-                Header set X-XSS-Protection: "1; mode=block"
-                Header set X-Content-Type-Options: nosniff
-                Header set X-WebKit-CSP: "default-src 'self'"
-                Header set X-Permitted-Cross-Domain-Policies: "master-only"
-        </IfModule>
+        <Files README.txt>
+            Order deny,allow
+            Deny from all
+        </Files>
 
 	    <IfModule mod_expires.c>
 		        ExpiresActive On
@@ -106,6 +128,7 @@
 				                ## I'm nearly positive we only need to do so for the WebFonts.
 				                ## For now I'm going to keep this disabled.
 				                #Header add Access-Control-Allow-Origin "*"
+                                Header set Cache-Control "public"
 			            </FilesMatch>
 		        </Directory>
 	    </IfModule>
@@ -126,6 +149,10 @@
         RewriteCond %{REQUEST_URI} !^/w/
         RewriteCond %{REQUEST_URI} !^/wiki/
         RewriteRule ^/(.*)$ https://<%= scope.lookupvar("mediawiki::site_hostname") %>/wiki/$1 [L,R]
+
+        # Disable unused HTTP methods
+        RewriteCond %{REQUEST_METHOD} !^(GET|POST|HEAD)
+        RewriteRule .* - [R=405,L]
 
         ErrorLog /var/log/apache2/error.log
 

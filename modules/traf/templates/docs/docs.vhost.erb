@@ -1,0 +1,42 @@
+# ************************************
+# Managed by Puppet
+# ************************************
+
+NameVirtualHost *:80
+<VirtualHost *:80>
+  ServerName <%= srvname %>
+<% if serveraliases.is_a? Array -%>
+<% serveraliases.each do |name| -%><%= "  ServerAlias #{name}\n" %><% end -%>
+<% elsif serveraliases != '' -%>
+<%= " ServerAlias #{serveraliases}" %>
+<% end -%>
+
+  # Turn on RewriteEngine
+  RewriteEngine on
+  RewriteCond %{REQUEST_URI} !\.(pdf|doc|html|css|png|gif|ico)$
+  RewriteRule ^(.*)$ https://wiki.<%= domain %>/wiki/index.php/Documentation [L,R=301]
+
+  DocumentRoot <%= docroot %>
+  <Directory <%= docroot %>>
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    allow from all
+  </Directory>
+  ErrorLog /var/log/apache2/<%= srvname %>_error.log
+  LogLevel warn
+  CustomLog /var/log/apache2/<%= srvname %>_access.log combined
+
+  <FilesMatch "\.(pdf|doc)$">
+    ExpiresActive On
+    ExpiresDefault A1
+    Header append Cache-Control must-revalidate
+  </FilesMatch>
+
+  # Turn Server Signature Off
+  ServerSignature Off
+
+  # turn on PHP
+  #php_admin_flag engine On
+  #php_flag display_errors on
+</VirtualHost>
