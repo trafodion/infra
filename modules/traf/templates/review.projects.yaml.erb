@@ -3,7 +3,7 @@
   local-git-dir: <%= local_git_dir %>
   gerrit-host: <%= fqdn %>
   gerrit-user: Trafodion-project-creator
-  gerrit-committer: Project Creator <neo-devtools@hp.com>
+  gerrit-committer: Project Creator <trafodion-infrastructure@lists.launchpad.net>
   gerrit-key: <%= ssh_project_key %>
   github-config: /etc/github/github-projects.secure.config
   has-wiki: False
@@ -19,17 +19,24 @@
 #  acl-config:
 
 - project: trafodion/sandbox
+  upstream: git://github.com/trafodion/sandbox.git
   description: Playground - Not a permanent home for anything.
-- project: trafodion/core
-- project: trafodion/phoenix_test
-  acl-config: /home/gerrit2/acls/trafodion/core.config
-- project: trafodion/dcs
-  acl-config: /home/gerrit2/acls/trafodion/core.config
-- project: trafodion/install
-  acl-config: /home/gerrit2/acls/trafodion/core.config
-- project: trafodion/win-odbc64
-  acl-config: /home/gerrit2/acls/trafodion/core.config
-- project: trafodion/manuals
-- project: trafodion/infra
+#- project: trafodion/core
+#  upstream: git://github.com/trafodion/core.git
+#- project: trafodion/phoenix_test
+#  upstream: git://github.com/trafodion/phoenix_test.git
+#  acl-config: /home/gerrit2/acls/trafodion/core.config
+#- project: trafodion/dcs
+#  upstream: git://github.com/trafodion/dcs.git
+#  acl-config: /home/gerrit2/acls/trafodion/core.config
+#- project: trafodion/install
+#  upstream: git://github.com/trafodion/install.git
+#  acl-config: /home/gerrit2/acls/trafodion/core.config
+#- project: trafodion/win-odbc64
+#  upstream: git://github.com/trafodion/win-odbc64.git
+#  acl-config: /home/gerrit2/acls/trafodion/core.config
+#- project: trafodion/manuals
+#  upstream: git://github.com/trafodion/manuals.git
+#- project: trafodion/infra
+#  upstream: git://github.com/trafodion/infra.git
 
-# project: trafodion/hbase-trx
