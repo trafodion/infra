@@ -155,11 +155,10 @@ node 'graphite.trafodion.org' {
 # Jenkins slaves:
 #
 
-node 'slave01.novaclient' {
+node /^slave\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
   class { 'traf::cloudera_slave':
-    certname  => 'slave01.novaclient',
     ssh_key   => $traf::jenkins_ssh_key,
     sysadmins => hiera('sysadmins'),
     hive_sql_pw => hiera('hive_sql_pw'),
