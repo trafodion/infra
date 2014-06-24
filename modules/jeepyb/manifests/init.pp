@@ -40,8 +40,7 @@ class jeepyb (
   vcsrepo { '/opt/jeepyb':
     ensure   => latest,
     provider => git,
-    # pin version because of our setup can't deal with 2 seperate project config files yet
-    revision => 'ad2494b8d6f09ccdaf90dc171c20d48e9c76096d',
+    revision => 'master',
     source   => $git_source_repo,
   }
 
@@ -51,5 +50,6 @@ class jeepyb (
     refreshonly => true,
     require     => Class['mysql::python'],
     subscribe   => Vcsrepo['/opt/jeepyb'],
+    logoutput   => true,
   }
 }

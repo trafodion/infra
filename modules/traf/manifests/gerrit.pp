@@ -4,14 +4,16 @@
 # up for launchpad single sign on and bug/blueprint links
 
 class traf::gerrit (
+  $mysql_host,
+  $mysql_password,
   $vhost_name = $::fqdn,
   $canonicalweburl = "https://${::fqdn}/",
-  $serveradmin = 'infra@trafodion.org',
+  $serveradmin = 'trafodion-infrastructure@lists.launchpad.net',
   $ssh_host_key = '/home/gerrit2/review_site/etc/ssh_host_rsa_key',
   $ssh_project_key = '/home/gerrit2/review_site/etc/ssh_project_rsa_key',
-  $ssl_cert_file = '',
-  $ssl_key_file = '',
-  $ssl_chain_file = '',
+  $ssl_cert_file = '/etc/ssl/certs/${::fqdn}.pem',
+  $ssl_key_file = '/etc/ssl/private/${::fqdn}.key',
+  $ssl_chain_file = '/etc/ssl/certs/intermediate.pem',
   $ssl_cert_file_contents = '',
   $ssl_key_file_contents = '',
   $ssl_chain_file_contents = '',
@@ -21,6 +23,10 @@ class traf::gerrit (
   $ssh_rsa_pubkey_contents = '', # If left empty puppet will not create file.
   $ssh_project_rsa_key_contents = '', # If left empty will not create file.
   $ssh_project_rsa_pubkey_contents = '', # If left empty will not create file.
+  $ssh_welcome_rsa_key_contents='', # If left empty will not create file.
+  $ssh_welcome_rsa_pubkey_contents='', # If left empty will not create file.
+  $ssh_replication_rsa_key_contents='', # If left empty will not create file.
+  $ssh_replication_rsa_pubkey_contents='', # If left empty will not create file.
   $email = '',
   $database_poollimit = '',
   $container_heaplimit = '',
@@ -37,10 +43,8 @@ class traf::gerrit (
   $contactstore_appsec = '',
   $contactstore_pubkey = '',
   $contactstore_url = '',
-  $script_user = 'Trafodion-project-creator',
-  $script_key_file = $ssh_project_key,
-  $script_logging_conf = '/home/gerrit2/.sync_logging.conf',
   $projects_file = 'UNDEF',
+  $projects_config = 'UNDEF',
   $github_username = '',
   $github_oauth_token = '',
   $github_project_username = '',
@@ -49,7 +53,8 @@ class traf::gerrit (
   $email_private_key = '',
   $replicate_local = true,
   $replication = [],
-  $local_git_dir = '/var/lib/git',
+  $local_git_dir = '/opt/lib/git',
+  $jeepyb_cache_dir = '/opt/lib/jeepyb',
   $cla_description = 'Trafodion Individual Contributor License Agreement',
   $cla_file = 'static/cla.html',
   $cla_id = '1',
@@ -61,6 +66,7 @@ class traf::gerrit (
   $gitweb = true,
   $cgit = false,
   $web_repo_url = '',
+  $secondary_index = true,
 ) {
   class { 'traf::server':
     iptables_public_tcp_ports => [80, 443, 29418],
@@ -85,7 +91,8 @@ class traf::gerrit (
     # opinions
     enable_melody                   => true,
     melody_session                  => true,
-    robots_txt_source               => 'puppet:///modules/openstack_project/gerrit/robots.txt',
+    robots_txt_source               => 'puppet:///modules/traf/gerrit/robots.txt',
+    enable_javamelody_top_menu      => false,
     # passthrough
     ssl_cert_file                   => $ssl_cert_file,
     ssl_key_file                    => $ssl_key_file,
@@ -99,6 +106,8 @@ class traf::gerrit (
     ssh_rsa_pubkey_contents         => $ssh_rsa_pubkey_contents,
     ssh_project_rsa_key_contents    => $ssh_project_rsa_key_contents,
     ssh_project_rsa_pubkey_contents => $ssh_project_rsa_pubkey_contents,
+    ssh_replication_rsa_key_contents    => $ssh_replication_rsa_key_contents,
+    ssh_replication_rsa_pubkey_contents => $ssh_replication_rsa_pubkey_contents,
     email                           => $email,
     openidssourl                    => 'https://login.launchpad.net/+openid',
     database_poollimit              => $database_poollimit,
@@ -112,11 +121,6 @@ class traf::gerrit (
     httpd_maxthreads                => $httpd_maxthreads,
     httpd_maxwait                   => $httpd_maxwait,
     commentlinks                    => [
-      {
-        name  => 'changeid',
-        match => '(I?[0-9a-f]{8,40})',
-        link  => '#q,$1,n,z',
-      },
       {
         name  => 'bugheader',
         match => '([Cc]loses|[Pp]artial|[Rr]elated)-[Bb]ug:\\s*#?(\\d+)',
@@ -134,13 +138,23 @@ class traf::gerrit (
       },
       {
         name  => 'testresult',
-        match => '<li>([^ ]+) <a href=\"[^\"]+\">([^<]+)</a> : ([^ ]+)([^<]*)</li>',
-        html  => '<li><span class=\"comment_test_name\"><a href=\"$2\">$1</a></span> <span class=\"comment_test_result\"><span class=\"result_$3\">$3</span>$4</span></li>',
+        match => '<li>([^ ]+) <a href=\"[^\"]+\" target=\"_blank\">([^<]+)</a> : ([^ ]+)([^<]*)</li>',
+	html  => '<li class=\"comment_test\"><span class=\"comment_test_name\"><a href=\"$2\">$1</a></span> <span class=\"comment_test_result\"><span class=\"result_$3\">$3</span>$4</span></li>',
       },
       {
         name  => 'launchpadbug',
-        match => '<a href=\"(https://bugs\\.launchpad\\.net/[a-zA-Z0-9\\-]+/\\+bug/(\\d+))[^\"]+\">[^<]+</a>',
+        match => '<a href=\"(https://bugs\\.launchpad\\.net/[a-zA-Z0-9\\-]+/\\+bug/(\\d+))[^\"]*\">[^<]+</a>',
         html  => '<a href=\"$1\">$1</a>'
+      },
+      {
+        name  => 'changeid',
+        match => '(I[0-9a-f]{8,40})',
+        link  => '#q,$1,n,z',
+      },
+      {
+        name  => 'gitsha',
+	match => '(<p>|[\\s(])([0-9a-f]{40})(</p>|[\\s.,;:)])',
+	html  => '$1<a href=\"#q,$2,n,z\">$2</a>$3',
       },
     ],
     war                             => $war,
@@ -148,14 +162,17 @@ class traf::gerrit (
     contactstore_appsec             => $contactstore_appsec,
     contactstore_pubkey             => $contactstore_pubkey,
     contactstore_url                => $contactstore_url,
-    email_private_key               => $email_private_key,
+    mysql_host                      => $mysql_host,
     mysql_password                  => $mysql_password,
+    email_private_key               => $email_private_key,
     replicate_local                 => $replicate_local,
+    replicate_path                  => $local_git_dir,
     replication                     => $replication,
     gitweb                          => $gitweb,
     cgit                            => $cgit,
     web_repo_url                    => $web_repo_url,
     testmode                        => $testmode,
+    secondary_index                 => $secondary_index,
     require                         => Class[traf::server],
   }
 
@@ -164,10 +181,7 @@ class traf::gerrit (
   }
 
   if ($testmode == false) {
-    class { 'gerrit::cron':
-      script_user     => $script_user,
-      script_key_file => $script_key_file,
-    }
+    include gerrit::cron
     class { 'github':
       username         => $github_username,
       project_username => $github_project_username,
@@ -247,7 +261,17 @@ class traf::gerrit (
     owner   => 'root',
     group   => 'root',
     mode    => '0555',
-    source  => 'puppet:///modules/openstack_project/gerrit/change-merged',
+    source  => 'puppet:///modules/traf/gerrit/change-merged',
+    replace => true,
+    require => Class['::gerrit'],
+  }
+
+  file { '/home/gerrit2/review_site/hooks/change-abandoned':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0555',
+    source  => 'puppet:///modules/traf/gerrit/change-abandoned',
     replace => true,
     require => Class['::gerrit'],
   }
@@ -262,6 +286,28 @@ class traf::gerrit (
     require => Class['::gerrit'],
   }
 
+  if $ssh_welcome_rsa_key_contents != '' {
+    file { '/home/gerrit2/review_site/etc/ssh_welcome_rsa_key':
+      owner   => 'gerrit2',
+      group   => 'gerrit2',
+      mode    => '0600',
+      content => $ssh_welcome_rsa_key_contents,
+      replace => true,
+      require => File['/home/gerrit2/review_site/etc']
+    }
+  }
+
+  if $ssh_welcome_rsa_pubkey_contents != '' {
+    file { '/home/gerrit2/review_site/etc/ssh_welcome_rsa_key.pub':
+      owner   => 'gerrit2',
+      group   => 'gerrit2',
+      mode    => '0644',
+      content => $ssh_welcome_rsa_pubkey_contents,
+      replace => true,
+      require => File['/home/gerrit2/review_site/etc']
+    }
+  }
+
   if ($projects_file != 'UNDEF') {
     if ($replicate_local) {
       file { $local_git_dir:
@@ -274,7 +320,7 @@ class traf::gerrit (
         weekday     => '0',
         hour        => '4',
         minute      => '7',
-        command     => 'find /var/lib/git/ -type d -name "*.git" -print -exec git --git-dir="{}" repack -afd \;',
+        command     => "find ${local_git_dir} -type d -name \"*.git\" -print -exec git --git-dir=\"{}\" repack -afd \\;",
         environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin',
       }
     }
@@ -284,7 +330,17 @@ class traf::gerrit (
       owner   => 'gerrit2',
       group   => 'gerrit2',
       mode    => '0444',
-      content => template($projects_file),
+      source  => $projects_file,
+      replace => true,
+      require => Class['::gerrit'],
+    }
+
+    file { '/home/gerrit2/projects.ini':
+      ensure  => present,
+      owner   => 'gerrit2',
+      group   => 'gerrit2',
+      mode    => '0444',
+      content => template($projects_config),
       replace => true,
       require => Class['::gerrit'],
     }
@@ -302,7 +358,8 @@ class traf::gerrit (
       require => Class['::gerrit']
     }
 
-    exec { 'manage_projects':
+    if ($testmode == false) {
+     exec { 'manage_projects':
       command     => '/usr/local/bin/manage-projects',
       timeout     => 900, # 15 minutes
       subscribe   => [
@@ -310,25 +367,29 @@ class traf::gerrit (
           File['/home/gerrit2/acls'],
         ],
       refreshonly => true,
+      logoutput   => true,
       require     => [
           File['/home/gerrit2/projects.yaml'],
           File['/home/gerrit2/acls'],
           Class['jeepyb'],
         ],
+     }
     }
   }
-  file { '/home/gerrit2/review_site/bin/set_agreements.sh':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    content => template('traf/gerrit_set_agreements.sh.erb'),
-    replace => true,
-    require => Class['::gerrit']
-  }
-  exec { 'set_contributor_agreements':
-    path    => ['/bin', '/usr/bin'],
-    command => '/home/gerrit2/review_site/bin/set_agreements.sh',
-    require => File['/home/gerrit2/review_site/bin/set_agreements.sh']
-  }
+  # Retained just in case we ever ned to change contributor agreement
+  # Openstack has removed this script and references entirely
+  #file { '/home/gerrit2/review_site/bin/set_agreements.sh':
+  #  ensure  => present,
+  #  owner   => 'root',
+  #  group   => 'root',
+  #  mode    => '0755',
+  #  content => template('traf/gerrit_set_agreements.sh.erb'),
+  #  replace => true,
+  #  require => Class['::gerrit']
+  #}
+  #exec { 'set_contributor_agreements':
+  #  path    => ['/bin', '/usr/bin'],
+  #  command => '/home/gerrit2/review_site/bin/set_agreements.sh',
+  #  require => File['/home/gerrit2/review_site/bin/set_agreements.sh']
+  #}
 }

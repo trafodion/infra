@@ -6,7 +6,7 @@
 	canonicalWebUrl = <%= canonicalweburl %>
 [database]
 	type = MYSQL
-	hostname = localhost
+	hostname = <%= mysql_host %>
 	database = reviewdb
 	username = gerrit2
 <% if database_poollimit != "" -%>
@@ -19,6 +19,7 @@
 <% end -%>
 	type = <%= gerrit_auth_type %>
 	cookieSecure = true
+	enableRunAs = true
 <% if gerrit_auth_type == 'OPENID_SSO' -%>
 	openIdSsoUrl = <%= openidssourl %>
 <% end -%>
@@ -26,10 +27,13 @@
 [ldap]
 	server = <%= ldap_server %>
 	accountBase = <%= ldap_account_base %>
-	username = <%= ldap_username %>
-	password = <%= ldap_password %>
+	<% if ldap_username -%>username = <%= ldap_username %><%end%>
+	<% if ldap_password -%>password = <%= ldap_password %><%end%>
+	<% if ldap_accountfullname -%>accountFullName = <%= ldap_accountfullname %><%end%>
 	accountPattern = <%= ldap_account_pattern %>
 	accountEmailAddress = <%= ldap_account_email_address %>
+	sslVerify = <%= ldap_sslverify %>
+	<% if @ldap_ssh_account_name -%>accountSshUserName = <%= ldap_ssh_account_name %><%end%>
 <% end %>
 [sendemail]
 	smtpServer = <%= smtpserver %>
@@ -77,26 +81,28 @@
 	email = <%= email %>
 <% commentlinks.each do |commentlink| -%>
 [commentlink "<%= commentlink['name'] %>"]
-        match = "<%= commentlink['match'] %>"
+	match = "<%= commentlink['match'] %>"
 <% if commentlink['link'] != "" -%>
-        link = "<%= commentlink['link'] %>"
+	link = "<%= commentlink['link'] %>"
 <% end -%>
 <% if commentlink['html'] != "" -%>
-        html = "<%= commentlink['html'] %>"
+	html = "<%= commentlink['html'] %>"
 <% end -%>
 <% end -%>
 [theme]
-        backgroundColor = ffffff
-        topMenuColor = ffffff
-        textColor = 264d69
-        trimColor = eef3f5
-        selectionColor = d1e6ea
+	backgroundColor = ffffff
+	topMenuColor = ffffff
+	textColor = 264d69
+	trimColor = eef3f5
+	selectionColor = d1e6ea
 	changeTableOutdatedColor = f5cccc
 	tableOddRowColor = ffffff
 	tableEvenRowColor = f5f5ff
 [melody]
 	monitoring = <%= enable_melody %>
 	session = <%= melody_session %>
+[plugin "javamelody"]
+        allowTopMenu = <%= enable_javamelody_top_menu %>
 <% if gitweb or cgit -%>
 [gitweb]
 <% if gitweb -%>
@@ -113,3 +119,19 @@
 	appsec = <%= contactstore_appsec %>
 	url = <%= contactstore_url %>
 <% end -%>
+<% if secondary_index == true -%>
+[index]
+	type = <%= secondary_index_type %>
+<% end -%>
+[mimetype "image/*"]
+	safe = true
+[mimetype "application/yaml"]
+	safe = true
+[mimetype "application/xml"]
+	safe = true
+[mimetype "application/rst"]
+	safe = true
+[mimetype "application/txt"]
+	safe = true
+[mimetype "application/html"]
+	safe = true

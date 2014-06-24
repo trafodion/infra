@@ -31,7 +31,7 @@ pipelines:
         # much more expensive (see http://lists.openstack.org/pipermail/openstack-dev/2014-February/027425.html for background)
         - event: comment-added
           require-approval:
-            - approved: 1
+            - workflow: 1
             - username: jenkins
               older-than: 72h
         # Must use reverify bug # or reverify lp #. Reverify no bug has been disallowed. If it's failing at gate a bug number
@@ -42,7 +42,7 @@ pipelines:
         - event: comment-added
           comment_filter: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*reverify( (?:bug|lp)[\s#:]*(\d+))\s*$
           require-approval:
-            - approved: 1
+            - workflow: 1
             - username: jenkins
         # From openstack-infra/config SHA-1 : 98b169f60030fed4b9a54bf7bd5d1476057bcdf5
         # Have Zuul enqueue the change for check testing then move it to the gate pipeline if a verified +1 comes back from the check
@@ -52,13 +52,13 @@ pipelines:
             - verified: -1
               username: jenkins
           approval:
-            - approved: 1
+            - workflow: 1
         - event: comment-added
           require-approval:
             - verified: -2
               username: jenkins
           approval:
-            - approved: 1
+            - workflow: 1
     start:
       gerrit:
         verified: 0
@@ -88,7 +88,7 @@ pipelines:
               username: jenkins
               newer-than: 72h
           approval:
-            - approved: 1
+            - workflow: 1
         # From openstack-infra/config SHA-1 : 8010041ed1d877d23105b2aad4fdb722b67df08f
         # If a change ends up with a +2 from jenkins but no approval (because a core reviewer removed his or her vote), allow the change to be enqueued the next
         # time someone approves it
@@ -98,7 +98,7 @@ pipelines:
               username: jenkins
               newer-than: 72h
           approval:
-            - approved: 1
+            - workflow: 1
         - event: comment-added
           approval:
             - verified: 1

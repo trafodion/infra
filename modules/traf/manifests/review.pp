@@ -38,14 +38,20 @@ class traf::review (
   $github_project_password = '',
   # Create arbitrary values and put here, puppet will use during
   # provisioning.
+  $mysql_host = '',
   $mysql_password = '',
   $mysql_root_password = '',
   $email_private_key = '',
   # Register an IRC bot and supply it's password here.
   $gerritbot_password = '',
+  $gerritbot_ssh_rsa_key_contents = '',
+  $gerritbot_ssh_rsa_pubkey_contents = '',
   # Register SSL keys and pass their contents in.
+  $ssl_cert_file = "/etc/ssl/certs/${::fqdn}.pem",
   $ssl_cert_file_contents = '',
+  $ssl_key_file = "/etc/ssl/private/${::fqdn}.key",
   $ssl_key_file_contents = '',
+  $ssl_chain_file = '/etc/ssl/certs/intermediate.pem',
   $ssl_chain_file_contents = '',
   # Create SSH server key by hand and supply here.
   $ssh_dsa_key_contents = '',
@@ -55,12 +61,19 @@ class traf::review (
   # manage-projects's user ssh key.
   $ssh_project_rsa_key_contents='',
   $ssh_project_rsa_pubkey_contents='',
+  # SSH key for outbound ssh-based replication.
+  $ssh_replication_rsa_key_contents='',
+  $ssh_replication_rsa_pubkey_contents='',
+  # welcome-message's user ssh key.
+  $ssh_welcome_rsa_key_contents='',
+  $ssh_welcome_rsa_pubkey_contents='',
   # To be renamed - they're now just launchpad creds, not lp_sync
   $lp_sync_consumer_key='',
   $lp_sync_token='',
   $lp_sync_secret='',
   # For gerrit's contactstore feature
   # https://review.openstack.org/Documentation/config-contact.html
+  $contactstore = false,
   $contactstore_appsec='',
   $contactstore_pubkey='',
   $sysadmins = [],
@@ -78,11 +91,9 @@ class traf::review (
   }
 
   class { 'traf::gerrit':
-    ssl_cert_file                   =>
-      "/etc/ssl/certs/${::fqdn}.pem",
-    ssl_key_file                    =>
-      "/etc/ssl/private/${::fqdn}.key",
-    ssl_chain_file                  => '/etc/ssl/certs/intermediate.pem',
+    ssl_cert_file                   => $ssl_cert_file,
+    ssl_key_file                    => $ssl_key_file,
+    ssl_chain_file                  => $ssl_chain_file,
     ssl_cert_file_contents          => $ssl_cert_file_contents,
     ssl_key_file_contents           => $ssl_key_file_contents,
     ssl_chain_file_contents         => $ssl_chain_file_contents,
@@ -92,7 +103,11 @@ class traf::review (
     ssh_rsa_pubkey_contents         => $ssh_rsa_pubkey_contents,
     ssh_project_rsa_key_contents    => $ssh_project_rsa_key_contents,
     ssh_project_rsa_pubkey_contents => $ssh_project_rsa_pubkey_contents,
-    email                           => "gerrit@${::fqdn}",
+    ssh_replication_rsa_key_contents    => $ssh_replication_rsa_key_contents,
+    ssh_replication_rsa_pubkey_contents => $ssh_replication_rsa_pubkey_contents,
+    ssh_welcome_rsa_key_contents        => $ssh_welcome_rsa_key_contents,
+    ssh_welcome_rsa_pubkey_contents     => $ssh_welcome_rsa_pubkey_contents,
+    email                           => "review@${::fqdn}",
       # 1 + 100 + 9 + 2 + 2 + 25 = 139(rounded up)
     database_poollimit              => '150',
     container_heaplimit             => '16g',
@@ -102,21 +117,22 @@ class traf::review (
     sshd_threads                    => '100',
     httpd_maxwait                   => '5000min',
     war                             =>
-      'http://tarballs.openstack.org/ci/gerrit-2.4.4-14-gab7f4c1.war',
-    contactstore                    => false,    ######## Turn off contact info storage
+      'http://tarballs.openstack.org/ci/gerrit/gerrit-v2.8.4.15.6dc8444.war',
+    contactstore                    => $contactstore,
     contactstore_appsec             => $contactstore_appsec,
     contactstore_pubkey             => $contactstore_pubkey,
     contactstore_url                => '',
-    script_user                     => 'launchpadsync',
-    script_key_file                 => '/home/gerrit2/.ssh/launchpadsync_rsa',
-    script_logging_conf             => '/home/gerrit2/.sync_logging.conf',
     projects_file                   =>
-      'traf/review.projects.yaml.erb',
+      'puppet:///modules/traf/review.projects.yaml',
+    projects_config                     =>
+      'traf/review.projects.ini.erb',
     github_username                 => 'Trafodion-gerrit',
     github_oauth_token              => $github_oauth_token,
     github_project_username         => $github_project_username,
     github_project_password         => $github_project_password,
-    trivial_rebase_role_id          => 'trivial-rebase',
+    mysql_host                          => $mysql_host,
+    mysql_password                      => $mysql_password,
+    trivial_rebase_role_id          => '', # dis-abled, use gerrit instead
     email_private_key               => $email_private_key,
     sysadmins                       => $sysadmins,
     swift_username                  => $swift_username,
@@ -126,13 +142,14 @@ class traf::review (
         name                 => 'github',
         url                  => 'git@github.com:',
         authGroup            => 'Anonymous Users',
+	replicationDelay     => '1',
         replicatePermissions => false,
         mirror               => true,
       },
       {
         name                 => 'local',
-        url                  => 'file:///var/lib/git/',
-        replicationDelay     => '0',
+        url                  => 'file:///opt/lib/git/',
+        replicationDelay     => '1',
         threads              => '4',
         mirror               => true,
       },
@@ -140,28 +157,28 @@ class traf::review (
       #{
       #  name                 => 'git01',
       #  url                  => 'cgit@git01.trafodion.org:/var/lib/git/',
-      #  replicationDelay     => '0',
+      #  replicationDelay     => '1',
       #  threads              => '4',
       #  mirror               => true,
       #},
       #{
       #  name                 => 'git02',
       #  url                  => 'cgit@git02.trafodion.org:/var/lib/git/',
-      #  replicationDelay     => '0',
+      #  replicationDelay     => '1',
       #  threads              => '4',
       #  mirror               => true,
       #},
       #{
       #  name                 => 'git03',
       #  url                  => 'cgit@git03.trafodion.org:/var/lib/git/',
-      #  replicationDelay     => '0',
+      #  replicationDelay     => '1',
       #  threads              => '4',
       #  mirror               => true,
       #},
       #{
       #  name                 => 'git04',
       #  url                  => 'cgit@git04.trafodion.org:/var/lib/git/',
-      #  replicationDelay     => '0',
+      #  replicationDelay     => '1',
       #  threads              => '4',
       #  mirror               => true,
       #},
@@ -175,8 +192,12 @@ class traf::review (
   #  server     => 'irc.freenode.net',
   #  user       => 'gerritbot',
   #  vhost_name => $::fqdn,
+  #  ssh_rsa_key_contents    => $gerritbot_ssh_rsa_key_contents,
+  #  ssh_rsa_pubkey_contents => $gerritbot_ssh_rsa_pubkey_contents,
   #}
-  include gerrit::remotes
+  class { 'gerrit::remotes':
+    ensure => absent,
+  }
 
   file { '/home/gerrit2/.ssh':
     ensure  => directory,
@@ -193,20 +214,7 @@ class traf::review (
     replace => true,
     require => User['gerrit2'],
   }
-  file {'/home/gerrit2/.ssh/launchpadsync_rsa':
-    owner   => 'gerrit2',
-    group   => 'gerrit2',
-    mode    => '0600',
-    content => hiera('gerrit_lp_sync_key'),
-    require => User['gerrit2'],
-  }
-  file {'/home/gerrit2/.ssh/launchpadsync_rsa.pub':
-    owner   => 'gerrit2',
-    group   => 'gerrit2',
-    mode    => '0644',
-    content => hiera('gerrit_lp_sync_pubkey'),
-    require => User['gerrit2'],
-  }
+
   file { '/home/gerrit2/.launchpadlib':
     ensure  => directory,
     owner   => 'gerrit2',
@@ -221,20 +229,6 @@ class traf::review (
     mode    => '0600',
     content => template('traf/gerrit_lp_creds.erb'),
     replace => true,
-    require => User['gerrit2'],
-  }
-  file { '/home/gerrit2/dbupdates':
-    ensure  => directory,
-    owner   => 'gerrit2',
-    group   => 'gerrit2',
-    mode    => '0775',
-    require => User['gerrit2'],
-  }
-  file { '/home/gerrit2/.sync_logging.conf':
-    ensure  => present,
-    source  => 'puppet:///modules/traf/gerrit/launchpad_sync_logging.conf',
-    owner   => 'gerrit2',
-    group   => 'gerrit2',
     require => User['gerrit2'],
   }
 

@@ -1,5 +1,7 @@
 # Install and maintain Gerrit Code Review.
 # params:
+#   mysql_host:
+#     The mysql host to which gerrit should connect.
 #   mysql_password:
 #     The password with which gerrit connects to mysql.
 #   vhost_name:
@@ -64,6 +66,8 @@
 #     A URL for the remote contact store application
 #   replicate_local:
 #     A boolean enabling local replication for apache acceleration
+#   replicate_path:
+#     The path to the local git replica if replicate_local is enabled
 #   gitweb:
 #     A boolean enabling gitweb
 #   cgit:
@@ -73,9 +77,17 @@
 #   testmode:
 #     Set this to true to disable cron jobs and replication,
 #     which can interfere with testing.
+#   secondary_index:
+#     Set this to true to enable secondary index support
+#   secondary_index_type:
+#     which secondary index to use: SQL (no secondary index),
+#     LUCENE (recommended), SOLR (experimental). Note: as of
+#     Gerrit 2.9 LUCENE is default secondary index and SQL is
+#     removed.
 # TODO: make more gerrit options configurable here
 #
 class gerrit(
+  $mysql_host = 'localhost',
   $mysql_password,
   $war = '',
   $email_private_key = '',
@@ -95,6 +107,8 @@ class gerrit(
   $ssh_rsa_pubkey_contents = '', # If left empty puppet will not create file.
   $ssh_project_rsa_key_contents = '', # If left empty will not create file.
   $ssh_project_rsa_pubkey_contents = '', # If left empty will not create file.
+  $ssh_replication_rsa_key_contents = '', # If left emptry will not create files.
+  $ssh_replication_rsa_pubkey_contents = '', # If left emptry will not create files.
   $gerrit_auth_type = 'OPENID_SSO',
   $gerrit_contributor_agreement = true,
   $openidssourl = 'https://login.launchpad.net/+openid',
@@ -104,6 +118,9 @@ class gerrit(
   $ldap_password = '',
   $ldap_account_pattern = '',
   $ldap_account_email_address = '',
+  $ldap_sslverify = true,
+  $ldap_ssh_account_name = '',
+  $ldap_accountfullname = '',
   $email = '',
   $smtpserver = 'localhost',
   $sendemail_from = 'MIXED',
@@ -126,12 +143,15 @@ class gerrit(
   $enable_melody = false,
   $melody_session = false,
   $replicate_local = false,
+  $replicate_path = '/opt/lib/git',
   $replication = [],
-  $replication_targets = [],
   $gitweb = true,
   $cgit = false,
   $web_repo_url = '',
-  $testmode = false
+  $testmode = false,
+  $secondary_index = false,
+  $secondary_index_type = 'LUCENE',
+  $enable_javamelody_top_menu = false,
 ) {
   include apache
   include jeepyb
@@ -140,6 +160,9 @@ class gerrit(
   $java_home = $::lsbdistcodename ? {
     'precise' => '/usr/lib/jvm/java-7-openjdk-amd64/jre',
   }
+
+  $gerrit_war = '/home/gerrit2/review_site/bin/gerrit.war'
+  $gerrit_site = '/home/gerrit2/review_site'
 
   user { 'gerrit2':
     ensure     => present,
@@ -161,6 +184,10 @@ class gerrit(
     }
   }
 
+  package { 'unzip':
+    ensure => present,
+  }
+
   package { 'openjdk-7-jre-headless':
     ensure => present,
   }
@@ -175,6 +202,14 @@ class gerrit(
     owner  => 'gerrit2',
   }
 
+  if ((!defined(File['/opt/lib']))
+      and ($replicate_path =~ /^\/opt\/lib\/.*$/)) {
+    file { '/opt/lib':
+      ensure => directory,
+      owner  => root,
+    }
+  }
+
   # Prepare gerrit directories.  Even though some of these would be created
   # by the init command, we can go ahead and create them now and populate them.
   # That way the config files are already in place before init runs.
@@ -182,6 +217,19 @@ class gerrit(
   file { '/home/gerrit2/review_site':
     ensure  => directory,
     owner   => 'gerrit2',
+    require => User['gerrit2'],
+  }
+
+  file { '/home/gerrit2/review_site/plugins':
+    ensure  => directory,
+    owner   => 'gerrit2',
+    require => [User['gerrit2'], File['/home/gerrit2/review_site']],
+  }
+
+  file { '/home/gerrit2/.ssh':
+    ensure  => directory,
+    owner   => 'gerrit2',
+    mode    => '0700',
     require => User['gerrit2'],
   }
 
@@ -231,6 +279,7 @@ class gerrit(
 
   # Gerrit sets these permissions in 'init'; don't fight them.
   # Template uses:
+  # - $mysql_host
   # - $canonicalweburl
   # - $database_poollimit
   # - $gerrit_contributor_agreement
@@ -297,6 +346,7 @@ class gerrit(
   # - $ssl_chain_file
   # - $canonicalweburl
   # - $replicate_local
+  # - $replicate_path
   # - $contactstore
   # - $robots_txt_source
   apache::vhost { $vhost_name:
@@ -422,6 +472,28 @@ class gerrit(
     }
   }
 
+  if $ssh_replication_rsa_key_contents != '' {
+    file { '/home/gerrit2/.ssh/id_rsa':
+      owner   => 'gerrit2',
+      group   => 'gerrit2',
+      mode    => '0600',
+      content => $ssh_replication_rsa_key_contents,
+      replace => true,
+      require => File['/home/gerrit2/.ssh']
+    }
+  }
+
+  if $ssh_replication_rsa_pubkey_contents != '' {
+    file { '/home/gerrit2/.ssh/id_rsa.pub':
+      owner   => 'gerrit2',
+      group   => 'gerrit2',
+      mode    => '0644',
+      content => $ssh_replication_rsa_pubkey_contents,
+      replace => true,
+      require => File['/home/gerrit2/.ssh']
+    }
+  }
+
   # Install Gerrit itself.
 
   # The Gerrit WAR is specified as a url like
@@ -450,7 +522,7 @@ class gerrit(
   }
 
   # If gerrit.war isn't the same as $basewar, install it.
-  file { '/home/gerrit2/review_site/bin/gerrit.war':
+  file { $gerrit_war:
     ensure  => present,
     source  => "file:///home/gerrit2/gerrit-wars/${basewar}",
     require => Exec["download:${war}"],
@@ -465,17 +537,17 @@ class gerrit(
 
   # If gerrit.war was just installed, run the Gerrit "init" command.
   exec { 'gerrit-initial-init':
-    user      => 'gerrit2',
-    command   => '/usr/bin/java -jar /home/gerrit2/review_site/bin/gerrit.war init -d /home/gerrit2/review_site --batch --no-auto-start',
-    subscribe => File['/home/gerrit2/review_site/bin/gerrit.war'],
-    require   => [Package['openjdk-7-jre-headless'],
-                  User['gerrit2'],
-                  Mysql::Db['reviewdb'],
-                  File['/home/gerrit2/review_site/etc/gerrit.config'],
-                  File['/home/gerrit2/review_site/etc/secure.config']],
-    notify    => Exec['gerrit-start'],
-    unless    => '/usr/bin/test -f /etc/init.d/gerrit',
-    logoutput => true,
+    user        => 'gerrit2',
+    command     => "/usr/bin/java -jar ${gerrit_war} init -d ${gerrit_site} --batch --no-auto-start; /usr/bin/java -jar ${gerrit_war} reindex -d ${gerrit_site}",
+    subscribe   => File['/home/gerrit2/review_site/bin/gerrit.war'],
+    refreshonly => true,
+    require     => [Package['openjdk-7-jre-headless'],
+                    User['gerrit2'],
+                    File['/home/gerrit2/review_site/etc/gerrit.config'],
+                    File['/home/gerrit2/review_site/etc/secure.config']],
+    notify      => Exec['install-core-plugins'],
+    unless      => '/usr/bin/test -f /etc/init.d/gerrit',
+    logoutput   => true,
   }
 
   # If a new gerrit.war was just installed, run the Gerrit "init" command.
@@ -484,16 +556,27 @@ class gerrit(
   # Running the init script as the gerrit2 user _does_ work.
   exec { 'gerrit-init':
     user        => 'gerrit2',
-    command     => '/etc/init.d/gerrit stop; /usr/bin/java -jar /home/gerrit2/review_site/bin/gerrit.war init -d /home/gerrit2/review_site --batch --no-auto-start',
+    command     => "/etc/init.d/gerrit stop; /usr/bin/java -jar ${gerrit_war} init -d ${gerrit_site} --batch --no-auto-start; /usr/bin/java -jar ${gerrit_war} reindex -d ${gerrit_site}",
     subscribe   => File['/home/gerrit2/review_site/bin/gerrit.war'],
     refreshonly => true,
     require     => [Package['openjdk-7-jre-headless'],
                     User['gerrit2'],
-                    Mysql::Db['reviewdb'],
                     File['/home/gerrit2/review_site/etc/gerrit.config'],
                     File['/home/gerrit2/review_site/etc/secure.config']],
-    notify      => Exec['gerrit-start'],
+    notify      => Exec['install-core-plugins'],
     onlyif      => '/usr/bin/test -f /etc/init.d/gerrit',
+    logoutput   => true,
+  }
+
+  # Install Core Plugins
+  exec { 'install-core-plugins':
+    user        => 'gerrit2',
+    command     => '/usr/bin/unzip -jo /home/gerrit2/review_site/bin/gerrit.war WEB-INF/plugins/* -d /home/gerrit2/review_site/plugins || true',
+    subscribe   => File['/home/gerrit2/review_site/bin/gerrit.war'],
+    require     => [Package['unzip'],
+                    File['/home/gerrit2/review_site/plugins']],
+    notify      => Exec['gerrit-start'],
+    refreshonly => true,
     logoutput   => true,
   }
 
@@ -542,6 +625,38 @@ class gerrit(
 
   file { '/usr/local/gerrit/scripts':
     ensure  => absent,
+  }
+
+  package { 'libmysql-java':
+    ensure => present,
+  }
+  file { '/home/gerrit2/review_site/lib/mysql-connector-java.jar':
+    ensure  => link,
+    target  => '/usr/share/java/mysql-connector-java.jar',
+    require => [
+      Package['libmysql-java'],
+      File['/home/gerrit2/review_site/lib'],
+    ],
+  }
+  file { '/home/gerrit2/review_site/lib/mysql-connector-java-5.1.10.jar':
+    ensure  => absent,
+    require => File['/home/gerrit2/review_site/lib/mysql-connector-java.jar'],
+  }
+
+  package { 'libbcprov-java':
+    ensure => present,
+  }
+  file { '/home/gerrit2/review_site/lib/bcprov.jar':
+    ensure  => link,
+    target  => '/usr/share/java/bcprov.jar',
+    require => [
+      Package['libbcprov-java'],
+      File['/home/gerrit2/review_site/lib'],
+    ],
+  }
+  file { '/home/gerrit2/review_site/lib/bcprov-jdk16-144.jar':
+    ensure  => absent,
+    require => File['/home/gerrit2/review_site/lib/bcprov.jar'],
   }
 
   # Install Bouncy Castle's OpenPGP plugin and populate the contact store
