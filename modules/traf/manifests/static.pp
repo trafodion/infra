@@ -12,7 +12,7 @@ class traf::static (
   $server_path = '/srv/static',
   $download_cipher = hiera('download_cipher'),
   $download_salt = hiera('download_salt'),
-  $download_path = "${server_path}/downloads",
+  $download_path = '/srv/static/downloads',
 
 ) {
 
