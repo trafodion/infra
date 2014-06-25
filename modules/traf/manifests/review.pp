@@ -36,6 +36,8 @@ class traf::review (
   # details here.
   $github_project_username = '',
   $github_project_password = '',
+  # gerrit account user
+  $gerrit_creator = 'Trafodion-project-creator',
   # Create arbitrary values and put here, puppet will use during
   # provisioning.
   $mysql_host = '',
@@ -137,6 +139,7 @@ class traf::review (
     sysadmins                       => $sysadmins,
     swift_username                  => $swift_username,
     swift_password                  => $swift_password,
+    gerrit_creator                  => $gerrit_creator,
     replication                     => [
       {
         name                 => 'github',
@@ -197,22 +200,6 @@ class traf::review (
   #}
   class { 'gerrit::remotes':
     ensure => absent,
-  }
-
-  file { '/home/gerrit2/.ssh':
-    ensure  => directory,
-    owner   => 'gerrit2',
-    group   => 'gerrit2',
-    mode    => '0700',
-    require => User['gerrit2'],
-  }
-  file {'/home/gerrit2/.ssh/config':
-    ensure  => present,
-    owner   => 'gerrit2',
-    group   => 'gerrit2',
-    content => template('traf/gerrit_ssh_config.erb'),
-    replace => true,
-    require => User['gerrit2'],
   }
 
   file { '/home/gerrit2/.launchpadlib':

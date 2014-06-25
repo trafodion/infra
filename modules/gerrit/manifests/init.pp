@@ -152,6 +152,7 @@ class gerrit(
   $secondary_index = false,
   $secondary_index_type = 'LUCENE',
   $enable_javamelody_top_menu = false,
+  $gerrit_creator = '',
 ) {
   include apache
   include jeepyb
@@ -231,6 +232,16 @@ class gerrit(
     owner   => 'gerrit2',
     mode    => '0700',
     require => User['gerrit2'],
+  }
+
+  file {'/home/gerrit2/.ssh/config':
+    ensure  => present,
+    owner   => 'gerrit2',
+    group   => 'gerrit2',
+    content => template('gerrit/gerrit_ssh_config.erb'),
+    replace => true,
+    require => User['gerrit2'],
+    require => File['/home/gerrit2/.ssh']
   }
 
   file { '/home/gerrit2/review_site/etc':
