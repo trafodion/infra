@@ -1,6 +1,23 @@
 #!/bin/bash -e
 # -e option: Error out on any command/pipeline error
-
+#
+# @@@ START COPYRIGHT @@@
+#
+# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# @@@ END COPYRIGHT @@@
 
 # option: -b branch
 # Ignored unless ZUUL_REF is not set
@@ -13,7 +30,7 @@ then
 fi
 
 # arguments: repo list
-PROJ_LIST="$*"  
+PROJ_LIST="$*"
 
 GERRIT_SITE="https://review.trafodion.org"
 ZUUL_SITE="http://zuul.trafodion.org"
@@ -53,7 +70,7 @@ workspace="$(pwd)"
 echo "Using branch: $ZUUL_BRANCH"
 echo "Using reference: $ZUUL_REF"
 
-set -x   
+set -x
 
 # Build ID across repos
 BLDInfo="$ZUUL_PIPELINE Build $(date -u)"
@@ -132,7 +149,7 @@ do
     fi
 
     git clean -x -f -d -q
-    
+
     # leave some version info around
     echo "$BLDInfo" > build-version.txt
     echo "$repo" >> build-version.txt

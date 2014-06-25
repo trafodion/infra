@@ -1,4 +1,21 @@
 #!/usr/bin/perl
+# @@@ START COPYRIGHT @@@
+#
+# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# @@@ END COPYRIGHT @@@
 #
 # This script parses the output from Puppet's call to rsync to figure out
 # which .gz were updated and then untars those files only.
@@ -12,7 +29,7 @@ use Getopt::Long;
 # Default values of the 2 command line arguments
 my $rsync_out = "/opt/traf/build-tool-gz/rsync.out";
 my $top_dir = "/opt/traf";
-my @array; 
+my @array;
 my @filename;
 my $tar_cmd;
 my $status;
@@ -49,7 +66,7 @@ while (<LOG>) {
         print "Received $filename[0] which now needs to be un-tar'd\n";
         $tar_cmd = "/bin/tar -C tools -xvzf $filename[0]";
         # $status = system($tar_cmd) or die("Failed to run \"$tar_cmd\": $!");
-        system($tar_cmd) == 0 
+        system($tar_cmd) == 0
           or die "system $tar_cmd failed: $?";
       }
    }

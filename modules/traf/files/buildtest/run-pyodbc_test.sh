@@ -1,4 +1,21 @@
-#!/bin/bash 
+#!/bin/bash
+# @@@ START COPYRIGHT @@@
+#
+# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# @@@ END COPYRIGHT @@@
 
 source "/usr/local/bin/traf-functions.sh"
 source "$HOME/.bashrc"
@@ -46,9 +63,9 @@ else
   sleep 60
 
   set -x
-  if [ $(jps | grep -c DcsServer) -ne $NUM_DCS ]; then 
+  if [ $(jps | grep -c DcsServer) -ne $NUM_DCS ]; then
     echo "ERROR: No DcsServer found. Please check your DCS setup."
-    exit 1 
+    exit 1
   fi
   echo ""
 
@@ -70,7 +87,7 @@ else
     tox -e py27
     toxRes=$?
     testr last --subunit | subunit-1to2 | subunit2junitxml > "$WORKSPACE/$TEST_DIR/logs/test_report.xml"
-  else 
+  else
     echo "INFO: Run only specific pyodbc tests"
     tox -e py27 -- $TESTS
     toxRes=$?
