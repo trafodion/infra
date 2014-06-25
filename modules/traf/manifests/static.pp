@@ -92,7 +92,7 @@ class traf::static (
     priority   => '50',
     docroot    => "${server_path}/downloads-www",
     template   => 'traf/downloads/downloads.vhost.erb',
-    require    => File["${server_path}/downloads"],
+    require    => File["${server_path}/downloads-www"],
   }
 
   # where download site resides
