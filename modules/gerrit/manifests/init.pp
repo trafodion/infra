@@ -240,8 +240,7 @@ class gerrit(
     group   => 'gerrit2',
     content => template('gerrit/gerrit_ssh_config.erb'),
     replace => true,
-    require => User['gerrit2'],
-    require => File['/home/gerrit2/.ssh']
+    require => [User['gerrit2'], File['/home/gerrit2/.ssh']],
   }
 
   file { '/home/gerrit2/review_site/etc':

@@ -49,6 +49,7 @@ class traf::gerrit (
   $github_oauth_token = '',
   $github_project_username = '',
   $github_project_password = '',
+  $gerrit_creator = '',
   $trivial_rebase_role_id = '',
   $email_private_key = '',
   $replicate_local = true,
@@ -174,6 +175,7 @@ class traf::gerrit (
     testmode                        => $testmode,
     secondary_index                 => $secondary_index,
     require                         => Class[traf::server],
+    gerrit_creator                  => $gerrit_creator,
   }
 
   mysql_backup::backup { 'gerrit':
