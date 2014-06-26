@@ -265,7 +265,6 @@ projects:
     daily:
       - traf-pub-release
       - traf-pub-debug
-      - phoenix_test
       - core-regress-core
       - core-regress-charsets
       - core-regress-qat
@@ -275,6 +274,8 @@ projects:
       - core-regress-executor
       - core-regress-hive
       - core-regress-seabase
+      - phoenix_test
+      - pyodbc_test
     release:
       - traf-pub-release
     pre-release:

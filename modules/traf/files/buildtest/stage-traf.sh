@@ -39,6 +39,7 @@ set +x
 
 # Clean up any previous label directories
 rm -rf ./collect ./publish
+rm -f $workspace/Versions*
 
 
 mkdir -p "./$DestDir" || exit 2
@@ -46,7 +47,9 @@ mkdir -p "./collect" || exit 2
 
 cp trafodion/core/traf*.tgz collect/  || exit 2
 
-cp trafodion/dcs/target/dcs*gz collect/  || exit 2
+# change suffix from tar.gz to tgz
+dcsbase=$(basename trafodion/dcs/target/dcs*gz .tar.gz)
+cp trafodion/dcs/target/dcs*gz collect/${dcsbase}.tgz  || exit 2
 
 cp trafodion/install/installer*gz collect/  || exit 2
 

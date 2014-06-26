@@ -64,6 +64,8 @@
       - link-logs
       - multi-git-prep:
            repos: "trafodion/core trafodion/install trafodion/dcs"
+      - code-change-check:
+           flavor: "{flavor}"
       - pkg-traf:
            flavor: "{flavor}"
       - maven-package:

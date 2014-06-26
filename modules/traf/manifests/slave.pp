@@ -56,6 +56,13 @@ class traf::slave (
     require => Class['jenkins::slave'],
   }
 
+  # Admin access for test slaves
+  $jenkins_auth_users = {
+    creynaga   =>  { pub_key => "$traf::users::creynaga_sshkey"},
+  }
+  create_resources(jenkins::add_pub_key, $jenkins_auth_users)
+
+
   class { 'salt':
     salt_master => 'puppet.trafodion.org',
   }
