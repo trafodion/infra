@@ -20,8 +20,8 @@
 #- project: trafodion/win-odbc64
 #  upstream: git://github.com/trafodion/win-odbc64.git
 #  acl-config: /home/gerrit2/acls/trafodion/core.config
-#- project: trafodion/manuals
-#  upstream: git://github.com/trafodion/manuals.git
+- project: trafodion/manuals
+  upstream: git://github.com/trafodion/manuals.git
 #- project: trafodion/infra
 #  upstream: git://github.com/trafodion/infra.git
 
