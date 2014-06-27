@@ -65,7 +65,14 @@ class traf::buildtest {
     # not available in latest CentOS distribution, but is in Vault repos
     package { 'qpid-cpp-client-devel':
         ensure => present,
-	install_options => '--enablerepo=C6.3-updates',
+    #    install_options => '--enablerepo=C6.3-updates',
+        require => Exec['enable-Vault'],
+    }
+    # install_options not supported for yum package manager in Puppet 2.7
+    # so we enable the repo the hard way
+    exec { 'enable-Vault':
+      command => "/bin/sed -i '/C6.3-updates/,/^$/s/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-Vault.repo",
+      unless  => '/bin/grep -q "enabled=1" /etc/yum.repos.d/CentOS-Vault.repo',
     }
 
     # Remove bug reporting tool, so we can specify core file pattern
