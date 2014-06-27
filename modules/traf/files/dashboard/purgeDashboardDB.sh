@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_NAME=`basename $0`
+DASHBOARD_DIR="/usr/share/puppet-dashboard"
 DASHBOARD_LOCK="/usr/share/puppet-dashboard/tmp/pids/purge-dashboard.lock"
 
 # file lock to ensure only one is running at any given time
