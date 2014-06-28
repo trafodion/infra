@@ -6,22 +6,22 @@
 - project: trafodion/sandbox
   upstream: git://github.com/trafodion/sandbox.git
   description: Playground - Not a permanent home for anything.
-#- project: trafodion/core
-#  upstream: git://github.com/trafodion/core.git
-#- project: trafodion/phoenix_test
-#  upstream: git://github.com/trafodion/phoenix_test.git
-#  acl-config: /home/gerrit2/acls/trafodion/core.config
-#- project: trafodion/dcs
-#  upstream: git://github.com/trafodion/dcs.git
-#  acl-config: /home/gerrit2/acls/trafodion/core.config
-#- project: trafodion/install
-#  upstream: git://github.com/trafodion/install.git
-#  acl-config: /home/gerrit2/acls/trafodion/core.config
-#- project: trafodion/win-odbc64
-#  upstream: git://github.com/trafodion/win-odbc64.git
-#  acl-config: /home/gerrit2/acls/trafodion/core.config
+- project: trafodion/core
+  upstream: git://github.com/trafodion/core.git
+- project: trafodion/phoenix_test
+  upstream: git://github.com/trafodion/phoenix_test.git
+  acl-config: /home/gerrit2/acls/trafodion/core.config
+- project: trafodion/dcs
+  upstream: git://github.com/trafodion/dcs.git
+  acl-config: /home/gerrit2/acls/trafodion/core.config
+- project: trafodion/install
+  upstream: git://github.com/trafodion/install.git
+  acl-config: /home/gerrit2/acls/trafodion/core.config
+- project: trafodion/win-odbc64
+  upstream: git://github.com/trafodion/win-odbc64.git
+  acl-config: /home/gerrit2/acls/trafodion/core.config
 - project: trafodion/manuals
   upstream: git://github.com/trafodion/manuals.git
-#- project: trafodion/infra
-#  upstream: git://github.com/trafodion/infra.git
+- project: trafodion/infra
+  upstream: git://github.com/trafodion/infra.git
 
