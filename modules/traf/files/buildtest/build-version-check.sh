@@ -16,7 +16,7 @@ fi
 # file is created by the stage-traf.sh script 
 # and posted by the traf-pub-* log publisher in jenkins_job_builder/config/traf.yaml
 
-LOGLOC="http://sea-jenkins.hpl.hp.com/logs/buildvers"
+LOGLOC="http://logs.trafodion.org/buildvers"
 LOGFILE="Versions-${BRANCH}-${ZUUL_PIPELINE}-${FLAVOR}.txt"
 
 rm -f Previous_Version
