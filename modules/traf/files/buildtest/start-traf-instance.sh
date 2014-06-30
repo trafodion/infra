@@ -133,8 +133,20 @@ START_TRAF() {
 
     source_env
 
+    # Check jar files
+    jarpath=""
+    for jar in "${HBASE_TRXDIR}/${HBASE_TRX_JAR}" "$HBASE_HBLDIR/$HBASE_HBL_JAR"
+    do
+      if [[ ! -f "$jar" ]]
+      then
+        echo "Error: File not found: $jar"
+        exit 1
+      fi
+      [[ -z $jarpath ]] && jarpath="$jar" || jarpath="${jarpath}:$jar"
+    done
+
     # set java path and start HBase
-    sudo /usr/local/bin/hbase-sudo.sh start "${HBASE_TRXDIR}/${HBASE_TRX_JAR}"
+    sudo /usr/local/bin/hbase-sudo.sh start "$jarpath"
     echo "Return code $?"
 
     # clean up previous schema

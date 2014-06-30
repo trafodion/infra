@@ -26,10 +26,10 @@ then
  exit 1
 fi
 
-if [[ "$action" == "start" && ! -f "$jarpath" ]]
+if [[ "$action" == "start" && -z "$jarpath" ]]
 then
- echo "Error: In start mode, jarfile required. No such file: $jarpath"
- exit 2
+   echo "Error: In start mode, jarfile(s) required. Missing argument."
+   exit 2
 fi
 
 if [[ "$action" == "stop" ]]

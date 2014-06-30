@@ -7,7 +7,7 @@
   </property>
   <property>
     <name>hbase.rootdir</name>
-    <value>file:///var/hbase/hbase</value>
+    <value>hdfs://localhost/hbase</value>
   </property>
   <property>
     <name>hbase.client.scanner.caching</name>
@@ -22,8 +22,12 @@
     <value>true</value>
   </property>
   <property>
+    <name>hbase.bulkload.staging.dir</name>
+    <value>hdfs://localhost/hbase-staging</value>
+  </property>
+  <property>
     <name>hbase.coprocessor.region.classes</name>
-    <value>org.apache.hadoop.hbase.regionserver.transactional.TransactionalAggregateImpl</value>
+    <value>org.apache.hadoop.hbase.regionserver.transactional.TransactionalAggregateImpl,org.trafodion.sql.extensions.TrafBulkLoadEndpoint</value>
   </property>
   <property>
     <name>hbase.regionserver.class</name>

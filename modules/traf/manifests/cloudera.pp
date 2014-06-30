@@ -237,6 +237,33 @@ class traf::cloudera (
       user    => 'hdfs',
       require => [ Service[$hdfs_services],User['jenkins'] ]
   }
+  # HDFS directories for Bulkload feature
+  exec { 'hdfs-hbase-staging':
+      command => 
+          '/usr/bin/hadoop fs -mkdir -p /hbase-staging
+	   /usr/bin/hadoop fs -chown hbase /hbase-staging',
+      unless  => '/usr/bin/hadoop fs -ls -d /hbase-staging',
+      user    => 'hdfs',
+      require => [ Service[$hdfs_services],User['jenkins'] ]
+  }
+  exec { 'hdfs-trafodion':
+      command => 
+          '/usr/bin/hadoop fs -mkdir -p /user/trafodion
+	   /usr/bin/hadoop fs -chown jenkins /user/trafodion',
+      unless  => '/usr/bin/hadoop fs -ls -d /user/trafodion',
+      user    => 'hdfs',
+      require => [ Service[$hdfs_services],User['jenkins'] ]
+  }
+  exec { 'hdfs-trafodion-bulkload':
+      command => 
+          '/usr/bin/hadoop fs -mkdir -p /user/trafodion/bulkload
+	   /usr/bin/hadoop fs -chown jenkins /user/trafodion/bulkload',
+      unless  => '/usr/bin/hadoop fs -ls -d /user/trafodion/bulkload',
+      user    => 'hdfs',
+      require => [ Exec['hdfs-trafodion'] ]
+  }
+
+
   exec { 'zookeeper-init':
       command => 
           '/sbin/service zookeeper-server init',
