@@ -42,9 +42,21 @@ source_env
 cd ../sql/regress
 echo "Saving output in Regress.log"
 ./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \
-   sed  --unbuffered -r -es':(^diff |^cp )([a-zA-Z]*[0-9]*)(.*):\2:' \
-			-es:^DIFF:TEST: -es:^EXPECTED:TEST: -es:^LOG:TEST: | \
-   grep --line-buffered -C1 -E '### PASS |### FAIL '
+   grep --line-buffered -C1 -E '### PASS |### FAIL ' | \
+   grep --line-buffered -v '^$' | \
+   sed --unbuffered -r \
+     '-es:(^diff |^cp )(.*/)(.+) (.+):\3:' \
+     '-es:(^diff |^cp )(.*/)(.+):\3:' \
+     '-es:(^diff |^cp )([a-zA-Z]*[0-9]*)(.*):\2:' \
+     '-es:(.*) (DIFF.+*):\2:' \
+     '-es:.KNOWN.[a-zA-Z]*::g' \
+     '-es:.flt$::' \
+     '-es:.OS$::' \
+     '-es:\.tmp2$::' \
+     '-es:^DIFF:TEST:' \
+     '-es:^EXPECTED:TEST:' \
+     '-es:^LOG:TEST:' \
+     '-es:TESTTEST:TEST:';
 echo "Return code ${PIPESTATUS[0]}"
 
 /usr/local/bin/stop-traf-instance.sh
