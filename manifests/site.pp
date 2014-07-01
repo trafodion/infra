@@ -109,7 +109,7 @@ node 'zuul.trafodion.org' {
     gerrit_user                    => 'jenkins',
     gerrit_ssh_host_key            => hiera('gerrit_ssh_rsa_pubkey_contents', 'XXX'),
     zuul_ssh_private_key           => hiera('zuul_ssh_private_key_contents', 'XXX'),
-    url_pattern                    => 'http://logs.trafodion.org/logs/{build.parameters[LOG_PATH]}',
+    url_pattern                    => 'http://logs.trafodion.org/{build.parameters[LOG_PATH]}',
     #swift_authurl                  => 'https://identity.api.rackspacecloud.com/v2.0/',
     #swift_user                     => 'infra-files-rw',
     #swift_key                      => hiera('infra_files_rw_password', 'XXX'),
