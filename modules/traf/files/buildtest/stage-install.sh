@@ -23,24 +23,16 @@ workspace="$(pwd)"
 # Build ID indicates specific date or tag
 BLD="$(< $workspace/Build_ID)"
 
-# flavor of build
-Flavor="$1"
-if [[ "$Flavor" == "debug" ]]
-then
-  DestFile="trafodion_debug-$BLD.tar.gz"
-else
-  DestFile="trafodion-$BLD.tar.gz"
-fi
-# branch - hard-coded for now
+Flavor="Install"
+DestFile="installer-$BLD.tar.gz"
 Branch=master
-
 DestDir="publish/$ZUUL_PIPELINE/$BLD"
 
 set +x
 
 
 # Clean up any previous label directories
-rm -rf ./collect ./publish
+rm -rf ./publish
 rm -f $workspace/Versions*
 
 # Check if we have already staged a build for this version of code
@@ -51,28 +43,13 @@ then
   exit 0
 fi
 
-
 mkdir -p "./$DestDir" || exit 2
-mkdir -p "./collect" || exit 2
 
-cp trafodion/core/traf*.tgz collect/  || exit 2
-
-# change suffix from tar.gz to tgz
-dcsbase=$(basename trafodion/dcs/target/dcs*gz .tar.gz)
-cp trafodion/dcs/target/dcs*gz collect/${dcsbase}.tgz  || exit 2
-
-for repo in core dcs 
-do
-  cat trafodion/$repo/build-version.txt >> collect/build-version.txt
-  echo "==========================" >> collect/build-version.txt
-  echo "" >> collect/build-version.txt
-done
-cat collect/build-version.txt
+cp trafodion/install/installer*gz "$workspace/$DestDir/$DestFile"  || exit 2
 
 
-cd ./collect
-sha512sum * > sha512.txt
-tar czvf "$workspace/$DestDir/$DestFile" *
+cat trafodion/install/build-version.txt
+
 
 # Declare success - make this the latest good build version to be uploaded
 mv $workspace/Code_Versions $workspace/Versions-${Branch}-${ZUUL_PIPELINE}-${Flavor}.txt
