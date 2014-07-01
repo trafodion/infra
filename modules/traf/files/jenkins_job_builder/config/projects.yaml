@@ -62,6 +62,7 @@
     jobs:
       - gate-{name}-check-for-binary
       - installer-build
+      - installer-pub
 
 - project:
     name: win-odbc64
