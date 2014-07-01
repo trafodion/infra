@@ -48,6 +48,11 @@
       - shell: "/usr/local/bin/stage-traf.sh {flavor}"
 
 - builder:
+    name: stage-install
+    builders:
+      - shell: "/usr/local/bin/stage-install.sh"
+
+- builder:
     name: sql-regress
     builders:
       - shell: "/usr/local/bin/run-traf-regress.sh {dir} {suites}"

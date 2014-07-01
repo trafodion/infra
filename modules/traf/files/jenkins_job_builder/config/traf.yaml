@@ -63,7 +63,7 @@
     builders:
       - link-logs
       - multi-git-prep:
-           repos: "trafodion/core trafodion/install trafodion/dcs"
+           repos: "trafodion/core trafodion/dcs"
       - pkg-traf:
            flavor: "{flavor}"
       - maven-package:
@@ -90,6 +90,21 @@
 
     publishers:
       - console-log
+
+- job:
+    name: 'installer-pub'
+    node: redhat_cdh4.4
+
+    builders:
+      - link-logs
+      - multi-git-prep:
+           repos: "trafodion/install"
+      - pkg-install
+      - stage-install
+
+    publishers:
+      - console-log
+      - traf-release-tar
 
 - job:
     name: 'dcs-build'
