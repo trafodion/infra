@@ -126,7 +126,7 @@
                 $ivSize = openssl_cipher_iv_length($cipher);
                 $iv = bin2hex(openssl_random_pseudo_bytes($ivSize / 2));
                 $hashFname = openssl_encrypt($fName, $cipher, $salt, 0, $iv);
-                echo '<li><a class="postlink" href="#" target="_blank" rn="' . $rType . '" fn="' . $fName . '" token="' . $iv . $hashFname . '");>' . $shortFname . '</a></li>' . PHP_EOL;
+                echo '<li><a class="postlink" href="#" target="_blank" rn="' . $rType . '" fn="' . $fName . '" token="' . $iv . $hashFname . '">' . $shortFname . '</a></li>' . PHP_EOL;
             }
         }
 
