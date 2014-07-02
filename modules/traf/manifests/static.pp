@@ -127,11 +127,7 @@ class traf::static (
   }
 
   file { "${server_path}/downloads-www/downloading.php":
-    ensure  => file,
-    owner   => 'www-data',
-    group   => 'www-data',
-    content => template('traf/downloads/downloading.php.erb'),
-    require => File["${server_path}/downloads-www"],
+    ensure  => absent,
   }
 
   file { "${server_path}/downloads-www/getfile.php":
