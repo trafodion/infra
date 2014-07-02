@@ -9,8 +9,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:py="http://genshi.edgewall.org/"
       lang="en">
-  <HEAD>
-    <TITLE>Trafodion Downloads</TITLE>
+  <head>
+    <title>Trafodion Downloads</title>
     <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
     <meta http-equiv="Pragma" content="no-store, no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -19,29 +19,17 @@
     <script type="text/javascript" src="http://status.<%= domain %>/jquery.min.js"></script>
     <script type="text/javascript">
     /* <![CDATA[ */
-    (function($) {
-        $.fn.extend({
-            postlink: function() {
-                return this.each(function() {
-                    $(this).click(function(e) {
-                        var frm = $("<form>");
-                        frm.attr({'action': 'downloading.php', 'method': 'post'});
-                        frm.append('<input type="hidden" name="token" value="' + $(this).attr('token') + '" />');
-                        frm.appendTo("body");
-                        frm.submit();
-                        e.preventDefault();
-                    });
-                });
-            }
-        });
-    })(jQuery);
-    /* ]]> */
-    </script>
-    <script type="text/javascript">
-    /* <![CDATA[ */
-    $(document).ready(function() {
-        $(".postlink").postlink();
-    });
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create','UA-52287605-1','auto');ga('send','pageview');
+      $(document).ready(function(){$(".postlink").postlink();});
+      (function($){$.fn.extend({postlink:function(){return this.each(function() {
+      $(this).click(function(e){ga('send','event','downloads',$(this).attr('fn'),$(this).attr('rn'),1);
+      var frm = $("<form>");frm.attr({'action':'getfile.php','method':'post'});
+      frm.append('<input type="hidden" name="token" value="'+$(this).attr('token')+'" />');frm.appendTo("body");
+      setTimeout(function(){frm.submit();},400);e.preventDefault();});});}});})(jQuery);
     /* ]]> */
     </script>
 
@@ -52,10 +40,7 @@
     <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/print.css" type="text/css" media="print">
     <!-- IE CSS -->
     <!--[if lt IE 8]><link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
-    <!-- OpenStack Specific CSS -->
-    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/dropdown.css" type="text/css" media="screen, projection, print">
     <!-- Page Specific CSS -->
-    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/home.css" type="text/css" media="screen, projection, print">
     <link rel="stylesheet" type="text/css" href="http://status.<%= domain %>/themes/trafodion/css/main.css">
     <style type="text/css">
         #blurb-container {
@@ -71,16 +56,15 @@
             color: #204A87;
         }
     </style>
-  </HEAD>
-  <BODY>
+  </head>
+  <body>
     <script type="text/javascript">header('Downloads');</script>
     <div id="blurb-container">
     <h1>Trafodion Downloads</h1>
     <div id="message-container">
         <div class="container">
-            <div class="span-24 last">
+            <div class="span-12 last">
                 <p id="message"/>
-                For the best downloading experience please disable popups for this site.
                 </p>
             </div>
         </div>
@@ -142,7 +126,7 @@
                 $ivSize = openssl_cipher_iv_length($cipher);
                 $iv = bin2hex(openssl_random_pseudo_bytes($ivSize / 2));
                 $hashFname = openssl_encrypt($fName, $cipher, $salt, 0, $iv);
-                echo '<li><a class="postlink" href="#" token="' . $iv . $hashFname . '">' . $shortFname . '</a></li>' . PHP_EOL;
+                echo '<li><a class="postlink" href="#" target="_blank" rn="' . $rType . '" fn="' . $fName . '" token="' . $iv . $hashFname . '");>' . $shortFname . '</a></li>' . PHP_EOL;
             }
         }
 
@@ -182,11 +166,9 @@
         array_walk($dailyArray, 'print_links', 'daily');
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
-
     ?>
-
     </p></div>
     <script type="text/javascript">footer();</script>
-  </BODY>
+  </body>
 </html>
 
