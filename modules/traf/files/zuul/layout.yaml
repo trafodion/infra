@@ -210,12 +210,12 @@ pipelines:
     success:
       smtp:
         from: jenkins@trafodion.org
-        to: trafodion-firefighters@lists.launchpad.net
+        to: trafodionffs@hp.com
         subject: 'Daily build of {change.project} -- Passed All Tests'
     failure:
       smtp:
         from: jenkins@trafodion.org
-        to: trafodion-firefighters@lists.launchpad.net
+        to: trafodionffs@hp.com
         subject: 'Daily build of {change.project} -- Test Failures'
 
 
