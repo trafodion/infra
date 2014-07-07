@@ -67,6 +67,8 @@ node 'jenkins01.trafodion.org' {
 node 'puppet.trafodion.org' {
   class { 'traf::puppetmaster':
     sysadmins => hiera('sysadmins'),
+    cloud_auto_user => hiera('cloud_auto_user'),
+    cloud_auto_passwd => hiera('cloud_auto_passwd'),
   }
 }
 
