@@ -103,6 +103,10 @@
 	session = <%= melody_session %>
 [plugin "javamelody"]
         allowTopMenu = <%= enable_javamelody_top_menu %>
+[commitmessage]
+	maxSubjectLength = 75
+	maxLineLength = 80
+	rejectTooLong = true
 <% if gitweb or cgit -%>
 [gitweb]
 <% if gitweb -%>
