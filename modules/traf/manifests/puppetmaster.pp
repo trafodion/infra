@@ -46,6 +46,18 @@ class traf::puppetmaster (
     mode   => '0750',
     }
 
+  # Cloud admin script
+  file { '/usr/local/bin/slave-ip.sh':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('traf/slave-ip.sh.erb'),
+  }
+  # Cloud admin users, other than sysadmins
+  realize (User::Virtual::Localuser['creynaga'])
+
+
 #### Not sure if we'll use launch-node.py script
 #
 # Cloud credentials are stored in this directory for launch-node.py.
