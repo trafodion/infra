@@ -45,21 +45,15 @@ class traf::buildtest {
 
     # Use exec to run yum groupinstall since it is not
     # supported by the package type
-    file { '/tmp/Development_Tools_Installed.out':
-        mode   => '0644',
-        source => "puppet:///modules/traf/Development_Tools_Installed.out",
-    }
-
     exec { 'install_Development_Tools':
         path    => "/usr/bin:/bin:/usr/local/bin",
         command => 'yum groupinstall "Development Tools"',
-        unless  => 'yum grouplist "Development Tools" > /tmp/Development_Tools_Installed.run.out; diff -wq /tmp/Development_Tools_Installed.run.out /tmp/Development_Tools_Installed.out',
-        require => File['/tmp/Development_Tools_Installed.out'],
+        onlyif  => "test `yum grouplist \"Development Tools\" | grep -A 1 \"Installed Groups:\" | grep -c \"Development tools\"` -eq 0",
     }
 
     package { $packages:
         ensure => present,
-   	require => [ Exec['install_Development_Tools'] ]
+        require => [ Exec['install_Development_Tools'] ]
     }
 
     # not available in latest CentOS distribution, but is in Vault repos
@@ -107,12 +101,12 @@ class traf::buildtest {
     }
 
     # This dir contains the tarballs of the build tool binaries.  Jenkins user 
-    # needs to write to this directory to sync the build tools.
+    # needs to write to this directory to sync the build tools. Do not ensure 
+    # mode since the mode of this directory is inherited from rsync
     file { '/opt/traf/build-tool-tgz' :
        ensure  => directory,
        owner   => 'jenkins',
        group   => 'jenkins',
-       mode    => '0755',
        require => File['/opt/traf'],
     }
 
@@ -126,31 +120,25 @@ class traf::buildtest {
        require => File['/opt/traf'],
     }
 
-    # This file is created by the rsync-build-tool-tgz step and we don't want rsync
-    # to append to an existing output file so we make sure to remove any old copy.
-    file { '/opt/traf/rsync.out' :
-       ensure  => absent,
-       require => File['/opt/traf'],
-    }
-
+    # Zero out output file then rsync
     # Sync /opt/traf/tools directory, output gets saved so later we know which files were sync'd.
     # We only untar the files that were sync'd.  That's done in the next step.
-    exec { 'rsync-build-tool-tgz' :
-        command   => "/usr/bin/rsync -havS --log-file=/opt/traf/rsync.out --log-file-format=\"%o --- %n\" --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf",
-	    user      => jenkins,
-	    provider  => shell,
-	    require   => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'], File['/opt/traf/rsync.out'] ],
+    exec { 'rsync-build-tool-tgz' : 
+        command   => "cat /dev/null > /opt/traf/rsync.out; /usr/bin/rsync -havS --log-file=/opt/traf/rsync.out --log-file-format=\"%o --- %n\" --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf", 
+        user      => jenkins, 
+        provider  => shell, 
+        onlyif    => "test `rsync -haS --dry-run --itemize-changes --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf | wc -l` -gt 0", 
+        require   => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'] ],
     }
 
     # Un-tar the build tool tarballs, only when tarball has been updated by rsync
-    exec { 'untar-build-tool-tgz' :
-        command   => '/usr/local/bin/untar_updated_tools.pl -d /opt/traf -f /opt/traf/rsync.out',
-	    user      => root,
-	    provider  => shell,
-	    require   => Exec['rsync-build-tool-tgz'],
+    exec { 'untar-build-tool-tgz' : 
+        command     => '/usr/local/bin/untar_updated_tools.pl -d /opt/traf -f /opt/traf/rsync.out', 
+        user        => root, 
+        provider    => shell, 
+        refreshonly => true, 
+        subscribe   => Exec['rsync-build-tool-tgz'],
     }
-    
-    
   }
 }
 
