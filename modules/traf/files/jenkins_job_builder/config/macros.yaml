@@ -28,11 +28,6 @@
       - shell: "/usr/local/bin/kill-rogue-instance.sh"
 
 - builder:
-    name: code-change-check
-    builders:
-      - shell: "/usr/local/bin/build-version-check.sh master {flavor}"
-
-- builder:
     name: make-traf
     builders:
       - shell: "/usr/local/bin/build-traf.sh {flavor}"

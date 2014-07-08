@@ -31,6 +31,8 @@ then
 else
   DestFile="trafodion-$BLD.tar.gz"
 fi
+# branch - hard-coded for now
+Branch=master
 
 DestDir="publish/$ZUUL_PIPELINE/$BLD"
 
@@ -40,6 +42,14 @@ set +x
 # Clean up any previous label directories
 rm -rf ./collect ./publish
 rm -f $workspace/Versions*
+
+# Check if we have already staged a build for this version of code
+if ! /usr/local/bin/build-version-check.sh "$Branch" "$Flavor"
+then
+  # Declare success, but don't leave any files to be published
+  echo "This build has been previously staged. Exiting."
+  exit 0
+fi
 
 
 mkdir -p "./$DestDir" || exit 2
@@ -67,7 +77,6 @@ sha512sum * > sha512.txt
 tar czvf "$workspace/$DestDir/$DestFile" *
 
 # Declare success - make this the latest good build version to be uploaded
-# hard-code master branch for now
-mv $workspace/Code_Versions $workspace/Versions-master-${ZUUL_PIPELINE}-${Flavor}.txt
+mv $workspace/Code_Versions $workspace/Versions-${Branch}-${ZUUL_PIPELINE}-${Flavor}.txt
 
 exit 0

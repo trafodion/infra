@@ -44,7 +44,10 @@ rc=$?
 
 if [[ $rc == 0 ]]
 then
+  echo "*****************************"
   echo "Code version is identical to previous successful build."
+  cat Code_Versions
+  echo "*****************************"
   exit 1
 else
   echo "Code changes detected."
