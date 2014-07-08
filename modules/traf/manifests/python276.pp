@@ -8,47 +8,52 @@ class traf::python276 {
 
   $python_file = 'Python-2.7.6.tgz'
 
-  file { '/tmp/Python-2.7.6.md5.orig':
+  file { '/tmp/python':
+    ensure => directory,
+  }
+
+  file { '/tmp/python/Python-2.7.6.md5.orig':
       mode   => '0644',
       source => "puppet:///modules/traf/python/Python-2.7.6.md5",
+      require => File['/tmp/python'],
   }
 
   exec { 'download_Python2.7.6':
       path    => "/usr/bin:/bin:/usr/local/bin",
-      cwd     => "/tmp",
+      cwd     => "/tmp/python",
       command => "wget -O - http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz | tee $python_file | md5sum > Python-2.7.6.md5.download; diff -wq Python-2.7.6.md5.download Python-2.7.6.md5.orig",
-      creates => "/tmp/$python_file",
-      require => File['/tmp/Python-2.7.6.md5.orig'],
+      creates => "/tmp/python/$python_file",
+      require => File['/tmp/python/Python-2.7.6.md5.orig'],
   }
 
   exec { 'untar_Python2.7.6':
       path    => "/usr/bin:/bin:/usr/local/bin",
-      cwd     => "/tmp",
+      cwd     => "/tmp/python",
       command => "tar xfz $python_file",
-      creates => "/tmp/Python-2.7.6/configure",
+      creates => "/tmp/python/Python-2.7.6/configure",
       require => Exec['download_Python2.7.6'],
   }
 
   exec { 'configure_Python2.7.6':
-      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/Python-2.7.6",
-      cwd     => "/tmp/Python-2.7.6",
+      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/python/Python-2.7.6",
+      cwd     => "/tmp/python/Python-2.7.6",
       command => "./configure --enable-unicode=ucs2 --prefix=/usr/local",
-      creates => "/tmp/Python-2.7.6/Makefile",
+      creates => "/tmp/python/Python-2.7.6/Makefile",
       require => [ Exec['untar_Python2.7.6'], Package['libpcap-devel'] ]
   }
 
   exec { 'make_Python2.7.6':
-      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/Python-2.7.6",
-      cwd     => "/tmp/Python-2.7.6",
+      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/python/Python-2.7.6",
+      cwd     => "/tmp/python/Python-2.7.6",
       command => "make",
-      timeout => '300',
-      creates => "/tmp/Python-2.7.6/build/scripts-2.7/smtpd.py",
+      timeout => '600',
+      creates => "/tmp/python/Python-2.7.6/build/lib.linux-x86_64-2.7/_ctypes.so",
       require => Exec['configure_Python2.7.6'],
   }
 
   exec { 'make_install_Python2.7.6':
-      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/Python-2.7.6",
-      cwd     => "/tmp/Python-2.7.6",
+      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/python/Python-2.7.6",
+      cwd     => "/tmp/python/Python-2.7.6",
       command => "make altinstall",
       timeout => '300',
       creates => "/usr/local/bin/python2.7",
@@ -67,15 +72,16 @@ class traf::python276 {
   # NOTE: This should also install setuptools
   exec { 'download_python_pip':
       path    => "/usr/local/bin:/usr/bin:/bin",
-      cwd     => "/tmp",
+      cwd     => "/tmp/python",
       command => "wget --no-check-certificate https://raw.github.com/pypa/pip/master/contrib/get-pip.py",
-      creates => "/tmp/get-pip.py",
+      creates => "/tmp/python/get-pip.py",
+      require => File['/tmp/python'],
   }
 
   # NOTE: Make sure the path to the newly compiled python binary comes first!
   exec { 'run_get-pip.py':
       path        => "/usr/local/bin:/usr/bin:/bin",
-      cwd         => "/tmp",
+      cwd         => "/tmp/python",
       environment => "PYTHONHOME=/usr/local",
       command     => "python get-pip.py",
       creates     => "/usr/local/bin/pip",
@@ -150,8 +156,8 @@ class traf::python276 {
   exec { 'pip_install_pythonodbc' :
       path        => "/usr/local/bin:/usr/bin:/bin",
       environment => "PYTHONHOME=/usr/local",
-      command     => "pip install http://pyodbc.googlecode.com/files/pyodbc-3.0.7.zip",
-      creates     => "/usr/local/lib/python2.7/site-packages/pyodbc.so",
+      command     => "pip install http://dl.bintray.com/alchen99/python/pyodbc-3.0.7.1-unsupported.zip",
+      unless      => "pip freeze | grep 'pyodbc==3.0.7.1-unsupported'",
       require     => Exec['run_get-pip.py'],
   }
 
