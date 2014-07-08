@@ -122,7 +122,6 @@ class jenkins::slave(
   # Packages that need to be installed from pip
   $pip_packages = [
     'setuptools-git',
-    'tox',
   ]
 
   if $python3 {
@@ -137,9 +136,19 @@ class jenkins::slave(
       provider => pip3,
       require  => Class[pip::python3],
     }
+    package { 'tox':
+      ensure   => '1.6.1',
+      provider => pip3,
+      require  => Class[pip::python3],
+    }
   } else {
     package { $pip_packages:
       ensure   => latest,  # we want the latest from these
+      provider => pip,
+      require  => Class[pip],
+    }
+    package { 'tox':
+      ensure   => '1.6.1',
       provider => pip,
       require  => Class[pip],
     }
