@@ -8,74 +8,87 @@ class traf::python276 {
 
   $python_file = 'Python-2.7.6.tgz'
 
-  file { '/tmp/Python-2.7.6.md5.orig':
+  file { '/var/python276':
+    ensure => directory,
+  }
+
+  file { '/var/python276/Python-2.7.6.md5.orig':
       mode   => '0644',
       source => "puppet:///modules/traf/python/Python-2.7.6.md5",
+      require => File['/var/python276'],
   }
 
   exec { 'download_Python2.7.6':
       path    => "/usr/bin:/bin:/usr/local/bin",
-      cwd     => "/tmp",
+      cwd     => "/var/python276",
       command => "wget -O - http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz | tee $python_file | md5sum > Python-2.7.6.md5.download; diff -wq Python-2.7.6.md5.download Python-2.7.6.md5.orig",
-      creates => "/tmp/$python_file",
-      require => File['/tmp/Python-2.7.6.md5.orig'],
+      creates => "/var/python276/$python_file",
+      require => File['/var/python276/Python-2.7.6.md5.orig'],
+      unless  => "test `/usr/local/bin/python --version 2>&1 | egrep -c 'Python 2.7.6'` -eq 1 && test `/usr/local/bin/python -c 'import sys; print sys.maxunicode;'` = '65535'",
   }
 
   exec { 'untar_Python2.7.6':
-      path    => "/usr/bin:/bin:/usr/local/bin",
-      cwd     => "/tmp",
-      command => "tar xfz $python_file",
-      creates => "/tmp/Python-2.7.6/configure",
-      require => Exec['download_Python2.7.6'],
+      path        => "/usr/bin:/bin:/usr/local/bin",
+      cwd         => "/var/python276",
+      command     => "tar xfz $python_file",
+      creates     => "/var/python276/Python-2.7.6/configure",
+      refreshonly => true,
+      subscribe   => Exec['download_Python2.7.6'],
   }
 
   exec { 'configure_Python2.7.6':
-      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/Python-2.7.6",
-      cwd     => "/tmp/Python-2.7.6",
-      command => "./configure --enable-unicode=ucs2 --prefix=/usr/local",
-      creates => "/tmp/Python-2.7.6/Makefile",
-      require => [ Exec['untar_Python2.7.6'], Package['libpcap-devel'] ]
+      path        => "/usr/bin:/bin:/usr/local/bin:/var/python276/Python-2.7.6",
+      cwd         => "/var/python276/Python-2.7.6",
+      command     => "./configure --enable-unicode=ucs2 --prefix=/usr/local",
+      creates     => "/var/python276/Python-2.7.6/Makefile",
+      refreshonly => true,
+      require     => Package['libpcap-devel'],
+      subscribe   => Exec['untar_Python2.7.6'],
   }
 
   exec { 'make_Python2.7.6':
-      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/Python-2.7.6",
-      cwd     => "/tmp/Python-2.7.6",
-      command => "make",
-      timeout => '300',
-      creates => "/tmp/Python-2.7.6/build/scripts-2.7/smtpd.py",
-      require => Exec['configure_Python2.7.6'],
+      path        => "/usr/bin:/bin:/usr/local/bin:/var/python276/Python-2.7.6",
+      cwd         => "/var/python276/Python-2.7.6",
+      command     => "make",
+      timeout     => '600',
+      creates     => "/var/python276/Python-2.7.6/build/lib.linux-x86_64-2.7/_ctypes.so",
+      refreshonly => true,
+      subscribe   => Exec['configure_Python2.7.6'],
   }
 
   exec { 'make_install_Python2.7.6':
-      path    => "/usr/bin:/bin:/usr/local/bin:/tmp/Python-2.7.6",
-      cwd     => "/tmp/Python-2.7.6",
-      command => "make altinstall",
-      timeout => '300',
-      creates => "/usr/local/bin/python2.7",
-      require => Exec['make_Python2.7.6'],
+      path        => "/usr/bin:/bin:/usr/local/bin:/var/python276/Python-2.7.6",
+      cwd         => "/var/python276/Python-2.7.6",
+      command     => "make altinstall",
+      timeout     => '300',
+      creates     => "/usr/local/bin/python2.7",
+      refreshonly => true,
+      subscribe   => Exec['make_Python2.7.6'],
   }
 
   exec { 'link_Python2.7.6':
-      path    => "/usr/bin:/bin:/usr/local/bin",
-      cwd     => "/usr/local/bin",
-      command => "ln -s python2.7 python",
-      creates => "/usr/local/bin/python",
-      require => Exec['make_install_Python2.7.6'],
+      path        => "/usr/bin:/bin:/usr/local/bin",
+      cwd         => "/usr/local/bin",
+      command     => "ln -s python2.7 python",
+      creates     => "/usr/local/bin/python",
+      refreshonly => true,
+      subscribe   => Exec['make_install_Python2.7.6'],
   }
 
   # Download and install pip for Python 2.7
   # NOTE: This should also install setuptools
   exec { 'download_python_pip':
       path    => "/usr/local/bin:/usr/bin:/bin",
-      cwd     => "/tmp",
+      cwd     => "/var/python276",
       command => "wget --no-check-certificate https://raw.github.com/pypa/pip/master/contrib/get-pip.py",
-      creates => "/tmp/get-pip.py",
+      creates => "/var/python276/get-pip.py",
+      require => File['/var/python276'],
   }
 
   # NOTE: Make sure the path to the newly compiled python binary comes first!
   exec { 'run_get-pip.py':
       path        => "/usr/local/bin:/usr/bin:/bin",
-      cwd         => "/tmp",
+      cwd         => "/var/python276",
       environment => "PYTHONHOME=/usr/local",
       command     => "python get-pip.py",
       creates     => "/usr/local/bin/pip",
@@ -96,6 +109,7 @@ class traf::python276 {
       environment => "PYTHONHOME=/usr/local",
       command     => "pip install flake8==2.0",
       creates     => "/usr/local/bin/flake8",
+      unless      => "pip freeze | grep 'flake8==2.0'",
       require     => Exec['run_get-pip.py'],
   }
 
@@ -136,6 +150,7 @@ class traf::python276 {
       environment => "PYTHONHOME=/usr/local",
       command     => "pip install pep8==1.4.5",
       creates     => "/usr/local/bin/pep8",
+      unless      => "pip freeze | grep 'pep8==1.4.5'",
       require     => Exec['run_get-pip.py'],
   }
 
@@ -144,14 +159,15 @@ class traf::python276 {
       environment => "PYTHONHOME=/usr/local",
       command     => "pip install tox==1.6.1",
       creates     => "/usr/local/bin/tox",
+      unless      => "pip freeze | grep 'tox==1.6.1'",
       require     => Exec['run_get-pip.py'],
   }
 
   exec { 'pip_install_pythonodbc' :
       path        => "/usr/local/bin:/usr/bin:/bin",
       environment => "PYTHONHOME=/usr/local",
-      command     => "pip install http://pyodbc.googlecode.com/files/pyodbc-3.0.7.zip",
-      creates     => "/usr/local/lib/python2.7/site-packages/pyodbc.so",
+      command     => "pip install http://dl.bintray.com/alchen99/python/pyodbc-3.0.7.1-unsupported.zip",
+      unless      => "pip freeze | grep 'pyodbc==3.0.7.1-unsupported'",
       require     => Exec['run_get-pip.py'],
   }
 
