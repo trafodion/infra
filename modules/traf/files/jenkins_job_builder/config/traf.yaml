@@ -283,6 +283,76 @@
       - git-log
       - pyodbc_test-log
 
+# For jdbc_test* jobs parameter tests1 should contain a list of tests seperated by a comma and NO space. 
+# For instance : TestBasic,SomeOtherTest
+# If parameter tests1 is "" then all tests will be run
+# If parameter tests1 = DONT_RUN_TESTS then none of the jdbc tests will run.
+# This should only be used in jdbc_test-experimental if jdbc_test is running all tests.
+- job:
+    name: 'jdbc_test-experimental'
+    node: redhat_cdh4.4
+
+    wrappers:
+      - timeout:
+          timeout: 60
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - kill-traf
+      - multi-git-prep:
+           repos: "trafodion/core trafodion/dcs"
+      - make-traf:
+           flavor: "debug"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - kill-traf
+      - run-jdbc_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/dcs/src/test/jdbc_test"
+           tests1: "DONT_RUN_TESTS"
+
+    publishers:
+      - jdbc-xunit
+      - console-log
+      - traf-make-log
+      - git-log
+      - jdbc_test-log
+
+- job:
+    name: 'jdbc_test'
+    node: redhat_cdh4.4
+
+    wrappers:
+      - timeout:
+          timeout: 60
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - kill-traf
+      - multi-git-prep:
+           repos: "trafodion/core trafodion/dcs"
+      - make-traf:
+           flavor: "debug"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - kill-traf
+      - run-jdbc_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/dcs/src/test/jdbc_test"
+           tests1: ""
+
+    publishers:
+      - jdbc-xunit
+      - console-log
+      - traf-make-log
+      - git-log
+      - jdbc_test-log
 
 # Simple file type check can run on master
 # Does not need to be exclusive
