@@ -62,6 +62,11 @@
     builders:
       - shell: '/usr/local/bin/run-pyodbc_test.sh {trafCoreDir} {dcsDir} {testDir} "{tests1}"'
 
+- builder:
+    name: run-jdbc_test
+    builders:
+      - shell: '/usr/local/bin/run-jdbc_test.sh {trafCoreDir} {dcsDir} /usr/lib/jvm/java-1.7.0-openjdk.x86_64 {testDir} "{tests1}"'
+
 
 - builder:
     name: assert-no-binary-files
@@ -234,6 +239,35 @@
             - junit:
                 pattern: "trafodion/dcs/src/test/pytests/logs/test_report.xml"
           
+- publisher:
+    name: jdbc_test-log
+    publishers:
+      - scp:
+          site: 'logs.trafodion.org'
+          files:
+            - target: 'logs/$LOG_PATH/surefire-reports'
+              source: 'trafodion/dcs/src/test/jdbc_test/target/surefire-reports/**'
+              copy-after-failure: true
+          
+- publisher:
+    name: jdbc-xunit
+    publishers:
+      - xunit:
+          thresholds:
+            - failed:
+                unstable: '0'
+                unstablenew: '0'
+                failure: '0'
+                failurenew: '0'
+            - skipped:
+                unstable: '0'
+                unstablenew: '0'
+                failure: '0'
+                failurenew: '0'
+          types:
+            - junit:
+                pattern: "trafodion/dcs/src/test/jdbc_test/target/surefire-reports/*.xml"
+
 - publisher:
     name: console-log
     publishers:
