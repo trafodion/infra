@@ -143,9 +143,17 @@ do
         echo "Could not find Zuul change $ZUUL_REF for $repo"
 	exit 3
       fi
-      git checkout -f $branch
-      git reset --hard remotes/origin/$branch
-      ref=$branch
+      # A tag reference in dependent project (not the ZUUL_PROJECT) might not be in zuul
+      # Look in origin
+      if git fetch $GIT_ORIGIN/$repo $ref
+      then
+        git checkout -f FETCH_HEAD
+        git reset --hard FETCH_HEAD
+      else
+        git checkout -f $branch
+        git reset --hard remotes/origin/$branch
+        ref=$branch
+      fi
     fi
 
     git clean -x -f -d -q
