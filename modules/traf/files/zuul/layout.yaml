@@ -280,6 +280,18 @@ projects:
       - traf-pub-release
     pre-release:
       - traf-pub-release
+      - traf-pub-debug
+      - core-regress-core
+      - core-regress-charsets
+      - core-regress-qat
+      - core-regress-udr
+      - core-regress-catman1
+      - core-regress-compGeneral
+      - core-regress-executor
+      - core-regress-hive
+      - core-regress-seabase
+      - phoenix_test
+      - pyodbc_test
 
   - name: trafodion/dcs
     check:
