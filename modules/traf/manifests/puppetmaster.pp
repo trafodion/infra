@@ -72,7 +72,7 @@ class traf::puppetmaster (
 
 # For launch/launch-node.py.
   package { 'python-novaclient':
-    ensure   => '2.18.0',
+    ensure   => '2.17.0',
     provider => pip,
   }
   package { 'python-cinderclient':
