@@ -71,7 +71,11 @@ class traf::puppetmaster (
     }
 
 # For launch/launch-node.py.
-  package { ['python-cinderclient', 'python-novaclient']:
+  package { 'python-novaclient':
+    ensure   => '2.18.0',
+    provider => pip,
+  }
+  package { 'python-cinderclient':
     ensure   => latest,
     provider => pip,
   }
