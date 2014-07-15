@@ -42,7 +42,7 @@ if [ $# -gt 4 ]; then
     echo "INFO: Will NOT run any JDBC tests as requested. You should not see this message in the normal Jenkins job jdbc_test! This should only be used to turn off testing of the experimetal jobs."
     exit 0
   # exit if tests option not specified correctly
-  elif ! [[ $TESTS =~ ^--tests=.* ]]; then
+  elif [[ ! -z "$TESTS" ]] && ! [[ $TESTS =~ ^--tests=.* ]]; then
     echo "ERROR: Incorrect specification for the tests option. The tests option should start with --tests= and should be delimited by a comma with no space."
     echo "       i.e.  --tests=TestBasic,SomeOtherTestName"
     exit 1
