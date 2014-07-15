@@ -210,6 +210,10 @@ pipelines:
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
+  - name: jdbc_test
+    voting: false
+  - name: jdbc_test-experimental
+    voting: false
   - name: phoenix_test
     voting: true
   - name: phoenix_test-experimental
@@ -264,6 +268,7 @@ projects:
       - core-regress-seabase
       - phoenix_test
       - pyodbc_test
+      - jdbc_test
     release:
       - traf-pub-release
     pre-release:
@@ -280,6 +285,7 @@ projects:
       - core-regress-seabase
       - phoenix_test
       - pyodbc_test
+      - jdbc_test
 
   - name: trafodion/dcs
     check:
@@ -287,13 +293,13 @@ projects:
       - dcs-build
       - phoenix_quick
       - pyodbc_test
-      - pyodbc_test-experimental
+      - jdbc_test
     gate:
       - gate-dcs-check-for-binary
       - dcs-build
       - phoenix_quick
       - pyodbc_test
-      - pyodbc_test-experimental
+      - jdbc_test
     check-full:
       - phoenix_test
 
