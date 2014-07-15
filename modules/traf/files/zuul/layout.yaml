@@ -335,6 +335,12 @@ projects:
     gate:
       - gate-install-check-for-binary
       - installer-build
+    daily:
+      - installer-pub
+    release:
+      - installer-pub
+    pre-release:
+      - installer-pub
 
   - name: trafodion/win-odbc64
     check:
