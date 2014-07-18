@@ -68,7 +68,6 @@
            flavor: "{flavor}"
       - maven-package:
            buildDir: "trafodion/dcs"
-      - pkg-install
       - stage-traf:
            flavor: "{flavor}"
 
