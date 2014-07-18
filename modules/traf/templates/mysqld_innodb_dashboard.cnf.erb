@@ -1,6 +1,7 @@
 [mysqld]
 innodb_buffer_pool_size=<%= mysql_innodb_buffer_pool_size %>
 innodb_flush_method=O_DIRECT
+innodb_lock_wait_timeout=300
 max_allowed_packet=32M
 
 [mysqldump]
