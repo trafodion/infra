@@ -137,8 +137,9 @@
         $wPath = realpath($scriptPath . "/../downloads/trafodion/publish");
 
         // call scanDirectory function to iterate through directory structure
-        $fArray = scanDirectory($wPath, true, true);
-        natsort($fArray);
+        $fArrayTemp = scanDirectory($wPath, true, true);
+        natsort($fArrayTemp);
+        $fArray = array_reverse($fArrayTemp);
 
         // create array for release
         echo '<div class="blurb">' . PHP_EOL;
