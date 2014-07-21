@@ -68,6 +68,7 @@ class traf::base(
       User::Virtual::Localuser['brackfay'],
       User::Virtual::Localuser['alchen'],
       User::Virtual::Localuser['sjohnson'],
+      User::Virtual::Localuser['johnstac'],
       User::Virtual::Localuser['csheedy'],
     )
   }
