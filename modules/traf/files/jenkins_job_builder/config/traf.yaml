@@ -1,28 +1,46 @@
 - job-group:
     name: 'core-regress-suites'
     jobs:
-      - core-regress-{suite}:
+      - core-regress-{suite}-{dist}:
          suite: "charsets"
-      - core-regress-{suite}:
+         dist:
+          - "cdh4.4"
+      - core-regress-{suite}-{dist}:
          suite: "core"
-      - core-regress-{suite}:
+         dist:
+          - "cdh4.4"
+      - core-regress-{suite}-{dist}:
          suite: "executor"
-      - core-regress-{suite}:
+         dist:
+          - "cdh4.4"
+      - core-regress-{suite}-{dist}:
          suite: "qat"
-      - core-regress-{suite}:
+         dist:
+          - "cdh4.4"
+      - core-regress-{suite}-{dist}:
          suite: "seabase"
-      - core-regress-{suite}:
+         dist:
+          - "cdh4.4"
+      - core-regress-{suite}-{dist}:
          suite: "hive"
-      - core-regress-{suite}:
+         dist:
+          - "cdh4.4"
+      - core-regress-{suite}-{dist}:
          suite: "compGeneral"
-      - core-regress-{suite}:
+         dist:
+          - "cdh4.4"
+      - core-regress-{suite}-{dist}:
          suite: "udr"
-      - core-regress-{suite}:
+         dist:
+          - "cdh4.4"
+      - core-regress-{suite}-{dist}:
          suite: "catman1"
+         dist:
+          - "cdh4.4"
 
 - job-template:
-    name: 'core-regress-{suite}'
-    node: redhat_cdh4.4
+    name: 'core-regress-{suite}-{dist}'
+    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
@@ -124,9 +142,9 @@
 # If parameters tests1-4 are all "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the phoenix tests will run.  
 # This should only be used in phoenix_test-experimental if phoenix_test is running all tests.
-- job:
-    name: 'phoenix_test-experimental'
-    node: redhat_cdh4.4
+- job-template:
+    name: 'phoenix_test-experimental-{dist}'
+    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
@@ -160,9 +178,9 @@
       - git-log
       - phoenix_test-log
 
-- job:
-    name: 'phoenix_test'
-    node: redhat_cdh4.4
+- job-template:
+    name: 'phoenix_test-{dist}'
+    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
@@ -196,9 +214,9 @@
       - git-log
       - phoenix_test-log
 
-- job:
-    name: 'phoenix_quick'
-    node: redhat_cdh4.4 
+- job-template:
+    name: 'phoenix_quick-{dist}'
+    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
@@ -235,9 +253,9 @@
 # For pyodbc_test* jobs parameter tests1 should contain a list of tests seperated by a space. For instance : test_p2.ConnectTest.test11 test_p2.ConnectTest.test12
 # If parameter tests1 is "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the pyodbc tests will run.  This should only be used in pyodbc_test-experimental if pyodbc_test is running all tests.
-- job:
-    name: 'pyodbc_test-experimental'
-    node: redhat_cdh4.4
+- job-template:
+    name: 'pyodbc_test-experimental-{dist}'
+    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
@@ -266,9 +284,9 @@
       - git-log
       - pyodbc_test-log
 
-- job:
-    name: 'pyodbc_test'
-    node: redhat_cdh4.4
+- job-template:
+    name: 'pyodbc_test-{dist}'
+    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
@@ -303,9 +321,9 @@
 # If parameter tests1 is "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the jdbc tests will run.
 # This should only be used in jdbc_test-experimental if jdbc_test is running all tests.
-- job:
-    name: 'jdbc_test-experimental'
-    node: redhat_cdh4.4
+- job-template:
+    name: 'jdbc_test-experimental-{dist}'
+    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
@@ -335,9 +353,9 @@
       - git-log
       - jdbc_test-log
 
-- job:
-    name: 'jdbc_test'
-    node: redhat_cdh4.4
+- job-template:
+    name: 'jdbc_test-{dist}'
+    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
