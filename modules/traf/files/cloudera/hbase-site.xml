@@ -45,5 +45,9 @@
     <name>hbase.master.distributed.log.splitting</name> 
     <value>false</value> 
   </property> 
+  <property>
+    <name>hbase.snapshot.enabled</name>
+    <value>true</value>
+  </property>
 </configuration>
 
