@@ -22,12 +22,15 @@
     name: core
     github-org: trafodion
 
+    dist:
+      - "cdh4.4"
+
     jobs:
       - traf-publish
       - core-regress-suites
       - gate-{name}-check-for-binary
-      - phoenix_test
-      - phoenix_quick
+      - phoenix_test-{dist}
+      - phoenix_quick-{dist}
 
 - project:
     name: manuals
@@ -40,20 +43,26 @@
     name: phoenix_test
     github-org: trafodion
 
+    dist:
+      - "cdh4.4"
+
     jobs:
       - gate-{name}-check-for-binary
-      - phoenix_test-experimental
-      - phoenix_test
+      - phoenix_test-experimental-{dist}
+      - phoenix_test-{dist}
 
 - project:
     name: dcs
     github-org: trafodion
 
+    dist:
+      - "cdh4.4"
+
     jobs:
       - gate-{name}-check-for-binary
       - dcs-build
-      - phoenix_test
-      - phoenix_quick
+      - phoenix_test-{dist}
+      - phoenix_quick-{dist}
 
 - project:
     name: install
