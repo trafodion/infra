@@ -71,6 +71,10 @@ pipelines:
         - event: comment-added
           approval:
             - workflow: 1
+        # event is code-review, already approved
+        - event: comment-added
+          approval:
+            - code-review: 2
         # event is check test pass, already approved
         - event: comment-added
           approval:
