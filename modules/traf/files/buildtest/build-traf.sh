@@ -26,7 +26,8 @@ FLAVOR=$1
 TARGET="all"
 if [[ -n "$2" ]]
 then
-  TARGET="$2"
+  shift 1
+  TARGET="$*"
 fi
 
 workspace="$(pwd)"
@@ -46,6 +47,7 @@ export PV_DATE=$(echo ${BUILD_ID} | sed 's/-//g')
 
 make $TARGET > Make.log 2>&1
 rc=$?
+ls -l *.tgz 2>/dev/null
 
 cd $workspace
 
