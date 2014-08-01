@@ -51,6 +51,11 @@
       - shell: "/usr/local/bin/build-traf.sh {flavor}"
 
 - builder:
+    name: check-build
+    builders:
+      - shell: "/usr/local/bin/check-git-status {dir}"
+
+- builder:
     name: pkg-traf
     builders:
       - shell: "/usr/local/bin/build-traf.sh {flavor} package pkg-sql-regress"

@@ -65,6 +65,24 @@
       - traf-make-log
       - traf-regress-log
 
+- job:
+    name: 'core-build-nondbg-cdh4.4'
+    node: redhat_cdh4.4
+
+    builders:
+      - link-logs
+      - multi-git-prep:
+           repos: "trafodion/core"
+      - pkg-traf:
+           flavor: "release"
+      - check-build:
+           dir: "trafodion/core"
+
+    publishers:
+      - console-log
+      - git-log
+      - traf-make-log
+
 - job-group:
     name: 'traf-publish'
     jobs:

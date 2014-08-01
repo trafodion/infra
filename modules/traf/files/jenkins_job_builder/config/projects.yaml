@@ -27,6 +27,7 @@
 
     jobs:
       - traf-publish
+      - core-build-nondbg-cdh4.4
       - core-regress-suites
       - gate-{name}-check-for-binary
       - phoenix_test-{dist}

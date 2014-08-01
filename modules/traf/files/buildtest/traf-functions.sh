@@ -54,6 +54,11 @@ function source_env () {
 
   # Save flavor used for later calls
   echo "$ENVfile" > ./BuildFlavor
+  # add this save file to the ignored file list for this workspace
+  if ! grep -q sqf/BuildFlavor ../.git/info/exclude
+  then
+    echo "sqf/BuildFlavor" >> ../.git/info/exclude
+  fi
 
   echo "Sourcing ./$ENVfile"
   SQ_VERBOSE=1
@@ -69,28 +74,28 @@ function source_env () {
 }
 
 ############################################################
-# modify_env - find and source env file
+# modify_env - add local env setting (will be sourced by ENVfile above)
 #
-# Caller must be in correct source tree current dir (trafodion/core/sqf)
-# source_env must have been called previously (to create BuildFlavor file)
 
 function modify_env() {
-  ENVfile=$(< ./BuildFlavor)
   ADDITION="$1"
-  if [[ ! -w ./$ENVfile ]]
-  then
-    echo "Error: ./$ENVfile is not write-able"
-    return 1
-  fi
 
-  if ! grep -q "$ADDITION" ./$ENVfile
+  if ! grep -q "$ADDITION" ~/.trafodion
   then
      echo "Adding env: $ADDITION"
-     echo "$ADDITION" >> ./$ENVfile
+     echo "$ADDITION" >> ~/.trafodion
      return $?
   else
      echo "Env already contains: $ADDITION"
      return 0
   fi
 
+}
+
+############################################################
+# clear_env - clear local environment file
+#
+function clear_env() {
+  rm -f ~/.trafodion
+  return $?
 }

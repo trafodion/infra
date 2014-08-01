@@ -183,6 +183,8 @@ EOF
 
 # main
 set -x
+clear_env
+
 if [ -z "$WORKSPACE" ]; then
     export WORKSPACE=$(pwd)
 fi
