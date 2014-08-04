@@ -53,7 +53,7 @@
 - builder:
     name: check-build
     builders:
-      - shell: "/usr/local/bin/check-git-status {dir}"
+      - shell: "/usr/local/bin/check-git-status.sh {dir}"
 
 - builder:
     name: pkg-traf
