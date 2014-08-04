@@ -228,6 +228,8 @@ jobs:
     voting: false
   - name: gate-infra-puppet-lint
     voting: false
+  - name: core-build-nondbg-cdh4.4
+    voting: false
 
 projects:
   - name: trafodion/sandbox
@@ -244,6 +246,7 @@ projects:
       - phoenix_quick
       - core-regress-core
       - gate-core-check-for-binary
+      - core-build-nondbg-cdh4.4
     check-full:
       - phoenix_test
       - core-regress-charsets
@@ -258,6 +261,7 @@ projects:
       - phoenix_quick
       - core-regress-core
       - gate-core-check-for-binary
+      - core-build-nondbg-cdh4.4
     daily:
       - traf-pub-release
       - traf-pub-debug
