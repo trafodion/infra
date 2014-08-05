@@ -169,6 +169,12 @@ do
     fi
     echo "Commit: $(git log -n1 --format=oneline)" >> build-version.txt
     echo "Desc:   $(git describe --long --tags --dirty --always)" >> build-version.txt
+    # exclude this file from git status so we don't contaminate the environment.
+    # check-git-status.sh script will verify no extraneous files are created.
+    if ! grep -q build-version.txt .git/info/exclude
+    then
+       echo "/build-version.txt" >> .git/info/exclude
+    fi
 
     #combined list -- allows check for change from previous build
     echo "$repo $(git log -n1 --format=oneline)" >> "$workspace/Code_Versions"
