@@ -55,7 +55,8 @@ fi
 mkdir -p "./$DestDir" || exit 2
 mkdir -p "./collect" || exit 2
 
-cp trafodion/core/traf*.tgz collect/  || exit 2
+cp trafodion/core/trafodion_server-*.tgz collect/  || exit 2
+cp trafodion/core/trafodion_clients-*.tgz collect/  || exit 2
 
 # change suffix from tar.gz to tgz
 dcsbase=$(basename trafodion/dcs/target/dcs*gz .tar.gz)
