@@ -164,10 +164,22 @@ node 'graphite.trafodion.org' {
 # Jenkins slaves:
 #
 
+# Cloudera4.4
 node /^slave\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
   class { 'traf::cloudera_slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    sysadmins => hiera('sysadmins'),
+    hive_sql_pw => hiera('hive_sql_pw'),
+  }
+}
+
+# HortonWorks1.3
+node /^slave-hw\d\d.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::horton_slave':
     ssh_key   => $traf::jenkins_ssh_key,
     sysadmins => hiera('sysadmins'),
     hive_sql_pw => hiera('hive_sql_pw'),

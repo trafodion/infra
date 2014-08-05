@@ -1,6 +1,9 @@
 # == Class: traf::tpcds
 #
-class traf::tpcds {
+class traf::tpcds (
+  $namenodeserv = 'hadoop-hdfs-namenode',
+  $datanodeserv = 'hadoop-hdfs-datanode',
+) {
 
   # TPC-DS data required for hive regression tests
   # read-only tables by the tests, so one-time operation
@@ -49,13 +52,13 @@ class traf::tpcds {
   exec { 'gen_and_load_data':
      require  => [ Exec['build-tools'], 
 		   File['/usr/local/bin/load_tpcds_data.sh'],
-                   Service['hadoop-hdfs-namenode'],
-                   Service['hadoop-hdfs-datanode'] ],
+                   Service[$namenodeserv],
+                   Service[$datanodeserv] ],
      command  => "/usr/local/bin/load_tpcds_data.sh",
      user     => 'hdfs',
      timeout  => 600,
      cwd      => "$tools_dir/tools",
-     unless   => "/usr/bin/hdfs dfs -ls -d /hive/tpcds",
+     unless   => "/usr/bin/hadoop dfs -ls /hive/tpcds",
   }
   exec { 'hive_tables':
      require  => [ Exec['gen_and_load_data'], 

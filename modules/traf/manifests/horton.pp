@@ -1,8 +1,8 @@
-# == Class: traf::cloudera
+# == Class: traf::horton
 #
 # Single-Node set-up, only useful for simple functional testing
 # Installs & configures a subset of CDH4
-class traf::cloudera (
+class traf::horton (
    $hive_sql_pw = '',
 ) {
 
@@ -45,63 +45,48 @@ class traf::cloudera (
     # packages needed for a stand-alone node
     $packages = [
       'hadoop',
-      'hadoop-hdfs',
-      'hadoop-hdfs-namenode',
-      'hadoop-hdfs-datanode',
+      'hadoop-native',
+      'hadoop-pipes',
+      'hadoop-sbin',
+      'hadoop-namenode',
+      'hadoop-datanode',
       'hadoop-libhdfs',
-      'hadoop-mapreduce',
-      'hadoop-yarn',
-      'hadoop-yarn-resourcemanager',
-      'hadoop-yarn-nodemanager',
-      'hadoop-client',
+      # compression libs?
       'hbase',
       'hbase-master',
       'hbase-thrift',
-      'hive',
+      'hive', # hcatalog?
       'zookeeper',
       'zookeeper-server',
     ]
 
-    file { '/etc/yum.repos.d/cloudera-cdh4.repo':
+    file { '/etc/yum.repos.d/horton.repo':
        owner => 'root',
        group => 'root',
        mode  => '0644',
-       source => 'puppet:///modules/traf/hadoop/cloudera-cdh4.repo',
-    }
-
-    exec { 'cloudera rpm' :
-       command   => '/bin/rpm --import http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera',
-       unless    => '/bin/rpm -qa -qa gpg-pubkey* | grep -q gpg-pubkey-e8f86acd-4a418045',
-       require   => File['/etc/yum.repos.d/cloudera-cdh4.repo'],
+       source => 'puppet:///modules/traf/hadoop/horton-hdp1.3.repo',
     }
 
     package { $packages:
         ensure => present,
-	require => Exec['cloudera rpm'],
+	require => File['/etc/yum.repos.d/horton.repo'],
     }
   } # if RedHat
 
   exec { 'hadoop-conf':
-     command  => '/bin/cp -r /etc/hadoop/conf.dist /etc/hadoop/conf.localtest;
+     command  => '/bin/cp -r /etc/hadoop/conf.empty /etc/hadoop/conf.localtest;
       /usr/sbin/alternatives --install /etc/hadoop/conf hadoop-conf /etc/hadoop/conf.localtest 50;
       /usr/sbin/alternatives --set hadoop-conf /etc/hadoop/conf.localtest',
      creates  => '/etc/hadoop/conf.localtest',
      require  => Package['hadoop'],
   }
+  # config files using hadoop 1.2 properties instead of hadoop 2.0
   file { '/etc/hadoop/conf.localtest/core-site.xml':
-     source => 'puppet:///modules/traf/hadoop/core-site.xml',
+     source => 'puppet:///modules/traf/hadoop/core-site.xml-1.2',
      require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/hdfs-site.xml':
-     source => 'puppet:///modules/traf/hadoop/hdfs-site.xml',
-     require => Exec['hadoop-conf'],
-  }
-  file { '/etc/hadoop/conf.localtest/mapred-site.xml':
-     source => 'puppet:///modules/traf/hadoop/mapred-site.xml',
-     require => Exec['hadoop-conf'],
-  }
-  file { '/etc/hadoop/conf.localtest/yarn-site.xml':
-     source => 'puppet:///modules/traf/hadoop/yarn-site.xml',
+     source => 'puppet:///modules/traf/hadoop/hdfs-site.xml-1.2',
      require => Exec['hadoop-conf'],
   }
 
@@ -134,18 +119,21 @@ class traf::cloudera (
        target  => '/usr/share/java/mysql-connector-java.jar',
        require => [ Package['mysql-connector-java'], Package['hive'] ],
   }
-  # No longer needed -- make it absent after HBase on HDFS change is fully propagated
-  #file { ['/var/hbase']:
-  #     ensure => absent,
-  #}
+
+  # JAVA_HOME setting needed by all hadoop commands
+  exec { 'hadoop-default':
+       command => '/bin/echo "export JAVA_HOME=/usr/lib/jvm/java-openjdk" >> /etc/default/hadoop',
+       unless => '/bin/grep -q JAVA_HOME /etc/default/hadoop',
+       require => Package['hadoop'],
+  }
 
   # as specified in hdfs-site.xml
   file { ['/data/dfs','/data/dfs/data']:
        owner => 'hdfs',
        group => 'hdfs',
-       mode  => '0770',
+       mode  => '0755',
        ensure => directory,
-       require => Package['hadoop-hdfs'],
+       require => Package['hadoop'],
   }
   file { ['/data']:
        owner => 'root',
@@ -155,20 +143,12 @@ class traf::cloudera (
   }
   # format name hdfs when first created
   exec { 'namenode-format':
-       command   => '/usr/bin/hdfs namenode -format -force',
+       command   => '/usr/bin/hadoop namenode -format -force',
        user      => 'hdfs',
-       require   => File['/data/dfs'],
+       require   => [ File['/data/dfs'],Exec['hadoop-default'] ],
        creates  => '/data/dfs/name',
   }
-  file { ['/var/log/hadoop-yarn','/var/log/hadoop-yarn/containers','/var/log/hadoop-yarn/apps']:
-       owner => 'yarn',
-       group => 'yarn',
-       mode  => '0755',
-       ensure => directory,
-       require => Package['hadoop-yarn'],
-  }
-  $hdfs_services = ['hadoop-hdfs-datanode','hadoop-hdfs-namenode']
-  $yarn_services = ['hadoop-yarn-resourcemanager','hadoop-yarn-nodemanager']
+  $hdfs_services = ['hadoop-datanode','hadoop-namenode']
   # HBase services are not started, since
   # Trafodion testing stops/starts them
 
@@ -182,90 +162,60 @@ class traf::cloudera (
 	 Exec['namenode-format'],
        ],
   }
-  service { $yarn_services:
-      ensure => running,
-      subscribe => [ 
-         File['/etc/hadoop/conf.localtest/yarn-site.xml'], 
-         File['/etc/hadoop/conf.localtest/mapred-site.xml'], 
-       ],
-      require => [ 
-	 Exec['hdfs-tmp'],
-	 Exec['hdfs-userhist'],
-	 Exec['hdfs-yarnlog'],
-       ],
-  }
   exec { 'hdfs-tmp':
-      command => '/usr/bin/hadoop fs -mkdir -p /tmp && /usr/bin/hadoop fs -chmod 1777 /tmp',
-      unless  => '/usr/bin/hadoop fs -ls -d /tmp',
-      user    => 'hdfs',
-      require => Service[$hdfs_services],
-  }
-  # /user is specified in yarn-site.xml
-  exec { 'hdfs-userhist':
-      command => 
-          '/usr/bin/hadoop fs -mkdir -p /user/history 
-           /usr/bin/hadoop fs -chmod 1777 /user/history
-	   /usr/bin/hadoop fs -chown yarn /user/history',
-      unless  => '/usr/bin/hadoop fs -ls -d /user/history',
-      user    => 'hdfs',
-      require => Service[$hdfs_services],
-  }
-  exec { 'hdfs-yarnlog':
-      command => 
-          '/usr/bin/hadoop fs -mkdir -p /var/log/hadoop-yarn
-	   /usr/bin/hadoop fs -chown yarn:mapred /var/log/hadoop-yarn',
-      unless  => '/usr/bin/hadoop fs -ls -d /var/log/hadoop-yarn',
+      command => '/usr/bin/hadoop fs -mkdir /tmp && /usr/bin/hadoop fs -chmod 1777 /tmp',
+      unless  => '/usr/bin/hadoop fs -ls /tmp',
       user    => 'hdfs',
       require => Service[$hdfs_services],
   }
   exec { 'hdfs-jenkins':
       command => 
-          '/usr/bin/hadoop fs -mkdir -p /user/jenkins
+          '/usr/bin/hadoop fs -mkdir /user/jenkins
 	   /usr/bin/hadoop fs -chown jenkins /user/jenkins',
-      unless  => '/usr/bin/hadoop fs -ls -d /user/jenkins',
+      unless  => '/usr/bin/hadoop fs -ls /user/jenkins',
       user    => 'hdfs',
       require => [ Service[$hdfs_services],User['jenkins'] ]
   }
   exec { 'hdfs-hive-dir':
       command => 
-          '/usr/bin/hadoop fs -mkdir -p /user/hive
+          '/usr/bin/hadoop fs -mkdir /user/hive
 	   /usr/bin/hadoop fs -chown jenkins /user/hive',
-      unless  => '/usr/bin/hadoop fs -ls -d /user/hive',
+      unless  => '/usr/bin/hadoop fs -ls /user/hive',
       user    => 'hdfs',
       require => [ Service[$hdfs_services],User['jenkins'] ]
   }
   # HBase on HDFS, specified in hbase-site.xml
   exec { 'hdfs-hbase':
       command =>
-          '/usr/bin/hadoop fs -mkdir -p /hbase
+          '/usr/bin/hadoop fs -mkdir /hbase
 	   /usr/bin/hadoop fs -chown hbase:hbase /hbase',
-      unless  => '/usr/bin/hadoop fs -ls -d /hbase',
+      unless  => '/usr/bin/hadoop fs -ls /hbase',
       user    => 'hdfs',
       require => [ Service[$hdfs_services],Package['hbase'] ]
   }
   # HDFS directories for Bulkload feature
   exec { 'hdfs-hbase-staging':
       command =>
-          '/usr/bin/hadoop fs -mkdir -p /hbase-staging
+          '/usr/bin/hadoop fs -mkdir /hbase-staging
 	   /usr/bin/hadoop fs -chmod 711 /hbase-staging
 	   /usr/bin/hadoop fs -chown hbase /hbase-staging',
-      unless  => '/usr/bin/hadoop fs -ls -d /hbase-staging',
+      unless  => '/usr/bin/hadoop fs -ls /hbase-staging',
       user    => 'hdfs',
       require => [ Service[$hdfs_services],User['jenkins'] ]
   }
   exec { 'hdfs-trafodion':
       command => 
-          '/usr/bin/hadoop fs -mkdir -p /user/trafodion
+          '/usr/bin/hadoop fs -mkdir /user/trafodion
 	   /usr/bin/hadoop fs -chown jenkins /user/trafodion',
-      unless  => '/usr/bin/hadoop fs -ls -d /user/trafodion',
+      unless  => '/usr/bin/hadoop fs -ls /user/trafodion',
       user    => 'hdfs',
       require => [ Service[$hdfs_services],User['jenkins'] ]
   }
   exec { 'hdfs-trafodion-bulkload':
       command => 
-          '/usr/bin/hadoop fs -mkdir -p /user/trafodion/bulkload
+          '/usr/bin/hadoop fs -mkdir /user/trafodion/bulkload
 	   /usr/bin/hadoop fs -chown jenkins /user/trafodion/bulkload',
-      unless  => '/usr/bin/hadoop fs -ls -d /user/trafodion/bulkload',
+      unless  => '/usr/bin/hadoop fs -ls /user/trafodion/bulkload',
       user    => 'hdfs',
       require => [ Exec['hdfs-trafodion'] ]
   }
@@ -273,9 +223,12 @@ class traf::cloudera (
 
   exec { 'zookeeper-init':
       command => 
-          '/sbin/service zookeeper-server init',
+          '/sbin/service zookeeper-server start',
      creates  => '/var/lib/zookeeper/version-2',
-     require  => Package['zookeeper-server'],
+     require  => [Package['zookeeper-server'],Group['zookeeper'] ]
+  }
+  group { 'zookeeper':
+     ensure  => present,
   }
 }
 

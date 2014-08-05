@@ -26,11 +26,12 @@ done
 echo "Copying generated data to HDFS..."
 for t in $TABLES
 do
-  /usr/bin/hdfs dfs -rm -r -f /hive/tpcds/$t
-  /usr/bin/hdfs dfs -mkdir /hive/tpcds/$t
-  /usr/bin/hdfs dfs -put $TEMP_DATA_DIR/${t}.dat /hive/tpcds/$t
+  # rmr (on hadoop 1.2) exits with error if path does not exist
+  #/usr/bin/hadoop fs -rmr /hive/tpcds/$t
+  /usr/bin/hadoop fs -mkdir /hive/tpcds/$t
+  /usr/bin/hadoop fs -put $TEMP_DATA_DIR/${t}.dat /hive/tpcds/$t
 done
 
-/usr/bin/hdfs dfs -ls /hive/tpcds/*/*.dat
+/usr/bin/hadoop fs -ls /hive/tpcds/*/*.dat
 
 rm -rf $TEMP_DATA_DIR
