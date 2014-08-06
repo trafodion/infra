@@ -41,6 +41,7 @@ source_env
 # run SQL regression tests
 cd ../sql/regress
 echo "Saving output in Regress.log"
+ulimit -c unlimited
 ./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \
    grep --line-buffered -C1 -E '### PASS |### FAIL ' | \
    grep --line-buffered -v '^$' | \
@@ -94,6 +95,15 @@ fail=$(grep FAIL */runregr*.log | wc -l)
 pass=$(grep PASS */runregr*.log | wc -l)
 echo "Total Passed:   $pass"
 echo "Total Failures: $fail"
+
+cd $DIR
+COREFILES=$(find-corefiles.pl $DIR)
+if [[ -n "$COREFILES" ]]; then
+  echo
+  echo "WARNING: Core files found:"
+  ls -l $COREFILES
+  echo
+fi
 
 if [[ $pass > 0 && $fail == 0 && $missed == 0 ]]
 then
