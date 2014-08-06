@@ -96,8 +96,8 @@ pass=$(grep PASS */runregr*.log | wc -l)
 echo "Total Passed:   $pass"
 echo "Total Failures: $fail"
 
-cd $DIR
-COREFILES=$(find-corefiles.pl $DIR)
+cd $MY_SQROOT/..
+COREFILES=$(find-corefiles.pl $PWD)
 if [[ -n "$COREFILES" ]]; then
   echo
   echo "WARNING: Core files found:"
