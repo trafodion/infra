@@ -61,6 +61,7 @@ echo ""
 
 # run phoenix_test
 cd "$WORKSPACE/$TEST_DIR"
+ulimit -c unlimited
 if [ -z "$TESTS" ]; then
   ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar
   phoenixRes=$?
@@ -75,6 +76,7 @@ fi
 cd $WORKSPACE
 /usr/local/bin/stop-traf-instance.sh "$TRAF_DIR/sqf"
 
+report_on_corefiles
+
 # exit with phoenix_test.py return code
 exit $phoenixRes
-

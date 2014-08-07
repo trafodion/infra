@@ -99,3 +99,22 @@ function clear_env() {
   rm -f ~/.trafodion
   return $?
 }
+
+############################################################
+# report_on_corefiles - find and report on corefiles
+#
+function report_on_corefiles() {
+  if [[ -d $MY_SQROOT ]]; then
+    echo
+    cd $MY_SQROOT/..
+    COREFILES=$(find-corefiles.pl $PWD)
+    if [[ -n "$COREFILES" ]]; then
+      echo "WARNING: Core files found in $PWD :"
+      ls -l $COREFILES
+      echo
+    else
+      echo "Info: Found no core files in $PWD"
+    fi
+    echo
+  fi
+}
