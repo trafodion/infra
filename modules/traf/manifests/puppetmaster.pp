@@ -56,9 +56,6 @@ class traf::puppetmaster (
     mode    => '0755',
     content => template('traf/slave-ip.sh.erb'),
   }
-  # Cloud admin users, other than sysadmins
-  realize (User::Virtual::Localuser['creynaga'])
-
 
 #### Not sure if we'll use launch-node.py script
 #

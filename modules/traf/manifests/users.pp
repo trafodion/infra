@@ -7,8 +7,6 @@ class traf::users {
 
   $sandstroms_sshkey = "AAAAB3NzaC1yc2EAAAABJQAAAQEAiQ0wvM9jt6/8fm+mBQZFtg4mWeD4CylyNrYLhxwPIXwSZXnthpmp1ZKWNRSN2yUe+fTgQ265ArQHJLSmxgz9CRVymNeWrSR8hYiyVWGQo2WzTJkZDrGDlBQtuevJ5Eqg+02Fr6/jaguJc5IMe4CfqbWLgf5Qxyz+IpZ9BaQZIlH7VmzFAJYuQVKAaRMcraQxJiMppskqXZoRdhAECxsnAgjp7imc0AV8qRHW89WbroqRNud+qYtzifXRykDH5jMtHrpb8RYvccrfZuQ8Y5G8eabKlqb6cD30ahsqPMKhCJO94O1J+qc3UtbpuhzR7Onfzrswu24gsZ8Z4iwszH5PfQ=="
 
-  $brackfay_sshkey = "AAAAB3NzaC1yc2EAAAABIwAAAQEAqCmIjI5vf7dCED4qbR5XIN57vqEGJYiZ3steWrdxn1wwv8fclCPl5SEQ8V5Mopl8g9Yf+35PCJ92A0tdBHpujNa7iZ9vbydz3GmiLANA6rmEhnzKEudpG6taWUYfpmReSEkwXhcmcXNFdYSxfdTlSWMz2IXKf8gsUjd3Ef0uqWXXlhlfk+IjBcR8c9tucBiZwwx7OprscnqNxl7UHASJpEk9Uk07Wbix4wBfWJ6E50JjUneD/y8SjTX3yaiH9x549ORTDrfTd4b56F25IumITpqj3S5u89SA8F1FjPgxO3ZsfZ+GDYXZA9uhwhMvWcBot1l8re8acz6cuCfjqBYKnw=="
-
   $zellerh_sshkey = "AAAAB3NzaC1yc2EAAAABIwAAAQEAxZXs6pbHt+y5TymPLdGccf4LXmSoiliWEFhrrrvJxe2XlGfc++bphcwz/+NB482RE7HltNzd3Fk1M//Ue/NkJA8GgLWOl1qodp86jxMBYbavc2C2qfTUynjQALBF8v5lHdypP19oaqqgQAr1n8mJo0vft1MymoZ72RUgpJMQwRQKW11X3WtFrFzNDCTx6YjKY4EjdelekAKvt0Yc+MCoSa6effrIvKie4wEPbXMjP9G3t1JDN+5xvHNHQoDti4CpQLLonJLW6pSpKiUVjw9CxynJNZHOiGtvKzTojHhJpWyMQBUmDE+R+BKc1bwJ108cmJpWZKdffaWjlpTCnA1Cbw=="
 
   $wtsai_sshkey = "AAAAB3NzaC1yc2EAAAABIwAAAQEAw6VmM81Tr73aqd1oGVyCixiECYap/4HHe7Zra7O626RiPR1T3DeleXVWhivUB+W24/eIgcaaSKuqlwH4yyYvlmXqNgnwjvafLjAqx8hX9z85Vy/o0E3SSgiMKFE2GWyfBJ0ormbW1e5NRCgEC/Ffwo9+DPBoqwTMk/V/UYagN8lZ0zZGK9NFWASyIlp9aqZ64Du7oZVFkQwwLJFrqDGeJuQ73h+CzhkIRP5PNSnPQg5CjHJHGytZTYl1f2JiCVwvuPpf5TthBxljXP6d/Ym7k60/AgECIPqjnKRkOuKCuWOXzwZQqgCa9lyD4V0qvn61fKudZstPjvG5gFTZXxuTIw=="
@@ -18,8 +16,6 @@ class traf::users {
   $sjohnson_sshkey = "AAAAB3NzaC1yc2EAAAABIwAAAQEA1m3jYI3OQ269m+9Qd8/qK1yCeRL5hrihrgFkpnNP1rcZUhBp3cfRYT4acINo0aqoX+Z+sTubWkKFgKEhPVKSE8Wi2XlUhIxXACTBi3/GpJOoiib9Y2bobqCT6o0/OzxQ4Gl4CbieSLhaHeE7BucNIYXbodq9UYM3HGL2Ba8KJA90aKK50TfOgZXEiWlOkdElGCD/XXero2TAdYj0Ehxhlalf8poDWVQ0QhGVt4PxfLrWYf9aDQP6FN3YU/CL0IvqSCY14pJcUHY6gwfKuDKQt3dFt2h6gUJy5eFBwK4NqZuJmc3WdSK2vX9cKibim3Ti1riuC16+bEc6D2vlRtoCmw=="
 
   $csheedy_sshkey = "AAAAB3NzaC1kc3MAAACBALyONTFvWz0PFIfVFMQGTIIVPDKYnNlbRHbnhhwhvWHqsbf97enOjtb41OsYTniKO5ngRz74ezklOgXvDiCosEd8GEbmbJIHPBGr3DVoPKFSOa3QOCZXkpnQ8uALxoGnlSy0nTMT84/PSyYldyBcTF11xsXVG/BerLfIcnaIzly/AAAAFQCAFYPNw9LHgY6dFqrdAXB0pkzcKQAAAIA5cB4inCFT3WfwkV+69Wd5VK0tSiKGBFMGBPt1Ui3yHkGaEHmuImZeQk8GLCBfLBMznigXsNRAl9I3wqOTsIQFNY94d0T5Bifa8/ebW/v8U7WZan5ON3nZPYFqjVNaYFFIbSAKDZvL1ooii3O5xHixubvhlAbYYVVjS0akcC/NGgAAAIA5RGYtJH/OYyN0r6zkm/JRa5lv3hXDQifAZu3pBeOqu/d2Lsv4CvajejsUBMJMceOek0OG41g+gUeSMjXfvPh4tXHYi4NW9fqq8h7YsAX+yroUjZ8/yYLNEB8ApWURP3MzX9enjkwhjBdv3CbrzDq3i9K8t/aIzMY3AbF2fBDVdw=="
-
-  $creynaga_sshkey = "AAAAB3NzaC1yc2EAAAABIwAAAQEAwrQF+moD2CMfnHCjq55LCipR+vX+ufxPqIQtCPv+VM2/2+TQ7HF/W+ZcAOkA/EdfSkGQ6ID1tcqqKIYBg1DuGiF2wrhF+rKAjCcgF/yc+fbm+GpTOhB5eANPOXE0KcoSLf3b2MOejQG2ROThKqmu34EMg20T/JPSIktgYoNKnBiIR1y0f2V3vh0EThehNq2aZwoHo+HcQUMwsyo33tmy/vO8Joeqn1DnuH8vBiUKPH6z1pOsFePZ2A37DoPKSVo19QRZ7xC74FIQKb++kc7yRnVh6byu88kwPNNHKg6urQnYLDNCAcLzQyyvcxfB+5Bzt1PAkBa6D2TvF5W6/5Pw1w=="
 
 
   
@@ -36,10 +32,6 @@ class traf::users {
   @user::virtual::localuser { 'sandstroms':
     realname => 'Susan Sandstrom',
     sshkeys  => "ssh-rsa $sandstroms_sshkey sandstroms\n",
-  }
-  @user::virtual::localuser { 'brackfay':
-    realname => 'Faye Bracket',
-    sshkeys  => "ssh-rsa $brackfay_sshkey brackfay\n",
   }
   @user::virtual::localuser { 'zellerh':
     realname => 'Hans Zeller',
@@ -60,9 +52,5 @@ class traf::users {
   @user::virtual::localuser { 'csheedy':
     realname => 'Chris Sheedy',
     sshkeys  => "ssh-dss $csheedy_sshkey csheedy\n",
-  }
-  @user::virtual::localuser { 'creynaga':
-    realname => 'Carlos Reynaga',
-    sshkeys  => "ssh-rsa $creynaga_sshkey creynaga\n",
   }
 }
