@@ -150,6 +150,8 @@
       - gerrit-git-prep
       - maven-package:
            buildDir: "."
+      - check-build:
+           dir: "."
 
     publishers:
       - console-log
