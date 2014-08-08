@@ -103,17 +103,32 @@ function clear_env() {
 ############################################################
 # report_on_corefiles - find and report on corefiles
 #
+# If argument supplied, use that, otherwise try directory
+# above MY_SQROOT.
+#
 function report_on_corefiles() {
-  if [[ -d $MY_SQROOT ]]; then
+  ADIR="$1"
+  if [[ -z "$ADIR" ]]; then
+    if [[ -n "$MY_SQROOT" ]]; then
+      BDIR=$(dirname "$MY_SQROOT")
+      if [[ -d "$BDIR" ]]; then
+        ADIR="$BDIR"
+      fi
+    fi
+  fi
+  if [[ -z "$ADIR" ]]; then
+    echo "WARNING: report_on_corefiles called with no argument"
+    return 0
+  fi
+  if [[ -d "$ADIR" ]]; then
     echo
-    cd $MY_SQROOT/..
-    COREFILES=$(find-corefiles.pl $PWD)
+    COREFILES=$(find-corefiles.pl "$ADIR")
     if [[ -n "$COREFILES" ]]; then
-      echo "WARNING: Core files found in $PWD :"
+      echo "WARNING: Core files found in $ADIR :"
       ls -l $COREFILES
       echo
     else
-      echo "Info: Found no core files in $PWD"
+      echo "INFO: Found no core files in $ADIR"
     fi
     echo
   fi

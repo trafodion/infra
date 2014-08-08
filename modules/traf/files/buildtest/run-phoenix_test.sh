@@ -76,7 +76,7 @@ fi
 cd $WORKSPACE
 /usr/local/bin/stop-traf-instance.sh "$TRAF_DIR/sqf"
 
-report_on_corefiles
+report_on_corefiles "$TRAF_DIR"
 
 # exit with phoenix_test.py return code
 exit $phoenixRes
