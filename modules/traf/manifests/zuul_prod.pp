@@ -124,18 +124,22 @@ class traf::zuul_prod(
 
   class { '::recheckwatch':
     gerrit_server                => $gerrit_server,
-    gerrit_user                  => $gerrit_user,
+    gerrit_user                  => 'recheckwatch',
     recheckwatch_ssh_private_key => $zuul_ssh_private_key,
   }
 
   file { '/var/lib/recheckwatch/scoreboard.html':
     ensure  => present,
+    owner   => recheckwatch,
+    group   => recheckwatch,
     source  => 'puppet:///modules/traf/zuul/scoreboard.html',
     require => File['/var/lib/recheckwatch'],
   }
 
   file { '/var/www/recheckwatch/rechecks.html':
     ensure  => file,
+    owner   => recheckwatch,
+    group   => recheckwatch,
     source  => 'puppet:///modules/traf/zuul/rechecks.html',
     require => File['/var/www/recheckwatch'],
   }
