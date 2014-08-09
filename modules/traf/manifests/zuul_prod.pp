@@ -138,6 +138,7 @@ class traf::zuul_prod(
 
   file { '/var/www/recheckwatch/rechecks.html':
     ensure  => present,
+    replace => 'no',
     owner   => recheckwatch,
     group   => recheckwatch,
     source  => 'puppet:///modules/traf/zuul/rechecks.html',
