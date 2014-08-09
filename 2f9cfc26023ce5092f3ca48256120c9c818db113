@@ -1,0 +1,9 @@
+Code-Review+2: Alice Chen <alice.chen@hp.com>
+Workflow+1: Alice Chen <alice.chen@hp.com>
+Verified+2: Trafodion Jenkins
+Code-Review+1: Chris Sheedy <chris.sheedy@hp.com>
+Submitted-by: Trafodion Jenkins
+Submitted-at: Sat, 09 Aug 2014 01:07:55 +0000
+Reviewed-on: https://review.trafodion.org/219
+Project: trafodion/infra
+Branch: refs/heads/master
