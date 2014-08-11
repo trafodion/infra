@@ -243,6 +243,7 @@ projects:
     check:
       - phoenix_quick
       - core-regress-core
+      - core-regress-seabase
       - gate-core-check-for-binary
       - core-build-nondbg-cdh4.4
     check-full:
@@ -254,10 +255,10 @@ projects:
       - core-regress-compGeneral
       - core-regress-executor
       - core-regress-hive
-      - core-regress-seabase
     gate:
       - phoenix_quick
       - core-regress-core
+      - core-regress-seabase
       - gate-core-check-for-binary
       - core-build-nondbg-cdh4.4
     daily:
