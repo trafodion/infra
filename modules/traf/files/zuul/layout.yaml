@@ -215,7 +215,7 @@ jobs:
   - name: ^.*$
     parameter-function: set_log_url
   - name: jdbc_test
-    voting: false
+    voting: true
   - name: jdbc_test-experimental
     voting: false
   - name: phoenix_test
