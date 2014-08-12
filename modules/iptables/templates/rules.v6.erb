@@ -9,16 +9,16 @@
 -A INPUT -i lo -j ACCEPT
 -A INPUT -j BLACKLIST
 -A INPUT -j TRAF-INPUT
--A INPUT -m limit --limit 1/sec -j LOG --log-prefix drop_packet --log-level 7
+-A INPUT -m limit --limit 1/sec -j LOG --log-prefix "IPTABLES (limit 1/sec): " --log-level 7
 -A INPUT -j DROP
 <% blacklist_rules6.each do |blacklist| -%>
 -A BLACKLIST <%= blacklist %>
 <% end -%>
 # Log IP making more than 1 connection per second for SSH
--A LOGDROP -p tcp -m tcp --dport 22 -m limit --limit 1/sec -j LOG --log-prefix ssh_blacklist --log-level 7
+-A LOGDROP -p tcp -m tcp --dport 22 -m limit --limit 1/sec -j LOG --log-prefix "IPTABLES (ssh_blacklist): " --log-level 7
 -A LOGDROP -j REJECT --reject-with icmp6-adm-prohibited
-#-A TRAF-INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 128 -m limit --limit 1/sec -j ACCEPT
-#-A TRAF-INPUT -p ipv6-icmp -m icmp6 --icmpv6-type 129 -m limit --limit 1/sec -j ACCEPT
+# accept all ICMP request but limit them to 1 per sec
+-A TRAF-INPUT -p ipv6-icmp -m icmp6 --icmpv6-type any -m limit --limit 1/sec -j ACCEPT
 # SSH from anywhere
 -A TRAF-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 # SNMP from trafodion cacti
@@ -36,5 +36,8 @@
 <% rules6.each do |rule| -%>
 -A TRAF-INPUT <%= rule %>
 <% end -%>
+# log whatever gets to the end of our iptables so we will know when we
+# need new rules
+-A TRAF-INPUT -j LOG --log-prefix "IPTABLES (End TRAF-INPUT): " --log-level 7
 -A TRAF-INPUT -j REJECT --reject-with icmp6-adm-prohibited
 COMMIT
