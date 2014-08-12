@@ -16,9 +16,3 @@ find -O3 /srv/static/logs/ -depth \
       -o \( -type d -not -name lost+found -empty -mtime +1 \
           -execdir rmdir {} \; \) \
     \)
-find -O3 /srv/static/docs-draft/ -depth \
-    \( \
-      \( -type f -mtime +30 -name \*.gz -execdir rm \{\} \; \) \
-      -o \( -type d -not -name lost+found -empty -mtime +1 \
-          -execdir rmdir {} \; \) \
-    \)
