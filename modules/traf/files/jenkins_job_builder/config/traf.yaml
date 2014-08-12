@@ -54,7 +54,7 @@
       - multi-git-prep:
            repos: "trafodion/core"
       - make-traf:
-           flavor: "debug"
+           flavor: "release"
       - sql-regress:
            dir: "./trafodion/core"
            suites: "{suite}"
