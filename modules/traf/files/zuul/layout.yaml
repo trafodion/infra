@@ -247,14 +247,14 @@ projects:
       - gate-core-check-for-binary
       - core-build-nondbg-cdh4.4
     check-full:
-      - phoenix_test
-      - core-regress-charsets
-      - core-regress-qat
-      - core-regress-udr
-      - core-regress-catman1
-      - core-regress-compGeneral
-      - core-regress-executor
-      - core-regress-hive
+      - phoenix_test-cdh4.4
+      - core-regress-charsets-cdh4.4
+      - core-regress-qat-cdh4.4
+      - core-regress-udr-cdh4.4
+      - core-regress-catman1-cdh4.4
+      - core-regress-compGeneral-cdh4.4
+      - core-regress-executor-cdh4.4
+      - core-regress-hive-cdh4.4
     gate:
       - phoenix_quick
       - core-regress-core
@@ -264,16 +264,16 @@ projects:
     daily:
       - traf-pub-release
       - traf-pub-debug
-      - core-regress-core
-      - core-regress-charsets
-      - core-regress-qat
-      - core-regress-udr
-      - core-regress-catman1
-      - core-regress-compGeneral
-      - core-regress-executor
-      - core-regress-hive
-      - core-regress-seabase
-      - phoenix_test
+      - core-regress-core-cdh4.4
+      - core-regress-charsets-cdh4.4
+      - core-regress-qat-cdh4.4
+      - core-regress-udr-cdh4.4
+      - core-regress-catman1-cdh4.4
+      - core-regress-compGeneral-cdh4.4
+      - core-regress-executor-cdh4.4
+      - core-regress-hive-cdh4.4
+      - core-regress-seabase-cdh4.4
+      - phoenix_test-cdh4.4
       - pyodbc_test
       - jdbc_test
     release:
