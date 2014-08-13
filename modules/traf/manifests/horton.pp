@@ -213,9 +213,9 @@ class traf::horton (
   }
   exec { 'hdfs-trafodion-bulkload':
       command => 
-          '/usr/bin/hadoop fs -mkdir /user/trafodion/bulkload
-	   /usr/bin/hadoop fs -chown jenkins /user/trafodion/bulkload',
-      unless  => '/usr/bin/hadoop fs -ls /user/trafodion/bulkload',
+          '/usr/bin/hadoop fs -mkdir /bulkload
+	   /usr/bin/hadoop fs -chown jenkins /bulkload',
+      unless  => '/usr/bin/hadoop fs -ls /bulkload',
       user    => 'hdfs',
       require => [ Exec['hdfs-trafodion'] ]
   }

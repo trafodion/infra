@@ -263,9 +263,9 @@ class traf::cloudera (
   }
   exec { 'hdfs-trafodion-bulkload':
       command => 
-          '/usr/bin/hadoop fs -mkdir -p /user/trafodion/bulkload
-	   /usr/bin/hadoop fs -chown jenkins /user/trafodion/bulkload',
-      unless  => '/usr/bin/hadoop fs -ls -d /user/trafodion/bulkload',
+          '/usr/bin/hadoop fs -mkdir -p /bulkload
+	   /usr/bin/hadoop fs -chown jenkins /bulkload',
+      unless  => '/usr/bin/hadoop fs -ls -d /bulkload',
       user    => 'hdfs',
       require => [ Exec['hdfs-trafodion'] ]
   }
