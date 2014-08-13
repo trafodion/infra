@@ -33,6 +33,8 @@ logarchive="$workspace/sql-regress-logs"
 rm -rf $logarchive
 mkdir $logarchive
 
+ulimit -c unlimited
+
 /usr/local/bin/start-traf-instance.sh "$DIR" || exit 1
 
 cd $DIR/sqf
@@ -41,7 +43,6 @@ source_env
 # run SQL regression tests
 cd ../sql/regress
 echo "Saving output in Regress.log"
-ulimit -c unlimited
 ./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \
    grep --line-buffered -C1 -E '### PASS |### FAIL ' | \
    grep --line-buffered -v '^$' | \
