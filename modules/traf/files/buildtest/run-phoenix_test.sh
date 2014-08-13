@@ -46,6 +46,7 @@ fi
 
 # start trafodion
 cd $WORKSPACE
+ulimit -c unlimited
 /usr/local/bin/start-traf-instance.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
 set +x
 
@@ -61,7 +62,6 @@ echo ""
 
 # run phoenix_test
 cd "$WORKSPACE/$TEST_DIR"
-ulimit -c unlimited
 if [ -z "$TESTS" ]; then
   ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar
   phoenixRes=$?
