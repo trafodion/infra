@@ -32,6 +32,8 @@
       - gate-{name}-check-for-binary
       - phoenix_test-{dist}
       - phoenix_quick-{dist}
+      - jdbc_test-{dist}
+      - pyodbc_test-{dist}
 
 - project:
     name: manuals
@@ -64,6 +66,8 @@
       - dcs-build
       - phoenix_test-{dist}
       - phoenix_quick-{dist}
+      - jdbc_test-{dist}
+      - pyodbc_test-{dist}
 
 - project:
     name: install
