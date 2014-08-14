@@ -7,13 +7,13 @@ class traf::slave (
   $sysadmins = [],
   $python3 = false,
   $include_pypy = false,
+  $hive_sql_pw = '',
+  $distro = '',
 ) {
   include traf
   include traf::buildtest
   include traf::tmpcleanup
-  class { 'traf::automatic_upgrades':
-    origins => ['LP-PPA-saltstack-salt precise'],
-  }
+  include traf::automatic_upgrades
 
   include traf::python276
 
@@ -112,4 +112,32 @@ class traf::slave (
     limit_item   => 'memlock',
     limit_value  => '16330224'
   }
+
+  # Hadoop components
+  if $distro == 'HDP1.3' {
+    class { 'traf::tpcds':
+      namenodeserv => 'hadoop-namenode',
+      datanodeserv => 'hadoop-datanode',
+    }
+    class { 'traf::horton':
+      hive_sql_pw => $hive_sql_pw,
+      distro      => $distro,
+    }
+  }
+  if $distro == 'HDP2.1' {
+    class { 'traf::tpcds': }
+
+    class { 'traf::horton':
+      hive_sql_pw => $hive_sql_pw,
+      distro      => $distro,
+    }
+  }
+  if $distro == 'CDH4.4' {
+    class { 'traf::tpcds':}
+
+    class { 'traf::cloudera':
+      hive_sql_pw => $hive_sql_pw,
+    }
+  }
+
 }

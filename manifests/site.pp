@@ -165,27 +165,40 @@ node 'graphite.trafodion.org' {
 #
 
 # Cloudera4.4
-node /^slave\d\d.trafodion.org$/ {
+node /^(slave|slave-cdh44-)\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
-  class { 'traf::cloudera_slave':
+  class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     sysadmins => hiera('sysadmins'),
     hive_sql_pw => hiera('hive_sql_pw'),
+    distro => 'CDH4.4',
   }
 }
 
 # HortonWorks1.3
-node /^slave-hw\d\d.trafodion.org$/ {
+node /^slave-hdp13-\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
-  class { 'traf::horton_slave':
+  class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     sysadmins => hiera('sysadmins'),
     hive_sql_pw => hiera('hive_sql_pw'),
+    distro => 'HDP1.3',
   }
 }
 
+# HortonWorks2.1
+node /^slave-hdp21-\d\d.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    sysadmins => hiera('sysadmins'),
+    hive_sql_pw => hiera('hive_sql_pw'),
+    distro => 'HDP2.1',
+  }
+}
 
 
 # vim:sw=2:ts=2:expandtab:textwidth=79

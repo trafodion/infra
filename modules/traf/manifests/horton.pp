@@ -1,9 +1,10 @@
 # == Class: traf::horton
 #
 # Single-Node set-up, only useful for simple functional testing
-# Installs & configures a subset of CDH4
+# Installs & configures a subset of HDP
 class traf::horton (
    $hive_sql_pw = '',
+   $distro      = '',
 ) {
 
   
@@ -41,7 +42,7 @@ class traf::horton (
   }
 
 
-  if $::osfamily == 'RedHat' {
+  if $distro == 'HDP1.3' {
     # packages needed for a stand-alone node
     $packages = [
       'hadoop',
@@ -51,27 +52,55 @@ class traf::horton (
       'hadoop-namenode',
       'hadoop-datanode',
       'hadoop-libhdfs',
-      # compression libs?
       'hbase',
       'hbase-master',
       'hbase-thrift',
-      'hive', # hcatalog?
+      'hive',
+      'hcatalog',
       'zookeeper',
       'zookeeper-server',
     ]
+    $repofile = 'puppet:///modules/traf/hadoop/horton-hdp1.3.repo'
+    $coresite = 'puppet:///modules/traf/hadoop/core-site.xml-1.2'
+    $hdfssite = 'puppet:///modules/traf/hadoop/hdfs-site.xml-1.2'
+    $hdfs_services = ['hadoop-datanode','hadoop-namenode']
+    $zoopidfile = '/var/lib/zookeeper/version-2/snapshot-0'
+  } # HDP1.3
+  if $distro == 'HDP2.1' {
+    $packages = [
+      'hadoop',
+      'hadoop-hdfs',
+      'hadoop-hdfs-namenode',
+      'hadoop-hdfs-datanode',
+      'hadoop-libhdfs',
+      'hadoop-yarn',
+      'hadoop-mapreduce',
+      'hadoop-client',
+      'hbase',
+      'hbase-thrift',
+      'hive',
+      'hive-hcatalog',
+      'zookeeper',
+      'zookeeper-server',
+    ]
+    $repofile = 'puppet:///modules/traf/hadoop/horton-hdp2.1.repo'
+    $coresite = 'puppet:///modules/traf/hadoop/core-site.xml'
+    $hdfssite = 'puppet:///modules/traf/hadoop/hdfs-site.xml'
+    $hdfs_services = ['hadoop-hdfs-datanode','hadoop-hdfs-namenode']
+    $zoopidfile = '/var/lib/zookeeper/zookeeper_server.pid'
+  } # HDP2.1
 
     file { '/etc/yum.repos.d/horton.repo':
        owner => 'root',
        group => 'root',
        mode  => '0644',
-       source => 'puppet:///modules/traf/hadoop/horton-hdp1.3.repo',
+       source => $repofile,
     }
 
     package { $packages:
         ensure => present,
 	require => File['/etc/yum.repos.d/horton.repo'],
     }
-  } # if RedHat
 
   exec { 'hadoop-conf':
      command  => '/bin/cp -r /etc/hadoop/conf.empty /etc/hadoop/conf.localtest;
@@ -80,15 +109,25 @@ class traf::horton (
      creates  => '/etc/hadoop/conf.localtest',
      require  => Package['hadoop'],
   }
-  # config files using hadoop 1.2 properties instead of hadoop 2.0
   file { '/etc/hadoop/conf.localtest/core-site.xml':
-     source => 'puppet:///modules/traf/hadoop/core-site.xml-1.2',
+     source => $coresite,
      require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/hdfs-site.xml':
-     source => 'puppet:///modules/traf/hadoop/hdfs-site.xml-1.2',
+     source => $hdfssite,
      require => Exec['hadoop-conf'],
   }
+  if $distro == 'HDP2.1' {
+    file { '/etc/hadoop/conf.localtest/mapred-site.xml':
+       source => 'puppet:///modules/traf/hadoop/mapred-site.xml',
+       require => Exec['hadoop-conf'],
+    }
+    ##### Yarn managers not set up as standard services. 
+    #     /usr/lib/hadoop/sbin/yarn-daemon.sh 
+    #     No way to easy way to check if it is already running
+    #     Skip yarn set-up. Not required by trafodion at this point.
+
+  } # HDP2.1 
 
   exec { 'hbase-conf':
      command  => '/bin/cp -r /etc/hbase/conf.dist /etc/hbase/conf.localtest;
@@ -120,11 +159,27 @@ class traf::horton (
        require => [ Package['mysql-connector-java'], Package['hive'] ],
   }
 
-  # JAVA_HOME setting needed by all hadoop commands
+  # Both JAVA_HOME setting methods don't conflict, so we'll do both
+  
+  # JAVA_HOME setting for HDP1 
   exec { 'hadoop-default':
        command => '/bin/echo "export JAVA_HOME=/usr/lib/jvm/java-openjdk" >> /etc/default/hadoop',
        unless => '/bin/grep -q JAVA_HOME /etc/default/hadoop',
-       require => Package['hadoop'],
+       require => Package[$packages],
+  }
+  # JAVA_HOME setting for HDP2
+  file { '/usr/lib/bigtop-utils/bigtop-detect-javahome':
+       owner => 'root',
+       group => 'root',
+       mode  => '0444',
+       content => 'export JAVA_HOME=/usr/lib/jvm/java-openjdk',
+       require => File['/usr/lib/bigtop-utils'],
+  }
+  file { '/usr/lib/bigtop-utils':
+       owner => 'root',
+       group => 'root',
+       mode  => '0444',
+       ensure => directory,
   }
 
   # as specified in hdfs-site.xml
@@ -145,10 +200,9 @@ class traf::horton (
   exec { 'namenode-format':
        command   => '/usr/bin/hadoop namenode -format -force',
        user      => 'hdfs',
-       require   => [ File['/data/dfs'],Exec['hadoop-default'] ],
+       require   => [ File['/data/dfs'],Exec['hadoop-default'],File['/usr/lib/bigtop-utils/bigtop-detect-javahome'] ],
        creates  => '/data/dfs/name',
   }
-  $hdfs_services = ['hadoop-datanode','hadoop-namenode']
   # HBase services are not started, since
   # Trafodion testing stops/starts them
 
@@ -223,8 +277,9 @@ class traf::horton (
 
   exec { 'zookeeper-init':
       command => 
-          '/sbin/service zookeeper-server start',
-     creates  => '/var/lib/zookeeper/version-2',
+          '/usr/lib/zookeeper/bin/zkServer.sh start /etc/zookeeper/conf/zoo.cfg',
+     user    => 'zookeeper',
+     creates  => $zoopidfile,
      require  => [Package['zookeeper-server'],Group['zookeeper'] ]
   }
   group { 'zookeeper':

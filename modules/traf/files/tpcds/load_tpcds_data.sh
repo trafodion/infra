@@ -28,7 +28,9 @@ for t in $TABLES
 do
   # rmr (on hadoop 1.2) exits with error if path does not exist
   #/usr/bin/hadoop fs -rmr /hive/tpcds/$t
-  /usr/bin/hadoop fs -mkdir /hive/tpcds/$t
+  # hadoop 1: mkdir does not allow -p, just assumes it
+  # hadoop 2: mkdir needs -p for multiple dir levels, so lets try both
+  /usr/bin/hadoop fs -mkdir /hive/tpcds/$t || /usr/bin/hadoop fs -mkdir -p /hive/tpcds/$t
   /usr/bin/hadoop fs -put $TEMP_DATA_DIR/${t}.dat /hive/tpcds/$t
 done
 
