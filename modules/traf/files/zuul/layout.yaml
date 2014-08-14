@@ -241,9 +241,9 @@ projects:
 
   - name: trafodion/core
     check:
-      - phoenix_quick
-      - core-regress-core
-      - core-regress-seabase
+      - phoenix_quick-cdh4.4
+      - core-regress-core-cdh4.4
+      - core-regress-seabase-cdh4.4
       - gate-core-check-for-binary
       - core-build-nondbg-cdh4.4
     check-full:
@@ -256,9 +256,9 @@ projects:
       - core-regress-executor-cdh4.4
       - core-regress-hive-cdh4.4
     gate:
-      - phoenix_quick
-      - core-regress-core
-      - core-regress-seabase
+      - phoenix_quick-cdh4.4
+      - core-regress-core-cdh4.4
+      - core-regress-seabase-cdh4.4
       - gate-core-check-for-binary
       - core-build-nondbg-cdh4.4
     daily:
@@ -274,41 +274,41 @@ projects:
       - core-regress-hive-cdh4.4
       - core-regress-seabase-cdh4.4
       - phoenix_test-cdh4.4
-      - pyodbc_test
-      - jdbc_test
+      - pyodbc_test-cdh4.4
+      - jdbc_test-cdh4.4
     release:
       - traf-pub-release
     pre-release:
       - traf-pub-release
       - traf-pub-debug
-      - core-regress-core
-      - core-regress-charsets
-      - core-regress-qat
-      - core-regress-udr
-      - core-regress-catman1
-      - core-regress-compGeneral
-      - core-regress-executor
-      - core-regress-hive
-      - core-regress-seabase
-      - phoenix_test
-      - pyodbc_test
-      - jdbc_test
+      - core-regress-core-cdh4.4
+      - core-regress-charsets-cdh4.4
+      - core-regress-qat-cdh4.4
+      - core-regress-udr-cdh4.4
+      - core-regress-catman1-cdh4.4
+      - core-regress-compGeneral-cdh4.4
+      - core-regress-executor-cdh4.4
+      - core-regress-hive-cdh4.4
+      - core-regress-seabase-cdh4.4
+      - phoenix_test-cdh4.4
+      - pyodbc_test-cdh4.4
+      - jdbc_test-cdh4.4
 
   - name: trafodion/dcs
     check:
       - gate-dcs-check-for-binary
       - dcs-build
-      - phoenix_quick
-      - pyodbc_test
-      - jdbc_test
+      - phoenix_quick-cdh4.4
+      - pyodbc_test-cdh4.4
+      - jdbc_test-cdh4.4
     gate:
       - gate-dcs-check-for-binary
       - dcs-build
-      - phoenix_quick
-      - pyodbc_test
-      - jdbc_test
+      - phoenix_quick-cdh4.4
+      - pyodbc_test-cdh4.4
+      - jdbc_test-cdh4.4
     check-full:
-      - phoenix_test
+      - phoenix_test-cdh4.4
 
   - name: trafodion/infra
     check:
@@ -329,11 +329,11 @@ projects:
   - name: trafodion/phoenix_test
     check:
       - gate-phoenix_test-check-for-binary
-      - phoenix_test
+      - phoenix_test-cdh4.4
 
     gate:
       - gate-phoenix_test-check-for-binary
-      - phoenix_test
+      - phoenix_test-cdh4.4
 
   - name: trafodion/install
     check:
