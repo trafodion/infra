@@ -43,15 +43,6 @@
     <!-- Page Specific CSS -->
     <link rel="stylesheet" type="text/css" href="http://status.<%= domain %>/themes/trafodion/css/main.css">
     <style type="text/css">
-        #blurb-container {
-            max-width: 950px;
-            margin: 0 auto;
-        }
-        .blurb {
-            float: left;
-            width: 25em;
-            padding: 4px;
-        }
         a:link {
             color: #204A87;
         }
@@ -59,7 +50,7 @@
   </head>
   <body>
     <script type="text/javascript">header('Downloads');</script>
-    <div id="blurb-container">
+    <div class="container">
     <h1>Trafodion Downloads</h1>
     <div id="message-container">
         <div class="container">
@@ -115,6 +106,13 @@
             }
         }
 
+        // callback function to match directory publish/opencart
+        function opencart($var) {
+            if (strpos($var, 'publish/opencart') !== false) {
+                return true;
+            }
+        }
+
         // callback function to print links to files
         function print_links($item, $key, $rType) {
             if (is_file($item) === true) {
@@ -142,7 +140,7 @@
         $fArray = array_reverse($fArrayTemp);
 
         // create array for release
-        echo '<div class="blurb">' . PHP_EOL;
+        echo '<div class="span-11">' . PHP_EOL;
         echo '    <h2 class="subhead">Release</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
         $releaseArray = array_filter($fArray, "release");
@@ -151,7 +149,7 @@
         echo '</div>' . PHP_EOL;
 
         // create array for pre-release
-        echo '<div class="blurb">' . PHP_EOL;
+        echo '<div class="span-11 last">' . PHP_EOL;
         echo '    <h2 class="subhead">Pre-Release</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
         $prereleaseArray = array_filter($fArray, "prerelease");
@@ -160,13 +158,23 @@
         echo '</div>' . PHP_EOL;
 
         // create array for daily
-        echo '<div class="blurb">' . PHP_EOL;
+        echo '<div class="span-11">' . PHP_EOL;
         echo '    <h2 class="subhead">Daily</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
         $dailyArray = array_filter($fArray, "daily");
         array_walk($dailyArray, 'print_links', 'daily');
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
+
+        // create array for OpenCart
+        echo '<div class="span-11 last">' . PHP_EOL;
+        echo '    <h2 class="subhead">OpenCart Demo</h2>' . PHP_EOL;
+        echo '    <p><ul>' . PHP_EOL;
+        $opencartArray = array_filter($fArray, "opencart");
+        array_walk($opencartArray, 'print_links', 'opencart');
+        echo '    </ul></p>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+
     ?>
     </p></div>
     <script type="text/javascript">footer();</script>
