@@ -203,12 +203,12 @@ pipelines:
       smtp:
         from: jenkins@trafodion.org
         to: traf_bld_stats_external.groups.hp.com@external.groups.hp.com
-        subject: 'Daily build {change._data[lastUpdated]} of {change.project} -- Passed All Tests'
+        subject: 'Daily build of {change.project} -- Passed All Tests'
     failure:
       smtp:
         from: jenkins@trafodion.org
         to: traf_bld_stats_external.groups.hp.com@external.groups.hp.com
-        subject: 'Daily build {change._data[lastUpdated]} of {change.project} -- Test Failures'
+        subject: 'Daily build of {change.project} -- Test Failures'
 
 
 jobs:
