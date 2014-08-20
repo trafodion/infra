@@ -46,6 +46,9 @@
         a:link {
             color: #204A87;
         }
+        li.empty {
+            list-style-type: none;
+        }
     </style>
   </head>
   <body>
@@ -115,7 +118,7 @@
 
         // callback function to print links to files
         function print_links($item, $key, $rType) {
-            if (is_file($item) === true) {
+            if (is_file($item) === true && $rType != "empty_list") {
                 $shortFname = basename($item);
                 list($z, $shortPath) = split('trafodion/publish/' . $rType . '/', $item);
                 $fName = $rType . '/' . $shortPath;
@@ -125,6 +128,8 @@
                 $iv = bin2hex(openssl_random_pseudo_bytes($ivSize / 2));
                 $hashFname = openssl_encrypt($fName, $cipher, $salt, 0, $iv);
                 echo '<li><a class="postlink" href="#" target="_blank" rn="' . $rType . '" fn="' . $fName . '" token="' . $iv . $hashFname . '">' . $shortFname . '</a></li>' . PHP_EOL;
+            } else if ($rType === "empty_list") {
+                echo '<li class="empty">&nbsp;</li>' . PHP_EOL;
             }
         }
 
@@ -148,12 +153,29 @@
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
-        // create array for pre-release
+        /*
+         * Create array for pre-release and print a list of links based off of the array.
+         * If prereleaseArray is empty print empty links using releaseArray which comes right before it.
+         * If prereleaseArray is smaller than releaseArray then pad prereleaseArray before printing. 
+         * Otherwise just print prereleaseArray.
+         * NOTE: Printing empty links preserves the layout of the page.
+         */ 
         echo '<div class="span-11 last">' . PHP_EOL;
         echo '    <h2 class="subhead">Pre-Release</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
         $prereleaseArray = array_filter($fArray, "prerelease");
-        array_walk($prereleaseArray, 'print_links', 'pre-release');
+        if (sizeof($prereleaseArray) === 0) {
+            array_walk($releaseArray, 'print_links', 'empty_list');
+        } else if (sizeof($prereleaseArray) >= sizeof($releaseArray)) {
+            array_walk($prereleaseArray, 'print_links', 'pre-release');
+        } else {
+            // pad prereleaseArray to size of releaseArray
+            $arraySizeDiff = sizeof($releaseArray) - sizeof($prereleaseArray);
+            for ($i = 1; $i <= $arraySizeDiff; $i++) {
+                $prereleaseArray[] = 'empty';
+            }
+            array_walk($prereleaseArray, 'print_links', 'pre-release');
+        }
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
