@@ -20,6 +20,9 @@
 workspace="$(pwd)"
 
 # ZUUL_PIPELINE indicates if this is daily, pre-release, or release build
+# If we are run from jenkins, not Zuul, then default to daily
+ZUUL_PIPELINE=${ZUUL_PIPELINE:-daily}
+
 # Build ID indicates specific date or tag
 BLD="$(< $workspace/Build_ID)"
 
