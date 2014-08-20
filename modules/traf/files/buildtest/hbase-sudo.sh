@@ -49,6 +49,13 @@ then
   echo "Adding HBASE_CLASSPATH = $jarpath"
   echo "export HBASE_CLASSPATH=$jarpath" >> /etc/hbase/conf.localtest/hbase-env.sh || exit 3
 
+  echo "Removing/Creating HDFS /hbase"
+  set -x
+  sudo -u hdfs /usr/bin/hadoop fs -rm -r -f /hbase 
+  sudo -u hdfs /usr/bin/hadoop fs -mkdir /hbase
+  sudo -u hdfs /usr/bin/hadoop fs -chown hbase:hbase /hbase
+  set +x
+
   echo "Starting hbase-master"
   /sbin/service hbase-master start
   echo "Return code $?"
