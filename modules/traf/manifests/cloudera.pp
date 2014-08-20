@@ -135,9 +135,9 @@ class traf::cloudera (
        require => [ Package['mysql-connector-java'], Package['hive'] ],
   }
   # No longer needed -- make it absent after HBase on HDFS change is fully propagated
-  #file { ['/var/hbase']:
-  #     ensure => absent,
-  #}
+  file { ['/var/hbase']:
+       ensure => absent,
+  }
 
   # as specified in hdfs-site.xml
   file { ['/data/dfs','/data/dfs/data']:
@@ -233,15 +233,6 @@ class traf::cloudera (
       unless  => '/usr/bin/hadoop fs -ls -d /user/hive',
       user    => 'hdfs',
       require => [ Service[$hdfs_services],User['jenkins'] ]
-  }
-  # HBase on HDFS, specified in hbase-site.xml
-  exec { 'hdfs-hbase':
-      command =>
-          '/usr/bin/hadoop fs -mkdir -p /hbase
-	   /usr/bin/hadoop fs -chown hbase:hbase /hbase',
-      unless  => '/usr/bin/hadoop fs -ls -d /hbase',
-      user    => 'hdfs',
-      require => [ Service[$hdfs_services],Package['hbase'] ]
   }
   # HDFS directories for Bulkload feature
   exec { 'hdfs-hbase-staging':

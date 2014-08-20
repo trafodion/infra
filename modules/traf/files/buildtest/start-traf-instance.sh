@@ -149,14 +149,6 @@ START_TRAF() {
     sudo /usr/local/bin/hbase-sudo.sh start "$jarpath"
     echo "Return code $?"
 
-    # clean up previous schema
-    hbase shell > Schema_Drop.log 2>&1 <<EOF
-disable_all 'TRAFODION.*'
-y
-drop_all 'TRAFODION.*'
-y
-EOF
-
     # generate new schema
     sqgen
     echo "Return code $?"
