@@ -288,6 +288,16 @@ class traf::gerrit (
     require => Class['::gerrit'],
   }
 
+  file { '/home/gerrit2/review_site/etc/welcome_message.txt':
+    ensure  => present,
+    owner   => 'gerrit2',
+    group   => 'gerrit2',
+    mode    => '0644',
+    source  => 'puppet:///modules/traf/gerrit/welcome_message.txt',
+    replace => true,
+    require => Class['::gerrit'],
+  }
+
   if $ssh_welcome_rsa_key_contents != '' {
     file { '/home/gerrit2/review_site/etc/ssh_welcome_rsa_key':
       owner   => 'gerrit2',

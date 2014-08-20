@@ -13,5 +13,6 @@ timeout -k 2m 10m /usr/local/bin/trivial-rebase \
 <% if @ssh_welcome_rsa_key_contents != "" -%>
 timeout -k 2m 10m /usr/local/bin/welcome-message patchset-created \
     --verbose --ssh-user=welcome-message \
+    ----message-file /home/gerrit2/review_site/etc/welcome_message.txt \
     --ssh-key=/home/gerrit2/review_site/etc/ssh_welcome_rsa_key "$@"
 <% end -%>
