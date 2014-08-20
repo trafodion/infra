@@ -1,27 +1,35 @@
 #- project: org/repo
+#  launchpad: launchpad_project_name
 #  upstream: git://github.com/org/repo.git
 #  description: 
 #  acl-config:
 
 - project: trafodion/sandbox
+  launchpad: trafodion
   upstream: git://github.com/trafodion/sandbox.git
   description: Playground - Not a permanent home for anything.
 - project: trafodion/core
+  launchpad: trafodion
   upstream: git://github.com/trafodion/core.git
 - project: trafodion/phoenix_test
+  launchpad: trafodion
   upstream: git://github.com/trafodion/phoenix_test.git
   acl-config: /home/gerrit2/acls/trafodion/core.config
 - project: trafodion/dcs
+  launchpad: trafodion
   upstream: git://github.com/trafodion/dcs.git
   acl-config: /home/gerrit2/acls/trafodion/core.config
 - project: trafodion/install
+  launchpad: trafodion
   upstream: git://github.com/trafodion/install.git
   acl-config: /home/gerrit2/acls/trafodion/core.config
 - project: trafodion/win-odbc64
+  launchpad: trafodion
   upstream: git://github.com/trafodion/win-odbc64.git
   acl-config: /home/gerrit2/acls/trafodion/core.config
 - project: trafodion/manuals
+  launchpad: trafodion
   upstream: git://github.com/trafodion/manuals.git
 - project: trafodion/infra
+  launchpad: trafodion
   upstream: git://github.com/trafodion/infra.git
-
