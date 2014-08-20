@@ -1,0 +1,21 @@
+Thank you for your first contribution to Trafodion.
+
+Your patch will now be tested automatically by the Trafodion testing frameworks.
+Oonce the automatic tests pass, it will be reviewed by other friendly developers. 
+They will give you feedback and may require you to refine it.  People seldom get 
+their patch approved on the first try, so don't be concerned if requested to make 
+corrections. Feel free to modify your patch and resubmit a new change-set.
+
+Patches usually take 3 to 7 days to be reviewed so be patient and be available 
+to ask and answer questions about your work. The more you participate in the 
+community the more rewarding it is for you. You may also notice that the more you 
+get to know people and get to be known, the faster your patches will be reviewed 
+and eventually approved. Get to know others and become known by doing code reviews: 
+anybody can do it, and it's a great way to learn the code base.
+
+Thanks again for supporting Trafodion, we look forward to working with you.
+
+Mailing List(s): trafodion-development@lists.launchpad.net
+Workflow: https://wiki.trafodion.org/wiki/index.php/Contributor_Workflow
+Commit Messages: https://wiki.trafodion.org/wiki/index.php/Contributor_Workflow#Committing_Changes
+Launchpad Bugs and Blueprints: https://launchpad.net/trafodion
