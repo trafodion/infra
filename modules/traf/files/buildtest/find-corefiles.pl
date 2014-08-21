@@ -208,7 +208,7 @@ sub main
 {
 	my $hostname;
 	my $hostnameshort;
-	$realHostName = qx(hostname -f);
+	$realHostName = qx(hostname);
 	$hostname = $realHostName         if ! $aliasName;
 	$hostname = $aliasName            if   $aliasName;
 	$hostnameshort = qx(hostname -s)  if ! $aliasShort;
