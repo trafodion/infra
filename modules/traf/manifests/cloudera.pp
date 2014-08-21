@@ -137,6 +137,8 @@ class traf::cloudera (
   # No longer needed -- make it absent after HBase on HDFS change is fully propagated
   file { ['/var/hbase']:
        ensure => absent,
+       recurse => true,
+       force => true,
   }
 
   # as specified in hdfs-site.xml
