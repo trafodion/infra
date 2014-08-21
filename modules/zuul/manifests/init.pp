@@ -123,8 +123,6 @@ class zuul (
     ensure => directory,
   }
 
-# TODO: We should put in  notify either Service['zuul'] or Exec['zuul-reload']
-#       at some point, but that still has some problems.
   file { '/etc/zuul/zuul.conf':
     ensure  => present,
     owner   => 'zuul',
@@ -134,6 +132,7 @@ class zuul (
       File['/etc/zuul'],
       User['zuul'],
     ],
+    notify => Exec['zuul-reload'],
   }
 
   file { '/etc/default/zuul':
