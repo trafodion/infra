@@ -50,12 +50,28 @@ node 'review.trafodion.org' {
   }
 }
 
+# Jenkins master for US West
 node 'jenkins01.trafodion.org' {
   class { 'traf::jenkins':
     jenkins_jobs_password   => hiera('jenkins_jobs_password'),
     jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
     ssl_cert_file_contents  => hiera('jenkins01_ssl_cert_file_contents'),
     ssl_key_file_contents   => hiera('jenkins01_ssl_key_file_contents'),
+    ssl_chain_file_contents => hiera('ssl_chain_file_contents'),
+    sysadmins               => hiera('sysadmins'),
+    #zmq_event_receivers     => ['logstash.openstack.org',],
+    #zmq_event_receivers     => ['nodepool.trafodion.org',
+    #],
+  }
+}
+
+# Jenkins master for US East
+node 'jenkins02.trafodion.org' {
+  class { 'traf::jenkins':
+    jenkins_jobs_password   => hiera('jenkins_jobs_password'),
+    jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
+    ssl_cert_file_contents  => hiera('jenkins02_ssl_cert_file_contents'),
+    ssl_key_file_contents   => hiera('jenkins02_ssl_key_file_contents'),
     ssl_chain_file_contents => hiera('ssl_chain_file_contents'),
     sysadmins               => hiera('sysadmins'),
     #zmq_event_receivers     => ['logstash.openstack.org',],
@@ -123,10 +139,12 @@ node 'zuul.trafodion.org' {
     sysadmins                      => hiera('sysadmins', ['admin']),
     #statsd_host                    => 'graphite.trafodion.org',
     gearman_workers                => [
+      '15.126.225.210',
       '15.125.67.186',
       '192.168.0.34',
     ],
     gearman6_workers               => [
+      '0:0:0:0:0:ffff:f7e:e1d2',
       '0:0:0:0:0:ffff:f7d:43ba',
       '0:0:0:0:0:ffff:c0a8:22'
     ],
