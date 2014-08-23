@@ -67,8 +67,11 @@ echo "Return code ${PIPESTATUS[0]}"
 cd ../../sqf/rundir
 
 set +x
+echo
 
+totalCoreCount=0
 missed=0
+foundMsg=
 for dir in *
 do
   if [[ $dir =~ tools|tmp ]]
@@ -80,14 +83,22 @@ do
   if [[ -f "$dir/runregr-sb.log" ]]
   then
     cat $dir/runregr-sb.log
+
+    # Any core files means failure
+    report_on_corefiles
+    coreCount=$?
+    totalCoreCount=$(( totalCoreCount + coreCount ))
+
     if grep -q FAIL "$dir/runregr-sb.log"
     then
-      echo "Found failures -- saving $dir logs."
+      foundMsg="$foundMsg
+Found failures -- saving $dir logs to $logarchive/$dir/"
       mkdir $logarchive/$dir
-      cp $dir/* $logarchive/$dir/
+      # Filter out core files
+      cp $(ls $dir/* | grep -v "/core.$(hostname)") $logarchive/$dir/
     fi
   else
-    echo "Failed -- No tests run"
+    echo "Failed -- No tests run for $dir"
     missed=1
   fi
 done
@@ -97,9 +108,17 @@ pass=$(grep PASS */runregr*.log | wc -l)
 echo "Total Passed:   $pass"
 echo "Total Failures: $fail"
 
-report_on_corefiles
+if [[ $totalCoreCount -gt 0 ]]; then
+    echo
+    echo "Failure : Found $totalCoreCount core files"
+fi
 
-if [[ $pass > 0 && $fail == 0 && $missed == 0 ]]
+if [[ -n "$foundMsg" ]]; then
+  echo
+  echo "$foundMsg"
+fi
+
+if [[ $pass -gt 0 && $fail == 0 && $missed == 0 && $totalCoreCount == 0 ]]
 then
   exit 0
 else

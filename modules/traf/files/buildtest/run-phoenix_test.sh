@@ -76,7 +76,10 @@ fi
 cd $WORKSPACE
 /usr/local/bin/stop-traf-instance.sh "$TRAF_DIR/sqf"
 
+# Any core files means failure
 report_on_corefiles "$TRAF_DIR"
+coreCount=$?
+phoenixRes=$(( phoenixRes + coreCount ))
 
-# exit with phoenix_test.py return code
+# exit with sum of return codes from phoenix_test.py and report_on_corefiles
 exit $phoenixRes
