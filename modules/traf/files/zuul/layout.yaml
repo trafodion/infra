@@ -164,11 +164,9 @@ pipelines:
 #        - event: comment-added
 #          comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*check experimental\s*$
 #    success:
-#      gerrit:
-#        force-message: true
+#      gerrit: {}
 #    failure:
-#      gerrit:
-#        force-message: true
+#      gerrit: {}
 #
 #  - name: periodic
 #    description: Jobs in this queue are triggered on a timer.
@@ -187,11 +185,9 @@ pipelines:
         - event: comment-added
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*run check-full\s*$
     success:
-      gerrit:
-        force-message: true
+      gerrit: {}
     failure:
-      gerrit:
-        force-message: true
+      gerrit: {}
 
   - name: daily
     description: Jobs in this queue are triggered daily.
