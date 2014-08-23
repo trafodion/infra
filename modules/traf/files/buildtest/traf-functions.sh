@@ -103,8 +103,9 @@ function clear_env() {
 ############################################################
 # report_on_corefiles - find and report on corefiles
 #
-# If argument supplied, use that, otherwise try directory
-# above MY_SQROOT.
+# If argument supplied, use that, otherwise try the directory
+# above MY_SQROOT.  The return code is the number of
+# core files found.
 #
 function report_on_corefiles() {
   ADIR="$1"
@@ -120,16 +121,19 @@ function report_on_corefiles() {
     echo "WARNING: report_on_corefiles could not find a directory to report on"
     return 0
   fi
+  CORECOUNT=0
   if [[ -d "$ADIR" ]]; then
     echo
     COREFILES=$(find-corefiles.pl "$ADIR")
     if [[ -n "$COREFILES" ]]; then
       echo "WARNING: Core files found in $ADIR :"
       ls -l $COREFILES
+      CORECOUNT=$(echo $COREFILES | wc -w)
       echo
     else
       echo "INFO: Found no core files in $ADIR"
     fi
     echo
   fi
+  return $CORECOUNT
 }
