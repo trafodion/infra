@@ -127,7 +127,9 @@ function report_on_corefiles() {
     COREFILES=$(find-corefiles.pl "$ADIR")
     if [[ -n "$COREFILES" ]]; then
       echo "WARNING: Core files found in $ADIR :"
+      pushd "$ADIR" >/dev/null
       ls -l $COREFILES
+      popd >/dev/null
       CORECOUNT=$(echo $COREFILES | wc -w)
       echo
     else
