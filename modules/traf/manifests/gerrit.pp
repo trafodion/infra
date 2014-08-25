@@ -185,11 +185,12 @@ class traf::gerrit (
   if ($testmode == false) {
     include gerrit::cron
     class { 'github':
-      username         => $github_username,
-      project_username => $github_project_username,
-      project_password => $github_project_password,
-      oauth_token      => $github_oauth_token,
-      require          => Class['::gerrit']
+      close_pull_requests_args => '--message-file=/home/gerrit2/review_site/etc/close-pull-requests.txt',
+      username                 => $github_username,
+      project_username         => $github_project_username,
+      project_password         => $github_project_password,
+      oauth_token              => $github_oauth_token,
+      require                  => Class['::gerrit']
     }
   }
 

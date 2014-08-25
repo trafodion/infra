@@ -1,6 +1,7 @@
 # == Class: github
 #
 class github(
+  $close_pull_requests_args = '',
   $username = '',
   $oauth_token = '',
   $project_username = '',
@@ -87,7 +88,7 @@ class github(
   }
 
   cron { 'githubclosepull':
-    command => 'sleep $((RANDOM\%60+90)) && /usr/local/bin/close-pull-requests',
+    command => "sleep $((RANDOM\%60+90)) && /usr/local/bin/close-pull-requests $close_pull_requests_args",
     minute  => '*/5',
     require => [
       Class['jeepyb'],
