@@ -1,0 +1,8 @@
+Thank you for contributing to %(project)s!
+
+%(project)s uses Gerrit for code review.
+
+Please visit https://wiki.trafodion.org/wiki/index.php/Contributor_Workflow
+for instructions on how to upload your changes to Gerrit. Our Gerrit server
+can be found at https://review.trafodion.org. If you have any questions 
+please contact us @ trafodion-development@lists.launchpad.net.

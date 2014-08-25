@@ -185,11 +185,12 @@ class traf::gerrit (
   if ($testmode == false) {
     include gerrit::cron
     class { 'github':
-      username         => $github_username,
-      project_username => $github_project_username,
-      project_password => $github_project_password,
-      oauth_token      => $github_oauth_token,
-      require          => Class['::gerrit']
+      close_pull_requests_args => '--message-file=/home/gerrit2/review_site/etc/close-pull-requests.txt',
+      username                 => $github_username,
+      project_username         => $github_project_username,
+      project_password         => $github_project_password,
+      oauth_token              => $github_oauth_token,
+      require                  => Class['::gerrit']
     }
   }
 
@@ -284,6 +285,16 @@ class traf::gerrit (
     group   => 'root',
     mode    => '0555',
     content => template('traf/gerrit_patchset-created.erb'),
+    replace => true,
+    require => Class['::gerrit'],
+  }
+
+  file { '/home/gerrit2/review_site/etc/close-pull-requests.txt':
+    ensure  => present,
+    owner   => 'gerrit2',
+    group   => 'gerrit2',
+    mode    => '0644',
+    source  => 'puppet:///modules/traf/gerrit/close-pull-requests.txt',
     replace => true,
     require => Class['::gerrit'],
   }
