@@ -129,8 +129,8 @@ class traf::gerrit (
       },
       {
         name  => 'bug',
-        match => '\\bbug:? #?(\\d+)',
-        link  => 'https://launchpad.net/bugs/$1',
+        match => '\\b([Bb]ug|[Ll][Pp]):? #?(\\d+)\\b',
+        link  => 'https://launchpad.net/bugs/$2',
       },
       {
         name  => 'blueprint',
