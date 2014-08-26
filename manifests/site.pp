@@ -68,7 +68,7 @@ node 'jenkins01.trafodion.org' {
 # Jenkins master for US East
 node 'jenkins02.trafodion.org' {
   class { 'traf::jenkins':
-    jenkins_jobs_password   => hiera('jenkins_jobs_password'),
+    jenkins_jobs_password   => hiera('jenkins02_jobs_password'),
     jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
     ssl_cert_file_contents  => hiera('jenkins02_ssl_cert_file_contents'),
     ssl_key_file_contents   => hiera('jenkins02_ssl_key_file_contents'),

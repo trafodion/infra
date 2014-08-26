@@ -67,7 +67,13 @@ class traf::jenkins (
     version => '1.20',
   }
   jenkins::plugin { 'build-timeout':
-    version => '1.13',
+    version => '1.14',
+  }
+  jenkins::plugin { 'build-flow-plugin':
+    version => '0.12',
+  }
+  jenkins::plugin { 'conditional-buildstep':
+    version => '1.3.3',
   }
   jenkins::plugin { 'copyartifact':
     version => '1.22',
@@ -76,10 +82,13 @@ class traf::jenkins (
     version => '2.3',
   }
   jenkins::plugin { 'envinject':
-    version => '1.70',
+    version => '1.89',
+  }
+  jenkins::plugin { 'zmq-event-publisher':
+    version => '0.0.3',
   }
   jenkins::plugin { 'gearman-plugin':
-    version => '0.0.3',
+    version => '0.0.7',
   }
   jenkins::plugin { 'git':
     version => '1.1.23',
@@ -102,25 +111,17 @@ class traf::jenkins (
   jenkins::plugin { 'postbuild-task':
     version => '1.8',
   }
-#  TODO(clarkb): release
-#  jenkins::plugin { 'zmq-event-publisher':
-#    version => '1.0',
-#  }
   jenkins::plugin { 'jclouds-jenkins':
     version => '2.3.1',
-  }
-#  TODO(jeblair): release
-#  jenkins::plugin { 'scp':
-#    version => '1.9',
-#  }
-  jenkins::plugin { 'violations':
-    version => '0.7.11',
   }
   jenkins::plugin { 'jobConfigHistory':
     version => '1.13',
   }
   jenkins::plugin { 'monitoring':
     version => '1.40.0',
+  }
+  jenkins::plugin { 'jenkins-multijob-plugin':
+    version => '1.13',
   }
   jenkins::plugin { 'nodelabelparameter':
     version => '1.2.1',
@@ -132,7 +133,7 @@ class traf::jenkins (
     version => '1.5',
   }
   jenkins::plugin { 'parameterized-trigger':
-    version => '2.15',
+    version => '2.25',
   }
   jenkins::plugin { 'publish-over-ftp':
     version => '1.7',
@@ -140,11 +141,15 @@ class traf::jenkins (
   jenkins::plugin { 'rebuild':
     version => '1.14',
   }
+#  TODO(jeblair): release
+#  jenkins::plugin { 'scp':
+#    version => '1.9',
+#  }
   jenkins::plugin { 'simple-theme-plugin':
     version => '0.2',
   }
   jenkins::plugin { 'timestamper':
-    version => '1.3.1',
+    version => '1.5.14',
   }
   jenkins::plugin { 'token-macro':
     version => '1.5.1',
@@ -154,6 +159,12 @@ class traf::jenkins (
   }
   jenkins::plugin { 'urltrigger':
     version => '0.24',
+  }
+  jenkins::plugin { 'violations':
+    version => '0.7.11',
+  }
+  jenkins::plugin { 'xunit':
+    version => '1.90',
   }
 
   if $manage_jenkins_jobs == true {

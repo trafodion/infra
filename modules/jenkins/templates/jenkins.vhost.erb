@@ -8,7 +8,7 @@
 
              CustomLog ${APACHE_LOG_DIR}/<%= scope.lookupvar("::jenkins::master::vhost_name") %>-access.log combined
 
-             Redirect / https://<%= scope.lookupvar("::jenkins::master::vhost_name") %>/
+             Redirect permanent / https://<%= scope.lookupvar("::jenkins::master::vhost_name") %>/
 
 </VirtualHost>
 
@@ -42,11 +42,12 @@
 
              RewriteRule /zuul/status http://127.0.0.1:8001/status [P]
 
+             ProxyRequests Off
+             ProxyPreserveHost On
+             AllowEncodedSlashes NoDecode
              ProxyPass / http://127.0.0.1:8080/ retry=0 nocanon
              ProxyPassReverse / http://127.0.0.1:8080/
-             ProxyPreserveHost On
-             ProxyRequests Off
-             AllowEncodedSlashes NoDecode
+             ProxyPassReverse / http://<%= scope.lookupvar("::jenkins::master::vhost_name") %>/
 
              # Local reverse proxy authorization override
              # Most unix distribution deny proxy by default (ie /etc/apache2/mods-enabled/proxy.conf in Ubuntu)
