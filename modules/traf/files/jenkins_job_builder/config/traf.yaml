@@ -37,6 +37,10 @@
          suite: "catman1"
          dist:
           - "cdh4.4"
+      - core-regress-{suite}-{dist}:
+         suite: "fullstack2"
+         dist:
+          - "cdh4.4"
 
 - job-template:
     name: 'core-regress-{suite}-{dist}'
@@ -156,11 +160,11 @@
     publishers:
       - console-log
 
-# For phoenix_test* jobs parameters tests1-4 should contain a list of tests seperated by a comma and NO space. 
+# For phoenix_test* jobs parameters tests1-4 should contain a list of tests seperated by a comma and NO space.
 # For instance : ExtendedQueryExecTest,ProductMetricsTest
 # If using multiple testsX parameters, be sure to include trailing comma on all but the last one.
 # If parameters tests1-4 are all "" then all tests will be run
-# If parameter tests1 = DONT_RUN_TESTS then none of the phoenix tests will run.  
+# If parameter tests1 = DONT_RUN_TESTS then none of the phoenix tests will run.
 # This should only be used in phoenix_test-experimental if phoenix_test is running all tests.
 - job-template:
     name: 'phoenix_test-experimental-{dist}'
@@ -335,8 +339,8 @@
       - git-log
       - pyodbc_test-log
 
-# For jdbc_test* jobs parameter tests1 should start with "--testes=" and contain a list of 
-# tests seperated by a comma and NO space. 
+# For jdbc_test* jobs parameter tests1 should start with "--testes=" and contain a list of
+# tests seperated by a comma and NO space.
 # For instance : "--tests=TestBasic,SomeOtherTest"
 # If parameter tests1 is "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the jdbc tests will run.
