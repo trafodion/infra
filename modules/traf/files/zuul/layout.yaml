@@ -213,6 +213,8 @@ jobs:
     parameter-function: set_log_url
   - name: jdbc_test
     voting: true
+  - name: core-regress-fullstack2-cdh4.4
+    voting: false
   - name: jdbc_test-experimental
     voting: false
   - name: phoenix_test
@@ -251,6 +253,7 @@ projects:
       - core-regress-catman1-cdh4.4
       - core-regress-compGeneral-cdh4.4
       - core-regress-executor-cdh4.4
+      - core-regress-fullstack2-cdh4.4
       - core-regress-hive-cdh4.4
     gate:
       - phoenix_quick-cdh4.4
@@ -268,6 +271,7 @@ projects:
       - core-regress-catman1-cdh4.4
       - core-regress-compGeneral-cdh4.4
       - core-regress-executor-cdh4.4
+      - core-regress-fullstack2-cdh4.4
       - core-regress-hive-cdh4.4
       - core-regress-seabase-cdh4.4
       - phoenix_test-cdh4.4
@@ -285,6 +289,7 @@ projects:
       - core-regress-catman1-cdh4.4
       - core-regress-compGeneral-cdh4.4
       - core-regress-executor-cdh4.4
+      - core-regress-fullstack2-cdh4.4
       - core-regress-hive-cdh4.4
       - core-regress-seabase-cdh4.4
       - phoenix_test-cdh4.4
