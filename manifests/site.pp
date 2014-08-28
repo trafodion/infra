@@ -194,6 +194,18 @@ node /^(slave|slave-cdh44-)\d\d.trafodion.org$/ {
   }
 }
 
+# Cloudera5.1
+node /^slave-cdh51-\d\d.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    sysadmins => hiera('sysadmins'),
+    hive_sql_pw => hiera('hive_sql_pw'),
+    distro => 'CDH5.1',
+  }
+}
+
 # HortonWorks1.3
 node /^slave-hdp13-\d\d.trafodion.org$/ {
   include traf

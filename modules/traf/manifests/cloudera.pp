@@ -4,6 +4,7 @@
 # Installs & configures a subset of CDH4
 class traf::cloudera (
    $hive_sql_pw = '',
+   $distro      = '',
 ) {
 
   
@@ -41,7 +42,6 @@ class traf::cloudera (
   }
 
 
-  if $::osfamily == 'RedHat' {
     # packages needed for a stand-alone node
     $packages = [
       'hadoop',
@@ -62,24 +62,38 @@ class traf::cloudera (
       'zookeeper-server',
     ]
 
-    file { '/etc/yum.repos.d/cloudera-cdh4.repo':
+  if $distro == 'CDH4.4' {
+
+    $repofile = 'cloudera-cdh4.repo'
+    $repokey  = 'http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
+    $keyver   = 'gpg-pubkey-e8f86acd-4a418045'
+
+  } # if CDH4.4
+
+  if $distro == 'CDH5.1' {
+
+    $repofile = 'cloudera-cdh5.1.repo'
+    $repokey  = 'http://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
+    $keyver   = 'gpg-pubkey-e8f86acd-4a418045'
+
+  } # if CDH5.1
+
+    file { "/etc/yum.repos.d/$repofile":
        owner => 'root',
        group => 'root',
        mode  => '0644',
-       source => 'puppet:///modules/traf/hadoop/cloudera-cdh4.repo',
+       source => "puppet:///modules/traf/hadoop/$repofile",
     }
-
     exec { 'cloudera rpm' :
-       command   => '/bin/rpm --import http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera',
-       unless    => '/bin/rpm -qa -qa gpg-pubkey* | grep -q gpg-pubkey-e8f86acd-4a418045',
-       require   => File['/etc/yum.repos.d/cloudera-cdh4.repo'],
+       command   => "/bin/rpm --import $repokey",
+       unless    => "/bin/rpm -qa gpg-pubkey* | grep -q $keyver",
+       require   => File["/etc/yum.repos.d/$repofile"],
     }
 
     package { $packages:
         ensure => present,
 	require => Exec['cloudera rpm'],
     }
-  } # if RedHat
 
   exec { 'hadoop-conf':
      command  => '/bin/cp -r /etc/hadoop/conf.dist /etc/hadoop/conf.localtest;

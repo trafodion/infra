@@ -137,6 +137,15 @@ class traf::slave (
 
     class { 'traf::cloudera':
       hive_sql_pw => $hive_sql_pw,
+      distro      => $distro,
+    }
+  }
+  if $distro == 'CDH5.1' {
+    class { 'traf::tpcds':}
+
+    class { 'traf::cloudera':
+      hive_sql_pw => $hive_sql_pw,
+      distro      => $distro,
     }
   }
 
