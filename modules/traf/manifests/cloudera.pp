@@ -67,6 +67,7 @@ class traf::cloudera (
     $repofile = 'cloudera-cdh4.repo'
     $repokey  = 'http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
     $keyver   = 'gpg-pubkey-e8f86acd-4a418045'
+    $yarnsite = 'yarn-site.xml'
 
   } # if CDH4.4
 
@@ -75,6 +76,7 @@ class traf::cloudera (
     $repofile = 'cloudera-cdh5.1.repo'
     $repokey  = 'http://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
     $keyver   = 'gpg-pubkey-e8f86acd-4a418045'
+    $yarnsite = 'yarn-site.xml-2.2'
 
   } # if CDH5.1
 
@@ -115,7 +117,7 @@ class traf::cloudera (
      require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/yarn-site.xml':
-     source => 'puppet:///modules/traf/hadoop/yarn-site.xml',
+     source => "puppet:///modules/traf/hadoop/$yarnsite",
      require => Exec['hadoop-conf'],
   }
 
