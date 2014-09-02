@@ -15,7 +15,8 @@ class iptables(
   $public_tcp_ports = [],
   $public_udp_ports = [],
   $blacklist_rules4 = [],
-  $blacklist_rules6 = []
+  $blacklist_rules6 = [],
+  $log_file = '/var/log/iptables.log',
 ) {
 
   include iptables::params
@@ -77,5 +78,34 @@ class iptables(
     # When this file is updated, make sure the rules get reloaded.
     notify  => Service['iptables'],
     replace => true,
+  }
+
+  service { 'rsyslog':
+    name       => 'rsyslog',
+    hasstatus  => true,
+    hasrestart => true,
+    require    => Package['rsyslog'],
+  }
+
+  file { '/etc/rsyslog.d/iptables.conf':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    content => template('iptables/iptables.conf.erb'),
+    notify  => Service['rsyslog']
+  }
+
+  include logrotate
+  logrotate::file { 'iptables.log':
+    log     => "${log_file}",
+    options => [
+      'compress',
+      'copytruncate',
+      'missingok',
+      'rotate 30',
+      'daily',
+      'notifempty',
+    ],
+    require => [ Service['iptables'], File['/etc/rsyslog.d/iptables.conf'] ],
   }
 }

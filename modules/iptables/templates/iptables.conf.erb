@@ -1,0 +1,6 @@
+# Log IPTABLES generated log messages to file
+:msg,contains,"IPTABLES" <%= log_file %>
+
+# comment out the following line to allow IPTABLES messages through.
+# Doing so means you'll also get IPTABLES messages in /var/log/kern.log
+#& ~
