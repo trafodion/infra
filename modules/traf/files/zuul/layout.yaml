@@ -213,8 +213,6 @@ jobs:
     parameter-function: set_log_url
   - name: jdbc_test
     voting: true
-  - name: core-regress-fullstack2-cdh4.4
-    voting: false
   - name: jdbc_test-experimental
     voting: false
   - name: phoenix_test
