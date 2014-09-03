@@ -47,6 +47,11 @@ class traf::base(
 
   }
 
+  package { 'rake':
+    ensure   => latest,
+    provider => 'gem',
+  }
+
   package { $::traf::params::packages:
     ensure => present
   }
