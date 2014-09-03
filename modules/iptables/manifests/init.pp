@@ -80,13 +80,6 @@ class iptables(
     replace => true,
   }
 
-  service { 'rsyslog':
-    name       => 'rsyslog',
-    hasstatus  => true,
-    hasrestart => true,
-    require    => Package['rsyslog'],
-  }
-
   file { '/etc/rsyslog.d/iptables.conf':
     ensure  => present,
     owner   => 'root',

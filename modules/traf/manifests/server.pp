@@ -49,6 +49,12 @@ class traf::server (
       ensure => present,
     }
   }
+  elsif $::osfamily == 'RedHat' {
+    service { 'rsyslog':
+      ensure      => running,
+      hasrestart  => true,
+    }
+  }
 
   file { '/root/.vimrc':
     ensure => present,
