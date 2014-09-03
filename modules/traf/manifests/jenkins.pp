@@ -24,6 +24,18 @@ class traf::jenkins (
     sysadmins                 => $sysadmins,
   }
 
+  # install rake and puppetlabs_spec_helper from ruby gems
+  # so puppet-lint can run on jenkins
+  package { 'rake':
+    ensure   => latest,
+    provider => 'gem',
+  }
+
+  package { 'puppetlabs_spec_helper':
+    ensure   => latest,
+    provider => 'gem',
+  }
+
   if $ssl_chain_file_contents != '' {
     $ssl_chain_file = '/etc/ssl/certs/intermediate.pem'
   } else {
