@@ -106,8 +106,8 @@ class elasticsearch (
   }
 
   service { 'elasticsearch':
-    ensure    => running,
-    require   => [
+    ensure  => running,
+    require => [
       Package['elasticsearch'],
       File['/etc/elasticsearch/elasticsearch.yml'],
       File['/etc/elasticsearch/default-mapping.json'],

@@ -1,3 +1,5 @@
+# == Class: openstack_project::etherpad_dev
+#
 class openstack_project::etherpad_dev (
   $mysql_password,
   $mysql_host = 'localhost',

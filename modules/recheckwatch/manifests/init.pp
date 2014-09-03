@@ -112,9 +112,9 @@ class recheckwatch (
   }
 
   file { '/usr/local/bin/recheckwatch':
-    ensure  => present,
-    mode    => '0555',
-    source  => 'puppet:///modules/recheckwatch/recheckwatch',
-    notify  => Service['recheckwatch'],
+    ensure => present,
+    mode   => '0555',
+    source => 'puppet:///modules/recheckwatch/recheckwatch',
+    notify => Service['recheckwatch'],
   }
 }

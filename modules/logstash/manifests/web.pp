@@ -44,9 +44,9 @@ class logstash::web (
       }
 
       service { 'logstash-web':
-        ensure    => running,
-        enable    => true,
-        require   => [
+        ensure  => running,
+        enable  => true,
+        require => [
           Class['logstash'],
           File['/etc/init/logstash-web.conf'],
         ],

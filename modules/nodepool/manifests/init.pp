@@ -140,12 +140,12 @@ class nodepool (
   }
 
   file { '/etc/nodepool/logging.conf':
-    ensure  => present,
-    mode    => '0444',
-    owner   => 'root',
-    group   => 'root',
-    source  => 'puppet:///modules/nodepool/logging.conf',
-    notify  => Service['nodepool'],
+    ensure => present,
+    mode   => '0444',
+    owner  => 'root',
+    group  => 'root',
+    source => 'puppet:///modules/nodepool/logging.conf',
+    notify => Service['nodepool'],
   }
 
   file { '/etc/init.d/nodepool':

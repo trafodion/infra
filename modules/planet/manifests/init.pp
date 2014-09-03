@@ -1,3 +1,5 @@
+# == Class: planet
+#
 class planet {
   package { 'planet-venus':
     ensure => present,

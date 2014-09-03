@@ -28,17 +28,17 @@ define drupal::distbuild (
   $site_makefile = undef,
 ) {
   file { $site_sandbox_root:
-    ensure  => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
   }
 
   file { $site_staging_root:
-    ensure  => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
   }
 
   vcsrepo { "${site_sandbox_root}/${site_build_repo_name}":

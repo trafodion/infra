@@ -67,7 +67,7 @@ class jenkins::jenkinsuser(
 #    content => $ssh_key,
 #    require => File['/home/jenkins/.ssh'],
 #  }
-  $default_jenkins_auth = { jenkins => { pub_key => "$ssh_key"}, }
+  $default_jenkins_auth = { jenkins => { pub_key => $ssh_key}, }
   create_resources(jenkins::add_pub_key, $default_jenkins_auth)
 
   #NOTE: not all distributions have default bash files in /etc/skel

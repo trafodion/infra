@@ -32,8 +32,8 @@ node 'review.trafodion.org' {
     ssh_rsa_pubkey_contents         => hiera('gerrit_ssh_rsa_pubkey_contents', 'XXX'),
     ssh_project_rsa_key_contents    => hiera('gerrit_project_ssh_rsa_key_contents', 'XXX'),
     ssh_project_rsa_pubkey_contents => hiera('gerrit_project_ssh_rsa_pubkey_contents', 'XXX'),
-    ssh_welcome_rsa_key_contents        => hiera('welcome_message_gerrit_ssh_private_key', 'XXX'),
-    ssh_welcome_rsa_pubkey_contents     => hiera('welcome_message_gerrit_ssh_public_key', 'XXX'),
+    ssh_welcome_rsa_key_contents    => hiera('welcome_message_gerrit_ssh_private_key', 'XXX'),
+    ssh_welcome_rsa_pubkey_contents => hiera('welcome_message_gerrit_ssh_public_key', 'XXX'),
     #Key for replicating to cgit servers
     #ssh_replication_rsa_key_contents    => hiera('gerrit_replication_ssh_rsa_key_contents', 'XXX'),
     #ssh_replication_rsa_pubkey_contents => hiera('gerrit_replication_ssh_rsa_pubkey_contents', 'XXX'),
@@ -82,8 +82,8 @@ node 'jenkins02.trafodion.org' {
 
 node 'puppet.trafodion.org' {
   class { 'traf::puppetmaster':
-    sysadmins => hiera('sysadmins'),
-    cloud_auto_user => hiera('cloud_auto_user'),
+    sysadmins         => hiera('sysadmins'),
+    cloud_auto_user   => hiera('cloud_auto_user'),
     cloud_auto_passwd => hiera('cloud_auto_passwd'),
   }
 }
@@ -113,9 +113,9 @@ node 'wiki2.trafodion.org' {
 
 node 'dashboard.trafodion.org' {
   class { 'traf::dashboard':
-    password        => hiera('dashboard_password'),
-    mysql_password  => hiera('dashboard_mysql_password'),
-    sysadmins       => hiera('sysadmins'),
+    password       => hiera('dashboard_password'),
+    mysql_password => hiera('dashboard_mysql_password'),
+    sysadmins      => hiera('sysadmins'),
   }
 }
 
@@ -187,10 +187,10 @@ node /^(slave|slave-cdh44-)\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    sysadmins => hiera('sysadmins'),
+    ssh_key     => $traf::jenkins_ssh_key,
+    sysadmins   => hiera('sysadmins'),
     hive_sql_pw => hiera('hive_sql_pw'),
-    distro => 'CDH4.4',
+    distro      => 'CDH4.4',
   }
 }
 
@@ -199,10 +199,10 @@ node /^slave-cdh51-\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    sysadmins => hiera('sysadmins'),
+    ssh_key     => $traf::jenkins_ssh_key,
+    sysadmins   => hiera('sysadmins'),
     hive_sql_pw => hiera('hive_sql_pw'),
-    distro => 'CDH5.1',
+    distro      => 'CDH5.1',
   }
 }
 
@@ -211,10 +211,10 @@ node /^slave-hdp13-\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    sysadmins => hiera('sysadmins'),
+    ssh_key     => $traf::jenkins_ssh_key,
+    sysadmins   => hiera('sysadmins'),
     hive_sql_pw => hiera('hive_sql_pw'),
-    distro => 'HDP1.3',
+    distro      => 'HDP1.3',
   }
 }
 
@@ -223,10 +223,10 @@ node /^slave-hdp21-\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    sysadmins => hiera('sysadmins'),
+    ssh_key     => $traf::jenkins_ssh_key,
+    sysadmins   => hiera('sysadmins'),
     hive_sql_pw => hiera('hive_sql_pw'),
-    distro => 'HDP2.1',
+    distro      => 'HDP2.1',
   }
 }
 

@@ -1,3 +1,5 @@
+# == Class: subversion
+#
 class subversion {
   package { 'subversion':
     ensure => latest,

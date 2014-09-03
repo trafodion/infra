@@ -155,7 +155,7 @@ class traf::zuul_prod(
 
   file { '/home/recheckwatch/.ssh':
     ensure  => directory,
-    mode    => '700',
+    mode    => '0700',
     owner   => 'recheckwatch',
     group   => 'recheckwatch',
     require => User['recheckwatch'],

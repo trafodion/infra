@@ -4,13 +4,13 @@ class traf::buildtest {
 
   # Build/test scripts
   file { '/usr/local/bin':
-    ensure => directory,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0755',
-    source => 'puppet:///modules/traf/buildtest',
+    ensure  => directory,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    source  => 'puppet:///modules/traf/buildtest',
     recurse => true,
-    purge => false,
+    purge   => false,
   }
 
   # install Maven
@@ -46,19 +46,19 @@ class traf::buildtest {
     # Use exec to run yum groupinstall since it is not
     # supported by the package type
     exec { 'install_Development_Tools':
-        path    => "/usr/bin:/bin:/usr/local/bin",
+        path    => '/usr/bin:/bin:/usr/local/bin',
         command => 'yum groupinstall "Development Tools"',
         onlyif  => "test `yum grouplist \"Development Tools\" | grep -A 1 \"Installed Groups:\" | grep -c \"Development tools\"` -eq 0",
     }
 
     package { $packages:
-        ensure => present,
+        ensure  => present,
         require => [ Exec['install_Development_Tools'] ]
     }
 
     # not available in latest CentOS distribution, but is in Vault repos
     package { 'qpid-cpp-client-devel':
-        ensure => present,
+        ensure  => present,
     #    install_options => '--enablerepo=C6.3-updates',
         require => Exec['enable-Vault'],
     }
@@ -74,21 +74,21 @@ class traf::buildtest {
       ensure => absent,
     }
     exec { 'set corefile pattern' :
-      command   => '/sbin/sysctl -w kernel.core_pattern=core.%h.%p.%e',
-      unless    => '/sbin/sysctl -n kernel.core_pattern | grep -q core.%h.%p.%e',
-      require   => Package['abrt'],
+      command => '/sbin/sysctl -w kernel.core_pattern=core.%h.%p.%e',
+      unless  => '/sbin/sysctl -n kernel.core_pattern | grep -q core.%h.%p.%e',
+      require => Package['abrt'],
     }
     # Turn off randomizing virtual address space
     exec { 'turn off random addr space ' :
-      command   => '/sbin/sysctl -w kernel.randomize_va_space=0',
-      provider  => shell,
-      unless    => '[[ $(/sbin/sysctl -n kernel.randomize_va_space) == "0" ]]',
+      command  => '/sbin/sysctl -w kernel.randomize_va_space=0',
+      provider => shell,
+      unless   => '[[ $(/sbin/sysctl -n kernel.randomize_va_space) == "0" ]]',
     }
     # Set allowed concurrent requests of asynchronous I/O
     exec { 'set aio-max' :
-      command   => '/sbin/sysctl -w fs.aio-max-nr=262144',
-      provider  => shell,
-      unless    => '[[ $(/sbin/sysctl -n fs.aio-max-nr) == "262144" ]]',
+      command  => '/sbin/sysctl -w fs.aio-max-nr=262144',
+      provider => shell,
+      unless   => '[[ $(/sbin/sysctl -n fs.aio-max-nr) == "262144" ]]',
     }
 
     # This top level dir holds both tar'd up build tool binaries and the untar'd tools.
@@ -124,11 +124,11 @@ class traf::buildtest {
     # Sync /opt/traf/tools directory, output gets saved so later we know which files were sync'd.
     # We only untar the files that were sync'd.  That's done in the next step.
     exec { 'rsync-build-tool-tgz' :
-      command   => "/bin/cat /dev/null > /opt/traf/rsync.out; /usr/bin/rsync -havS --log-file=/opt/traf/rsync.out --log-file-format=\"%o --- %n\" --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf",
-      user      => jenkins,
-      provider  => shell,
-      onlyif    => "/usr/bin/test `/usr/bin/rsync -haS --dry-run --itemize-changes --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf | /usr/bin/wc -l` -gt 0",
-      require   => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'] ],
+      command  => "/bin/cat /dev/null > /opt/traf/rsync.out; /usr/bin/rsync -havS --log-file=/opt/traf/rsync.out --log-file-format=\"%o --- %n\" --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf",
+      user     => jenkins,
+      provider => shell,
+      onlyif   => "/usr/bin/test `/usr/bin/rsync -haS --dry-run --itemize-changes --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf | /usr/bin/wc -l` -gt 0",
+      require  => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'] ],
     }
 
     # Un-tar the build tool tarballs, only when tarball has been updated by rsync

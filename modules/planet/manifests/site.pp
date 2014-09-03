@@ -1,3 +1,5 @@
+# == Define: planet::site
+#
 define planet::site(
   $git_url,
   $vhost_name = "planet.${name}.org"

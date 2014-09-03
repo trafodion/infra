@@ -207,13 +207,13 @@ class traf::jenkins (
   }
   # Build/test scripts - some small jobs run on jenkins master 
   file { '/usr/local/bin':
-    ensure => directory,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0755',
-    source => 'puppet:///modules/traf/buildtest',
+    ensure  => directory,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    source  => 'puppet:///modules/traf/buildtest',
     recurse => true,
-    purge => false,
+    purge   => false,
   }
   
 }

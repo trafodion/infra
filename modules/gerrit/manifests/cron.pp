@@ -12,8 +12,8 @@ class gerrit::cron {
   }
 
   cron { 'expireoldreviews':
-    ensure      => 'absent',
-    user        => 'gerrit2',
+    ensure => 'absent',
+    user   => 'gerrit2',
   }
 
   cron { 'removedbdumps':

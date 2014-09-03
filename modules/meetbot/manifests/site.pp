@@ -1,3 +1,5 @@
+# == Define: meetbot::site
+#
 define meetbot::site(
   $channels,
   $network,

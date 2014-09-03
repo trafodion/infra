@@ -65,11 +65,11 @@ class openstack_project::logstash_worker (
   }
 
   file { '/etc/logstash/jenkins-log-worker.yaml':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0555',
-    source  => 'puppet:///modules/openstack_project/logstash/jenkins-log-worker.yaml',
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/openstack_project/logstash/jenkins-log-worker.yaml',
   }
 
   file { '/etc/init.d/jenkins-log-worker':

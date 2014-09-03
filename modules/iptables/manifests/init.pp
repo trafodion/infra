@@ -35,8 +35,8 @@ class iptables(
   }
 
   file { $::iptables::params::rules_dir:
-    ensure     => directory,
-    require    => Package['iptables'],
+    ensure  => directory,
+    require => Package['iptables'],
   }
 
   # This file is not required on Red Hat distros... but it
@@ -90,7 +90,7 @@ class iptables(
 
   include logrotate
   logrotate::file { 'iptables.log':
-    log     => "${log_file}",
+    log     => $log_file,
     options => [
       'compress',
       'copytruncate',

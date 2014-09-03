@@ -61,29 +61,29 @@ class traf::wiki (
   }
 
   file { '/srv/mediawiki/w/favicon.ico':
-    ensure => present,
-    mode   => 644,
-    owner  => www-data,
-    group  => www-data,
-    source => 'puppet:///modules/traf/favicon.ico',
+    ensure  => present,
+    mode    => '0644',
+    owner   => www-data,
+    group   => www-data,
+    source  => 'puppet:///modules/traf/favicon.ico',
     require => Vcsrepo['/srv/mediawiki/w'],
   }
 
   file { '/srv/mediawiki/w/favicon.png':
-    ensure => present,
-    mode   => 644,
-    owner  => www-data,
-    group  => www-data,
-    source => 'puppet:///modules/traf/favicon.png',
+    ensure  => present,
+    mode    => '0644',
+    owner   => www-data,
+    group   => www-data,
+    source  => 'puppet:///modules/traf/favicon.png',
     require => Vcsrepo['/srv/mediawiki/w'],
   }
 
   # configure mediawiki with default except for the following
   # installdbuser, installdbpass, pass (admin password)
   exec { 'install-mediawiki':
-    cwd     => "/srv/mediawiki/w/maintenance",
-    command => "/usr/bin/php install.php --installdbuser root --installdbpass \'$mysql_root_password\' --pass \'$wiki_admin_password\' Trafodion admin",
-    creates => "/srv/mediawiki/w/LocalSettings.php",
+    cwd     => '/srv/mediawiki/w/maintenance',
+    command => "/usr/bin/php install.php --installdbuser root --installdbpass \'${mysql_root_password}\' --pass \'${wiki_admin_password}\' Trafodion admin",
+    creates => '/srv/mediawiki/w/LocalSettings.php',
     require => Vcsrepo['/srv/mediawiki/w'],
   }
 
@@ -99,13 +99,13 @@ class traf::wiki (
   }
 
   exec { 'install OpenId':
-    cwd     => "/srv/mediawiki/w/extensions/OpenID",
+    cwd     => '/srv/mediawiki/w/extensions/OpenID',
     command => "/usr/bin/git clone https://github.com/openid/php-openid.git \
                 && /bin/mv php-openid/Auth/ Auth \
                 && /bin/rm -rf php-openid \
                 && cd /srv/mediawiki/w/maintenance \
                 && /usr/bin/php update.php",
-    unless  => "/usr/bin/test -d /srv/mediawiki/w/extensions/OpenID/Auth",
+    unless  => '/usr/bin/test -d /srv/mediawiki/w/extensions/OpenID/Auth',
     require => Vcsrepo['/srv/mediawiki/w/extensions/OpenID'],
   }
 
@@ -141,7 +141,7 @@ class traf::wiki (
   # install AddMetas extension
   file { '/srv/mediawiki/w/extensions/AddMetas.php.puppet':
     ensure  => file,
-    mode    => 644,
+    mode    => '0644',
     owner   => www-data,
     group   => www-data,
     source  => 'puppet:///modules/traf/mediawiki/extensions/AddMetas.php.puppet',
@@ -149,8 +149,8 @@ class traf::wiki (
   }
 
   exec { 'update AddMetas.php':
-    cwd     => "/srv/mediawiki/w/extensions",
-    command => "/bin/cp -p /srv/mediawiki/w/extensions/AddMetas.php.puppet /srv/mediawiki/w/extensions/AddMetas.php",
+    cwd     => '/srv/mediawiki/w/extensions',
+    command => '/bin/cp -p /srv/mediawiki/w/extensions/AddMetas.php.puppet /srv/mediawiki/w/extensions/AddMetas.php',
     unless  => "/bin/grep -E '^# PUPPET ME NOT' /srv/mediawiki/w/extensions/AddMetas.php",
     require => File['/srv'],
   }
@@ -158,7 +158,7 @@ class traf::wiki (
   # update default CSS files
   file { '/srv/mediawiki/w/skins/common/commonContent.css':
     ensure  => file,
-    mode    => 644,
+    mode    => '0644',
     owner   => www-data,
     group   => www-data,
     source  => 'puppet:///modules/traf/mediawiki/skins/common/commonContent.css',
@@ -167,7 +167,7 @@ class traf::wiki (
 
   file { '/srv/mediawiki/w/skins/common/commonElements.css':
     ensure  => file,
-    mode    => 644,
+    mode    => '0644',
     owner   => www-data,
     group   => www-data,
     source  => 'puppet:///modules/traf/mediawiki/skins/common/commonElements.css',
@@ -176,7 +176,7 @@ class traf::wiki (
 
   file { '/srv/mediawiki/w/skins/vector/screen.css':
     ensure  => file,
-    mode    => 644,
+    mode    => '0644',
     owner   => www-data,
     group   => www-data,
     source  => 'puppet:///modules/traf/mediawiki/skins/vector/screen.css',
@@ -185,7 +185,7 @@ class traf::wiki (
 
   file { '/srv/mediawiki/w/skins/vector/variables.less':
     ensure  => file,
-    mode    => 644,
+    mode    => '0644',
     owner   => www-data,
     group   => www-data,
     source  => 'puppet:///modules/traf/mediawiki/skins/vector/variables.less',
@@ -195,22 +195,22 @@ class traf::wiki (
   # Fix up LocalSettings.php file and configure mediawiki plugins
   file { '/srv/mediawiki/w/LocalSettings.php':
     ensure  => file,
-    mode    => 600,
+    mode    => '0600',
     owner   => www-data,
     group   => www-data,
     require => Exec['install OpenId'],
   }
 
   file { '/srv/mediawiki/w/LocalSettings.php.pupppet':
-    mode    => 600,
+    mode    => '0600',
     owner   => www-data,
     group   => www-data,
-    content => template("traf/LocalSettings.php.erb"),
+    content => template('traf/LocalSettings.php.erb'),
   }
 
   exec { 'update LocalSettings.php':
-    cwd     => "/srv/mediawiki/w",
-    command => "/bin/cp /srv/mediawiki/w/LocalSettings.php.pupppet /srv/mediawiki/w/LocalSettings.php",
+    cwd     => '/srv/mediawiki/w',
+    command => '/bin/cp /srv/mediawiki/w/LocalSettings.php.pupppet /srv/mediawiki/w/LocalSettings.php',
     unless  => "/bin/grep -E '^# PUPPET ME NOT' /srv/mediawiki/w/LocalSettings.php",
     require => [ File['/srv/mediawiki/w/LocalSettings.php'], File['/srv/mediawiki/w/LocalSettings.php.pupppet'] ],
   }
@@ -238,7 +238,7 @@ class traf::wiki (
 
   # update apache2 security configuration
   exec { 'update security':
-    cwd     => "/etc/apache2/conf.d",
+    cwd     => '/etc/apache2/conf.d',
     command => "/bin/sed -i -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
     unless  => "/bin/grep -E '^ServerTokens Prod' security",
     notify  => Service[apache2],
@@ -247,7 +247,7 @@ class traf::wiki (
   # update apache2 configuration
   # configure MaxClients and MaxRequestsPerChild for 4GB server
   exec { 'update apache2':
-    cwd     => "/etc/apache2",
+    cwd     => '/etc/apache2',
     command => "/bin/sed -i -e 's/^    MaxClients .*/    MaxClients 75/g' -e 's/^    MaxRequestsPerChild .*/    MaxRequestsPerChild 600/g' apache2.conf",
     unless  => "/bin/grep -E '^    MaxClients 75' apache2.conf && /bin/grep -E '^    MaxRequestsPerChild 600' apache2.conf",
     notify  => Service[apache2],
@@ -255,7 +255,7 @@ class traf::wiki (
 
   # update php.ini configuration
   exec { 'update php.ini':
-    cwd     => "/etc/php5/apache2",
+    cwd     => '/etc/php5/apache2',
     command => "/bin/sed -i -e 's/^expose_php = .*/expose_php = Off/g' php.ini",
     unless  => "/bin/grep -E '^expose_php = Off' php.ini",
     notify  => Service[apache2],
@@ -268,7 +268,7 @@ class traf::wiki (
     require => Class['mysql::server'],
   }
 
-  # backup on second node 
+  # backup on second node
   #include bup
   #bup::site { 'rs-ord':
   #  backup_user   => 'bup-wiki',

@@ -25,10 +25,10 @@ class openstack_project::review_dev (
 
   # Setup MySQL
   class { 'gerrit::mysql':
-    mysql_root_password  => $mysql_root_password,
-    database_name        => 'reviewdb',
-    database_user        => 'gerrit2',
-    database_password    => $mysql_password,
+    mysql_root_password => $mysql_root_password,
+    database_name       => 'reviewdb',
+    database_user       => 'gerrit2',
+    database_password   => $mysql_password,
   }
 
   class { 'openstack_project::gerrit':
@@ -79,11 +79,11 @@ class openstack_project::review_dev (
         mirror               => true,
       },
       {
-        name                 => 'local',
-        url                  => 'file:///var/lib/git/',
-        replicationDelay     => '0',
-        threads              => '4',
-        mirror               => true,
+        name             => 'local',
+        url              => 'file:///var/lib/git/',
+        replicationDelay => '0',
+        threads          => '4',
+        mirror           => true,
       },
     ],
   }

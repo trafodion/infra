@@ -77,11 +77,11 @@ class openstack_project::logstash (
   }
 
   file { '/etc/logstash/jenkins-log-client.yaml':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0555',
-    source  => 'puppet:///modules/openstack_project/logstash/jenkins-log-client.yaml',
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0555',
+    source => 'puppet:///modules/openstack_project/logstash/jenkins-log-client.yaml',
   }
 
   file { '/etc/init.d/jenkins-log-client':

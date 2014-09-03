@@ -39,8 +39,8 @@ class openstack_project::pbx (
   )
 
   class { 'asterisk':
-    asterisk_conf_source  => 'puppet:///modules/openstack_project/pbx/asterisk/asterisk.conf',
-    modules_conf_source   => 'puppet:///modules/openstack_project/pbx/asterisk/modules.conf',
+    asterisk_conf_source => 'puppet:///modules/openstack_project/pbx/asterisk/asterisk.conf',
+    modules_conf_source  => 'puppet:///modules/openstack_project/pbx/asterisk/modules.conf',
   }
 
   file {'/etc/asterisk/sip.conf.d/sip.conf':

@@ -1,3 +1,5 @@
+# == Class: exim
+#
 class exim(
   $mailman_domains = [],
   $queue_interval = '30m',
@@ -41,12 +43,12 @@ class exim(
   }
 
   service { 'exim':
-    ensure      => running,
-    name        => $::exim::params::service_name,
-    hasrestart  => true,
-    subscribe   => [File[$::exim::params::config_file],
+    ensure     => running,
+    name       => $::exim::params::service_name,
+    hasrestart => true,
+    subscribe  => [File[$::exim::params::config_file],
                     File[$::exim::params::sysdefault_file]],
-    require     => Package[$::exim::params::package],
+    require    => Package[$::exim::params::package],
   }
 
   file { $::exim::params::config_file:

@@ -1,3 +1,5 @@
+# == Class: meetbot
+#
 class meetbot {
   include apache
 

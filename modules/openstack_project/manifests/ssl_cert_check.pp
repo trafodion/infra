@@ -7,10 +7,10 @@ class openstack_project::ssl_cert_check {
   }
 
   file { '/var/lib/certcheck/ssldomains':
-      ensure  => present,
-      owner   => 'certcheck',
-      group   => 'certcheck',
-      mode    => '0444',
-      source  => 'puppet:///modules/openstack_project/ssl_cert_check/ssldomains'
+      ensure => present,
+      owner  => 'certcheck',
+      group  => 'certcheck',
+      mode   => '0444',
+      source => 'puppet:///modules/openstack_project/ssl_cert_check/ssldomains'
   }
 }

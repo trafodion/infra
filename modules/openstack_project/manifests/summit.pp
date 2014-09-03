@@ -1,3 +1,5 @@
+# == Class: openstack_project::summit
+#
 class openstack_project::summit (
   $sysadmins = []
 ) {

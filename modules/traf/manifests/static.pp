@@ -28,11 +28,11 @@ class traf::static (
 
   # add users to jenkins ssh authorized_keys
   $jenkins_auth_users = {
-    alchen     =>  { pub_key => "$traf::users::alchen_sshkey"},
-    svarnau    =>  { pub_key => "$traf::users::svarnau_sshkey"},
-    csheedy    =>  { pub_key => "$traf::users::csheedy_sshkey"},
-    johnstac   =>  { pub_key => "$traf::users::johnstac_sshkey"},
-    sandstroms =>  { pub_key => "$traf::users::sandstroms_sshkey"},
+    alchen     =>  { pub_key => $traf::users::alchen_sshkey},
+    svarnau    =>  { pub_key => $traf::users::svarnau_sshkey},
+    csheedy    =>  { pub_key => $traf::users::csheedy_sshkey},
+    johnstac   =>  { pub_key => $traf::users::johnstac_sshkey},
+    sandstroms =>  { pub_key => $traf::users::sandstroms_sshkey},
   }
 
   create_resources(jenkins::add_pub_key, $jenkins_auth_users)
@@ -43,32 +43,32 @@ class traf::static (
   # make sure Curl and PHP is installed
   $packages = ['curl','php5','php5-cli','libapache2-mod-php5','php5-mcrypt','libapache2-mod-xsendfile','lvm2','libjs-jquery','yui-compressor']
   package { $packages:
-    ensure => present,
+    ensure  => present,
     require => Package['apache2'],
   }
 
   a2mod { 'expires':
-    ensure => present,
+    ensure  => present,
     require => Package['apache2'],
   }
   a2mod { 'headers':
-    ensure => present,
+    ensure  => present,
     require => Package['apache2'],
   }
   a2mod { 'rewrite':
-    ensure => present,
+    ensure  => present,
     require => Package['apache2'],
   }
   a2mod { 'proxy':
-    ensure => present,
+    ensure  => present,
     require => Package['apache2'],
   }
   a2mod { 'proxy_http':
-    ensure => present,
+    ensure  => present,
     require => Package['apache2'],
   }
 
-  file { "${server_path}":
+  file { $server_path:
     ensure => directory,
   }
 
@@ -78,7 +78,7 @@ class traf::static (
   apache::vhost { 'www.trafodion.org':
     port          => 80,
     priority      => '01',
-    docroot       => "${server_path}",
+    docroot       => $server_path,
     serveraliases => ['trafodion.org', 'www.trafodion.com', 'trafodion.com', '15.125.67.182'],
     template      => 'traf/www.vhost.erb',
   }
@@ -89,18 +89,18 @@ class traf::static (
   # Downloads
 
   apache::vhost { 'downloads.trafodion.org':
-    port       => 80,
-    priority   => '50',
-    docroot    => "${server_path}/downloads-www",
-    template   => 'traf/downloads/downloads.vhost.erb',
-    require    => File["${server_path}/downloads-www"],
+    port     => 80,
+    priority => '50',
+    docroot  => "${server_path}/downloads-www",
+    template => 'traf/downloads/downloads.vhost.erb',
+    require  => File["${server_path}/downloads-www"],
   }
 
   # where download site resides
   file { "${server_path}/downloads-www":
-    ensure  => directory,
-    owner   => 'www-data',
-    group   => 'www-data',
+    ensure => directory,
+    owner  => 'www-data',
+    group  => 'www-data',
   }
 
   file { "${server_path}/downloads-www/favicon.ico":
@@ -140,65 +140,65 @@ class traf::static (
   }
 
   # actual location of files to download
-  file { "$download_path":
+  file { $download_path:
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     require => User['jenkins'],
   }
 
-  file { "$download_path/trafodion":
+  file { "${download_path}/trafodion":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
     require => [
       User['jenkins'],
-      File["$download_path"],
+      File[$download_path],
     ]
   }
 
-  file { "$download_path/trafodion/pre-release":
+  file { "${download_path}/trafodion/pre-release":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
     require => [
       User['jenkins'],
-      File["$download_path/trafodion"],
+      File["${download_path}/trafodion"],
     ]
   }
 
-  file { "$download_path/trafodion/publish":
+  file { "${download_path}/trafodion/publish":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
     require => [
       User['jenkins'],
-      File["$download_path/trafodion"],
+      File["${download_path}/trafodion"],
     ]
   }
 
-  file { "$download_path/build-tools-src":
+  file { "${download_path}/build-tools-src":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
     require => [
       User['jenkins'],
-      File["$download_path"],
+      File[$download_path],
     ]
   }
 
-  file { "$download_path/build-tool-tgz":
+  file { "${download_path}/build-tool-tgz":
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
     require => [
       User['jenkins'],
-      File["$download_path"],
+      File[$download_path],
     ]
   }
 
@@ -207,10 +207,10 @@ class traf::static (
   # Maven repository
 
   apache::vhost { 'mvnrepo.trafodion.org':
-    port       => 80,
-    priority   => '50',
-    docroot    => "${server_path}/mvnrepo",
-    require    => File["${server_path}/mvnrepo"],
+    port     => 80,
+    priority => '50',
+    docroot  => "${server_path}/mvnrepo",
+    require  => File["${server_path}/mvnrepo"],
   }
 
   file { "${server_path}/mvnrepo":
@@ -301,11 +301,11 @@ class traf::static (
 
   ## os-loganalyze will replace htmlify
   file { '/usr/local/bin/htmlify-screen-log.py':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    source  => 'puppet:///modules/openstack_project/logs/htmlify-screen-log.py',
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+    source => 'puppet:///modules/openstack_project/logs/htmlify-screen-log.py',
   }
 
 #  No log help files for Trafodion.
@@ -402,11 +402,11 @@ class traf::static (
   }
 
   exec { 'get-jquery-visibility.min':
-    command     => '/usr/bin/curl https://raw.github.com/mathiasbynens/jquery-visibility/v1.0.6/jquery-visibility.min.js > /opt/jquery-visibility/jquery-visibility.min.js',
-    require     => [Package['curl'],
+    command => '/usr/bin/curl https://raw.github.com/mathiasbynens/jquery-visibility/v1.0.6/jquery-visibility.min.js > /opt/jquery-visibility/jquery-visibility.min.js',
+    require => [Package['curl'],
                     Vcsrepo['/opt/jquery-visibility']],
-    cwd         => '/opt/jquery-visibility',
-    creates     => '/opt/jquery-visibility/jquery-visibility.min.js',
+    cwd     => '/opt/jquery-visibility',
+    creates => '/opt/jquery-visibility/jquery-visibility.min.js',
   }
 
   file { "${server_path}/status/jquery-visibility.min.js":
@@ -516,24 +516,24 @@ class traf::static (
   }
 
   ###########################################################
-  # www 
+  # www
 
   file { "${server_path}/themes":
     ensure  => directory,
-    mode    => 0755,
+    mode    => '0755',
     recurse => true,
   }
 
   file { "${server_path}/themes/trafodion":
     ensure  => directory,
-    mode    => 0755,
+    mode    => '0755',
     recurse => true,
     require => File["${server_path}/themes"],
   }
 
   file { "${server_path}/themes/trafodion/images":
     ensure  => directory,
-    mode    => 0755,
+    mode    => '0755',
     recurse => true,
     source  => 'puppet:///modules/traf/images/',
     require => File["${server_path}/themes/trafodion"],
@@ -547,7 +547,7 @@ class traf::static (
 
   file { "${server_path}/themes/trafodion/css":
     ensure  => directory,
-    mode    => 0755,
+    mode    => '0755',
     recurse => true,
     require => File["${server_path}/themes/trafodion"],
   }
@@ -586,7 +586,7 @@ class traf::static (
 
   # update apache2 security configuration
   exec { 'update security':
-    cwd     => "/etc/apache2/conf.d",
+    cwd     => '/etc/apache2/conf.d',
     command => "/bin/sed -i -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
     unless  => "/bin/grep -E '^ServerTokens Prod' security",
     notify  => Service[apache2],
@@ -595,7 +595,7 @@ class traf::static (
   # update apache2 configuration
   # configure MaxClients and MaxRequestsPerChild for 4GB server
   exec { 'update apache2':
-    cwd     => "/etc/apache2",
+    cwd     => '/etc/apache2',
     command => "/bin/sed -i -e 's/^    MaxClients .*/    MaxClients 75/g' -e 's/^    MaxRequestsPerChild .*/    MaxRequestsPerChild 600/g' apache2.conf",
     unless  => "/bin/grep -E '^    MaxClients 75' apache2.conf && /bin/grep -E '^    MaxRequestsPerChild 600' apache2.conf",
     notify  => Service[apache2],
@@ -603,7 +603,7 @@ class traf::static (
 
   # update php.ini configuration
   exec { 'update php.ini':
-    cwd     => "/etc/php5/apache2",
+    cwd     => '/etc/php5/apache2',
     command => "/bin/sed -i -e 's/^expose_php = .*/expose_php = Off/g' -e 's/^engine = .*/engine = Off/g' php.ini",
     unless  => "/bin/grep -E '^expose_php = Off' php.ini && /bin/grep -E '^engine = Off' php.ini",
     notify  => Service[apache2],

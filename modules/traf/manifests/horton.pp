@@ -7,7 +7,7 @@ class traf::horton (
   $distro      = '',
 ) {
 
-  
+
   class {'mysql::server':
     config_hash =>  {
       'root_password'  => 'insecure_slave',
@@ -16,7 +16,7 @@ class traf::horton (
     }
   }
   include mysql::server::account_security
-  
+
 
   class { 'mysql::java': }
   mysql::db { 'metastore':
@@ -103,11 +103,11 @@ class traf::horton (
   }
 
   exec { 'hadoop-conf':
-    command  => '/bin/cp -r /etc/hadoop/conf.empty /etc/hadoop/conf.localtest;
+    command => '/bin/cp -r /etc/hadoop/conf.empty /etc/hadoop/conf.localtest;
       /usr/sbin/alternatives --install /etc/hadoop/conf hadoop-conf /etc/hadoop/conf.localtest 50;
       /usr/sbin/alternatives --set hadoop-conf /etc/hadoop/conf.localtest',
-    creates  => '/etc/hadoop/conf.localtest',
-    require  => Package['hadoop'],
+    creates => '/etc/hadoop/conf.localtest',
+    require => Package['hadoop'],
   }
   file { '/etc/hadoop/conf.localtest/core-site.xml':
     source  => $coresite,
@@ -130,11 +130,11 @@ class traf::horton (
   } # HDP2.1 
 
   exec { 'hbase-conf':
-    command  => '/bin/cp -r /etc/hbase/conf.dist /etc/hbase/conf.localtest;
+    command => '/bin/cp -r /etc/hbase/conf.dist /etc/hbase/conf.localtest;
       /usr/sbin/alternatives --install /etc/hbase/conf hbase-conf /etc/hbase/conf.localtest 50;
       /usr/sbin/alternatives --set hbase-conf /etc/hbase/conf.localtest',
-    creates  => '/etc/hbase/conf.localtest',
-    require  => Package['hbase'],
+    creates => '/etc/hbase/conf.localtest',
+    require => Package['hbase'],
   }
   file { '/etc/hbase/conf.localtest/hbase-site.xml':
     owner   => 'root',
@@ -151,17 +151,17 @@ class traf::horton (
     require => Package['hive'],
   }
   file { '/usr/lib/hive/lib/mysql-connector-java.jar':
+    ensure  => link,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    ensure  => link,
     target  => '/usr/share/java/mysql-connector-java.jar',
     require => [ Package['mysql-connector-java'], Package['hive'] ],
   }
 
   # Both JAVA_HOME setting methods don't conflict, so we'll do both
-  
-  # JAVA_HOME setting for HDP1 
+
+  # JAVA_HOME setting for HDP1
   exec { 'hadoop-default':
     command => '/bin/echo "export JAVA_HOME=/usr/lib/jvm/java-openjdk" >> /etc/default/hadoop',
     unless  => '/bin/grep -q JAVA_HOME /etc/default/hadoop',
@@ -176,43 +176,43 @@ class traf::horton (
     require => File['/usr/lib/bigtop-utils'],
   }
   file { '/usr/lib/bigtop-utils':
+    ensure => directory,
     owner  => 'root',
     group  => 'root',
     mode   => '0444',
-    ensure => directory,
   }
 
   # as specified in hdfs-site.xml
   file { ['/data/dfs','/data/dfs/data']:
+    ensure  => directory,
     owner   => 'hdfs',
     group   => 'hdfs',
     mode    => '0755',
-    ensure  => directory,
     require => Package['hadoop'],
   }
   file { ['/data']:
+    ensure => directory,
     owner  => 'root',
     group  => 'root',
     mode   => '0755',
-    ensure => directory,
   }
   # format name hdfs when first created
   exec { 'namenode-format':
-    command   => '/usr/bin/hadoop namenode -format -force',
-    user      => 'hdfs',
-    require   => [ File['/data/dfs'],Exec['hadoop-default'],File['/usr/lib/bigtop-utils/bigtop-detect-javahome'] ],
-    creates   => '/data/dfs/name',
+    command => '/usr/bin/hadoop namenode -format -force',
+    user    => 'hdfs',
+    require => [ File['/data/dfs'],Exec['hadoop-default'],File['/usr/lib/bigtop-utils/bigtop-detect-javahome'] ],
+    creates => '/data/dfs/name',
   }
   # HBase services are not started, since
   # Trafodion testing stops/starts them
 
   service { $hdfs_services:
-    ensure => running,
+    ensure    => running,
     subscribe => [
       File['/etc/hadoop/conf.localtest/hdfs-site.xml'],
       File['/etc/hadoop/conf.localtest/core-site.xml'],
     ],
-    require => [
+    require   => [
       Exec['namenode-format'],
     ],
   }
@@ -279,8 +279,8 @@ class traf::horton (
     command =>
           '/usr/lib/zookeeper/bin/zkServer.sh start /etc/zookeeper/conf/zoo.cfg',
     user    => 'zookeeper',
-    creates  => $zoopidfile,
-    require  => [Package['zookeeper-server'],Group['zookeeper'] ]
+    creates => $zoopidfile,
+    require => [Package['zookeeper-server'],Group['zookeeper'] ]
   }
   group { 'zookeeper':
     ensure  => present,

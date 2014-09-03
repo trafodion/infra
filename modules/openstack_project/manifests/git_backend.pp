@@ -48,11 +48,11 @@ class openstack_project::git_backend (
   $ssh_project_key = ''
 
   file { '/etc/cgitrc':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    source  => 'puppet:///modules/openstack_project/git/cgitrc'
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+    source => 'puppet:///modules/openstack_project/git/cgitrc'
   }
 
   file { '/home/cgit/.ssh/':
@@ -128,10 +128,10 @@ class openstack_project::git_backend (
   }
 
   file { '/usr/local/bin/commit-filter.sh':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    source  => 'puppet:///modules/openstack_project/git/commit-filter.sh',
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+    source => 'puppet:///modules/openstack_project/git/commit-filter.sh',
   }
 }

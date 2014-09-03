@@ -124,11 +124,11 @@ class openstack_project::static (
 
   # NOTE(sdague): soon to be deprecated
   file { '/usr/local/bin/htmlify-screen-log.py':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    source  => 'puppet:///modules/openstack_project/logs/htmlify-screen-log.py',
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+    source => 'puppet:///modules/openstack_project/logs/htmlify-screen-log.py',
   }
 
   file { '/srv/static/logs/help':

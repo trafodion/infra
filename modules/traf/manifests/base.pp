@@ -102,9 +102,9 @@ class traf::base(
   }
 
   exec { 'disable TCP timestamp responses':
-    command   => '/sbin/sysctl -w net.ipv4.tcp_timestamps=0',
-    provider  => shell,
-    unless    => 'if [ $(/sbin/sysctl -n net.ipv4.tcp_timestamps) = "0" ]; then exit 0; else exit 1; fi',
+    command  => '/sbin/sysctl -w net.ipv4.tcp_timestamps=0',
+    provider => shell,
+    unless   => 'if [ $(/sbin/sysctl -n net.ipv4.tcp_timestamps) = "0" ]; then exit 0; else exit 1; fi',
   }
 
 }

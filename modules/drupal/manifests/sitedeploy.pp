@@ -55,11 +55,11 @@ define drupal::sitedeploy (
   }
 
   exec { "drupal-deploy-${site_name}":
-    path        => '/usr/bin:/bin:/usr/local/sbin',
-    command     => "drupal-site-deploy.sh -in /etc/drupal_site/${site_name}.config",
-    creates     => $site_deploy_flagfile,
-    timeout     => $site_deploy_timeout,
-    require     => [ File["/etc/drupal_site/${site_name}.config"],
+    path    => '/usr/bin:/bin:/usr/local/sbin',
+    command => "drupal-site-deploy.sh -in /etc/drupal_site/${site_name}.config",
+    creates => $site_deploy_flagfile,
+    timeout => $site_deploy_timeout,
+    require => [ File["/etc/drupal_site/${site_name}.config"],
       File['/usr/local/sbin/drupal-site-deploy.sh'] ],
   }
 

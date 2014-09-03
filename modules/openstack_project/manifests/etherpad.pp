@@ -1,3 +1,5 @@
+# == Class: openstack_project::etherpad
+#
 class openstack_project::etherpad (
   $mysql_password,
   $ssl_cert_file_contents = '',

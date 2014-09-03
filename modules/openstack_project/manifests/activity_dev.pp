@@ -29,10 +29,10 @@ class openstack_project::activity_dev (
   }
 
   apache::vhost {'activity-dev.openstack.org':
-    port         => 80,
-    priority     => '50',
-    docroot      => '/srv/static/dash',
-    require      => File['/srv/static/dash'],
+    port     => 80,
+    priority => '50',
+    docroot  => '/srv/static/dash',
+    require  => File['/srv/static/dash'],
   }
 
   file { '/srv/static/dash':
@@ -47,10 +47,10 @@ class openstack_project::activity_dev (
   }
 
   file { '/srv/static':
-    ensure  => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
   }
 
 }

@@ -6,7 +6,7 @@ class traf::cloudera (
   $hive_sql_pw = '',
   $distro      = '',
 ) {
-  
+
 
   class {'mysql::server':
     config_hash =>  {
@@ -16,7 +16,7 @@ class traf::cloudera (
     }
   }
   include mysql::server::account_security
-  
+
 
   class { 'mysql::java': }
   mysql::db { 'metastore':
@@ -35,9 +35,9 @@ class traf::cloudera (
 
   # Trafodion configuration for Hive
   file { '/etc/SQSystemDefaults.conf':
-    owner => 'root',
-    group => 'root',
-    mode  => '0644',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     content => template('traf/SQSystemDefaults.conf.erb'),
   }
 
@@ -80,109 +80,109 @@ class traf::cloudera (
 
   } # if CDH5.1
 
-  file { "/etc/yum.repos.d/$repofile":
-    owner => 'root',
-    group => 'root',
-    mode  => '0644',
-    source => "puppet:///modules/traf/hadoop/$repofile",
+  file { "/etc/yum.repos.d/${repofile}":
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+    source => "puppet:///modules/traf/hadoop/${repofile}",
   }
   exec { 'cloudera rpm' :
-    command   => "/bin/rpm --import $repokey",
-    unless    => "/bin/rpm -qa gpg-pubkey* | grep -q $keyver",
-    require   => File["/etc/yum.repos.d/$repofile"],
+    command => "/bin/rpm --import ${repokey}",
+    unless  => "/bin/rpm -qa gpg-pubkey* | grep -q ${keyver}",
+    require => File["/etc/yum.repos.d/${repofile}"],
   }
 
   package { $packages:
-    ensure => present,
+    ensure  => present,
     require => Exec['cloudera rpm'],
   }
 
   exec { 'hadoop-conf':
-    command  => '/bin/cp -r /etc/hadoop/conf.dist /etc/hadoop/conf.localtest;
+    command => '/bin/cp -r /etc/hadoop/conf.dist /etc/hadoop/conf.localtest;
       /usr/sbin/alternatives --install /etc/hadoop/conf hadoop-conf /etc/hadoop/conf.localtest 50;
       /usr/sbin/alternatives --set hadoop-conf /etc/hadoop/conf.localtest',
-    creates  => '/etc/hadoop/conf.localtest',
-    require  => Package['hadoop'],
+    creates => '/etc/hadoop/conf.localtest',
+    require => Package['hadoop'],
   }
   file { '/etc/hadoop/conf.localtest/core-site.xml':
-    source => 'puppet:///modules/traf/hadoop/core-site.xml',
+    source  => 'puppet:///modules/traf/hadoop/core-site.xml',
     require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/hdfs-site.xml':
-    source => 'puppet:///modules/traf/hadoop/hdfs-site.xml',
+    source  => 'puppet:///modules/traf/hadoop/hdfs-site.xml',
     require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/mapred-site.xml':
-    source => 'puppet:///modules/traf/hadoop/mapred-site.xml',
+    source  => 'puppet:///modules/traf/hadoop/mapred-site.xml',
     require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/yarn-site.xml':
-    source => "puppet:///modules/traf/hadoop/$yarnsite",
+    source  => "puppet:///modules/traf/hadoop/${yarnsite}",
     require => Exec['hadoop-conf'],
   }
 
   exec { 'hbase-conf':
-    command  => '/bin/cp -r /etc/hbase/conf.dist /etc/hbase/conf.localtest;
+    command => '/bin/cp -r /etc/hbase/conf.dist /etc/hbase/conf.localtest;
       /usr/sbin/alternatives --install /etc/hbase/conf hbase-conf /etc/hbase/conf.localtest 50;
       /usr/sbin/alternatives --set hbase-conf /etc/hbase/conf.localtest',
-    creates  => '/etc/hbase/conf.localtest',
-    require  => Package['hbase'],
+    creates => '/etc/hbase/conf.localtest',
+    require => Package['hbase'],
   }
   file { '/etc/hbase/conf.localtest/hbase-site.xml':
-    owner => 'root',
-    group => 'root',
-    mode  => '0644',
-    source => 'puppet:///modules/traf/hadoop/hbase-site.xml',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    source  => 'puppet:///modules/traf/hadoop/hbase-site.xml',
     require => Exec['hbase-conf'],
   }
   file { '/etc/hive/conf/hive-site.xml':
-    owner => 'root',
-    group => 'root',
-    mode  => '0644',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     content => template('traf/hive-site.xml.erb'),
     require => Package['hive'],
   }
   file { '/usr/lib/hive/lib/mysql-connector-java.jar':
-    owner => 'root',
-    group => 'root',
-    mode  => '0644',
     ensure  => link,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     target  => '/usr/share/java/mysql-connector-java.jar',
     require => [ Package['mysql-connector-java'], Package['hive'] ],
   }
   # No longer needed -- make it absent after HBase on HDFS change is fully propagated
   file { ['/var/hbase']:
-    ensure => absent,
+    ensure  => absent,
     recurse => true,
-    force => true,
+    force   => true,
   }
 
   # as specified in hdfs-site.xml
   file { ['/data/dfs','/data/dfs/data']:
-    owner => 'hdfs',
-    group => 'hdfs',
-    mode  => '0770',
-    ensure => directory,
+    ensure  => directory,
+    owner   => 'hdfs',
+    group   => 'hdfs',
+    mode    => '0770',
     require => Package['hadoop-hdfs'],
   }
   file { ['/data']:
-    owner => 'root',
-    group => 'root',
-    mode  => '0755',
     ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
   }
   # format name hdfs when first created
   exec { 'namenode-format':
-    command   => '/usr/bin/hdfs namenode -format -force',
-    user      => 'hdfs',
-    require   => File['/data/dfs'],
-    creates  => '/data/dfs/name',
+    command => '/usr/bin/hdfs namenode -format -force',
+    user    => 'hdfs',
+    require => File['/data/dfs'],
+    creates => '/data/dfs/name',
   }
   file { ['/var/log/hadoop-yarn','/var/log/hadoop-yarn/containers','/var/log/hadoop-yarn/apps']:
-    owner => 'yarn',
-    group => 'yarn',
-    mode  => '0755',
-    ensure => directory,
+    ensure  => directory,
+    owner   => 'yarn',
+    group   => 'yarn',
+    mode    => '0755',
     require => Package['hadoop-yarn'],
   }
   $hdfs_services = ['hadoop-hdfs-datanode','hadoop-hdfs-namenode']
@@ -191,22 +191,22 @@ class traf::cloudera (
   # Trafodion testing stops/starts them
 
   service { $hdfs_services:
-    ensure => running,
+    ensure    => running,
     subscribe => [
       File['/etc/hadoop/conf.localtest/hdfs-site.xml'],
       File['/etc/hadoop/conf.localtest/core-site.xml'],
     ],
-    require => [
+    require   => [
       Exec['namenode-format'],
     ],
   }
   service { $yarn_services:
-    ensure => running,
+    ensure    => running,
     subscribe => [
       File['/etc/hadoop/conf.localtest/yarn-site.xml'],
       File['/etc/hadoop/conf.localtest/mapred-site.xml'],
     ],
-    require => [
+    require   => [
       Exec['hdfs-tmp'],
       Exec['hdfs-userhist'],
       Exec['hdfs-yarnlog'],
@@ -221,7 +221,7 @@ class traf::cloudera (
   # /user is specified in yarn-site.xml
   exec { 'hdfs-userhist':
     command =>
-      '/usr/bin/hadoop fs -mkdir -p /user/history 
+      '/usr/bin/hadoop fs -mkdir -p /user/history
        /usr/bin/hadoop fs -chmod 1777 /user/history
 	   /usr/bin/hadoop fs -chown yarn /user/history',
     unless  => '/usr/bin/hadoop fs -ls -d /user/history',
@@ -281,9 +281,9 @@ class traf::cloudera (
 
 
   exec { 'zookeeper-init':
-    command  => '/sbin/service zookeeper-server init',
-    creates  => '/var/lib/zookeeper/version-2',
-    require  => Package['zookeeper-server'],
+    command => '/sbin/service zookeeper-server init',
+    creates => '/var/lib/zookeeper/version-2',
+    require => Package['zookeeper-server'],
   }
 }
 

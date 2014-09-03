@@ -132,7 +132,7 @@ class zuul (
       File['/etc/zuul'],
       User['zuul'],
     ],
-    notify => Exec['zuul-reload'],
+    notify  => Exec['zuul-reload'],
   }
 
   file { '/etc/default/zuul':
@@ -162,9 +162,9 @@ class zuul (
   }
 
   file { '/var/lib/zuul':
-    ensure  => directory,
-    owner   => 'zuul',
-    group   => 'zuul',
+    ensure => directory,
+    owner  => 'zuul',
+    group  => 'zuul',
   }
 
   file { '/var/lib/zuul/git':
