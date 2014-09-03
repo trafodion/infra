@@ -51,18 +51,18 @@ define drupal::distbuild (
   exec { 'drupal-build-dist':
     path      => '/usr/bin:/bin',
     timeout   => 900,
-    cwd       => "${site_sandbox_root}/${$site_build_repo_name}",
+    cwd       => "${site_sandbox_root}/${site_build_repo_name}",
     command   => "rm -rf ${site_staging_root}/${site_staging_tarball} && drush make --tar ${site_makefile} ${site_staging_root}/${site_staging_tarball}",
-    unless    => "diff ${site_sandbox_root}/${$site_build_repo_name}/.git/refs/heads/master ${site_build_flagfile}",
+    unless    => "diff ${site_sandbox_root}/${site_build_repo_name}/.git/refs/heads/master ${site_build_flagfile}",
     require   => File[$site_staging_root],
-    subscribe => Vcsrepo["${site_sandbox_root}/${$site_build_repo_name}"],
+    subscribe => Vcsrepo["${site_sandbox_root}/${site_build_repo_name}"],
   }
 
   exec { 'drupal-build-dist-post':
     path      => '/usr/bin:/bin',
-    command   => "cp ${site_sandbox_root}/${$site_build_repo_name}/.git/refs/heads/master ${site_build_flagfile} && rm -rf ${site_deploy_flagfile}",
-    unless    => "diff ${site_sandbox_root}/${$site_build_repo_name}/.git/refs/heads/master ${site_build_flagfile}",
-    subscribe => Vcsrepo["${site_sandbox_root}/${$site_build_repo_name}"],
+    command   => "cp ${site_sandbox_root}/${site_build_repo_name}/.git/refs/heads/master ${site_build_flagfile} && rm -rf ${site_deploy_flagfile}",
+    unless    => "diff ${site_sandbox_root}/${site_build_repo_name}/.git/refs/heads/master ${site_build_flagfile}",
+    subscribe => Vcsrepo["${site_sandbox_root}/${site_build_repo_name}"],
     require   => Exec['drupal-build-dist'],
   }
 }

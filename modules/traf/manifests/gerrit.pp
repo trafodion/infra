@@ -11,8 +11,8 @@ class traf::gerrit (
   $serveradmin = 'trafodion-infrastructure@lists.launchpad.net',
   $ssh_host_key = '/home/gerrit2/review_site/etc/ssh_host_rsa_key',
   $ssh_project_key = '/home/gerrit2/review_site/etc/ssh_project_rsa_key',
-  $ssl_cert_file = '/etc/ssl/certs/${::fqdn}.pem',
-  $ssl_key_file = '/etc/ssl/private/${::fqdn}.key',
+  $ssl_cert_file = "/etc/ssl/certs/${::fqdn}.pem",
+  $ssl_key_file = "/etc/ssl/private/${::fqdn}.key",
   $ssl_chain_file = '/etc/ssl/certs/intermediate.pem',
   $ssl_cert_file_contents = '',
   $ssl_key_file_contents = '',
@@ -140,7 +140,7 @@ class traf::gerrit (
       {
         name  => 'testresult',
         match => '<li>([^ ]+) <a href=\"[^\"]+\" target=\"_blank\">([^<]+)</a> : ([^ ]+)([^<]*)</li>',
-	html  => '<li class=\"comment_test\"><span class=\"comment_test_name\"><a href=\"$2\">$1</a></span> <span class=\"comment_test_result\"><span class=\"result_$3\">$3</span>$4</span></li>',
+        html  => '<li class=\"comment_test\"><span class=\"comment_test_name\"><a href=\"$2\">$1</a></span> <span class=\"comment_test_result\"><span class=\"result_$3\">$3</span>$4</span></li>',
       },
       {
         name  => 'launchpadbug',
@@ -154,8 +154,8 @@ class traf::gerrit (
       },
       {
         name  => 'gitsha',
-	match => '(<p>|[\\s(])([0-9a-f]{40})(</p>|[\\s.,;:)])',
-	html  => '$1<a href=\"#q,$2,n,z\">$2</a>$3',
+        match => '(<p>|[\\s(])([0-9a-f]{40})(</p>|[\\s.,;:)])',
+        html  => '$1<a href=\"#q,$2,n,z\">$2</a>$3',
       },
     ],
     war                             => $war,
@@ -382,21 +382,21 @@ class traf::gerrit (
     }
 
     if ($testmode == false) {
-     exec { 'manage_projects':
-      command     => '/usr/local/bin/manage-projects',
-      timeout     => 900, # 15 minutes
-      subscribe   => [
+      exec { 'manage_projects':
+        command     => '/usr/local/bin/manage-projects',
+        timeout     => 900, # 15 minutes
+        subscribe   => [
           File['/home/gerrit2/projects.yaml'],
           File['/home/gerrit2/acls'],
         ],
-      refreshonly => true,
-      logoutput   => true,
-      require     => [
+        refreshonly => true,
+        logoutput   => true,
+        require     => [
           File['/home/gerrit2/projects.yaml'],
           File['/home/gerrit2/acls'],
           Class['jeepyb'],
         ],
-     }
+      }
     }
   }
   # Retained just in case we ever ned to change contributor agreement

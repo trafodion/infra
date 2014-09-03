@@ -75,7 +75,7 @@ class traf::dashboard(
     require => Class['::dashboard'],
   }
 
-  cron { 'purge-dashboard-db': 
+  cron { 'purge-dashboard-db':
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin',
     command     => 'bash /usr/share/puppet-dashboard/bin/purgeDashboardDB.sh',
     user        => 'root',

@@ -5,7 +5,7 @@ class traf::jenkins (
   $port = 80,
   $ssl_port = 443,
   $jenkins_jobs_password = '',
-  $jenkins_jobs_username = 'JJB', 
+  $jenkins_jobs_username = 'JJB',
   $manage_jenkins_jobs = true,
   $ssl_cert_file_contents = '',
   $ssl_key_file_contents = '',

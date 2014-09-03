@@ -177,11 +177,13 @@ class traf::python276 {
       environment => "PYTHONHOME=/usr/local",
       command     => "pip uninstall -y pep8; pip install pep8==1.4.5",
       unless      => "pip freeze | grep 'pep8==1.4.5'",
-      require     => [ Exec['pip_install_virtualenv'], Exec['pip_install_flake8'], 
-                       Exec['pip_install_pyflakes'], Exec['pip_install_python-subunit'], 
-                       Exec['pip_install_testrepository'], Exec['pip_install_pep8'],
-                       Exec['pip_install_tox'], Exec['pip_install_junitxml'],
-                       Exec['pip_install_pythonodbc'] ],
+      require     => [
+        Exec['pip_install_virtualenv'], Exec['pip_install_flake8'],
+        Exec['pip_install_pyflakes'], Exec['pip_install_python-subunit'],
+        Exec['pip_install_testrepository'], Exec['pip_install_pep8'],
+        Exec['pip_install_tox'], Exec['pip_install_junitxml'],
+        Exec['pip_install_pythonodbc']
+      ],
   }
 
   exec { 'check_tox_version' :
@@ -189,11 +191,13 @@ class traf::python276 {
       environment => "PYTHONHOME=/usr/local",
       command     => "pip uninstall -y tox; pip install tox==1.6.1",
       unless      => "pip freeze | grep 'tox==1.6.1'",
-      require     => [ Exec['pip_install_virtualenv'], Exec['pip_install_flake8'], 
-                       Exec['pip_install_pyflakes'], Exec['pip_install_python-subunit'], 
-                       Exec['pip_install_testrepository'], Exec['pip_install_pep8'],
-                       Exec['pip_install_tox'], Exec['pip_install_junitxml'],
-                       Exec['pip_install_pythonodbc'] ],
+      require     => [
+        Exec['pip_install_virtualenv'], Exec['pip_install_flake8'],
+        Exec['pip_install_pyflakes'], Exec['pip_install_python-subunit'],
+        Exec['pip_install_testrepository'], Exec['pip_install_pep8'],
+        Exec['pip_install_tox'], Exec['pip_install_junitxml'],
+        Exec['pip_install_pythonodbc']
+      ],
   }
 
   # copy missing file subunit2csv to /usr/local/bin

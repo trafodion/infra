@@ -71,73 +71,73 @@ class traf::buildtest {
 
     # Remove bug reporting tool, so we can specify core file pattern
     package {['abrt-cli','abrt-addon-python','abrt-addon-ccpp','abrt-addon-kerneloops','abrt',] :
-        ensure => absent,
+      ensure => absent,
     }
     exec { 'set corefile pattern' :
-        command   => '/sbin/sysctl -w kernel.core_pattern=core.%h.%p.%e',
-	    unless    => '/sbin/sysctl -n kernel.core_pattern | grep -q core.%h.%p.%e',
-	    require   => Package['abrt'],
+      command   => '/sbin/sysctl -w kernel.core_pattern=core.%h.%p.%e',
+      unless    => '/sbin/sysctl -n kernel.core_pattern | grep -q core.%h.%p.%e',
+      require   => Package['abrt'],
     }
     # Turn off randomizing virtual address space
     exec { 'turn off random addr space ' :
-        command   => '/sbin/sysctl -w kernel.randomize_va_space=0',
-	    provider  => shell,
-	    unless    => '[[ $(/sbin/sysctl -n kernel.randomize_va_space) == "0" ]]',
+      command   => '/sbin/sysctl -w kernel.randomize_va_space=0',
+      provider  => shell,
+      unless    => '[[ $(/sbin/sysctl -n kernel.randomize_va_space) == "0" ]]',
     }
     # Set allowed concurrent requests of asynchronous I/O
     exec { 'set aio-max' :
-        command   => '/sbin/sysctl -w fs.aio-max-nr=262144',
-	    provider  => shell,
-	    unless    => '[[ $(/sbin/sysctl -n fs.aio-max-nr) == "262144" ]]',
+      command   => '/sbin/sysctl -w fs.aio-max-nr=262144',
+      provider  => shell,
+      unless    => '[[ $(/sbin/sysctl -n fs.aio-max-nr) == "262144" ]]',
     }
 
     # This top level dir holds both tar'd up build tool binaries and the untar'd tools.
     # Jenkins write rsync output to this dir.
     file { '/opt/traf' :
-       ensure => directory,
-       owner  => 'jenkins',
-       group  => 'jenkins',
-       mode   => '0755',
+      ensure => directory,
+      owner  => 'jenkins',
+      group  => 'jenkins',
+      mode   => '0755',
     }
 
     # This dir contains the tarballs of the build tool binaries.  Jenkins user 
     # needs to write to this directory to sync the build tools. Do not ensure 
     # mode since the mode of this directory is inherited from rsync
     file { '/opt/traf/build-tool-tgz' :
-       ensure  => directory,
-       owner   => 'jenkins',
-       group   => 'jenkins',
-       require => File['/opt/traf'],
+      ensure  => directory,
+      owner   => 'jenkins',
+      group   => 'jenkins',
+      require => File['/opt/traf'],
     }
 
     # This dir contains the tools that are used to build Trafodion.
     # We only want root to be able to update this directory.
     file { '/opt/traf/tools' :
-       ensure  => directory,
-       owner   => 'root',
-       group   => 'root',
-       mode    => '0755',
-       require => File['/opt/traf'],
+      ensure  => directory,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0755',
+      require => File['/opt/traf'],
     }
 
     # Zero out output file then rsync
     # Sync /opt/traf/tools directory, output gets saved so later we know which files were sync'd.
     # We only untar the files that were sync'd.  That's done in the next step.
-    exec { 'rsync-build-tool-tgz' : 
-        command   => "/bin/cat /dev/null > /opt/traf/rsync.out; /usr/bin/rsync -havS --log-file=/opt/traf/rsync.out --log-file-format=\"%o --- %n\" --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf", 
-        user      => jenkins, 
-        provider  => shell, 
-        onlyif    => "/usr/bin/test `/usr/bin/rsync -haS --dry-run --itemize-changes --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf | /usr/bin/wc -l` -gt 0", 
-        require   => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'] ],
+    exec { 'rsync-build-tool-tgz' :
+      command   => "/bin/cat /dev/null > /opt/traf/rsync.out; /usr/bin/rsync -havS --log-file=/opt/traf/rsync.out --log-file-format=\"%o --- %n\" --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf",
+      user      => jenkins,
+      provider  => shell,
+      onlyif    => "/usr/bin/test `/usr/bin/rsync -haS --dry-run --itemize-changes --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf | /usr/bin/wc -l` -gt 0",
+      require   => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'] ],
     }
 
     # Un-tar the build tool tarballs, only when tarball has been updated by rsync
-    exec { 'untar-build-tool-tgz' : 
-        command     => '/usr/local/bin/untar_updated_tools.pl -d /opt/traf -f /opt/traf/rsync.out', 
-        user        => root, 
-        provider    => shell, 
-        refreshonly => true, 
-        subscribe   => Exec['rsync-build-tool-tgz'],
+    exec { 'untar-build-tool-tgz' :
+      command     => '/usr/local/bin/untar_updated_tools.pl -d /opt/traf -f /opt/traf/rsync.out',
+      user        => root,
+      provider    => shell,
+      refreshonly => true,
+      subscribe   => Exec['rsync-build-tool-tgz'],
     }
   }
 }

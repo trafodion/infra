@@ -145,7 +145,7 @@ class traf::review (
         name                 => 'github',
         url                  => 'git@github.com:',
         authGroup            => 'Anonymous Users',
-	replicationDelay     => '1',
+        replicationDelay     => '1',
         replicatePermissions => false,
         mirror               => true,
       },

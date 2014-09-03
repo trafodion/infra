@@ -152,9 +152,10 @@ class traf::static (
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
-    require => [ User['jenkins'],
-                 File["$download_path"],
-               ]
+    require => [
+      User['jenkins'],
+      File["$download_path"],
+    ]
   }
 
   file { "$download_path/trafodion/pre-release":
@@ -162,9 +163,10 @@ class traf::static (
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
-    require => [ User['jenkins'],
-                 File["$download_path/trafodion"],
-               ]
+    require => [
+      User['jenkins'],
+      File["$download_path/trafodion"],
+    ]
   }
 
   file { "$download_path/trafodion/publish":
@@ -172,9 +174,10 @@ class traf::static (
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
-    require => [ User['jenkins'],
-                 File["$download_path/trafodion"],
-               ]
+    require => [
+      User['jenkins'],
+      File["$download_path/trafodion"],
+    ]
   }
 
   file { "$download_path/build-tools-src":
@@ -182,9 +185,10 @@ class traf::static (
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
-    require => [ User['jenkins'],
-                 File["$download_path"],
-               ]
+    require => [
+      User['jenkins'],
+      File["$download_path"],
+    ]
   }
 
   file { "$download_path/build-tool-tgz":
@@ -192,9 +196,10 @@ class traf::static (
     owner   => 'jenkins',
     group   => 'jenkins',
     mode    => '0775',
-    require => [ User['jenkins'],
-                 File["$download_path"],
-               ]
+    require => [
+      User['jenkins'],
+      File["$download_path"],
+    ]
   }
 
 
