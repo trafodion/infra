@@ -221,11 +221,12 @@ class traf::wiki (
     owner   => www-data,
     group   => www-data,
     notify  => Service[apache2],
-    require => [ Exec['install OpenId'],
-                 File['/srv/mediawiki/w/extensions/MiniMp3'],
-                 Vcsrepo['/srv/mediawiki/w/extensions/CustomNavBlocks'],
-                 Vcsrepo['/srv/mediawiki/w/extensions/UploadLocal'],
-               ]
+    require => [
+      Exec['install OpenId'], 
+      File['/srv/mediawiki/w/extensions/MiniMp3'], 
+      Vcsrepo['/srv/mediawiki/w/extensions/CustomNavBlocks'], 
+      Vcsrepo['/srv/mediawiki/w/extensions/UploadLocal'],
+    ]
   }
 
   file { '/srv/mediawiki/w/mw-config':
