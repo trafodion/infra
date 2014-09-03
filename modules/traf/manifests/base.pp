@@ -47,9 +47,13 @@ class traf::base(
 
   }
 
-  package { 'rake':
-    ensure   => latest,
-    provider => 'gem',
+  # this package will be skipped on dashboard host
+  # since puppet dashboard package includes rake
+  if ($::hostname != 'dashboard') {
+    package { 'rake':
+      ensure   => latest,
+      provider => 'gem',
+    }
   }
 
   package { $::traf::params::packages:
