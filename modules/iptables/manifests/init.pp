@@ -85,7 +85,7 @@ class iptables(
     owner   => 'root',
     group   => 'root',
     content => template('iptables/iptables.conf.erb'),
-    notify  => Service['rsyslog']
+    notify  => Service['rsyslog'],
   }
 
   include logrotate
@@ -100,5 +100,19 @@ class iptables(
       'notifempty',
     ],
     require => [ Service['iptables'], File['/etc/rsyslog.d/iptables.conf'] ],
+  }
+
+  file { '/etc/modprobe.d/xt_recent.conf':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    content => 'options xt_recent ip_list_tot=500 ip_pkt_list_tot=150',
+    notify  => Exec['reload xt_recent'],
+  }
+
+  exec { 'reload xt_recent':
+    command     => '/sbin/modprobe -r xt_recent; /sbin/modprobe xt_recent',
+    refreshonly => true,
+    notify      => Service['iptables'],
   }
 }
