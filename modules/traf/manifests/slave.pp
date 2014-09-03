@@ -29,6 +29,19 @@ class traf::slave (
     python3      => $python3,
     include_pypy => $include_pypy,
   }
+
+  # install rake and puppetlabs_spec_helper from ruby gems
+  # so puppet-lint can run on the slaves
+  package { 'rake':
+    ensure   => latest,
+    provider => 'gem',
+  }
+
+  package { 'puppetlabs_spec_helper':
+    ensure   => latest,
+    provider => 'gem',
+  }
+
   file { '/etc/sudoers.d/jenkins-sudo-hbase':
     ensure => present,
     source => 'puppet:///modules/traf/jenkins/jenkins-sudo-hbase.sudo',
