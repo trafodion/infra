@@ -54,6 +54,10 @@ class traf::base(
       ensure   => latest,
       provider => 'gem',
     }
+    package { 'puppetlabs_spec_helper':
+      ensure   => latest,
+      provider => 'gem',
+    }
   }
 
   package { $::traf::params::packages:
