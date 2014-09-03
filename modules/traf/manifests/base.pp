@@ -47,9 +47,13 @@ class traf::base(
 
   }
 
-  package { 'rake':
-    ensure   => latest,
-    provider => 'gem',
+  # this package will be installed on jenkins or slave machines
+  if (($::hostname =~ /^jenkins.*$/)
+      or ($::hostname =~ /^slave.*$/)) {
+    package { 'rake':
+      ensure   => latest,
+      provider => 'gem',
+    }
   }
 
   package { $::traf::params::packages:
