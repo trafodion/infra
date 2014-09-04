@@ -3,7 +3,9 @@
 class jeepyb (
   $git_source_repo = 'https://github.com/trafodion/jeepyb',
 ) {
-  include mysql::python
+  class { 'mysql::bindings':
+    python_enable => true,
+  }
 
   if ! defined(Package['python-paramiko']) {
     package { 'python-paramiko':
@@ -48,7 +50,7 @@ class jeepyb (
     command     => 'pip install /opt/jeepyb',
     path        => '/usr/local/bin:/usr/bin:/bin/',
     refreshonly => true,
-    require     => Class['mysql::python'],
+    require     => Class['mysql::bindings'],
     subscribe   => Vcsrepo['/opt/jeepyb'],
     logoutput   => true,
   }
