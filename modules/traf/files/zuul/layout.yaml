@@ -224,7 +224,7 @@ jobs:
   - name: pyodbc_test-experimental
     voting: false
   - name: gate-infra-puppet-lint
-    voting: false
+    voting: true
 
 projects:
   - name: trafodion/sandbox
