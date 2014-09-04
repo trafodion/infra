@@ -201,6 +201,10 @@
             - target: 'logs/$LOG_PATH'
               source: 'trafodion/core/Make.log'
               copy-after-failure: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/**/*build*log'
+              copy-after-failure: true
+              keep-hierarchy: true
 
 - publisher:
     name: traf-regress-log
