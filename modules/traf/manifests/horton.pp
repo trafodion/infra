@@ -9,16 +9,21 @@ class traf::horton (
 
 
   class {'mysql::server':
-    config_hash =>  {
-      'root_password'  => 'insecure_slave',
-      'default_engine' => 'MyISAM',
-      'bind_address'   => '127.0.0.1',
+    root_password    => 'insecure_slave',
+    override_options =>  {
+      'mysqld' => {
+        'default_engine' => 'MyISAM',
+        'bind_address'   => '127.0.0.1',
+      }
     }
   }
   include mysql::server::account_security
 
 
-  class { 'mysql::java': }
+  class { 'mysql::bindings':
+    java_enable  => true,
+  }
+
   mysql::db { 'metastore':
     user     => 'hive',
     charset  => 'latin1',

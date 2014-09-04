@@ -8,10 +8,12 @@ class gerrit::mysql(
 ) {
 
   class { 'mysql::server':
-    config_hash => {
-      'root_password'  => $mysql_root_password,
-      'default_engine' => 'InnoDB',
-      'bind_address'   => '127.0.0.1',
+    root_password    => $mysql_root_password,
+    override_options => {
+      'mysqld' => {
+        'default_engine' => 'InnoDB',
+        'bind_address'   => '127.0.0.1',
+      }
     }
   }
   include mysql::server::account_security
@@ -20,7 +22,7 @@ class gerrit::mysql(
     user     => $database_user,
     password => $database_password,
     host     => 'localhost',
-    grant    => ['all'],
+    grant    => ['ALL'],
     charset  => 'latin1',
     require  => [
       Class['mysql::server'],
