@@ -43,7 +43,7 @@ class traf::cloudera (
 
 
   # packages needed for a stand-alone node
-  $packages = [
+  $common_pkg = [
     'hadoop',
     'hadoop-hdfs',
     'hadoop-hdfs-namenode',
@@ -68,6 +68,7 @@ class traf::cloudera (
     $repokey  = 'http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
     $keyver   = 'gpg-pubkey-e8f86acd-4a418045'
     $yarnsite = 'yarn-site.xml'
+    $packages = $common_pkg
 
   } # if CDH4.4
 
@@ -77,6 +78,7 @@ class traf::cloudera (
     $repokey  = 'http://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
     $keyver   = 'gpg-pubkey-e8f86acd-4a418045'
     $yarnsite = 'yarn-site.xml-2.2'
+    $packages = [ $common_pkg, 'hadoop-libhdfs-devel']
 
   } # if CDH5.1
 
