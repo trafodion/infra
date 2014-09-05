@@ -1,0 +1,170 @@
+#!/usr/bin/perl
+# @@@ START COPYRIGHT @@@
+#
+# (C) Copyright 2010-2014 Hewlett-Packard Development Company, L.P.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# @@@ END COPYRIGHT @@@
+
+use Getopt::Long;
+
+# simple script that prints the backtrace of all the core files in the current directory
+
+sub print_usage ()
+{
+    print "\n";
+    print "core_bt: Prints the gdb backtrace of all the core files under the specified directory (defaults to the current directory)\n";
+    print "\n";
+    print "Usage: core_bt [-n | -h]\n";
+    print "   -h            : Help\n";
+    print "   -d <dir name> : Core files under the specified directory <dir name>\n";
+    print "   -x <file name>: Instead of the command 'bt', execute gdb commands in the specified file <file name>\n";
+    print "   -t            : Instead of the command 'bt', execute the gdb command: 'thread apply all bt' \n";
+    print "   -n            : Just prints the commands that it will execute\n";
+    print "   -r <0|1>      : Default '1'. For a value of '1', descends sub-directories. For a value of '0', just search the current dir\n";
+    print "   -g <string>   : Processes core files with the given string somewhere in its name\n";
+    print "   -v            : verbose\n";
+    print "\n";
+}
+
+sub main ()
+{
+    my ($l_cmd_output, $file_out, @fields, @fields_prog, $l_prog);
+
+    $lv_execute = 1;
+    $lv_dir = ".";
+    $lv_verbose = 0;
+    $lv_exec_file_specified = 0;
+    $lv_recurse_directories = 1;
+    $lv_maxdepth_string = "";
+    $lv_search_string = "core*";
+    $lv_thread_apply_all_bt = 0;
+
+    my $getOptRes = GetOptions(
+    'n'            => sub { $lv_execute = 0; },
+    'h'            => sub { print_usage();
+			    exit 0; },
+    'v'            => sub { $lv_verbose = 1; },
+    't'            => sub { $lv_thread_apply_all_bt = 1; },
+    'd:s'          => sub { $lv_dir = $_[1]; },
+    'x:s'          => sub { $lv_exec_file_specified = 1; $lv_tmp_file_name = $_[1]; },
+    'r:s'          => sub { $lv_recurse_directories = $_[1]; },
+    'g:s'          => sub { $lv_search_string = $lv_search_string.$_[1]."*"; print "search string: $lv_search_string\n"},
+    );
+
+    # Unrecognized command line option
+    if (!$getOptRes)
+    {
+	print_usage();
+	exit -1;
+    }
+
+    if ($lv_exec_file_specified == 1) {
+	open (XBS, "< $lv_tmp_file_name")
+	    or die ("unable to open the file: $lv_tmp_file_name (supposed to contain gdb commands)");
+
+	close (XBS);
+    }
+
+    if ( $lv_recurse_directories == 0 ) {
+	$lv_maxdepth_string = "-maxdepth 1";
+    }
+
+    if ($lv_exec_file_specified == 0) {
+	$lv_tmp_file_name = `mktemp -t`;
+	$lv_tmp_file_name =~ s/\n//;
+#	print "lv_tmp_file_name: $lv_tmp_file_name\n";
+	open (XBT, ">$lv_tmp_file_name")
+	    or die("unable to open the temporarily created file:$lv_tmp_file_name (supposed to contain gdb command)");
+	if ( $lv_thread_apply_all_bt == 1) {
+	    print XBT "thread apply all bt\n";
+	}
+	else {
+	    print XBT "bt\n";
+	}
+	close XBT;
+    }
+
+    $l_cmd_output = `find -L $lv_dir $lv_maxdepth_string -name "$lv_search_string" 2>/dev/null`;
+
+    foreach $lv_file_name (split("\n", $l_cmd_output)) {
+	$lv_file_name =~ s/\$/\\\$/g ;
+
+	$file_out = `file $lv_file_name 2>/dev/null`;
+
+	@fields = split(":", $file_out);
+
+        @fields_prog = split("\'", $fields[1]);
+        my @l_fields = split(/\s+/, $fields_prog[1]);
+        my $l_cnt = scalar(@l_fields);
+        if ($l_cnt == 1) {
+            $l_prog = $fields_prog[1];
+        } else {
+            $l_prog = $l_fields[0];
+        }
+
+	if ($l_prog eq "") {
+	    if ($lv_verbose == 1) {
+		print "Not a core file: $lv_file_name \n";
+	    }
+	    next;
+	}
+
+	$user_cmd_to_execute = "gdb $l_prog $lv_file_name";
+#	$cmd_to_execute = "gdb $l_prog $lv_file_name --batch -n -x $lv_tmp_file_name";
+	$cmd_to_execute = "$user_cmd_to_execute --batch -n -x $lv_tmp_file_name 2>&1";
+
+	$lv_ls_al = `ls -al $lv_file_name`;
+	print "core file  : $lv_ls_al";
+
+	if ($lv_execute == 1) {
+	    $l_out = `$cmd_to_execute`;
+
+	    # Check the executable name is complete at the end of the corefile name,
+	    # If actual executable has a longer name, we improve output by using
+	    # that longer name in the gdb command, and rerunning it.
+
+	    $_ = $l_out;
+	    if (/^.*: No such file/) {
+#		my $wrongExeFile = $l_out;
+#		$wrongExeFile =~ s/: .*\n//s;
+		my $exeFile = $l_out;
+		$exeFile =~ s/.*Core was generated by \`//s;
+		$exeFile =~ s/ (.*)//s;
+
+		$user_cmd_to_execute = "gdb $exeFile $lv_file_name";
+		$cmd_to_execute = "$user_cmd_to_execute --batch -n -x $lv_tmp_file_name 2>&1";
+		$l_out = `$cmd_to_execute`;
+	    }
+	}
+	print "gdb command: $cmd_to_execute\n";
+	if ($lv_execute == 1) {
+	    $l_out =~ s/warning: core file may not match specified executable file.\n\n//;
+	    print "$l_out\n";
+	    print "\nTo debug this yourself:\n";
+	    $lv_uname_out = `uname -n`;
+	    chop $lv_uname_out;
+	    print "ssh $lv_uname_out \ncd $ENV{'PWD'}; $user_cmd_to_execute\n";
+	    print "----------------------------------------------\n";
+	}
+	print "\n";
+    }
+
+    if ($lv_exec_file_specified == 0) {
+	system("rm $lv_tmp_file_name\n");
+    }
+
+}
+
+main()
