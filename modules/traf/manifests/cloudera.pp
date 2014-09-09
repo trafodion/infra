@@ -29,8 +29,7 @@ class traf::cloudera (
     charset  => 'latin1',
     password => $hive_sql_pw,
     host     => 'localhost',
-    sql      => '/usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-0.9.0.mysql.sql',
-    # For now Trafodion requires 0.9.0
+    sql      => $sqlhive,
     grant    => ['all'],   # lets see if autoschema works
     # if we need to be more restrictive, Hive docs say:
     #grant    => ['Select_priv','Insert_priv','Update_priv',
@@ -69,21 +68,25 @@ class traf::cloudera (
 
   if $distro == 'CDH4.4' {
 
-    $repofile = 'cloudera-cdh4.repo'
-    $repokey  = 'http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
-    $keyver   = 'gpg-pubkey-e8f86acd-4a418045'
-    $yarnsite = 'yarn-site.xml'
-    $packages = $common_pkg
+    $repofile  = 'cloudera-cdh4.repo'
+    $hbasefile = 'hbase-site.xml'
+    $repokey   = 'http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
+    $keyver    = 'gpg-pubkey-e8f86acd-4a418045'
+    $yarnsite  = 'yarn-site.xml'
+    $packages  = $common_pkg
+    $sqlhive   = '/usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-0.9.0.mysql.sql'
 
   } # if CDH4.4
 
   if $distro == 'CDH5.1' {
 
-    $repofile = 'cloudera-cdh5.1.repo'
-    $repokey  = 'http://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
-    $keyver   = 'gpg-pubkey-e8f86acd-4a418045'
-    $yarnsite = 'yarn-site.xml-2.2'
-    $packages = [ $common_pkg, 'hadoop-libhdfs-devel']
+    $repofile  = 'cloudera-cdh5.1.repo'
+    $hbasefile = 'hbase-site.xml-0.9'
+    $repokey   = 'http://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
+    $keyver    = 'gpg-pubkey-e8f86acd-4a418045'
+    $yarnsite  = 'yarn-site.xml-2.2'
+    $packages  = [ $common_pkg, 'hadoop-libhdfs-devel']
+    $sqlhive   = '/usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-0.13.0.mysql.sql'
 
   } # if CDH5.1
 
@@ -139,7 +142,7 @@ class traf::cloudera (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    source  => 'puppet:///modules/traf/hadoop/hbase-site.xml',
+    source  => "puppet:///modules/traf/hadoop/${hbasefile}",
     require => Exec['hbase-conf'],
   }
   file { '/etc/hive/conf/hive-site.xml':

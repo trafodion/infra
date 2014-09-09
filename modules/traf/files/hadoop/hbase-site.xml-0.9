@@ -2,12 +2,8 @@
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
   <property>
-    <name>hbase.tmp.dir</name>
-    <value>/var/hbase</value>
-  </property>
-  <property>
     <name>hbase.rootdir</name>
-    <value>file:///var/hbase/hbase</value>
+    <value>hdfs://localhost/hbase</value>
   </property>
   <property>
     <name>hbase.client.scanner.caching</name>
@@ -22,28 +18,24 @@
     <value>true</value>
   </property>
   <property>
+    <name>hbase.bulkload.staging.dir</name>
+    <value>hdfs://localhost/hbase-staging</value>
+  </property>
+  <property>
     <name>hbase.coprocessor.region.classes</name>
-    <value>org.apache.hadoop.hbase.regionserver.transactional.TransactionalAggregateImpl</value>
-  </property>
-  <property>
-    <name>hbase.regionserver.class</name>
-    <value>org.apache.hadoop.hbase.ipc.TransactionalRegionInterface</value>
-  </property>
-  <property>
-    <name>hbase.regionserver.impl</name>
-    <value>org.apache.hadoop.hbase.regionserver.transactional.TransactionalRegionServer</value>
+    <value>org.apache.hadoop.hbase.coprocessor.transactional.TrxRegionEndpoint,org.apache.hadoop.hbase.coprocessor.example.RowCountEndpoint,org.apache.hadoop.hbase.coprocessor.AggregateImplementation</value>
   </property>
   <property>
     <name>hbase.hregion.impl</name>
     <value>org.apache.hadoop.hbase.regionserver.transactional.TransactionalRegion</value>
   </property>
-  <property>
-    <name>hbase.hlog.splitter.impl</name>
-    <value>org.apache.hadoop.hbase.regionserver.transactional.THLogSplitter</value>
-  </property>
   <property> 
     <name>hbase.master.distributed.log.splitting</name> 
     <value>false</value> 
   </property> 
+  <property>
+    <name>hbase.snapshot.enabled</name>
+    <value>true</value>
+  </property>
 </configuration>
 
