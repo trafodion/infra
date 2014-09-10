@@ -12,8 +12,8 @@ class traf::horton (
     root_password    => 'insecure_slave',
     override_options =>  {
       'mysqld' => {
-        'default_engine' => 'MyISAM',
-        'bind_address'   => '127.0.0.1',
+        'default_storage_engine' => 'MyISAM',
+        'bind_address'           => '127.0.0.1',
       }
     }
   }
