@@ -24,10 +24,11 @@
 
     dist:
       - "cdh4.4"
+      - "cdh5.1"
 
     jobs:
       - traf-publish
-      - core-build-nondbg-cdh4.4
+      - core-build-check-{dist}
       - core-regress-suites
       - gate-{name}-check-for-binary
       - phoenix_test-{dist}
@@ -48,6 +49,7 @@
 
     dist:
       - "cdh4.4"
+      - "cdh5.1"
 
     jobs:
       - gate-{name}-check-for-binary
@@ -60,10 +62,11 @@
 
     dist:
       - "cdh4.4"
+      - "cdh5.1"
 
     jobs:
       - gate-{name}-check-for-binary
-      - dcs-build
+      - dcs-build-{dist}
       - phoenix_test-{dist}
       - phoenix_quick-{dist}
       - jdbc_test-{dist}

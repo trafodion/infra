@@ -1,46 +1,19 @@
 - job-group:
     name: 'core-regress-suites'
+    suite:
+      - "charsets"
+      - "core"
+      - "executor"
+      - "qat"
+      - "seabase"
+      - "hive"
+      - "compGeneral"
+      - "udr"
+      - "catman1"
+      - "fullstack2"
+
     jobs:
-      - core-regress-{suite}-{dist}:
-         suite: "charsets"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "core"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "executor"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "qat"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "seabase"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "hive"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "compGeneral"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "udr"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "catman1"
-         dist:
-          - "cdh4.4"
-      - core-regress-{suite}-{dist}:
-         suite: "fullstack2"
-         dist:
-          - "cdh4.4"
+      - core-regress-{suite}-{dist}
 
 - job-template:
     name: 'core-regress-{suite}-{dist}'
@@ -69,9 +42,9 @@
       - traf-make-log
       - traf-regress-log
 
-- job:
-    name: 'core-build-nondbg-cdh4.4'
-    node: redhat_cdh4.4
+- job-template:
+    name: 'core-build-check-{dist}'
+    node: 'redhat_{dist}'
 
     builders:
       - link-logs
@@ -90,15 +63,15 @@
 - job-group:
     name: 'traf-publish'
     jobs:
-      - traf-pub-{flavor}:
+      - traf-pub-{flavor}-{dist}:
          flavor: "release"
-      - traf-pub-{flavor}:
+      - traf-pub-{flavor}-{dist}:
          flavor: "debug"
 
 
 - job-template:
-    name: 'traf-pub-{flavor}'
-    node: redhat_cdh4.4
+    name: 'traf-pub-{flavor}-{dist}'
+    node: 'redhat_{dist}'
 
     builders:
       - link-logs
@@ -119,7 +92,7 @@
 
 - job:
     name: 'installer-build'
-    node: redhat_cdh4.4
+    node: redhat
 
     builders:
       - link-logs
@@ -132,7 +105,7 @@
 
 - job:
     name: 'installer-pub'
-    node: redhat_cdh4.4
+    node: redhat
 
     builders:
       - link-logs
@@ -145,9 +118,9 @@
       - console-log
       - traf-release-tar
 
-- job:
-    name: 'dcs-build'
-    node: redhat_cdh4.4
+- job-template:
+    name: 'dcs-build-{dist}'
+    node: 'redhat_{dist}'
 
     builders:
       - link-logs
