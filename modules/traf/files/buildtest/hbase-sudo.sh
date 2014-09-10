@@ -55,6 +55,10 @@ then
   sudo -u hdfs /usr/bin/hadoop fs -mkdir /hbase
   sudo -u hdfs /usr/bin/hadoop fs -chown hbase:hbase /hbase
   set +x
+  echo "Removing HBase zookeeper data"
+  set -x
+  sudo rm -rf /tmp/hbase-hbase
+  set +x
 
   echo "Starting hbase-master"
   /sbin/service hbase-master start
