@@ -13,8 +13,11 @@ pipelines:
     trigger:
       gerrit:
         - event: patchset-created
+          branch: master
         - event: change-restored
+          branch: master
         - event: comment-added
+          branch: master
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*(recheck|reverify)
           require-approval:
             - verified: [-1, 0]
@@ -25,6 +28,7 @@ pipelines:
         # the author know when the patch has zero chances of merging see
         # http://lists.openstack.org/pipermail/openstack-dev/2014-February/027425.html for background
         - event: comment-added
+          branch: master
           require-approval:
             - username: jenkins
               older-than: 72h
@@ -33,12 +37,72 @@ pipelines:
         # To prevent patches that have been approved with very old checks (older than 3 days) from going to gate where their failure is
         # much more expensive (see http://lists.openstack.org/pipermail/openstack-dev/2014-February/027425.html for background)
         - event: comment-added
+          branch: master
           require-approval:
             - workflow: 1
             - username: jenkins
               older-than: 72h
         # If check failed, but we get approval, run check again. If it passes, gate will trigger.
         - event: comment-added
+          branch: master
+          require-approval:
+            - verified: -1
+              username: jenkins
+          approval:
+            - workflow: 1
+    start:
+      gerrit:
+        verified: 0
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+  - name: check-hbase98
+    description: Temporary for HBase transition
+    failure-message: Build failed.  https://wiki.trafodion.org/wiki/index.php/Code_Reviews#Test_Failures
+    manager: IndependentPipelineManager
+    precedence: normal
+    require:
+      open: True
+      current-patchset: True
+    trigger:
+      gerrit:
+        - event: patchset-created
+          branch: hbase98
+        - event: change-restored
+          branch: hbase98
+        - event: comment-added
+          branch: hbase98
+          comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*(recheck|reverify)
+          require-approval:
+            - verified: [-1, 0]
+              username: jenkins
+        # From openstack-infra/config SHA-1: 06aada389aa1ceba23bb04b2020689b0d9f06c44
+        # Rerun check on change if the results are > 3 days. This is triggered by any activity on the change
+        # (in the form of anyone or any bot leaving comments).This should help detect merge conflicts earlier and also let
+        # the author know when the patch has zero chances of merging see
+        # http://lists.openstack.org/pipermail/openstack-dev/2014-February/027425.html for background
+        - event: comment-added
+          branch: hbase98
+          require-approval:
+            - username: jenkins
+              older-than: 72h
+        # From openstack-infra/config SHA-1 :  20f5d2d0034641bc96e822c6846d3b5886dbe119
+        # To support the removing of non-integrated jobs (not integrated in 3 days) from gate where their failure is much more expensive.
+        # To prevent patches that have been approved with very old checks (older than 3 days) from going to gate where their failure is
+        # much more expensive (see http://lists.openstack.org/pipermail/openstack-dev/2014-February/027425.html for background)
+        - event: comment-added
+          branch: hbase98
+          require-approval:
+            - workflow: 1
+            - username: jenkins
+              older-than: 72h
+        # If check failed, but we get approval, run check again. If it passes, gate will trigger.
+        - event: comment-added
+          branch: hbase98
           require-approval:
             - verified: -1
               username: jenkins
@@ -72,19 +136,23 @@ pipelines:
       gerrit:
         # event is approval
         - event: comment-added
+          branch: master
           approval:
             - workflow: 1
         # event is code-review, already approved
         - event: comment-added
+          branch: master
           approval:
             - code-review: 2
         # event is check test pass, already approved
         - event: comment-added
+          branch: master
           approval:
             - verified: 1
           username: jenkins
         # event is reverify comment, already approved
         - event: comment-added
+          branch: master
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*(recheck|reverify)( (?:bug|lp)[\s#:]*(\d+))
     start:
       gerrit:
@@ -99,23 +167,54 @@ pipelines:
     window-floor: 20
     window-increase-factor: 2
 
-#  - name: post
-#    description: This pipeline runs jobs that operate after each change is merged.
-#    manager: IndependentPipelineManager
-#    precedence: low
-#    trigger:
-#      gerrit:
-#        - event: ref-updated
-#          ref: ^(?!(devnull|refs/.*)).*$
-
-#  - name: tag
-#    description: This pipeline runs jobs in response to any tag event.
-#    manager: IndependentPipelineManager
-#    precedence: high
-#    trigger:
-#      gerrit:
-#        - event: ref-updated
-#          ref: ^refs/tags/.*$
+  - name: gate-hbase98
+    description: Temporary for hbase98 transition
+    failure-message: Build failed.  https://wiki.trafodion.org/wiki/index.php/Code_Reviews#Test_Failures
+    manager: DependentPipelineManager
+    precedence: high
+    require:
+      open: True
+      current-patchset: True
+      approval:
+        # must have passed check, but might have failed gate
+        - verified: [-2, 1, 2]
+          username: jenkins
+          newer-than: 72h
+        - workflow: 1
+    trigger:
+      gerrit:
+        # event is approval
+        - event: comment-added
+          branch: hbase98
+          approval:
+            - workflow: 1
+        # event is code-review, already approved
+        - event: comment-added
+          branch: hbase98
+          approval:
+            - code-review: 2
+        # event is check test pass, already approved
+        - event: comment-added
+          branch: hbase98
+          approval:
+            - verified: 1
+          username: jenkins
+        # event is reverify comment, already approved
+        - event: comment-added
+          branch: hbase98
+          comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*(recheck|reverify)( (?:bug|lp)[\s#:]*(\d+))
+    start:
+      gerrit:
+        verified: 0
+    success:
+      gerrit:
+        verified: 2
+        submit: true
+    failure:
+      gerrit:
+        verified: -2
+    window-floor: 20
+    window-increase-factor: 2
 
   - name: pre-release
     description: This pipeline runs jobs on projects in response to pre-release tags.
@@ -155,27 +254,6 @@ pipelines:
         - event: comment-added
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck(( (?:bug|lp)[\s#:]*(\d+))|( no bug))\s*$
 
-#  - name: experimental
-#    description: On-demand pipeline for requesting a run against a set of jobs that are not yet gating. Leave review comment of "check experimental" to run jobs in this pipeline.
-#    manager: IndependentPipelineManager
-#    precedence: low
-#    trigger:
-#      gerrit:
-#        - event: comment-added
-#          comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*check experimental\s*$
-#    success:
-#      gerrit: {}
-#    failure:
-#      gerrit: {}
-#
-#  - name: periodic
-#    description: Jobs in this queue are triggered on a timer.
-#    manager: IndependentPipelineManager
-#    precedence: low
-#    trigger:
-#      timer:
-#        - time: '0 6 * * *'
-
   - name: check-full
     description: On-demand extensive check testing. Leave review comment "run check-full".
     manager: IndependentPipelineManager
@@ -211,10 +289,6 @@ pipelines:
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
-  - name: ^.*cdh5.1$
-    branch: hbase98
-  - name: ^.*cdh4.4$
-    branch: master
   - name: ^.*-experimental.*$
     voting: false
 
@@ -235,9 +309,11 @@ projects:
       - core-regress-seabase-cdh4.4
       - gate-core-check-for-binary
       - core-build-check-cdh4.4
+    check-hbase98:
       - phoenix_quick-cdh5.1
       - core-regress-core-cdh5.1
       - core-regress-seabase-cdh5.1
+      - gate-core-check-for-binary
       - core-build-check-cdh5.1
     check-full:
       - phoenix_test-cdh4.4
@@ -249,24 +325,17 @@ projects:
       - core-regress-executor-cdh4.4
       - core-regress-fullstack2-cdh4.4
       - core-regress-hive-cdh4.4
-      - phoenix_test-cdh5.1
-      - core-regress-charsets-cdh5.1
-      - core-regress-qat-cdh5.1
-      - core-regress-udr-cdh5.1
-      - core-regress-catman1-cdh5.1
-      - core-regress-compGeneral-cdh5.1
-      - core-regress-executor-cdh5.1
-      - core-regress-fullstack2-cdh5.1
-      - core-regress-hive-cdh5.1
     gate:
       - phoenix_quick-cdh4.4
       - core-regress-core-cdh4.4
       - core-regress-seabase-cdh4.4
       - gate-core-check-for-binary
       - core-build-check-cdh4.4
+    gate-hbase98:
       - phoenix_quick-cdh5.1
       - core-regress-core-cdh5.1
       - core-regress-seabase-cdh5.1
+      - gate-core-check-for-binary
       - core-build-check-cdh5.1
     daily:
       - traf-pub-release-cdh4.4
@@ -306,25 +375,30 @@ projects:
   - name: trafodion/dcs
     check:
       - gate-dcs-check-for-binary
-      - dcs-build
+      - dcs-build-cdh4.4
       - phoenix_quick-cdh4.4
       - pyodbc_test-cdh4.4
       - jdbc_test-cdh4.4
+    check-hbase98:
+      - gate-dcs-check-for-binary
+      - dcs-build-cdh5.1
       - phoenix_quick-cdh5.1
       - pyodbc_test-cdh5.1
       - jdbc_test-cdh5.1
     gate:
       - gate-dcs-check-for-binary
-      - dcs-build
+      - dcs-build-cdh4.4
       - phoenix_quick-cdh4.4
       - pyodbc_test-cdh4.4
       - jdbc_test-cdh4.4
+    gate-hbase98:
+      - gate-dcs-check-for-binary
+      - dcs-build-cdh5.1
       - phoenix_quick-cdh5.1
       - pyodbc_test-cdh5.1
       - jdbc_test-cdh5.1
     check-full:
       - phoenix_test-cdh4.4
-      - phoenix_test-cdh5.1
 
   - name: trafodion/infra
     check:
@@ -346,11 +420,15 @@ projects:
     check:
       - gate-phoenix_test-check-for-binary
       - phoenix_test-cdh4.4
+    check-hbase98:
+      - gate-phoenix_test-check-for-binary
       - phoenix_test-cdh5.1
 
     gate:
       - gate-phoenix_test-check-for-binary
       - phoenix_test-cdh4.4
+    gate-hbase98:
+      - gate-phoenix_test-check-for-binary
       - phoenix_test-cdh5.1
 
   - name: trafodion/install
