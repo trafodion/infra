@@ -19,16 +19,6 @@
 #
 # @@@ END COPYRIGHT @@@
 
-# option: -b branch
-# Ignored unless ZUUL_REF is not set
-BRANCH="master"
-if [[ "$1" == "-b" ]]
-then
-  shift
-  BRANCH="$1"
-  shift
-fi
-
 # arguments: repo list
 PROJ_LIST="$*"
 
@@ -39,12 +29,21 @@ GIT_ZUUL="${ZUUL_SITE}/p"
 
 if [[ -z "$ZUUL_REF" ]]
 then
+    # branch defaults to master, or daily pipeline suffix
+    if [[ ${ZUUL_PIPELINE} =~ ^daily- ]]
+    then
+      ZUUL_BRANCH="${ZUUL_PIPELINE#daily-}"
+      SIDEBRANCH=$ZUUL_BRANCH
+    else
+      ZUUL_BRANCH="master"
+      SIDEBRANCH=""
+    fi
+    ZUUL_REF="None"
+
     echo "******************************************"
     echo "Warning: Job not triggered by code change."
-    echo "         Building latest on $BRANCH branch."
+    echo "         Building latest on $ZUUL_BRANCH branch."
     echo "******************************************"
-    ZUUL_BRANCH="$BRANCH"
-    ZUUL_REF="None"
 fi
 
 if [[ ! -z "$ZUUL_CHANGE" ]]
@@ -86,7 +85,7 @@ then
   echo "Building for review number: $BID"
 elif [[ -n "$ZUUL_PIPELINE" ]]
 then
-  BID="$(date -u +%Y%m%d_%H%M)"
+  BID="$(date -u +%Y%m%d_%H%M)$SIDEBRANCH"
   echo "Building for date: $BID"
 else
   BID="$(date -u +%Y%m%d_%H%M)"

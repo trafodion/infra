@@ -285,6 +285,24 @@ pipelines:
         to: traf_bld_stats_external.groups.hp.com@external.groups.hp.com
         subject: 'Daily build {change.start_datetime} of {change.project} -- Test Failures'
 
+  - name: daily-hbase98
+    description: Jobs in this queue are triggered daily.
+    manager: IndependentPipelineManager
+    precedence: low
+    trigger:
+      timer:
+        - time: '30 8 * * *'
+    success:
+      smtp:
+        from: jenkins@trafodion.org
+        to: traf_bld_stats_external.groups.hp.com@external.groups.hp.com
+        subject: 'Daily HBase98 build {change.start_datetime} of {change.project} -- Passed All Tests'
+    failure:
+      smtp:
+        from: jenkins@trafodion.org
+        to: traf_bld_stats_external.groups.hp.com@external.groups.hp.com
+        subject: 'Daily HBase98 build {change.start_datetime} of {change.project} -- Test Failures'
+
 
 jobs:
   - name: ^.*$
@@ -353,6 +371,22 @@ projects:
       - phoenix_test-cdh4.4
       - pyodbc_test-cdh4.4
       - jdbc_test-cdh4.4
+    daily-hbase98:
+      - traf-pub-release-cdh5.1
+      - traf-pub-debug-cdh5.1
+      - core-regress-core-cdh5.1
+      - core-regress-charsets-cdh5.1
+      - core-regress-qat-cdh5.1
+      - core-regress-udr-cdh5.1
+      - core-regress-catman1-cdh5.1
+      - core-regress-compGeneral-cdh5.1
+      - core-regress-executor-cdh5.1
+      - core-regress-fullstack2-cdh5.1
+      - core-regress-hive-cdh5.1
+      - core-regress-seabase-cdh5.1
+      - phoenix_test-cdh5.1
+      - pyodbc_test-cdh5.1
+      - jdbc_test-cdh5.1
     release:
       - traf-pub-release-cdh5.1
     pre-release:

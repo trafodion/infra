@@ -28,8 +28,16 @@ BLD="$(< $workspace/Build_ID)"
 
 Flavor="Install"
 DestFile="installer-$BLD.tar.gz"
-Branch=master
-DestDir="publish/$ZUUL_PIPELINE/$BLD"
+# side-branch build?
+if [[ ${ZUUL_PIPELINE} =~ ^daily- ]]
+then
+  Branch=${ZUUL_PIPELINE#daily-}
+  DestDir="publish/daily/$BLD"
+else
+  Branch=master
+  DestDir="publish/$ZUUL_PIPELINE/$BLD"
+fi
+
 
 set +x
 
