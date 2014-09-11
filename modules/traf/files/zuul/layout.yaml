@@ -211,20 +211,12 @@ pipelines:
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
-  - name: jdbc_test
-    voting: true
-  - name: jdbc_test-experimental
+  - name: ^.*cdh5.1$
+    branch: hbase98
+  - name: ^.*cdh4.4$
+    branch: master
+  - name: ^.*-experimental.*$
     voting: false
-  - name: phoenix_test
-    voting: true
-  - name: phoenix_test-experimental
-    voting: false
-  - name: pyodbc_test
-    voting: true
-  - name: pyodbc_test-experimental
-    voting: false
-  - name: gate-infra-puppet-lint
-    voting: true
 
 projects:
   - name: trafodion/sandbox
@@ -242,7 +234,11 @@ projects:
       - core-regress-core-cdh4.4
       - core-regress-seabase-cdh4.4
       - gate-core-check-for-binary
-      - core-build-nondbg-cdh4.4
+      - core-build-check-cdh4.4
+      - phoenix_quick-cdh5.1
+      - core-regress-core-cdh5.1
+      - core-regress-seabase-cdh5.1
+      - core-build-check-cdh5.1
     check-full:
       - phoenix_test-cdh4.4
       - core-regress-charsets-cdh4.4
@@ -253,15 +249,28 @@ projects:
       - core-regress-executor-cdh4.4
       - core-regress-fullstack2-cdh4.4
       - core-regress-hive-cdh4.4
+      - phoenix_test-cdh5.1
+      - core-regress-charsets-cdh5.1
+      - core-regress-qat-cdh5.1
+      - core-regress-udr-cdh5.1
+      - core-regress-catman1-cdh5.1
+      - core-regress-compGeneral-cdh5.1
+      - core-regress-executor-cdh5.1
+      - core-regress-fullstack2-cdh5.1
+      - core-regress-hive-cdh5.1
     gate:
       - phoenix_quick-cdh4.4
       - core-regress-core-cdh4.4
       - core-regress-seabase-cdh4.4
       - gate-core-check-for-binary
-      - core-build-nondbg-cdh4.4
+      - core-build-check-cdh4.4
+      - phoenix_quick-cdh5.1
+      - core-regress-core-cdh5.1
+      - core-regress-seabase-cdh5.1
+      - core-build-check-cdh5.1
     daily:
-      - traf-pub-release
-      - traf-pub-debug
+      - traf-pub-release-cdh4.4
+      - traf-pub-debug-cdh4.4
       - core-regress-core-cdh4.4
       - core-regress-charsets-cdh4.4
       - core-regress-qat-cdh4.4
@@ -276,23 +285,23 @@ projects:
       - pyodbc_test-cdh4.4
       - jdbc_test-cdh4.4
     release:
-      - traf-pub-release
+      - traf-pub-release-cdh5.1
     pre-release:
-      - traf-pub-release
-      - traf-pub-debug
-      - core-regress-core-cdh4.4
-      - core-regress-charsets-cdh4.4
-      - core-regress-qat-cdh4.4
-      - core-regress-udr-cdh4.4
-      - core-regress-catman1-cdh4.4
-      - core-regress-compGeneral-cdh4.4
-      - core-regress-executor-cdh4.4
-      - core-regress-fullstack2-cdh4.4
-      - core-regress-hive-cdh4.4
-      - core-regress-seabase-cdh4.4
-      - phoenix_test-cdh4.4
-      - pyodbc_test-cdh4.4
-      - jdbc_test-cdh4.4
+      - traf-pub-release-cdh5.1
+      - traf-pub-debug-cdh5.1
+      - core-regress-core-cdh5.1
+      - core-regress-charsets-cdh5.1
+      - core-regress-qat-cdh5.1
+      - core-regress-udr-cdh5.1
+      - core-regress-catman1-cdh5.1
+      - core-regress-compGeneral-cdh5.1
+      - core-regress-executor-cdh5.1
+      - core-regress-fullstack2-cdh5.1
+      - core-regress-hive-cdh5.1
+      - core-regress-seabase-cdh5.1
+      - phoenix_test-cdh5.1
+      - pyodbc_test-cdh5.1
+      - jdbc_test-cdh5.1
 
   - name: trafodion/dcs
     check:
@@ -301,14 +310,21 @@ projects:
       - phoenix_quick-cdh4.4
       - pyodbc_test-cdh4.4
       - jdbc_test-cdh4.4
+      - phoenix_quick-cdh5.1
+      - pyodbc_test-cdh5.1
+      - jdbc_test-cdh5.1
     gate:
       - gate-dcs-check-for-binary
       - dcs-build
       - phoenix_quick-cdh4.4
       - pyodbc_test-cdh4.4
       - jdbc_test-cdh4.4
+      - phoenix_quick-cdh5.1
+      - pyodbc_test-cdh5.1
+      - jdbc_test-cdh5.1
     check-full:
       - phoenix_test-cdh4.4
+      - phoenix_test-cdh5.1
 
   - name: trafodion/infra
     check:
@@ -330,10 +346,12 @@ projects:
     check:
       - gate-phoenix_test-check-for-binary
       - phoenix_test-cdh4.4
+      - phoenix_test-cdh5.1
 
     gate:
       - gate-phoenix_test-check-for-binary
       - phoenix_test-cdh4.4
+      - phoenix_test-cdh5.1
 
   - name: trafodion/install
     check:
