@@ -216,6 +216,22 @@
               source: 'sql-regress-logs/**'
               copy-after-failure: true
               keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/init_trafodion.log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/(hdfs|mvqr|pstartd|sqmon|wdt|zsb)*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/sql/scripts/*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/tmp/*'
+              copy-after-failure: true
+              keep-hierarchy: true
 
 - publisher:
     name: phoenix_test-log
@@ -223,9 +239,30 @@
       - scp:
           site: 'logs.trafodion.org'
           files:
-            - target: 'logs/$LOG_PATH/surefire-reports'
+            - target: 'logs/$LOG_PATH/phoenix_test/surefire-reports'
               source: 'trafodion/phoenix_test/target/surefire-reports/**'
               copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH/dcs/surefire-reports'
+              source: 'trafodion/dcs/target/surefire-reports/**'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/init_trafodion.log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/(hdfs|mvqr|pstartd|sqmon|wdt|zsb)*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/sql/scripts/*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/tmp/*'
+              copy-after-failure: true
+              keep-hierarchy: true
 
 - publisher:
     name: phoenix-xunit
@@ -255,6 +292,22 @@
             - target: 'logs/$LOG_PATH/logs'
               source: 'trafodion/dcs/src/test/pytests/logs/**'
               copy-after-failure: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/init_trafodion.log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/(hdfs|mvqr|pstartd|sqmon|wdt|zsb)*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/sql/scripts/*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/tmp/*'
+              copy-after-failure: true
+              keep-hierarchy: true
       - xunit:
           thresholds:
             - failed:
@@ -280,6 +333,22 @@
             - target: 'logs/$LOG_PATH/surefire-reports'
               source: 'trafodion/dcs/src/test/jdbc_test/target/surefire-reports/**'
               copy-after-failure: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/init_trafodion.log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/(hdfs|mvqr|pstartd|sqmon|wdt|zsb)*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/sql/scripts/*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/tmp/*'
+              copy-after-failure: true
+              keep-hierarchy: true
 
 - publisher:
     name: jdbc-xunit
