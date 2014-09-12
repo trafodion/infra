@@ -129,6 +129,7 @@ function report_on_corefiles() {
       echo "WARNING: Core files found in $ADIR :"
       pushd "$ADIR" > /dev/null
       ls -l $COREFILES
+      core_bt -t
       popd > /dev/null
       CORECOUNT=$(echo $COREFILES | wc -w)
       echo
