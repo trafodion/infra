@@ -221,7 +221,27 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/(hdfs|mvqr|pstartd|sqmon|wdt|zsb)*log'
+              source: 'trafodion/core/sqf/logs/hdfs*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/mvqr*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/pstartd*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/sqmon*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/wdt*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/zsb*log'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
@@ -252,7 +272,27 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/(hdfs|mvqr|pstartd|sqmon|wdt|zsb)*log'
+              source: 'trafodion/core/sqf/logs/hdfs*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/mvqr*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/pstartd*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/sqmon*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/wdt*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/zsb*log'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
@@ -297,7 +337,27 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/(hdfs|mvqr|pstartd|sqmon|wdt|zsb)*log'
+              source: 'trafodion/core/sqf/logs/hdfs*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/mvqr*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/pstartd*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/sqmon*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/wdt*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/zsb*log'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
@@ -338,7 +398,27 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/(hdfs|mvqr|pstartd|sqmon|wdt|zsb)*log'
+              source: 'trafodion/core/sqf/logs/hdfs*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/mvqr*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/pstartd*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/sqmon*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/wdt*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/zsb*log'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
