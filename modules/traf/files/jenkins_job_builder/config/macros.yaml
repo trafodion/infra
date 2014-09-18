@@ -263,6 +263,10 @@
               source: 'trafodion/phoenix_test/target/surefire-reports/**'
               copy-after-failure: true
               keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'dcs/dcs*/logs/*'
+              copy-after-failure: true
+              keep-hierarchy: true
             - target: 'logs/$LOG_PATH/dcs/surefire-reports'
               source: 'trafodion/dcs/target/surefire-reports/**'
               copy-after-failure: true
@@ -332,6 +336,14 @@
             - target: 'logs/$LOG_PATH/logs'
               source: 'trafodion/dcs/src/test/pytests/logs/**'
               copy-after-failure: true
+            - target: 'logs/$LOG_PATH'
+              source: 'dcs/dcs*/logs/*'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH/dcs/surefire-reports'
+              source: 'trafodion/dcs/target/surefire-reports/**'
+              copy-after-failure: true
+              keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
               source: 'trafodion/core/sqf/init_trafodion.log'
               copy-after-failure: true
