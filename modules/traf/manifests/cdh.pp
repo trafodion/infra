@@ -1,42 +1,11 @@
-# == Class: traf::cloudera
+# == Class: traf::cdh
 #
 # Single-Node set-up, only useful for simple functional testing
-# Installs & configures a subset of CDH4
-class traf::cloudera (
+# Installs & configures a subset of CDH4/5
+class traf::cdh (
   $hive_sql_pw = '',
   $distro      = '',
 ) {
-
-
-  class {'mysql::server':
-    root_password    => 'insecure_slave',
-    override_options =>  {
-      'mysqld' => {
-        'default_storage_engine' => 'MyISAM',
-        'bind_address'           => '127.0.0.1',
-      }
-    }
-  }
-  include mysql::server::account_security
-
-
-  class { 'mysql::bindings':
-    java_enable  => true,
-  }
-
-  mysql::db { 'metastore':
-    user     => 'hive',
-    charset  => 'latin1',
-    collate  => 'latin1_swedish_ci',
-    password => $hive_sql_pw,
-    host     => 'localhost',
-    sql      => $sqlhive,
-    grant    => ['all'],   # lets see if autoschema works
-    # if we need to be more restrictive, Hive docs say:
-    #grant    => ['Select_priv','Insert_priv','Update_priv',
-    #             'Delete_priv','Lock_tables_priv','Execute_priv'],
-    require  => Package['hive'],
-  }
 
   # Trafodion configuration for Hive
   file { '/etc/SQSystemDefaults.conf':
@@ -75,11 +44,11 @@ class traf::cloudera (
     $keyver    = 'gpg-pubkey-e8f86acd-4a418045'
     $yarnsite  = 'yarn-site.xml'
     $packages  = $common_pkg
-    $sqlhive   = '/usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-0.9.0.mysql.sql'
+    $hive_ver  = '0.9.0'
 
   } # if CDH4.4
 
-  if $distro == 'CDH5.1' {
+  elsif $distro == 'CDH5.1' {
 
     $repofile  = 'cloudera-cdh5.1.repo'
     $hbasefile = 'hbase-site.xml-0.9'
@@ -87,9 +56,20 @@ class traf::cloudera (
     $keyver    = 'gpg-pubkey-e8f86acd-4a418045'
     $yarnsite  = 'yarn-site.xml-2.2'
     $packages  = [ $common_pkg, 'hadoop-libhdfs-devel']
-    $sqlhive   = '/usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-0.13.0.mysql.sql'
+    $hive_ver  = '0.12.0'
 
   } # if CDH5.1
+
+  else {
+    # package dependencies need to resolve even if we don't take this path
+    $packages = $common_pkg
+  }
+
+  class {'traf::hive_metastore':
+    hive_sql_pw     => $hive_sql_pw,
+    hive_schema_ver => $hive_ver,
+    require         => Package['hive'],
+  }
 
   file { "/etc/yum.repos.d/${repofile}":
     owner  => 'root',
@@ -152,14 +132,6 @@ class traf::cloudera (
     mode    => '0644',
     content => template('traf/hive-site.xml.erb'),
     require => Package['hive'],
-  }
-  file { '/usr/lib/hive/lib/mysql-connector-java.jar':
-    ensure  => link,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    target  => '/usr/share/java/mysql-connector-java.jar',
-    require => [ Package['mysql-connector-java'], Package['hive'] ],
   }
   # No longer needed -- make it absent after HBase on HDFS change is fully propagated
   file { ['/var/hbase']:

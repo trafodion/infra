@@ -206,6 +206,26 @@ node /^slave-cdh51-\d\d.trafodion.org$/ {
   }
 }
 
+# CMgr
+node /^slave-cm44-\d\d.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    sysadmins => hiera('sysadmins'),
+    distro => 'CM4.4',
+  }
+}
+node /^slave-cm51-\d\d.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    sysadmins => hiera('sysadmins'),
+    distro => 'CM5.1',
+  }
+}
+
 # HortonWorks1.3
 node /^slave-hdp13-\d\d.trafodion.org$/ {
   include traf
