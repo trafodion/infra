@@ -8,37 +8,6 @@ class traf::horton (
 ) {
 
 
-  class {'mysql::server':
-    root_password    => 'insecure_slave',
-    override_options =>  {
-      'mysqld' => {
-        'default_storage_engine' => 'MyISAM',
-        'bind_address'           => '127.0.0.1',
-      }
-    }
-  }
-  include mysql::server::account_security
-
-
-  class { 'mysql::bindings':
-    java_enable  => true,
-  }
-
-  mysql::db { 'metastore':
-    user     => 'hive',
-    charset  => 'latin1',
-    collate  => 'latin1_swedish_ci',
-    password => $hive_sql_pw,
-    host     => 'localhost',
-    sql      => '/usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-0.9.0.mysql.sql',
-    # For now Trafodion requires 0.9.0
-    grant    => ['all'],   # lets see if autoschema works
-    # if we need to be more restrictive, Hive docs say:
-    #grant    => ['Select_priv','Insert_priv','Update_priv',
-    #             'Delete_priv','Lock_tables_priv','Execute_priv'],
-    require  => Package['hive'],
-  }
-
   # Trafodion configuration for Hive
   file { '/etc/SQSystemDefaults.conf':
     owner   => 'root',
@@ -71,6 +40,7 @@ class traf::horton (
     $hdfssite = 'puppet:///modules/traf/hadoop/hdfs-site.xml-1.2'
     $hdfs_services = ['hadoop-datanode','hadoop-namenode']
     $zoopidfile = '/var/lib/zookeeper/version-2/snapshot-0'
+    $hive_ver = '0.9.0'
   } # HDP1.3
   if $distro == 'HDP2.1' {
     $packages = [
@@ -94,7 +64,14 @@ class traf::horton (
     $hdfssite = 'puppet:///modules/traf/hadoop/hdfs-site.xml'
     $hdfs_services = ['hadoop-hdfs-datanode','hadoop-hdfs-namenode']
     $zoopidfile = '/var/lib/zookeeper/zookeeper_server.pid'
+    $hive_ver = '0.13.0'
   } # HDP2.1
+
+  class {'traf::hive_metastore':
+    hive_sql_pw     => $hive_sql_pw,
+    hive_schema_ver => $hive_ver,
+    require         => Package['hive'],
+  }
 
   file { '/etc/yum.repos.d/horton.repo':
     owner  => 'root',
@@ -155,14 +132,6 @@ class traf::horton (
     mode    => '0644',
     content => template('traf/hive-site.xml.erb'),
     require => Package['hive'],
-  }
-  file { '/usr/lib/hive/lib/mysql-connector-java.jar':
-    ensure  => link,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    target  => '/usr/share/java/mysql-connector-java.jar',
-    require => [ Package['mysql-connector-java'], Package['hive'] ],
   }
 
   # Both JAVA_HOME setting methods don't conflict, so we'll do both

@@ -21,4 +21,11 @@ class ssh {
       ],
       replace => true,
     }
+    exec { 'ssh_known_hosts':
+      command =>
+        'echo -n "localhost,$(hostname -s),$(hostname -f),$(hostname -i) " > /etc/ssh/ssh_known_hosts
+         cat /etc/ssh/ssh_host_rsa_key.pub >> /etc/ssh/ssh_known_hosts',
+      path    => '/bin',
+      creates => '/etc/ssh/ssh_known_hosts',
+    }
 }
