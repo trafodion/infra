@@ -38,10 +38,6 @@ elif [ $# -lt 3 ]; then
   exit 1
 fi
 
-set -x
-if [ -z "$WORKSPACE" ]; then
-  export WORKSPACE=$(pwd)
-fi
 set +x
 
 if [ "$TESTS" = "DONT_RUN_TESTS" ]; then
@@ -56,7 +52,7 @@ else
   set -x
   # start trafodion
   cd $WORKSPACE
-  /usr/local/bin/start-traf-instance.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" || exit 1
+  /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" || exit 1
   set +x
 
   echo "INFO: Waiting a minute to check for DcsServer"
@@ -73,7 +69,8 @@ else
   cd "$WORKSPACE/$TEST_DIR"
   mkdir "$WORKSPACE/$TEST_DIR/logs"
   export PATH=/usr/local/bin:$PATH
-  ./config.sh -r -v -d localhost:37800 -t $WORKSPACE/$TRAF_DIR/conn/clients/TRAF_ODBC_Linux_Driver_64.tar.gz
+  ./config.sh -r -v -d localhost:37800 \
+    -t $WORKSPACE/$TRAF_DIR/conn/clients/TRAF_ODBC_Linux_Driver_64.tar.gz
   if [ $? -ne 0 ]
   then
     echo "ERROR: Could not configure Python ODBC test properly."
@@ -95,7 +92,7 @@ else
   fi
 
   cd $WORKSPACE
-  /usr/local/bin/stop-traf-instance.sh "$TRAF_DIR/sqf"
+  /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"
 fi
 
 set -x

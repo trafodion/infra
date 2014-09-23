@@ -47,9 +47,6 @@ set -x
 
 # main
 set -x
-if [ -z "$WORKSPACE" ]; then
-    export WORKSPACE=$(pwd)
-fi
 
 # assume Trafodion env is already sourced in if there are no input parameters
 # otherwise make sure there is only 1 input parameter and that the input parameter
@@ -57,7 +54,7 @@ fi
 if [ $# -eq 1 -a -d "$1" ]; then
     cd "$WORKSPACE"
     cd "$1"
-    source_env
+    source_env build
 elif [ $# -gt 1 ]; then
     echo "ERROR: Incorrect number of input parameters passed to ${PRG_NAME}"
     PROGRAM_HELP

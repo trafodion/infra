@@ -183,6 +183,13 @@ class traf::slave (
       sshkeys  => 'generate',
       groups   => 'sudo',
     }
+    file { '/etc/sudoers.d/jenkins-sudo-inst':
+      ensure => present,
+      source => 'puppet:///modules/traf/jenkins/jenkins-sudo-inst.sudo',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0440',
+    }
 
     # json parser
     package { 'jq':
@@ -200,6 +207,11 @@ class traf::slave (
 
     class { 'traf::tpcds':
       require => Exec['cluster_setup'],
+    }
+    # cloudera module sets up yum repo, but does not install this package
+    package { 'hadoop-libhdfs':
+      ensure  => present,
+      require => Class['::cloudera'],
     }
   }
 

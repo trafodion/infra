@@ -40,14 +40,11 @@ elif [ $# -lt 4 ]; then
 fi
 
 set -x
-if [ -z "$WORKSPACE" ]; then
-  export WORKSPACE=$(pwd)
-fi
 
 # start trafodion
 cd $WORKSPACE
 ulimit -c unlimited
-/usr/local/bin/start-traf-instance.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
+/usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
 set +x
 
 echo "INFO: Waiting 2 minutes and check DcsServer"
@@ -63,18 +60,22 @@ echo ""
 # run phoenix_test
 cd "$WORKSPACE/$TEST_DIR"
 if [ -z "$TESTS" ]; then
-  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar
+  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare \
+       --targettype=TR --javahome=$JAVA_HOME \
+       --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar
   phoenixRes=$?
 elif [ "$TESTS" = "DONT_RUN_TESTS" ]; then
   echo "INFO: Will NOT run any phoenix tests as requested. You should not see this message in the normal Jenkins job phoenix_test! This should only be used to turn off testing of the experimetal jobs."
   phoenixRes=0
 else
-  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare --targettype=TR --javahome=$JAVA_HOME --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar --tests=$TESTS
+  ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare \
+       --targettype=TR --javahome=$JAVA_HOME \
+       --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar --tests=$TESTS
   phoenixRes=$?
 fi
 
 cd $WORKSPACE
-/usr/local/bin/stop-traf-instance.sh "$TRAF_DIR/sqf"
+/usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"
 
 # Any core files means failure
 report_on_corefiles "$TRAF_DIR"

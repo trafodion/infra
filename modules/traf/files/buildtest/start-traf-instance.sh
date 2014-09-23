@@ -131,7 +131,7 @@ START_TRAF() {
     # system hadoop installation location
     export HADOOP_MAPRED_HOME=/usr/lib/hadoop-mapreduce
 
-    source_env
+    source_env build
 
     # Check jar files
     jarpath=""
@@ -176,10 +176,6 @@ START_TRAF() {
 # main
 set -x
 clear_env
-
-if [ -z "$WORKSPACE" ]; then
-    export WORKSPACE=$(pwd)
-fi
 
 if [ $# -eq 1 ]; then
     export TRAF_DIR="$1"

@@ -53,13 +53,10 @@ elif [ $# -lt 4 ]; then
 fi
 
 set -x
-if [ -z "$WORKSPACE" ]; then
-  export WORKSPACE=$(pwd)
-fi
 
 # start trafodion
 cd $WORKSPACE
-/usr/local/bin/start-traf-instance.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
+/usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
 set +x
 
 echo "INFO: Waiting 2 minutes and check DcsServer"
@@ -74,11 +71,13 @@ echo ""
 
 # run jdbc_test
 cd "$WORKSPACE/$TEST_DIR"
-./jdbc_test.py --appid=jdbc_test --target=localhost:37800 --user=dontcare --pw=dontcare --javahome=$JAVA_HOME --jdbctype=T4 --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar ${TESTS}
+./jdbc_test.py --appid=jdbc_test --target=localhost:37800 \
+     --user=dontcare --pw=dontcare --javahome=$JAVA_HOME \
+     --jdbctype=T4 --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar ${TESTS}
 jdbcRes=$?
 
 cd $WORKSPACE
-/usr/local/bin/stop-traf-instance.sh "$TRAF_DIR/sqf"
+/usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"
 
 # exit with jdbc_test.py return code
 exit $jdbcRes
