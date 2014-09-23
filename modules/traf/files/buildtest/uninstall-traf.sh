@@ -17,35 +17,29 @@
 #
 # @@@ END COPYRIGHT @@@
 
-source /usr/local/bin/traf-functions.sh
+# Check if Cloudera-Manager or Ambari is installed
+USE_INSTALLER=0
 
-#parameter is build flavor: release or debug
-FLAVOR=$1
+for pkg in cloudera-manager-server ambari-server
+do
+  rpm -q $pkg >/dev/null
+  if [[ $? == 0 ]]
+  then
+    USE_INSTALLER=1
+  fi
+done
 
-#optional parameter for build target: e.g., "package"
-TARGET="all"
-if [[ -n "$2" ]]
+# No hadoop management SW, just stop trafodion in place
+if [[ $USE_INSTALLER == 0 ]]
 then
-  shift 1
-  TARGET="$*"
+  /usr/local/bin/stop-traf-instance.sh "$@"
+  exit $?
 fi
+
+# Use trafodion uninstaller
 
 set -x
 
-
-source_env -v build $FLAVOR
-
-cd trafodion/core
-
-# Use Zuul / Jenkins values
-VER="$(git describe --long --tags --dirty --always)${ZUUL_BRANCH}"
-export PV_BUILDID=${VER}_Bld${BUILD_NUMBER}
-export PV_DATE=$(echo ${BUILD_ID} | sed 's/-//g')
-
-make $TARGET > Make.log 2>&1
-rc=$?
-ls -l *.tgz 2>/dev/null
-
-cd $WORKSPACE
-
-exit $rc
+# tinstall user has required permissions 
+sudo -n -u tinstall /usr/local/bin/inst-sudo.sh uninstall
+exit $?

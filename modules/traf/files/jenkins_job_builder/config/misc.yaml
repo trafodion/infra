@@ -24,14 +24,15 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
-      - make-traf:
-           flavor: "debug"
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
+      - pkg-traf:
+           flavor: "release"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - pkg-install
       - sql-regress:
            dir: "./trafodion/core"
            suites: "udr"
-      - maven-package:
-           buildDir: "trafodion/dcs"
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"

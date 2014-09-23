@@ -23,25 +23,24 @@ DIR="$1"  # build tree
 shift
 SUITES="$*"
 
-workspace="$(pwd)"
-
 set -x
 
 # clean up any logs from previous runs
 # in case of test time-out we don't want to archive old logs
-logarchive="$workspace/sql-regress-logs"
+logarchive="$WORKSPACE/sql-regress-logs"
 rm -rf $logarchive
 mkdir $logarchive
 
 ulimit -c unlimited
 
-/usr/local/bin/start-traf-instance.sh "$DIR" || exit 1
+/usr/local/bin/install-traf.sh "sqlregress" "$DIR" || exit 1
 
-cd $DIR/sqf
-source_env
+source_env run
+
+testloc=$(loc_regress)
 
 # run SQL regression tests
-cd ../sql/regress
+cd $testloc
 echo "Saving output in Regress.log"
 ./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \
    grep --line-buffered -C1 -E '### PASS |### FAIL ' | \
@@ -61,10 +60,11 @@ echo "Saving output in Regress.log"
      '-es:TESTTEST:TEST:';
 echo "Return code ${PIPESTATUS[0]}"
 
-/usr/local/bin/stop-traf-instance.sh
+cd $WORKSPACE
+/usr/local/bin/uninstall-traf.sh "$DIR/sqf"
 
 # evaluate tests
-cd ../../sqf/rundir
+cd $testloc/../../sqf/rundir
 
 set +x
 echo
