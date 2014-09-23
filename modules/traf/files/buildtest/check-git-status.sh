@@ -39,6 +39,8 @@ then
   git ls-files -m
   echo "==========="
   rc=2
+else
+  echo "Success: Build modified 0 versioned files"
 fi
 if [[ $unignored != 0 ]]
 then
@@ -48,6 +50,19 @@ then
   git ls-files -o --exclude-standard
   echo "==========="
   rc=2
+else
+  echo "Success: Build created 0 untracked files"
+fi
+
+# Check for use of absolute files as DLLs
+sqf/build-scripts/find-abs-dlls
+absrefs=$?
+if [[ $absrefs != 0 ]]
+then
+  echo "Error: Build created $absrefs dll references to absolute filenames"
+  rc=3
+else
+  echo "Success: Build created 0 dll references to absolute filenames"
 fi
 
 exit $rc
