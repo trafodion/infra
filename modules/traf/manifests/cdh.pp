@@ -96,18 +96,30 @@ class traf::cdh (
     require => Package['hadoop'],
   }
   file { '/etc/hadoop/conf.localtest/core-site.xml':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     source  => 'puppet:///modules/traf/hadoop/core-site.xml',
     require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/hdfs-site.xml':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     source  => 'puppet:///modules/traf/hadoop/hdfs-site.xml',
     require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/mapred-site.xml':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     source  => 'puppet:///modules/traf/hadoop/mapred-site.xml',
     require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/yarn-site.xml':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     source  => "puppet:///modules/traf/hadoop/${yarnsite}",
     require => Exec['hadoop-conf'],
   }

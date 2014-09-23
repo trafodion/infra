@@ -18,15 +18,57 @@
 #
 # @@@ END COPYRIGHT @@@
 
+
+############################################################
+# Set common variables
+
+# depend on standard workspace location rather than initial CWD
+WORKSPACE="$HOME/workspace/$JOB_NAME"
+
+INSTLOC="$WORKSPACE/traf_inst"
+RUNLOC="$WORKSPACE/traf_run"
+
+
+############################################################
+# save locations of instance stuff for later use
+# encapsulate use of save file into functions in this file
+
+function install_loc () {
+  rm -f "$WORKSPACE/InstallEnv.sh"
+  if [[ $1 == "build" ]]
+  then
+    ENVloc=$WORKSPACE/trafodion/core/sqf
+    ENVfile=$(< $ENVloc/BuildFlavor)
+    REGloc=$WORKSPACE/trafodion/core/sql/regress
+  else
+    ENVloc=$RUNLOC
+    ENVfile=sqenv.sh
+    REGloc=$RUNLOC/sql/regress
+  fi
+  echo "ILOC=$ENVloc"  >  "$WORKSPACE/InstallEnv.sh"
+  echo "IENV=$ENVfile" >> "$WORKSPACE/InstallEnv.sh"
+  if [[ $2 == "regress" ]]
+  then
+    echo "RLOC=$REGloc" >> "$WORKSPACE/InstallEnv.sh"
+  fi
+}
+
+# locate regress -- retrieve from save file
+function loc_regress () {
+  source "$WORKSPACE/InstallEnv.sh"
+  echo "$RLOC"
+}
+
+
 ############################################################
 # source_env - find and source env file
 #
-# Caller must be in correct source tree current dir (trafodion/core/sqf)
-# parameter is build flavor: release or debug
-# leave parameter blank to use prior build flavor
+# Option: -v -- verbose
+# 1st Parameter: build | run -- build space or running instance
+# 2nd Parameter: (optional) release | debug -- build flavor
+# 		Leave parameter blank to use prior build flavor
 
 function source_env () {
-
   # tracing on?
   if [[ $(set -o | grep ^xtrace) =~ .*off ]]
   then
@@ -35,41 +77,65 @@ function source_env () {
     TracingWasOn=1
     set +x
   fi
+  currentdir="$(pwd)"
 
-  # If no flavor specified, has a flavor been specified previously?
-  if [[ -z "$1" && -r ./BuildFlavor ]]
+  if [[ $1 == "-v" ]]
   then
-    ENVfile=$(< ./BuildFlavor)
-  elif [[ "$1" =~ r.* ]]   # anything beginning with r, is "release"
-  then
-    ENVfile="sqenvr.sh"
-  else			   # default to debug
-    ENVfile="sqenvd.sh"
-  fi
-  # If no build "flavor" env file, then use "default" (installed instead of build tree)
-  if [[ ! -r ./$ENVfile ]]
-  then
-    ENVfile="sqenv.sh"
+    SQ_VERBOSE=1
+    shift
   fi
 
-  # Save flavor used for later calls
-  echo "$ENVfile" > ./BuildFlavor
-  # add this save file to the ignored file list for this workspace
-  if ! grep -q sqf/BuildFlavor ../.git/info/exclude
-  then
-    echo "sqf/BuildFlavor" >> ../.git/info/exclude
-  fi
-
-  echo "Sourcing ./$ENVfile"
-  SQ_VERBOSE=1
+  # test environment build tools
   export TOOLSDIR=/opt/traf/tools
-  source ./$ENVfile
-  rc=$?
 
+  if [[ $1 == "build" ]]
+  then
+    cd "$WORKSPACE/trafodion/core/sqf"
+
+    # If no flavor specified, has a flavor been specified previously?
+    if [[ -z "$2" && -r ./BuildFlavor ]]
+    then
+      ENVfile=$(< ./BuildFlavor)
+    elif [[ "$2" =~ r.* ]]   # anything beginning with r, is "release"
+    then
+      ENVfile="sqenvr.sh"
+    else			   # default to debug
+      ENVfile="sqenvd.sh"
+    fi
+
+    # Save flavor used for later calls
+    echo "$ENVfile" > ./BuildFlavor
+
+    # add this save file to the ignored file list for this workspace
+    if ! grep -q sqf/BuildFlavor ../.git/info/exclude
+    then
+      echo "sqf/BuildFlavor" >> ../.git/info/exclude
+    fi
+    echo "Sourcing ./$ENVfile"
+    source ./$ENVfile
+    rc=$?
+
+  elif [[ $1 == "run" ]]
+  then
+    source "$WORKSPACE/InstallEnv.sh"
+    echo "Sourcing $ILOC/$IENV"
+    cd "$ILOC"
+    source "./$IENV"
+    rc=$?
+
+  else
+    echo "Error: specify build or run environment"
+    rc=1
+
+  fi
+
+  # restore environment
   if (( $TracingWasOn ))
   then
     set -x
   fi
+  cd "$currentdir"
+
   return $rc
 }
 
