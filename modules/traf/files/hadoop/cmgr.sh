@@ -359,25 +359,25 @@ done
 
 # Start HBase
 
-State="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE | jq -r '.serviceState')"
-if [[ $State == "STOPPED" ]]
-then
-  [[ $mode == "check" ]] && exit 5
-  # create root dir
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/hbaseCreateRoot | jq -r '.id')
-  cm_cmd $CID "HBase Create Root"
-
-  # Start HBase service roles
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/start | jq -r '.id')
-  cm_cmd $CID "HBase Start"
-
-  # Check status
-  State="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE | jq -r '.serviceState')"
-  if [[ $State =~ STOP ]] # stopped, stopping
-  then
-    echo "Error: HBASE not started"
-    exit 2
-  fi
-fi
+#State="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE | jq -r '.serviceState')"
+#if [[ $State == "STOPPED" ]]
+#then
+#  [[ $mode == "check" ]] && exit 5
+#  # create root dir
+#  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/hbaseCreateRoot | jq -r '.id')
+#  cm_cmd $CID "HBase Create Root"
+#
+#  # Start HBase service roles
+#  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/start | jq -r '.id')
+#  cm_cmd $CID "HBase Start"
+#
+#  # Check status
+#  State="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE | jq -r '.serviceState')"
+#  if [[ $State =~ STOP ]] # stopped, stopping
+#  then
+#    echo "Error: HBASE not started"
+#    exit 2
+#  fi
+#fi
 
 exit 0
