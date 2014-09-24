@@ -97,11 +97,18 @@ sub main ()
     }
 
     $l_cmd_output = `find -L $lv_dir $lv_maxdepth_string -name "$lv_search_string" 2>/dev/null`;
+    print "Candidate files matching pattern $lv_search_string :\n$l_cmd_output\n"  if $lv_verbose == 1;
 
     foreach $lv_file_name (split("\n", $l_cmd_output)) {
 	$lv_file_name =~ s/\$/\\\$/g ;
 
 	$file_out = `file $lv_file_name 2>/dev/null`;
+	if  ($file_out !~ /: .*core file/) {
+	    if ($lv_verbose == 1) {
+		print "Not a core file: $lv_file_name \n";
+	    }
+	    next;
+	}
 
 	@fields = split(":", $file_out);
 
@@ -114,19 +121,31 @@ sub main ()
             $l_prog = $l_fields[0];
         }
 
-	if ($l_prog eq "") {
-	    if ($lv_verbose == 1) {
-		print "Not a core file: $lv_file_name \n";
-	    }
-	    next;
-	}
-
-	$user_cmd_to_execute = "gdb $l_prog $lv_file_name";
-#	$cmd_to_execute = "gdb $l_prog $lv_file_name --batch -n -x $lv_tmp_file_name";
-	$cmd_to_execute = "$user_cmd_to_execute --batch -n -x $lv_tmp_file_name 2>&1";
-
 	$lv_ls_al = `ls -al $lv_file_name`;
 	print "core file  : $lv_ls_al";
+	$ls_l_prog = `ls -al $l_prog 2>/dev/null`;
+	if ($ls_l_prog eq "") {
+	    # Get executable from end of core file name, then use `which`,
+	    # which works when PATH environment is same as when core file was made.
+	    $alt_prog_name = $lv_file_name;
+	    $alt_prog_name =~ s/.*\.(.*)$/$1/;
+	    if ($alt_prog_name eq "") {
+		print "Failed to find executable at end of file name $lv_file_name\n";
+		next;
+	    }
+	    $which_alt_prog_name = `which $alt_prog_name 2>/dev/null`;
+	    if ($which_alt_prog_name eq "") {
+		print "Failed to find executable $alt_prog_name using which\n";
+		next;
+	    }
+	    $l_prog = $which_alt_prog_name;
+	    chomp $l_prog;
+	    $ls_l_prog = `ls -l $l_prog 2>/dev/null`;
+	}
+	print "executable : $ls_l_prog\n";
+
+	$user_cmd_to_execute = "gdb $l_prog $lv_file_name";
+	$cmd_to_execute = "$user_cmd_to_execute --batch -n -x $lv_tmp_file_name 2>&1";
 
 	if ($lv_execute == 1) {
 	    $l_out = `$cmd_to_execute`;
@@ -148,7 +167,7 @@ sub main ()
 		$l_out = `$cmd_to_execute`;
 	    }
 	}
-	print "gdb command: $cmd_to_execute\n";
+	print "gdb command:\n  $cmd_to_execute\n";
 	if ($lv_execute == 1) {
 	    $l_out =~ s/warning: core file may not match specified executable file.\n\n//;
 	    print "$l_out\n";
