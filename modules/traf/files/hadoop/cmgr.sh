@@ -266,6 +266,27 @@ then
   fi
 fi
 
+Role="$(curl $Read $URL/clusters/trafcluster/services/trafHIVE/roles/trafHSRV | jq -r '.name')"
+
+if [[ $Role == "null" ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  echo "Creating Hive role"
+  Roles=$(curl $Create -d'
+		  { "items" : [ {
+		      "name" : "trafHSRV",
+		      "type" : "HIVESERVER2",
+		      "hostRef" : { "hostId" : "'$host'" }
+		    } ] }
+		  ' $URL/clusters/trafcluster/services/trafHIVE/roles | jq -r '.items[].name'
+       )
+  if [[ ! ($Roles =~ trafHSRV) ]]
+  then
+    echo "Error: failed to create Hive roles"
+    exit 2
+  fi
+fi
+
 # HBase
 Role="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE/roles/trafMAS | jq -r '.name')"
 
@@ -298,11 +319,6 @@ State="$(curl $Read $URL/clusters/trafcluster/services/trafHDFS | jq -r '.servic
 
 if [[ $State == "STOPPED" ]]
 then
-  [[ $mode == "check" ]] && exit 5
-  # Start HDFS service roles
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHDFS/commands/start | jq -r '.id')
-  cm_cmd $CID "HDFS Start"
-
   # Make sure namenode is formatted
   CID=$(curl $Create -d'
 		  { "items" : [ "trafNAME" ] }
@@ -310,6 +326,11 @@ then
 		  jq -r '.items[0].id'
 	)
   cm_cmd $CID "HDFS Format"
+
+  [[ $mode == "check" ]] && exit 5
+  # Start HDFS service roles
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHDFS/commands/start | jq -r '.id')
+  cm_cmd $CID "HDFS Start"
 
   # Check status
   State="$(curl $Read $URL/clusters/trafcluster/services/trafHDFS | jq -r '.serviceState')"
