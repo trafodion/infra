@@ -21,7 +21,7 @@
 
     wrappers:
       - timeout:
-          timeout: 180
+          timeout: 120
           fail: true
       - timestamps
 
@@ -29,9 +29,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core"
-      - make-traf:
+           repos: "trafodion/core trafodion/install trafodion/dcs"
+      - pkg-traf:
            flavor: "release"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - pkg-install
       - sql-regress:
            dir: "./trafodion/core"
            suites: "{suite}"
@@ -63,15 +66,15 @@
 - job-group:
     name: 'traf-publish'
     jobs:
-      - traf-pub-{flavor}-{dist}:
+      - traf-pub-{flavor}:
          flavor: "release"
-      - traf-pub-{flavor}-{dist}:
+      - traf-pub-{flavor}:
          flavor: "debug"
 
 
 - job-template:
-    name: 'traf-pub-{flavor}-{dist}'
-    node: 'redhat_{dist}'
+    name: 'traf-pub-{flavor}'
+    node: 'redhat'
 
     builders:
       - link-logs
@@ -119,8 +122,8 @@
       - traf-release-tar
 
 - job-template:
-    name: 'dcs-build-{dist}'
-    node: 'redhat_{dist}'
+    name: 'dcs-build'
+    node: 'redhat'
 
     builders:
       - link-logs
@@ -160,11 +163,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
-      - make-traf:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - kill-traf
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
@@ -196,11 +200,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
-      - make-traf:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - kill-traf
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
@@ -224,7 +229,7 @@
 
     wrappers:
       - timeout:
-          timeout: 60
+          timeout: 75
           fail: true
       - timestamps
 
@@ -232,11 +237,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
-      - make-traf:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - kill-traf
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
@@ -268,11 +274,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - make-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - kill-traf
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
@@ -304,11 +311,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - make-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - kill-traf
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
@@ -343,11 +351,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs"
-      - make-traf:
+           repos: "trafodion/core trafodion/dcs trafodion/install"
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - kill-traf
       - run-pyodbc_test:
            trafCoreDir: "trafodion/core"
@@ -374,11 +383,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs"
-      - make-traf:
+           repos: "trafodion/core trafodion/dcs trafodion/install"
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - kill-traf
       - run-pyodbc_test:
            trafCoreDir: "trafodion/core"
@@ -403,7 +413,7 @@
 
     wrappers:
       - timeout:
-          timeout: 60
+          timeout: 70
           fail: true
       - timestamps
 
@@ -411,11 +421,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs"
-      - make-traf:
+           repos: "trafodion/core trafodion/dcs trafodion/install"
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
@@ -435,7 +446,7 @@
 
     wrappers:
       - timeout:
-          timeout: 60
+          timeout: 70
           fail: true
       - timestamps
 
@@ -443,11 +454,12 @@
       - link-logs
       - kill-traf
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs"
-      - make-traf:
+           repos: "trafodion/core trafodion/dcs trafodion/install"
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
+      - pkg-install
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"

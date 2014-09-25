@@ -23,6 +23,7 @@
     dist:
       - "cdh5.1"
       - "hdp2.1"
+      - "cm5.1"
 
     jobs:
       - traf-publish
@@ -44,6 +45,7 @@
     dist:
       - "cdh5.1"
       - "hdp2.1"
+      - "cm5.1"
 
     jobs:
       - gate-{name}-check-for-binary
@@ -60,6 +62,7 @@
     dist:
       - "cdh5.1"
       - "hdp2.1"
+      - "cm5.1"
 
     jobs:
       - gate-{name}-check-for-binary
