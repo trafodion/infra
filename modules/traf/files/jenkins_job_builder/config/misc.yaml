@@ -13,6 +13,10 @@
           name: LOG_PATH
           default: node_test/$BUILD_NUMBER
           description: path on log server
+      - string:
+          name: BRANCH
+          default: master
+          description: git branch to build
 
     wrappers:
       - timeout:

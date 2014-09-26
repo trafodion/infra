@@ -34,6 +34,10 @@ then
     then
       ZUUL_BRANCH="${ZUUL_PIPELINE#daily-}"
       SIDEBRANCH=$ZUUL_BRANCH
+    elif [[ -n $BRANCH ]]  # direct jenkins parameter
+    then
+      ZUUL_BRANCH="$BRANCH"
+      SIDEBRANCH=""
     else
       ZUUL_BRANCH="master"
       SIDEBRANCH=""
