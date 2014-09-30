@@ -49,5 +49,13 @@
     <name>hbase.snapshot.enabled</name>
     <value>true</value>
   </property>
+  <property>
+    <name>hbase.snapshot.master.timeoutMillis</name>
+    <value>90000</value>
+  </property>
+  <property>
+    <name>hbase.snapshot.region.timeout</name>
+    <value>90000L</value>
+  </property>
 </configuration>
 
