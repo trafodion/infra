@@ -83,7 +83,7 @@ set -x
 chmod o+r $flist
 
 # tinstall user has required permissions to run installer
-sudo -n -u tinstall /usr/local/bin/inst-sudo.sh install \
+sudo -n -u tinstall /usr/local/bin/inst-sudo.sh install "$WORKSPACE" \
        "$instball" \
        "$trafball" \
        "$dcsball" \

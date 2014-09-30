@@ -17,26 +17,34 @@
 #
 # @@@ END COPYRIGHT @@@
 
-source "/usr/local/bin/traf-functions.sh"
-
 # install or uninstall
 action="$1"
 
+# work location - required for traf-functions.sh
+WORKSPACE="$2"
+
 # required tarballs for install
-instball="$2"
-trafball="$3"
-dcsball="$4"
+instball="$3"
+trafball="$4"
+dcsball="$5"
 # optional sql regression tarball
-regball="$5"
+regball="$6"
+
+source "/usr/local/bin/traf-functions.sh"
 
 set -x
 
 if [[ $action == "install" ]]
 then
+  # first clean out hbase from previous tests
+  sudo /usr/local/bin/hbase-clean.sh
+
   sudo rm -rf $INSTLOC $RUNLOC || exit 1
 
-  mkdir $INSTLOC || exit 1
-  mkdir $RUNLOC || exit 1
+  sudo mkdir $INSTLOC || exit 1
+  sudo mkdir $RUNLOC || exit 1
+
+  sudo chown tinstall $INSTLOC || exit 1
 
   cp "$instball" $INSTLOC || exit 1
 
@@ -48,12 +56,10 @@ then
 
   ./installer/trafodion_mods --trafodion_build "$trafball" || exit 2
 
-  sudo /usr/local/bin/hbase-clean.sh
-
   # trafodion user should exist after setup
   sudo chown trafodion $RUNLOC || exit 1
 
-  sudo -u trafodion ./installer/trafodion_install --dcs_servers 6 --init_trafodion \
+  sudo -n -i -u trafodion ./trafodion_installer --dcs_servers 6 --init_trafodion \
 	       --build "$trafball" \
 	       --dcs_build "$dcsball" \
 	       --install_path $RUNLOC
@@ -69,7 +75,7 @@ elif [[ $action == "uninstall" ]]
 then
   cd $INSTLOC
 
-  sudo -u trafodion ./installer/trafodion_uninstall \
+  sudo -n -i -u trafodion ./trafodion_uninstall \
                 --instance $RUNLOC
   exit $?
 

@@ -366,6 +366,25 @@ then
   cm_cmd $CID "Hive Create Warehouse"
 fi
 
+# MapReduce needs /tmp
+hadoop fs -ls /tmp >/dev/null
+if [[ $? != 0 ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHDFS/commands/hdfsCreateTmpDir | jq -r '.id')
+  cm_cmd $CID "HDFS Create tmp"
+fi
+
+# HBase root 
+hadoop fs -ls /hbase >/dev/null
+if [[ $? != 0 ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/hbaseCreateRoot | jq -r '.id')
+  cm_cmd $CID "HBase Create root"
+fi
+
+
 # Start Zookeeper and Hive
 for serv in ZOOKEEPER HIVE
 do
@@ -384,10 +403,6 @@ done
 #if [[ $State == "STOPPED" ]]
 #then
 #  [[ $mode == "check" ]] && exit 5
-#  # create root dir
-#  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/hbaseCreateRoot | jq -r '.id')
-#  cm_cmd $CID "HBase Create Root"
-#
 #  # Start HBase service roles
 #  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/start | jq -r '.id')
 #  cm_cmd $CID "HBase Start"
