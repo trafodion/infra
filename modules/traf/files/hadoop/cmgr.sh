@@ -1,7 +1,24 @@
 #!/bin/bash
+# @@@ START COPYRIGHT @@@
+#
+# (C) Copyright 2010-2014 Hewlett-Packard Development Company, L.P.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# @@@ END COPYRIGHT @@@
 
 # Interact with Cloudera Manager for initial cluster set-up
-# Simple single-node clustr for test environment
+# Simple single-node cluster for test environment
 
 PATH="/bin:/usr/bin"
 
@@ -366,6 +383,25 @@ then
   cm_cmd $CID "Hive Create Warehouse"
 fi
 
+# MapReduce needs /tmp
+hadoop fs -ls /tmp >/dev/null
+if [[ $? != 0 ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHDFS/commands/hdfsCreateTmpDir | jq -r '.id')
+  cm_cmd $CID "HDFS Create tmp"
+fi
+
+# HBase root 
+hadoop fs -ls /hbase >/dev/null
+if [[ $? != 0 ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/hbaseCreateRoot | jq -r '.id')
+  cm_cmd $CID "HBase Create root"
+fi
+
+
 # Start Zookeeper and Hive
 for serv in ZOOKEEPER HIVE
 do
@@ -384,10 +420,6 @@ done
 #if [[ $State == "STOPPED" ]]
 #then
 #  [[ $mode == "check" ]] && exit 5
-#  # create root dir
-#  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/hbaseCreateRoot | jq -r '.id')
-#  cm_cmd $CID "HBase Create Root"
-#
 #  # Start HBase service roles
 #  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/start | jq -r '.id')
 #  cm_cmd $CID "HBase Start"

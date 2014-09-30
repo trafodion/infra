@@ -236,6 +236,11 @@ class traf::slave (
     }
   }
   if $distro == 'CM5.1' {
+    # For CDH5, header files are in separate package
+    package { 'hadoop-libhdfs-devel':
+      ensure  => present,
+      require => Class['::cloudera'],
+    }
     exec {'cluster_setup':
       command => '/usr/local/bin/cmgr.sh 5.1.2',
       unless  => '/usr/local/bin/cmgr.sh check 5.1.2',

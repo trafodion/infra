@@ -17,9 +17,15 @@
 #
 # @@@ END COPYRIGHT @@@
 
+if id trafodion >/dev/null 2>&1
+then
+  user="trafodion"
+else
+  user="jenkins"
+fi
+
 # Look for the usual suspects
-# might need to get more agressive
-Instance=$(pgrep -u jenkins -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts')
+Instance=$(pgrep -u $user -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts')
 
 if [[ -z "$Instance" ]]
 then
@@ -32,20 +38,25 @@ attempt=1
 
 while [[ $attempt -lt 6 ]]
 do
-  ps -u jenkins -H
-  kill -9 $Instance
+  ps -u $user -H
+  if [[ $user == "trafodion" ]]
+  then
+    sudo -n -u trafodion kill -9 $Instance
+  else
+    kill -9 $Instance
+  fi
   sleep 3
 
-  Instance=$(pgrep -u jenkins -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty')
+  Instance=$(pgrep -u $user -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty')
   if [[ -z "$Instance" ]]
   then
     echo "Post-kill processes:"
-    ps -u jenkins -H
+    ps -u $user -H
     exit 0
   fi
   (( attempt += 1 ))
 done
 
 echo "Some instance processes still hanging around:"
-ps -u jenkins -H
+ps -u $user -H
 exit 1

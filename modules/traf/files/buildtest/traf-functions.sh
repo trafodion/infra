@@ -22,13 +22,11 @@
 ############################################################
 # Set common variables
 
-# depend on standard workspace location if jenkins-supplied variables are set
-if [[ -n $HOME && -n $JOB_NAME ]]
+# Set workspace depending on jenkins user home and jenkins job name.
+# Any other user/context should pre-set WORKSPACE.
+if [[ -z $WORKSPACE ]]
 then
   WORKSPACE="$HOME/workspace/$JOB_NAME"
-else
-  # if running manually, must be workspace-root dir
-  WORKSPACE="$(pwd)"
 fi
 
 INSTLOC="$WORKSPACE/traf_inst"
