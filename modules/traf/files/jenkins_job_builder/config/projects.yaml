@@ -23,7 +23,6 @@
     github-org: trafodion
 
     dist:
-      - "cdh4.4"
       - "cdh5.1"
 
     jobs:
@@ -48,7 +47,6 @@
     github-org: trafodion
 
     dist:
-      - "cdh4.4"
       - "cdh5.1"
 
     jobs:
@@ -61,7 +59,6 @@
     github-org: trafodion
 
     dist:
-      - "cdh4.4"
       - "cdh5.1"
 
     jobs:
