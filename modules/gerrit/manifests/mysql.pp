@@ -23,7 +23,8 @@ class gerrit::mysql(
     password => $database_password,
     host     => 'localhost',
     grant    => ['ALL'],
-    charset  => 'latin1',
+    charset  => 'utf8',
+    collate  => 'utf8_general_ci',
     require  => [
       Class['mysql::server'],
       Class['mysql::server::account_security'],
