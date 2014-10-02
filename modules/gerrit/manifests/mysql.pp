@@ -11,8 +11,8 @@ class gerrit::mysql(
     root_password    => $mysql_root_password,
     override_options => {
       'mysqld' => {
-        'default_engine' => 'InnoDB',
-        'bind_address'   => '127.0.0.1',
+        'default-storage-engine' => 'InnoDB',
+        'bind_address'           => '127.0.0.1',
       }
     }
   }
