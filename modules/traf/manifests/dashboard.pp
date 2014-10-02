@@ -90,7 +90,7 @@ class traf::dashboard(
   # update apache2 security configuration
   exec { 'update security':
     cwd     => '/etc/apache2/conf.d',
-    command => "/bin/sed -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
+    command => "/bin/sed -i -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
     unless  => "/bin/grep -E '^ServerTokens Prod' security",
     notify  => Service[apache2],
   }
