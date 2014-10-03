@@ -40,7 +40,7 @@ then
 fi
 MODULES["puppetlabs-apt"]="1.6.0"
 MODULES["puppetlabs-mysql"]="2.3.1"
-MODULES["razorsedge-cloudera"]="2.0.2"
+MODULES["razorsedge-cloudera"]="2.1.1"
 
 # freenode #puppet 2012-09-25:
 # 18:25 < jeblair> i would like to use some code that someone wrote,
