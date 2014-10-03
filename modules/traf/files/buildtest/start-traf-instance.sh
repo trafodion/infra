@@ -139,10 +139,10 @@ START_TRAF() {
     do
       if [[ ! -f "$jar" ]]
       then
-        echo "Error: File not found: $jar"
-        exit 1
+        echo "Warning: File not found: $jar"
+      else
+        [[ -z $jarpath ]] && jarpath="$jar" || jarpath="${jarpath}:$jar"
       fi
-      [[ -z $jarpath ]] && jarpath="$jar" || jarpath="${jarpath}:$jar"
     done
 
     # set java path and start HBase
