@@ -9,6 +9,7 @@ class traf::slave (
   $include_pypy = false,
   $hive_sql_pw = '',
   $distro = '',
+  $logs_host = '',
 ) {
   include traf
   include traf::buildtest
@@ -42,6 +43,18 @@ class traf::slave (
     provider => 'gem',
   }
 
+  # add known host keys for static server to upload logs, etc
+  sshkey { 'logs.trafodion.org':
+    ensure       => present,
+    host_aliases => [
+           'downloads.trafodion.org',
+           'static.trafodion.org',
+           'mvnrepo.trafodion.org',
+    ],
+    type         => 'ssh-rsa',
+    key          => $logs_host,
+  }
+
   # add jenkins public and private ssh keys
   file { '/home/jenkins/.ssh/id_rsa':
     ensure  => present,
@@ -59,6 +72,15 @@ class traf::slave (
     mode    => '0644',
     content => $traf::jenkins_ssh_pub_key,
     require => Class['jenkins::slave'],
+  }
+  # maven scp is too dumb to look at system known_hosts file
+  file { '/home/jenkins/.ssh/known_hosts':
+    ensure  => present,
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    mode    => '0644',
+    source  => '/etc/ssh/ssh_known_hosts',
+    require => Sshkey['logs.trafodion.org'],
   }
 
 
