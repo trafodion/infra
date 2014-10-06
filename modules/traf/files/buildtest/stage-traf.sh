@@ -46,7 +46,7 @@ else
 fi
 
 
-set +x
+set -x
 
 
 # Clean up any previous label directories
@@ -61,7 +61,42 @@ then
   exit 0
 fi
 
+# maven deploy of T2 and T4 drivers  -- non-debug only
+if [[ "$Flavor" == "release" ]]
+then
+  PubRepo="scp://mvnrepo.trafodion.org/srv/static/mvnrepo"
 
+  # official release goes to main repo
+  # intermediate builds goes to dev location
+  if [[ $BLD =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+  then
+    org="org.trafodion"
+  else
+    org="org.trafodion-dev"
+  fi
+
+  cd $workspace/trafodion/core/conn/jdbc_type2
+  cp /usr/local/bin/wagon.xml ./pom.xml
+  mvn deploy:deploy-file  \
+       -Durl="$PubRepo" -Dfile=./dist/jdbcT2.jar \
+       -DgroupId=${org}.jdbc.t2.T2Driver -DartifactId=t2driver \
+       -Dversion="$BLD" -DgeneratePom.description="Trafodion JDBC Type2"
+  rcA=$?
+
+  cd $workspace/trafodion/core/conn/jdbc_type4
+  cp /usr/local/bin/wagon.xml ./pom.xml
+  mvn deploy:deploy-file  \
+       -Durl="$PubRepo" -Dfile=./temp/deploy/lib/jdbcT4.jar \
+       -DgroupId=${org}.jdbc.t4.T4Driver -DartifactId=t4driver \
+       -Dversion="$BLD" -DgeneratePom.description="Trafodion JDBC Type4"
+  rcB=$?
+else
+  rcA=0
+  rcB=0
+fi
+
+cd $workspace
+# create server/clients tarballs
 mkdir -p "./$DestDir" || exit 2
 mkdir -p "./collect" || exit 2
 
@@ -80,12 +115,19 @@ do
 done
 cat collect/build-version.txt
 
-
+# publish (DestDir) dir will be uploaded by scp rules in jenkins job
 cd ./collect
 sha512sum * > sha512.txt
 tar czvf "$workspace/$DestDir/$DestFile" *
+rcC=$?
 
-# Declare success - make this the latest good build version to be uploaded
+if [[ $rcA != 0 || $rcB != 0 || $rcC != 0 ]]
+then
+  exit 2
+fi
+
+# Declare success - make this the latest good build 
+# Versions* file will be uploaded by scp rules in jenkins job
 mv $workspace/Code_Versions $workspace/Versions-${Branch}-${ZUUL_PIPELINE}-${Flavor}.txt
 
 exit 0
