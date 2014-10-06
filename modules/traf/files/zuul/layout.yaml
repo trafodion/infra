@@ -173,8 +173,6 @@ jobs:
     parameter-function: set_log_url
   - name: ^.*-experimental.*$
     voting: false
-  - name: ^core-regress-seabase-cdh5.1$
-    voting: false
 
 projects:
   - name: trafodion/sandbox
