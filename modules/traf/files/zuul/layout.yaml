@@ -202,8 +202,6 @@ projects:
       - core-regress-fullstack2-cdh5.1
       - core-regress-hive-cdh5.1
     gate:
-      - phoenix_quick-cdh5.1
-      - core-regress-core-cdh5.1
       - core-regress-seabase-cdh5.1
       - gate-core-check-for-binary
       - core-build-check-cdh5.1
