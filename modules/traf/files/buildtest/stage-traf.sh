@@ -30,9 +30,9 @@ BLD="$(< $workspace/Build_ID)"
 Flavor="$1"
 if [[ "$Flavor" == "debug" ]]
 then
-  DestFile="trafodion_debug-$BLD.tar.gz"
+  FileSuffix="_debug-$BLD.tar.gz"
 else
-  DestFile="trafodion-$BLD.tar.gz"
+  FileSuffix="-$BLD.tar.gz"
 fi
 
 # side-branch build?
@@ -65,8 +65,11 @@ fi
 mkdir -p "./$DestDir" || exit 2
 mkdir -p "./collect" || exit 2
 
+# clients tarfile
+cp ./trafodion/core/trafodion_clients-*.tgz ./$DestDir/clients$FileSuffix  || exit 2
+
+# core and dcs in server tarfile
 cp trafodion/core/trafodion_server-*.tgz collect/  || exit 2
-cp trafodion/core/trafodion_clients-*.tgz collect/  || exit 2
 
 # change suffix from tar.gz to tgz
 dcsbase=$(basename trafodion/dcs/target/dcs*gz .tar.gz)
@@ -83,7 +86,7 @@ cat collect/build-version.txt
 
 cd ./collect
 sha512sum * > sha512.txt
-tar czvf "$workspace/$DestDir/$DestFile" *
+tar czvf "$workspace/$DestDir/trafodion$FileSuffix" *
 
 # Declare success - make this the latest good build version to be uploaded
 mv $workspace/Code_Versions $workspace/Versions-${Branch}-${ZUUL_PIPELINE}-${Flavor}.txt
