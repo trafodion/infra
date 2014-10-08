@@ -123,6 +123,9 @@ START_TRAF() {
     sudo /usr/local/bin/hbase-sudo.sh stop
     echo "Return code $?"
 
+    # make sure our workspace is readable by hbase user
+    chmod a+rX $TRAF_DIR
+
     # start up instance
     cd $TRAF_DIR/sqf
     mkdir -p ./etc
