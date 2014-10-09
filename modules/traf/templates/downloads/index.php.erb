@@ -64,7 +64,17 @@
         </div>
     </div>
     <?php
-        // function to scan directory
+        /**
+         * Scan directory recursively for files with certain extension.
+         *
+         * Scan directory recursively for files with certain extension. 
+         * Return an array of found files.
+         *
+         * @param string $dir      Directory to start scanning files from
+         * @param bool $onlyFiles  Return only files?
+         * @param bool $fullPath   Return the full path of files/directories?
+         * @return array           Array of files/directories
+         */
         function scanDirectory($dir, $onlyFiles = false, $fullPath = false) {
             $pattern = '/\.(pdf|txt|pom|xml|cab|exe|gz|gzip|jar|msi|tar|tgz|zip|md5|sha1)$/';
             if (isset($dir) && is_readable($dir)) {
@@ -95,6 +105,13 @@
             }
         }
 
+        // callback function to match directory publish/old-release
+        function oldrelease($var) {
+            if (strpos($var, 'publish/old-release') !== false) {
+                return true;
+            }
+        }
+
         // callback function to match directory publish/pre-release
         function prerelease($var) {
             if (strpos($var, 'publish/pre-release') !== false) {
@@ -116,7 +133,16 @@
             }
         }
 
-        // callback function to print links to files
+        /**
+         * Callback function to print links to files.
+         *
+         * @param string $item   The absolute path to a file or empty for blank line
+         * @param string $key    Array key. Inferred usage via array_walk.
+         * @param string $rType  Release type. Should match the subdirectory name under 
+         *                       the trafodion/publish subdirectory. If rType is equal 
+         *                       to "empty_list" then an empty list will be printed 
+         *                       instead of a list of files.
+         */ 
         function print_links($item, $key, $rType) {
             if (is_file($item) === true && $rType != "empty_list") {
                 $shortFname = basename($item);
@@ -128,7 +154,7 @@
                 $iv = bin2hex(openssl_random_pseudo_bytes($ivSize / 2));
                 $hashFname = openssl_encrypt($fName, $cipher, $salt, 0, $iv);
                 echo '<li><a class="postlink" href="#" target="_blank" rn="' . $rType . '" fn="' . $fName . '" token="' . $iv . $hashFname . '">' . $shortFname . '</a></li>' . PHP_EOL;
-            } else if ($rType === "empty_list") {
+            } else {
                 echo '<li class="empty">&nbsp;</li>' . PHP_EOL;
             }
         }
@@ -145,8 +171,8 @@
         $fArray = array_reverse($fArrayTemp);
 
         // create array for release
-        echo '<div class="span-11">' . PHP_EOL;
-        echo '    <h2 class="subhead">Release</h2>' . PHP_EOL;
+        echo '<div class="span-8">' . PHP_EOL;
+        echo '    <h2 class="subhead">Current Release</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
         $releaseArray = array_filter($fArray, "release");
         array_walk($releaseArray, 'print_links', 'release');
@@ -154,23 +180,47 @@
         echo '</div>' . PHP_EOL;
 
         /*
-         * Create array for pre-release and print a list of links based off of the array.
-         * If prereleaseArray is empty print empty links using releaseArray which comes right before it.
-         * If prereleaseArray is smaller than releaseArray then pad prereleaseArray before printing. 
-         * Otherwise just print prereleaseArray.
+         * Create array for previous releases
+         * If oldreleaseArray is empty print empty links using releaseArray which comes right before it.
+         * If oldreleaseArray is smaller than releaseArray then pad oldreleaseArray before printing. 
          * NOTE: Printing empty links preserves the layout of the page.
          */ 
-        echo '<div class="span-11 last">' . PHP_EOL;
+        echo '<div class="span-8">' . PHP_EOL;
+        echo '    <h2 class="subhead">Previous Releases</h2>' . PHP_EOL;
+        echo '    <p><ul>' . PHP_EOL;
+        $oldreleaseArray = array_filter($fArray, "oldrelease");
+        if (sizeof($oldreleaseArray) === 0) {
+            array_walk($releaseArray, 'print_links', 'empty_list');
+        } else if (sizeof($oldreleaseArray) >= sizeof($releaseArray)) {
+            array_walk($oldreleaseArray, 'print_links', 'old-release');
+        } else {
+            // pad prereleaseArray to size of releaseArray
+            $arraySizeDiff = sizeof($releaseArray) - sizeof($oldreleaseArray);
+            for ($i = 1; $i <= $arraySizeDiff; $i++) {
+                $oldreleaseArray[] = 'empty';
+            }
+            array_walk($oldreleaseArray, 'print_links', 'old-release');
+        }
+        echo '    </ul></p>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+
+        /*
+         * Create array for pre-release
+         * If prereleaseArray is empty print empty links using oldreleaseArray which comes right before it.
+         * If prereleaseArray is smaller than oldreleaseArray then pad prereleaseArray before printing. 
+         * NOTE: Printing empty links preserves the layout of the page.
+         */ 
+        echo '<div class="span-8 last">' . PHP_EOL;
         echo '    <h2 class="subhead">Pre-Release</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
         $prereleaseArray = array_filter($fArray, "prerelease");
         if (sizeof($prereleaseArray) === 0) {
-            array_walk($releaseArray, 'print_links', 'empty_list');
-        } else if (sizeof($prereleaseArray) >= sizeof($releaseArray)) {
+            array_walk($oldreleaseArray, 'print_links', 'empty_list');
+        } else if (sizeof($prereleaseArray) >= sizeof($oldreleaseArray)) {
             array_walk($prereleaseArray, 'print_links', 'pre-release');
         } else {
-            // pad prereleaseArray to size of releaseArray
-            $arraySizeDiff = sizeof($releaseArray) - sizeof($prereleaseArray);
+            // pad prereleaseArray to size of oldreleaseArray
+            $arraySizeDiff = sizeof($oldreleaseArray) - sizeof($prereleaseArray);
             for ($i = 1; $i <= $arraySizeDiff; $i++) {
                 $prereleaseArray[] = 'empty';
             }
