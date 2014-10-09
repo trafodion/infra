@@ -37,6 +37,20 @@ source_env -v build $FLAVOR
 
 cd trafodion/core
 
+# Pull latest posted Win-ODBC build if available
+WINLOC="http://logs.trafodion.org/winbld"
+WFILE="TFODBC64-${TRAFODION_VER}.msi"
+
+mkdir -p conn/clients
+wget -O conn/clients/$WFILE $WINLOC/$WFILE
+rc=$?
+
+if [[ $rc != 0 ]]
+then
+  echo "Warning: No Win-ODBC64 build found"
+fi
+
+
 # Use Zuul / Jenkins values
 VER="$(git describe --long --tags --dirty --always)${ZUUL_BRANCH}"
 export PV_BUILDID=${VER}_Bld${BUILD_NUMBER}
