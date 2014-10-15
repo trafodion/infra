@@ -18,6 +18,7 @@
 # @@@ END COPYRIGHT @@@
 
 source "/usr/local/bin/traf-functions.sh"
+log_banner
 
 #===================
 # Define variables

@@ -18,6 +18,7 @@
 # @@@ END COPYRIGHT @@@
 
 source /usr/local/bin/traf-functions.sh
+log_banner
 
 #parameter is build flavor: release or debug
 FLAVOR=$1
@@ -42,7 +43,7 @@ WINLOC="http://logs.trafodion.org/winbld"
 WFILE="TFODBC64-${TRAFODION_VER}.msi"
 
 mkdir -p conn/clients
-wget -O conn/clients/$WFILE $WINLOC/$WFILE
+wget --no-verbose -O conn/clients/$WFILE $WINLOC/$WFILE
 rc=$?
 
 if [[ $rc != 0 ]]

@@ -17,6 +17,9 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+log_banner
+
 rc=0   #so far, so good
 
 text_pat='ASCII|UTF-|FORTRAN|empty|very short file \(no magic\)|Deleted|text|symbolic link'

@@ -17,6 +17,9 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+log_banner
+
 # Clean up all HBase data to start fresh test run
 
 if rpm -q cloudera-manager-server >/dev/null

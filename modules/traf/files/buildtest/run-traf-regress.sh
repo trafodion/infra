@@ -18,6 +18,7 @@
 # @@@ END COPYRIGHT @@@
 
 source "/usr/local/bin/traf-functions.sh"
+log_banner
 
 DIR="$1"  # build tree
 shift
@@ -40,6 +41,7 @@ source_env run
 testloc=$(loc_regress)
 
 # run SQL regression tests
+log_banner "runallsb"
 cd $testloc
 echo "Saving output in Regress.log"
 ./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \

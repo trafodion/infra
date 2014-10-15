@@ -18,6 +18,7 @@
 # @@@ END COPYRIGHT @@@
 
 source "/usr/local/bin/traf-functions.sh"
+log_banner
 
 export TRAF_DIR="$1"                   # location of trafodion/core
 export DCS_INSTALL_DIR="$2"            # location of trafodion/dcs
@@ -58,6 +59,7 @@ fi
 echo ""
 
 # run phoenix_test
+log_banner "phoenix_test.py"
 cd "$WORKSPACE/$TEST_DIR"
 if [ -z "$TESTS" ]; then
   ./phoenix_test.py --target=localhost:37800 --user=dontcare --pw=dontcare \

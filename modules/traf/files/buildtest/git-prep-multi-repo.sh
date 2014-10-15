@@ -19,6 +19,11 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+log_banner
+
+rm -f Git-Prep.log
+
 # arguments: repo list
 PROJ_LIST="$*"
 
@@ -73,8 +78,6 @@ workspace="$(pwd)"
 echo "Using branch: $ZUUL_BRANCH"
 echo "Using reference: $ZUUL_REF"
 
-set -x
-
 # Build ID across repos
 BLDInfo="$ZUUL_PIPELINE Build $(date -u)"
 rm -f "$workspace/Build_ID" "$workspace/Code_Versions"
@@ -99,6 +102,10 @@ fi
 # Leave file around for later job steps
 echo "$BID" > "$workspace/Build_ID"
 
+# Save stderr/stdout in log file
+echo "Saving output to Git-Prep.log"
+set -x
+exec &>Git-Prep.log
 
 # Repo-specific prep
 for repo in $PROJ_LIST

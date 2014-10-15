@@ -31,6 +31,7 @@ dcsball="$5"
 regball="$6"
 
 source "/usr/local/bin/traf-functions.sh"
+log_banner "Trafodion $action"
 
 set -x
 

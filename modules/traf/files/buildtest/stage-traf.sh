@@ -17,6 +17,9 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+log_banner
+
 workspace="$(pwd)"
 
 # ZUUL_PIPELINE indicates if this is daily, pre-release, or release build

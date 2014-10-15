@@ -78,8 +78,8 @@ function source_env () {
   then
     TracingWasOn=0
   else
-    TracingWasOn=1
     set +x
+    TracingWasOn=1
   fi
   currentdir="$(pwd)"
 
@@ -209,4 +209,32 @@ function report_on_corefiles() {
     echo
   fi
   return $CORECOUNT
+}
+
+##############################################################
+# log_banner - make output log more readable
+# 
+# put output banner indicating script running
+#
+function log_banner() {
+  # tracing on?
+  if [[ $(set -o | grep ^xtrace) =~ .*off ]]
+  then
+    TracingWasOn=0
+  else
+    set +x
+    TracingWasOn=1
+  fi
+
+  echo "========================================================"
+  echo "========================================================"
+  echo "=== $(date): $0"
+  echo "=== $*"
+  echo "========================================================"
+
+  # restore environment
+  if (( $TracingWasOn ))
+  then
+    set -x
+  fi
 }

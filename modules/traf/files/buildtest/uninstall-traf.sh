@@ -17,6 +17,9 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+log_banner
+
 # Check if Cloudera-Manager or Ambari is installed
 USE_INSTALLER=0
 

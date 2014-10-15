@@ -17,6 +17,9 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+log_banner
+
 if id trafodion >/dev/null 2>&1
 then
   user="trafodion"

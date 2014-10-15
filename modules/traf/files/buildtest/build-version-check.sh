@@ -30,6 +30,9 @@ then
   exit 11
 fi
 
+source /usr/local/bin/traf-functions.sh
+log_banner
+
 # retrieve previous build version
 # file is created by the stage-traf.sh script 
 # and posted by the traf-pub-* log publisher in jenkins_job_builder/config/traf.yaml
@@ -41,7 +44,7 @@ rm -f Previous_Version
 
 echo "Retrieving Previous_Version file ($LOGFILE)"
 
-wget -O Previous_Version $LOGLOC/$LOGFILE
+wget --no-verbose -O Previous_Version $LOGLOC/$LOGFILE
 rc=$?
 
 if [[ $rc != 0 ]]

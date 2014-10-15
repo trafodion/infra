@@ -18,6 +18,7 @@
 # @@@ END COPYRIGHT @@@
 
 source "/usr/local/bin/traf-functions.sh"
+log_banner
 
 export TRAF_DIR="$1"                   # location of trafodion/core
 export DCS_INSTALL_DIR="$2"            # location of trafodion/dcs
@@ -70,6 +71,7 @@ fi
 echo ""
 
 # run jdbc_test
+log_banner "jdbc_test.py"
 cd "$WORKSPACE/$TEST_DIR"
 ./jdbc_test.py --appid=jdbc_test --target=localhost:37800 \
      --user=dontcare --pw=dontcare --javahome=$JAVA_HOME \

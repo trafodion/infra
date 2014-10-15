@@ -17,6 +17,9 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+log_banner "HBase $1"
+
 action="$1"
 jarpath="$2"
 

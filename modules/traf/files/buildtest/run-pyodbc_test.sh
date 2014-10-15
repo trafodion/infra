@@ -18,6 +18,7 @@
 # @@@ END COPYRIGHT @@@
 
 source "/usr/local/bin/traf-functions.sh"
+log_banner
 source "$HOME/.bashrc"
 
 export TRAF_DIR="$1"                   # location of trafodion/core
@@ -66,6 +67,7 @@ else
   echo ""
 
   # run pyodbc tests
+  log_banner "config.sh"
   cd "$WORKSPACE/$TEST_DIR"
   mkdir "$WORKSPACE/$TEST_DIR/logs"
   export PATH=/usr/local/bin:$PATH
@@ -78,6 +80,7 @@ else
   fi
   echo ""
   set +x
+  log_banner "tox"
 
   if [ -z "$TESTS" ]; then
     echo "INFO: Running ALL pyodbc tests."

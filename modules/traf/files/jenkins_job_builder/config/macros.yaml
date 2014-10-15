@@ -26,7 +26,7 @@
 - builder:
     name: multi-git-prep
     builders:
-      - shell: "/usr/local/bin/git-prep-multi-repo.sh {repos} > Git-Prep.log 2>&1"
+      - shell: "/usr/local/bin/git-prep-multi-repo.sh {repos}"
 
 - builder:
     name: maven-package
