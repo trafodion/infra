@@ -3,7 +3,6 @@
     github-org: trafodion
 
     jobs:
-      - gate-noop
       - gate-{name}-check-for-binary
       - gate-{name}-puppet-lint
       - gate-{name}-puppet-syntax
@@ -13,7 +12,6 @@
     github-org: trafodion
 
     jobs:
-      - gate-noop
       - gate-{name}-puppet-lint
       - gate-{name}-puppet-syntax
       - gate-{name}-check-for-binary
@@ -30,10 +28,6 @@
       - core-build-check-{dist}
       - core-regress-suites
       - gate-{name}-check-for-binary
-      - phoenix_test-{dist}
-      - phoenix_quick-{dist}
-      - jdbc_test-{dist}
-      - pyodbc_test-{dist}
 
 - project:
     name: manuals
@@ -53,6 +47,7 @@
       - gate-{name}-check-for-binary
       - phoenix_test-experimental-{dist}
       - phoenix_test-{dist}
+      - phoenix_quick-{dist}
 
 - project:
     name: dcs
@@ -64,8 +59,6 @@
     jobs:
       - gate-{name}-check-for-binary
       - dcs-build-{dist}
-      - phoenix_test-{dist}
-      - phoenix_quick-{dist}
       - jdbc_test-{dist}
       - pyodbc_test-{dist}
 
