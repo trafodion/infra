@@ -26,6 +26,8 @@
 
   SSLEngine on
   SSLProtocol All -SSLv2 -SSLv3
+  SSLHonorCipherOrder On
+  SSLCipherSuite ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
   SSLCertificateFile      <%= scope.lookupvar("gerrit::ssl_cert_file") %>
   SSLCertificateKeyFile   <%= scope.lookupvar("gerrit::ssl_key_file") %>
 <% if scope.lookupvar("gerrit::ssl_chain_file") != "" %>
