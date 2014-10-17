@@ -124,47 +124,51 @@ then
 fi
 
 # Create Services 
-for serv in HDFS HIVE HBASE ZOOKEEPER MAPREDUCE
+# installer cannot understand arbitrary names for hdfs and hbase services Bug:1381764
+# specify type:name
+for serv in HDFS:hdfs HIVE:trafHIVE HBASE:trafhbase ZOOKEEPER:trafZOO MAPREDUCE:trafMAPRED
 do
-  Service="$(curl $Read $URL/clusters/trafcluster/services/traf$serv | jq -r '.name')"
+  stype=${serv%:*}
+  sname=${serv#*:}
+  Service="$(curl $Read $URL/clusters/trafcluster/services/$sname | jq -r '.name')"
 
   if [[ $Service == "null" ]]
   then
     [[ $mode == "check" ]] && exit 5
-    echo "Creating service: traf$serv"
+    echo "Creating service: $sname"
     Service=$(curl $Create -d'
 		  { "items" : [ {
-		      "name" : "'traf$serv'",
-		      "type" : "'$serv'"
+		      "name" : "'$sname'",
+		      "type" : "'$stype'"
 		    } ] }
 		  ' $URL/clusters/trafcluster/services |
 		  jq -r '.items[0].name'
        )
-    if [[ $Service != "traf$serv" ]]
+    if [[ $Service != "$sname" ]]
     then
-      echo "Error: failed to create $serv service"
+      echo "Error: failed to create $sname service"
       exit 2
     fi
   fi
 done
 
 # Hive config
-cm_config_serv "trafHIVE" "mapreduce_yarn_service" "trafMAPREDUCE"
-cm_config_serv "trafHIVE" "zookeeper_service" "trafZOOKEEPER"
+cm_config_serv "trafHIVE" "mapreduce_yarn_service" "trafMAPRED"
+cm_config_serv "trafHIVE" "zookeeper_service" "trafZOO"
 cm_config_serv "trafHIVE" "hive_metastore_database_password" "insecure_hive"
 
 # MapReduce config
-cm_config_serv "trafMAPREDUCE" "hdfs_service" "trafHDFS"
+cm_config_serv "trafMAPRED" "hdfs_service" "hdfs"
 
 # HBase config
-cm_config_serv "trafHBASE" "hdfs_service" "trafHDFS"
-cm_config_serv "trafHBASE" "zookeeper_service" "trafZOOKEEPER"
+cm_config_serv "trafhbase" "hdfs_service" "hdfs"
+cm_config_serv "trafhbase" "zookeeper_service" "trafZOO"
 
 # Create Service Roles -- all on local host
 host=$(hostname -f)
 
 # HDFS
-Role="$(curl $Read $URL/clusters/trafcluster/services/trafHDFS/roles/trafSEC | jq -r '.name')"
+Role="$(curl $Read $URL/clusters/trafcluster/services/hdfs/roles/trafSEC | jq -r '.name')"
 
 if [[ $Role == "null" ]]
 then
@@ -196,7 +200,7 @@ then
 				      "value" : "/data/dfs/secname"
 		                 } ] }
 		    } ] }
-		  ' $URL/clusters/trafcluster/services/trafHDFS/roles | jq -r '.items[].name'
+		  ' $URL/clusters/trafcluster/services/hdfs/roles | jq -r '.items[].name'
        )
   if [[ ! ($Roles =~ trafDATA && $Roles =~ trafNAME) ]]
   then
@@ -206,7 +210,7 @@ then
 fi
 
 # Zookeeper
-Role="$(curl $Read $URL/clusters/trafcluster/services/trafZOOKEEPER/roles/trafSERV | jq -r '.name')"
+Role="$(curl $Read $URL/clusters/trafcluster/services/trafZOO/roles/trafSERV | jq -r '.name')"
 
 if [[ $Role == "null" ]]
 then
@@ -218,7 +222,7 @@ then
 		      "type" : "SERVER",
 		      "hostRef" : { "hostId" : "'$host'" }
 		    } ] }
-		  ' $URL/clusters/trafcluster/services/trafZOOKEEPER/roles | jq -r '.items[].name'
+		  ' $URL/clusters/trafcluster/services/trafZOO/roles | jq -r '.items[].name'
        )
   if [[ ! ($Roles =~ trafSERV) ]]
   then
@@ -228,7 +232,7 @@ then
 fi
 
 # MapReduce
-Role="$(curl $Read $URL/clusters/trafcluster/services/trafMAPREDUCE/roles/trafJOB | jq -r '.name')"
+Role="$(curl $Read $URL/clusters/trafcluster/services/trafMAPRED/roles/trafJOB | jq -r '.name')"
 
 if [[ $Role == "null" ]]
 then
@@ -252,7 +256,7 @@ then
 				      "value" : "/data/mr/tasks"
 		                 } ] }
 		    } ] }
-		  ' $URL/clusters/trafcluster/services/trafMAPREDUCE/roles | jq -r '.items[].name'
+		  ' $URL/clusters/trafcluster/services/trafMAPRED/roles | jq -r '.items[].name'
        )
   if [[ ! ($Roles =~ trafJOB) ]]
   then
@@ -305,7 +309,7 @@ then
 fi
 
 # HBase
-Role="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE/roles/trafMAS | jq -r '.name')"
+Role="$(curl $Read $URL/clusters/trafcluster/services/trafhbase/roles/trafMAS | jq -r '.name')"
 
 if [[ $Role == "null" ]]
 then
@@ -321,7 +325,7 @@ then
 		      "type" : "REGIONSERVER",
 		      "hostRef" : { "hostId" : "'$host'" }
 		    } ] }
-		  ' $URL/clusters/trafcluster/services/trafHBASE/roles | jq -r '.items[].name'
+		  ' $URL/clusters/trafcluster/services/trafhbase/roles | jq -r '.items[].name'
        )
   if [[ ! ($Roles =~ trafMAS && $Roles =~ trafREG) ]]
   then
@@ -332,25 +336,25 @@ fi
 
 # Start HDFS
 
-State="$(curl $Read $URL/clusters/trafcluster/services/trafHDFS | jq -r '.serviceState')"
+State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
 
 if [[ $State == "STOPPED" ]]
 then
   # Make sure namenode is formatted
   CID=$(curl $Create -d'
 		  { "items" : [ "trafNAME" ] }
-  		' $URL/clusters/trafcluster/services/trafHDFS/roleCommands/hdfsFormat |
+  		' $URL/clusters/trafcluster/services/hdfs/roleCommands/hdfsFormat |
 		  jq -r '.items[0].id'
 	)
   cm_cmd $CID "HDFS Format"
 
   [[ $mode == "check" ]] && exit 5
   # Start HDFS service roles
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHDFS/commands/start | jq -r '.id')
+  CID=$(curl $Create $URL/clusters/trafcluster/services/hdfs/commands/start | jq -r '.id')
   cm_cmd $CID "HDFS Start"
 
   # Check status
-  State="$(curl $Read $URL/clusters/trafcluster/services/trafHDFS | jq -r '.serviceState')"
+  State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
   if [[ $State =~ STOP ]] # stopped, stopping
   then
     echo "Error: HDFS not started"
@@ -359,7 +363,7 @@ then
 fi
 
 # Deploy Client Config
-State="$(curl $Read $URL/clusters/trafcluster/services/trafHDFS | jq -r '.clientConfigStalenessStatus')"
+State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.clientConfigStalenessStatus')"
 if [[ $State =~ STALE ]]
 then
   [[ $mode == "check" ]] && exit 5
@@ -388,7 +392,7 @@ hadoop fs -ls /tmp >/dev/null
 if [[ $? != 0 ]]
 then
   [[ $mode == "check" ]] && exit 5
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHDFS/commands/hdfsCreateTmpDir | jq -r '.id')
+  CID=$(curl $Create $URL/clusters/trafcluster/services/hdfs/commands/hdfsCreateTmpDir | jq -r '.id')
   cm_cmd $CID "HDFS Create tmp"
 fi
 
@@ -397,38 +401,38 @@ hadoop fs -ls /hbase >/dev/null
 if [[ $? != 0 ]]
 then
   [[ $mode == "check" ]] && exit 5
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/hbaseCreateRoot | jq -r '.id')
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/hbaseCreateRoot | jq -r '.id')
   cm_cmd $CID "HBase Create root"
 fi
 
 
 # Start Zookeeper and Hive
-for serv in ZOOKEEPER HIVE
+for serv in trafZOO trafHIVE trafMAPRED
 do
-  State="$(curl $Read $URL/clusters/trafcluster/services/traf$serv | jq -r '.serviceState')"
+  State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
   if [[ $State == "STOPPED" ]]
   then
     [[ $mode == "check" ]] && exit 5
-    CID=$(curl $Create $URL/clusters/trafcluster/services/traf${serv}/commands/start | jq -r '.id')
+    CID=$(curl $Create $URL/clusters/trafcluster/services/${serv}/commands/start | jq -r '.id')
     cm_cmd $CID "$serv Start"
   fi
 done
 
 # Start HBase
 
-#State="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE | jq -r '.serviceState')"
+#State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
 #if [[ $State == "STOPPED" ]]
 #then
 #  [[ $mode == "check" ]] && exit 5
 #  # Start HBase service roles
-#  CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/start | jq -r '.id')
+#  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/start | jq -r '.id')
 #  cm_cmd $CID "HBase Start"
 #
 #  # Check status
-#  State="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE | jq -r '.serviceState')"
+#  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
 #  if [[ $State =~ STOP ]] # stopped, stopping
 #  then
-#    echo "Error: HBASE not started"
+#    echo "Error: trafhbase not started"
 #    exit 2
 #  fi
 #fi
