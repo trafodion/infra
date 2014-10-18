@@ -16,6 +16,9 @@ class iptables(
   $public_udp_ports = [],
   $blacklist_rules4 = [],
   $blacklist_rules6 = [],
+  $rate_unlimit_ips4 = [],
+  $rate_unlimit_ips6 = [],
+  $ssh_hitcount = '3',
   $log_file = '/var/log/iptables.log',
 ) {
 

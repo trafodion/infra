@@ -3,29 +3,67 @@
 :FORWARD DROP [0:0]
 :OUTPUT ACCEPT [0:0]
 :BLACKLIST - [0:0]
-:LOGDROP - [0:0]
 :TRAF-INPUT - [0:0]
+
+# accept established sessions
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
 # machine talking to itself on loopback and public IP
 -A INPUT -i lo -j ACCEPT
 -A INPUT -s <%= ipaddress %> -m comment --comment "Allow machine to talk to itself on public IP" -j ACCEPT
+
+# if source is from local subnet or from a list of IPs that shouldn't be rate limited then jump to TRAF-INPUT 
+# this should allow it to bypass rate-limiting
+<% if @ipaddress.start_with? "192.168.0" -%>
+-A INPUT -s 192.168.0.0/24 -m comment --comment "Machine from local subnet in US West" -j TRAF-INPUT
+<% elsif @ipaddress.start_with? "172." -%>
+-A INPUT -s 172.16.0.0/12 -m comment --comment "Machine from local subnet in US East" -j TRAF-INPUT
+<% end -%>
+<% rate_unlimit_ips4.each do |ru_ip| -%>
+-A INPUT -s <%= ru_ip %> -m comment --comment "This IP is not rate limited" -j TRAF-INPUT
+<% end -%>
+
+# go to BLACKLIST chain and check if IP blacklisted
 -A INPUT -j BLACKLIST
+
+# accept ICMP (ping) requests but limit them to 10 packets per 30 sec per remote IP
+-A INPUT -m icmp -p icmp --icmp-type any -m recent --set --name ICMPAccess --rsource
+-A INPUT -m icmp -p icmp --icmp-type any -m recent --update --seconds 30 --hitcount 10 --name ICMPAccess --rsource -j DROP
+
+# accept NTP requests but limit them to 10 packets per 30 sec per remote IP
+-A INPUT -p udp -m udp --dport 123 -m recent --set --name NTPAccess --rsource
+-A INPUT -p udp -m udp --dport 123 -m recent --update --seconds 30 --hitcount 10 --name NTPAccess --rsource -j DROP
+
+# accept SSH requests but limit them to <%= ssh_hitcount %> - 1 attempts per minute per remote IP
+-A INPUT -p tcp -m tcp --dport 22 -m state --state NEW -m recent --set --name SSHAccess --rsource
+-A INPUT -p tcp -m tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount <%= ssh_hitcount %> --name SSHAccess --rsource -j DROP
+
+# go to TRAF-INPUT chain
 -A INPUT -j TRAF-INPUT
--A INPUT -m limit --limit 1/sec -j LOG --log-prefix "IPTABLES (limit 1/sec): " --log-level 7
+
+# if packet gets here then log it and drop it
+-A INPUT -j LOG --log-prefix "IPTABLES (End INPUT): " --log-level 7
 -A INPUT -j DROP
+
+# BLACKLIST chain rules
 <% blacklist_rules4.each do |blacklist| -%>
 -A BLACKLIST <%= blacklist %>
 <% end -%>
-# Log IP making more than 1 connection per second for SSH
--A LOGDROP -p tcp -m tcp --dport 22 -m limit --limit 1/s -j LOG --log-prefix "IPTABLES (ssh_blacklist): " --log-level 7
--A LOGDROP -j REJECT --reject-with icmp-host-prohibited
-# accept all ICMP request but limit them to 1 per sec
--A TRAF-INPUT -m icmp -p icmp --icmp-type any -m state --state NEW -m limit --limit 1/s --limit-burst 1 -j ACCEPT
+
+# TRAF-INPUT chain rules start
+# Accept ICMP
+-A TRAF-INPUT -m icmp -p icmp --icmp-type any -j ACCEPT
+
+# Accept NTP
+-A TRAF-INPUT -p udp -m udp --dport 123 -j ACCEPT
+
 # SSH from anywhere
 -A TRAF-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+
 # SNMP from trafodion cacti
 #-A TRAF-INPUT -m udp -p udp --dport 161 -s 15.125.67.199 -j ACCEPT
 #-A TRAF-INPUT -m udp -p udp --dport 161 -s 192.168.0.99 -j ACCEPT
+
 # Public TCP ports
 <% public_tcp_ports.each do |port| -%>
 -A TRAF-INPUT -m tcp -p tcp --dport <%= port %> -j ACCEPT

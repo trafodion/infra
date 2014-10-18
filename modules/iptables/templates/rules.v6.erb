@@ -3,27 +3,59 @@
 :FORWARD DROP [0:0]
 :OUTPUT ACCEPT [0:0]
 :BLACKLIST - [0:0]
-:LOGDROP - [0:0]
 :TRAF-INPUT - [0:0]
+
+# accept established sessions
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# machine talking to itself on loopback and public IP
 -A INPUT -i lo -j ACCEPT
+
+# if source is from local subnet or from a list of IPs that shouldn't be rate limited then jump to TRAF-INPUT
+# this should allow it to bypass rate-limiting
+# enter rule here once IPv6 subnet is known
+
+# go to BLACKLIST chain and check if IP blacklisted
 -A INPUT -j BLACKLIST
+
+# accept ICMP (ping) requests but limit them to 10 packets per 30 sec per remote IP
+-A INPUT -p ipv6-icmp -m recent --set --name ICMPv6Access --rsource
+-A INPUT -p ipv6-icmp -m recent --update --seconds 30 --hitcount 10 --name ICMPv6Access --rsource -j DROP
+
+# accept NTP requests but limit them to 10 packets per 30 sec per remote IP
+-A INPUT -p udp -m udp --dport 123 -m recent --set --name NTPv6Access --rsource
+-A INPUT -p udp -m udp --dport 123 -m recent --update --seconds 30 --hitcount 10 --name NTPv6Access --rsource -j DROP
+
+# accept SSH requests but limit them to <%= ssh_hitcount %> - 1 attempts per minute per remote IP
+-A INPUT -p tcp -m tcp --dport 22 -m state --state NEW -m recent --set --name SSHv6Access --rsource
+-A INPUT -p tcp -m tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount <%= ssh_hitcount %> --name SSHv6Access --rsource -j DROP
+
+# go to TRAF-INPUT chain
 -A INPUT -j TRAF-INPUT
--A INPUT -m limit --limit 1/sec -j LOG --log-prefix "IPTABLES (limit 1/sec): " --log-level 7
+
+# if packet gets here then log it and drop it
+-A INPUT -j LOG --log-prefix "IPTABLES (End INPUT): " --log-level 7
 -A INPUT -j DROP
+
+# BLACKLIST chain rules
 <% blacklist_rules6.each do |blacklist| -%>
 -A BLACKLIST <%= blacklist %>
 <% end -%>
-# Log IP making more than 1 connection per second for SSH
--A LOGDROP -p tcp -m tcp --dport 22 -m limit --limit 1/sec -j LOG --log-prefix "IPTABLES (ssh_blacklist): " --log-level 7
--A LOGDROP -j REJECT --reject-with icmp6-adm-prohibited
-# accept all ICMP request but limit them to 1 per sec
--A TRAF-INPUT -p ipv6-icmp -m limit --limit 1/sec -j ACCEPT
+
+# TRAF-INPUT chain rules start
+# Accept ICMP
+-A TRAF-INPUT -p ipv6-icmp -j ACCEPT
+
+# Accept NTP
+-A TRAF-INPUT -p udp -m udp --dport 123 -j ACCEPT
+
 # SSH from anywhere
 -A TRAF-INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+
 # SNMP from trafodion cacti
 #-A TRAF-INPUT -m udp -p udp --dport 161 -s 0:0:0:0:0:ffff:f7d:43c7 -j ACCEPT
 #-A TRAF-INPUT -m udp -p udp --dport 161 -s  0:0:0:0:0:ffff:c0a8:63 -j ACCEPT
+
 # Public TCP ports
 <% public_tcp_ports.each do |port| -%>
 -A TRAF-INPUT -m tcp -p tcp --dport <%= port %> -j ACCEPT

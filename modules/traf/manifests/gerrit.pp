@@ -68,15 +68,19 @@ class traf::gerrit (
   $cgit = false,
   $web_repo_url = '',
   $secondary_index = true,
+  $smtp_servers = hiera('smtp_server_ips'),
 ) {
+  # turn list of smtp_servers into a list of iptables rules
+  $iptables4_rules = regsubst ($smtp_servers, '^(.*)$', '-m tcp -p tcp --dport 25 -s \1 -j ACCEPT')
+
   class { 'traf::server':
     iptables_public_tcp_ports => [80, 443, 29418],
+    iptables_rules4           => $iptables4_rules,
     sysadmins                 => $sysadmins,
   }
 
   class { 'jeepyb::openstackwatch':
-    projects       => [
-    ],
+    projects       => [],
     container      => 'rss',
     feed           => 'openstackwatch.xml',
     json_url       => "https://${::fqdn}/query?q=status:open",

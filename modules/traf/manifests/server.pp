@@ -6,14 +6,20 @@ class traf::server (
   $iptables_public_udp_ports = [],
   $iptables_rules4           = [],
   $iptables_rules6           = [],
+  $rate_unlimit_ips4         = [],
+  $rate_unlimit_ips6         = [],
+  $ssh_hitcount              = '3',
   $sysadmins                 = [],
-  $certname                  = $::fqdn
+  $certname                  = $::fqdn,
 ) {
   class { 'traf::template':
     iptables_public_tcp_ports => $iptables_public_tcp_ports,
     iptables_public_udp_ports => $iptables_public_udp_ports,
     iptables_rules4           => $iptables_rules4,
     iptables_rules6           => $iptables_rules6,
+    rate_unlimit_ips4         => $rate_unlimit_ips4,
+    rate_unlimit_ips6         => $rate_unlimit_ips6,
+    ssh_hitcount              => $ssh_hitcount,
     certname                  => $certname,
   }
   #class { 'exim':
