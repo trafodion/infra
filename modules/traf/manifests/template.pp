@@ -8,7 +8,10 @@ class traf::template (
   $iptables_rules4           = [],
   $iptables_rules6           = [],
   $install_users = true,
-  $certname = $::fqdn
+  $certname = $::fqdn,
+  $rate_unlimit_ips4 = [],
+  $rate_unlimit_ips6 = [],
+  $ssh_hitcount = '',
 ) {
   # Turn a list of IPs into a list of iptables rules
   $ipv4_blacklist_ips = hiera('ipv4_all_blacklist')
@@ -25,12 +28,15 @@ class traf::template (
   include traf::automatic_upgrades
 
   class { 'iptables':
-    public_tcp_ports => $iptables_public_tcp_ports,
-    public_udp_ports => $iptables_public_udp_ports,
-    rules4           => $iptables_rules4,
-    rules6           => $iptables_rules6,
-    blacklist_rules4 => $block_rules4,
-    blacklist_rules6 => $block_rules6,
+    public_tcp_ports  => $iptables_public_tcp_ports,
+    public_udp_ports  => $iptables_public_udp_ports,
+    rules4            => $iptables_rules4,
+    rules6            => $iptables_rules6,
+    blacklist_rules4  => $block_rules4,
+    blacklist_rules6  => $block_rules6,
+    rate_unlimit_ips4 => $rate_unlimit_ips4,
+    rate_unlimit_ips6 => $rate_unlimit_ips6,
+    ssh_hitcount      => $ssh_hitcount,
   }
 
   class { 'ntp': }

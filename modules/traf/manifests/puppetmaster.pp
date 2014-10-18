@@ -7,6 +7,7 @@ class traf::puppetmaster (
 ) {
   class { 'traf::server':
     iptables_public_tcp_ports => [4505, 4506, 8140],
+    ssh_hitcount              => '4',
     sysadmins                 => $sysadmins,
   }
 
