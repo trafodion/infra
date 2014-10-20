@@ -89,11 +89,11 @@ function source_env () {
     shift
   fi
 
-  # test environment build tools
-  export TOOLSDIR=/opt/traf/tools
-
   if [[ $1 == "build" ]]
   then
+    # test environment build tools
+    export TOOLSDIR=/opt/traf/tools
+
     cd "$WORKSPACE/trafodion/core/sqf"
 
     # If no flavor specified, has a flavor been specified previously?
@@ -118,14 +118,19 @@ function source_env () {
     echo "Sourcing ./$ENVfile"
     source ./$ENVfile
     rc=$?
+    echo "TOOLSDIR=${TOOLSDIR}"
 
   elif [[ $1 == "run" ]]
   then
+    # build tools - unset for run-time
+    unset TOOLSDIR=
+
     source "$WORKSPACE/InstallEnv.sh"
     echo "Sourcing $ILOC/$IENV"
     cd "$ILOC"
     source "./$IENV"
     rc=$?
+    echo "TOOLSDIR=${TOOLSDIR}"
 
   else
     echo "Error: specify build or run environment"
