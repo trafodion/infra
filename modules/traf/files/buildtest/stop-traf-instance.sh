@@ -55,7 +55,7 @@ set -x
 if [ $# -eq 1 -a -d "$1" ]; then
     cd "$WORKSPACE"
     cd "$1"
-    source_env build
+    source_env run
 elif [ $# -gt 1 ]; then
     echo "ERROR: Incorrect number of input parameters passed to ${PRG_NAME}"
     PROGRAM_HELP

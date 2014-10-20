@@ -135,11 +135,11 @@ START_TRAF() {
     # system hadoop installation location
     export HADOOP_MAPRED_HOME=/usr/lib/hadoop-mapreduce
 
-    source_env build
+    source_env run
 
     # Check jar files
     jarpath=""
-    for jar in "${HBASE_TRXDIR}/${HBASE_TRX_JAR}" "$HBASE_HBLDIR/$HBASE_HBL_JAR"
+    for jar in "${HBASE_TRXDIR}/${HBASE_TRX_JAR}"
     do
       if [[ ! -f "$jar" ]]
       then
