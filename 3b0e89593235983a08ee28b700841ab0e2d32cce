@@ -1,0 +1,9 @@
+Code-Review+2: Steve Varnau <steve.varnau@hp.com>
+Workflow+1: Steve Varnau <steve.varnau@hp.com>
+Verified+2: Trafodion Jenkins
+Code-Review+1: Chris Sheedy <chris.sheedy@hp.com>
+Submitted-by: Trafodion Jenkins
+Submitted-at: Tue, 21 Oct 2014 16:58:04 +0000
+Reviewed-on: https://review.trafodion.org/588
+Project: trafodion/infra
+Branch: refs/heads/master
