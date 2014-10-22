@@ -99,7 +99,8 @@ class traf::python276 {
   exec { 'pip_install_virtualenv' :
       path        => '/usr/local/bin:/usr/bin:/bin',
       environment => 'PYTHONHOME=/usr/local',
-      command     => 'pip install virtualenv',
+      command     => 'pip install virtualenv==1.11.6',
+      unless      => "pip freeze | grep 'virtualenv==1.11.6'",
       creates     => '/usr/local/bin/virtualenv',
       require     => Exec['run_get-pip.py'],
   }
@@ -124,16 +125,18 @@ class traf::python276 {
   exec { 'pip_install_python-subunit' :
       path        => '/usr/local/bin:/usr/bin:/bin',
       environment => 'PYTHONHOME=/usr/local',
-      command     => 'pip install python-subunit',
+      command     => 'pip install python-subunit==0.0.21',
       creates     => '/usr/local/bin/subunit2pyunit',
+      unless      => "pip freeze | grep 'python-subunit==0.0.21'",
       require     => Exec['run_get-pip.py'],
   }
 
   exec { 'pip_install_testrepository' :
       path        => '/usr/local/bin:/usr/bin:/bin',
       environment => 'PYTHONHOME=/usr/local',
-      command     => 'pip install testrepository',
+      command     => 'pip install testrepository==0.0.20',
       creates     => '/usr/local/bin/testr',
+      unless      => "pip freeze | grep 'testrepository==0.0.20'",
       require     => Exec['run_get-pip.py'],
   }
 
@@ -157,9 +160,9 @@ class traf::python276 {
   exec { 'pip_install_tox' :
       path        => '/usr/local/bin:/usr/bin:/bin',
       environment => 'PYTHONHOME=/usr/local',
-      command     => 'pip install tox==1.6.1',
+      command     => 'pip install tox==1.7.2',
       creates     => '/usr/local/bin/tox',
-      unless      => "pip freeze | grep 'tox==1.6.1'",
+      unless      => "pip freeze | grep 'tox==1.7.2'",
       require     => Exec['run_get-pip.py'],
   }
 
@@ -168,6 +171,14 @@ class traf::python276 {
       environment => 'PYTHONHOME=/usr/local',
       command     => 'pip install http://dl.bintray.com/alchen99/python/pyodbc-3.0.7.1-unsupported.zip',
       unless      => "pip freeze | grep 'pyodbc==3.0.7.1-unsupported'",
+      require     => Exec['run_get-pip.py'],
+  }
+
+  exec { 'pip_install_pypyodbc' :
+      path        => '/usr/local/bin:/usr/bin:/bin',
+      environment => 'PYTHONHOME=/usr/local',
+      command     => 'pip install http://dl.bintray.com/alchen99/python/pypyodbc-1.3.3.1-unsupported.zip',
+      unless      => "pip freeze | grep 'pypyodbc==1.3.3.1-unsupported'",
       require     => Exec['run_get-pip.py'],
   }
 
@@ -182,29 +193,22 @@ class traf::python276 {
         Exec['pip_install_pyflakes'], Exec['pip_install_python-subunit'],
         Exec['pip_install_testrepository'], Exec['pip_install_pep8'],
         Exec['pip_install_tox'], Exec['pip_install_junitxml'],
-        Exec['pip_install_pythonodbc']
+        Exec['pip_install_pythonodbc'], Exec['pip_install_pypyodbc'],
       ],
   }
 
   exec { 'check_tox_version' :
       path        => '/usr/local/bin:/usr/bin:/bin',
       environment => 'PYTHONHOME=/usr/local',
-      command     => 'pip uninstall -y tox; pip install tox==1.6.1',
-      unless      => "pip freeze | grep 'tox==1.6.1'",
+      command     => 'pip uninstall -y tox; pip install tox==1.7.2',
+      unless      => "pip freeze | grep 'tox==1.7.2'",
       require     => [
         Exec['pip_install_virtualenv'], Exec['pip_install_flake8'],
         Exec['pip_install_pyflakes'], Exec['pip_install_python-subunit'],
         Exec['pip_install_testrepository'], Exec['pip_install_pep8'],
         Exec['pip_install_tox'], Exec['pip_install_junitxml'],
-        Exec['pip_install_pythonodbc']
+        Exec['pip_install_pythonodbc'], Exec['pip_install_pypyodbc'],
       ],
-  }
-
-  # copy missing file subunit2csv to /usr/local/bin
-  file { '/usr/local/bin/subunit2csv':
-      ensure => present,
-      mode   => '0775',
-      source => 'puppet:///modules/traf/python/subunit2csv',
   }
 
 }
