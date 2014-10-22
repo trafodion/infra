@@ -72,6 +72,7 @@ else
   mkdir "$WORKSPACE/$TEST_DIR/logs"
   export PATH=/usr/local/bin:$PATH
   ./config.sh -r -v -d localhost:37800 \
+    -u <%= jenkins_test_user %> -p <%= jenkins_test_password %> \
     -t $WORKSPACE/$TRAF_DIR/conn/clients/TRAF_ODBC_Linux_Driver_64.tar.gz
   if [ $? -ne 0 ]
   then
