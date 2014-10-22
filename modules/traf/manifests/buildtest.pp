@@ -1,6 +1,9 @@
 # == Class: traf::buildtest
 #
-class traf::buildtest {
+class traf::buildtest (
+  $jenkins_test_user = hiera('jenkins_test_user', 'dontcare'),
+  $jenkins_test_password = hiera('jenkins_test_password', 'dontcare'),
+) {
 
   # Build/test scripts
   file { '/usr/local/bin':
@@ -11,6 +14,33 @@ class traf::buildtest {
     source  => 'puppet:///modules/traf/buildtest',
     recurse => true,
     purge   => false,
+  }
+
+  file { '/usr/local/bin/run-jdbc_test.sh':
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('traf/buildtest/run-jdbc_test.sh.erb'),
+    require => File['/usr/local/bin'],
+  }
+
+  file { '/usr/local/bin/run-phoenix_test.sh':
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('traf/buildtest/run-phoenix_test.sh.erb'),
+    require => File['/usr/local/bin'],
+  }
+
+  file { '/usr/local/bin/run-pyodbc_test.sh':
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('traf/buildtest/run-pyodbc_test.sh.erb'),
+    require => File['/usr/local/bin'],
   }
 
   # install Maven

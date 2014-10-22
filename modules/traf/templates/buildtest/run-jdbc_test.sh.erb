@@ -74,7 +74,7 @@ echo ""
 log_banner "jdbc_test.py"
 cd "$WORKSPACE/$TEST_DIR"
 ./jdbc_test.py --appid=jdbc_test --target=localhost:37800 \
-     --user=dontcare --pw=dontcare --javahome=$JAVA_HOME \
+     --user=<%= jenkins_test_user %> --pw=<%= jenkins_test_password %> --javahome=$JAVA_HOME \
      --jdbctype=T4 --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar ${TESTS}
 jdbcRes=$?
 
