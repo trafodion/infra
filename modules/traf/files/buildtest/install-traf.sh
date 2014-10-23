@@ -32,7 +32,7 @@ fi
 # Check if Cloudera-Manager or Ambari is installed
 USE_INSTALLER=0
 
-for pkg in cloudera-manager-server ambari-server
+for pkg in cloudera-manager-server #ambari-server
 do
   rpm -q $pkg >/dev/null
   if [[ $? == 0 ]]

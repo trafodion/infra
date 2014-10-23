@@ -17,31 +17,6 @@ class traf::horton (
   }
 
 
-  if $distro == 'HDP1.3' {
-    # packages needed for a stand-alone node
-    $packages = [
-      'hadoop',
-      'hadoop-native',
-      'hadoop-pipes',
-      'hadoop-sbin',
-      'hadoop-namenode',
-      'hadoop-datanode',
-      'hadoop-libhdfs',
-      'hbase',
-      'hbase-master',
-      'hbase-thrift',
-      'hive',
-      'hcatalog',
-      'zookeeper',
-      'zookeeper-server',
-    ]
-    $repofile = 'puppet:///modules/traf/hadoop/horton-hdp1.3.repo'
-    $coresite = 'puppet:///modules/traf/hadoop/core-site.xml-1.2'
-    $hdfssite = 'puppet:///modules/traf/hadoop/hdfs-site.xml-1.2'
-    $hdfs_services = ['hadoop-datanode','hadoop-namenode']
-    $zoopidfile = '/var/lib/zookeeper/version-2/snapshot-0'
-    $hive_ver = '0.9.0'
-  } # HDP1.3
   if $distro == 'HDP2.1' {
     $packages = [
       'hadoop',
@@ -58,10 +33,13 @@ class traf::horton (
       'hive-hcatalog',
       'zookeeper',
       'zookeeper-server',
+      'ambari-server',
     ]
     $repofile = 'puppet:///modules/traf/hadoop/horton-hdp2.1.repo'
+    $repoamb = 'puppet:///modules/traf/hadoop/ambari-1.6.1.repo'
     $coresite = 'puppet:///modules/traf/hadoop/core-site.xml'
     $hdfssite = 'puppet:///modules/traf/hadoop/hdfs-site.xml'
+    $hbasefile = 'hbase-site.xml-0.9'
     $hdfs_services = ['hadoop-hdfs-datanode','hadoop-hdfs-namenode']
     $zoopidfile = '/var/lib/zookeeper/zookeeper_server.pid'
     $hive_ver = '0.13.0'
@@ -78,6 +56,12 @@ class traf::horton (
     group  => 'root',
     mode   => '0644',
     source => $repofile,
+  }
+  file { '/etc/yum.repos.d/ambari.repo':
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+    source => $repoamb,
   }
 
   package { $packages:
@@ -123,7 +107,7 @@ class traf::horton (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    source  => 'puppet:///modules/traf/hadoop/hbase-site.xml',
+    source  => 'puppet:///modules/traf/hadoop/${hbasefile}',
     require => Exec['hbase-conf'],
   }
   file { '/etc/hive/conf/hive-site.xml':
@@ -134,14 +118,6 @@ class traf::horton (
     require => Package['hive'],
   }
 
-  # Both JAVA_HOME setting methods don't conflict, so we'll do both
-
-  # JAVA_HOME setting for HDP1
-  exec { 'hadoop-default':
-    command => '/bin/echo "export JAVA_HOME=/usr/lib/jvm/java-openjdk" >> /etc/default/hadoop',
-    unless  => '/bin/grep -q JAVA_HOME /etc/default/hadoop',
-    require => Package[$packages],
-  }
   # JAVA_HOME setting for HDP2
   file { '/usr/lib/bigtop-utils/bigtop-detect-javahome':
     owner   => 'root',
@@ -250,12 +226,18 @@ class traf::horton (
   }
 
 
+  exec { 'zookeeper-env':
+    command =>
+          '/bin/echo "export ZOO_LOG_DIR=/var/log/zookeeper" >> /etc/zookeeper/conf/zookeeper-env.sh',
+    unless  => '/bin/grep "/var/log/zookeeper" /etc/zookeeper/conf/zookeeper-env.sh',
+    require => [Package['zookeeper-server'] ]
+  }
   exec { 'zookeeper-init':
     command =>
           '/usr/lib/zookeeper/bin/zkServer.sh start /etc/zookeeper/conf/zoo.cfg',
     user    => 'zookeeper',
     creates => $zoopidfile,
-    require => [Package['zookeeper-server'],Group['zookeeper'] ]
+    require => [Exec['zookeeper-env'],Group['zookeeper'] ]
   }
   group { 'zookeeper':
     ensure  => present,

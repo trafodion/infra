@@ -123,7 +123,7 @@ function source_env () {
   elif [[ $1 == "run" ]]
   then
     # build tools - unset for run-time
-    unset TOOLSDIR=
+    unset TOOLSDIR
 
     source "$WORKSPACE/InstallEnv.sh"
     echo "Sourcing $ILOC/$IENV"
