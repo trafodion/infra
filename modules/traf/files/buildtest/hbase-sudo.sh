@@ -38,7 +38,14 @@ fi
 if [[ "$action" == "stop" ]]
 then
   echo "Stopping hbase-master"
-  /sbin/service hbase-master stop
+  # cdh has hbase service, hdp does not
+  if [[ -e /etc/init.d/hbase-master ]]
+  then
+    /sbin/service hbase-master stop
+  else
+    sudo -u hbase JAVA_HOME=/usr/lib/jvm/java \
+	     /usr/lib/hbase/bin/hbase-daemon.sh --config /etc/hbase/conf stop master
+  fi
   echo "Return code $?"
   exit 0
 fi
@@ -64,7 +71,13 @@ then
   set +x
 
   echo "Starting hbase-master"
-  /sbin/service hbase-master start
+  if [[ -e /etc/init.d/hbase-master ]]
+  then
+    /sbin/service hbase-master start
+  else
+    sudo -u hbase JAVA_HOME=/usr/lib/jvm/java \
+	     /usr/lib/hbase/bin/hbase-daemon.sh --config /etc/hbase/conf start master
+  fi
   echo "Return code $?"
 
   exit 0
