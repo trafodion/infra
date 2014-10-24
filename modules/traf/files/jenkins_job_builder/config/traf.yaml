@@ -235,10 +235,10 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
-           tests1: "AlterTableTest,ArithmeticQueryTest,AutoCommitTest,CoalesceFunctionTest"
+           tests1: "AlterTableTest,ArithmeticQueryTest,AutoCommitTest,BinaryRowKeyTest,CoalesceFunctionTest"
            tests2: ",CompareDecimalToLongTest,CreateTableTest,CustomEntityDataTest,DeleteRangeTest"
            tests3: ",DistinctCountTest,ExecuteStatementsTest,ExtendedQueryExecTest,FunkyNamesTest"
-           tests4: ",GroupByCaseTest,IsNullTest,KeyOnlyTest,MultiCfQueryExecTest,OrderByTest"
+           tests4: ",GroupByCaseTest,IndexTest,IsNullTest,KeyOnlyTest,MultiCfQueryExecTest,OrderByTest"
 
     publishers:
       - phoenix-xunit
