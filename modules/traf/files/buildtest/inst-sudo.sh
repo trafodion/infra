@@ -27,8 +27,10 @@ WORKSPACE="$2"
 instball="$3"
 trafball="$4"
 dcsball="$5"
+# dcs server number
+dcscnt="$6"
 # optional sql regression tarball
-regball="$6"
+regball="$7"
 
 source "/usr/local/bin/traf-functions.sh"
 log_banner "Trafodion $action"
@@ -52,31 +54,38 @@ then
   cd $INSTLOC
   tar xzf $(basename $instball) || exit 1
 
+  # Trafodion set-up
   echo "accept" | 
      ./installer/trafodion_setup --nodes "localhost"  || exit 2
 
+  # Trafodion mods
   ./installer/trafodion_mods --trafodion_build "$trafball" || exit 2
 
   # trafodion user should exist after setup
   sudo chown trafodion $RUNLOC || exit 1
 
-  sudo -n -i -u trafodion ./trafodion_installer --dcs_servers 6 --init_trafodion \
+  # Trafodion installer
+  # -i logs into home dir
+  sudo -n -i -u trafodion ./trafodion_installer --dcs_servers $dcscnt --init_trafodion \
 	       --build "$trafball" \
 	       --dcs_build "$dcsball" \
 	       --install_path $RUNLOC
   ret=$?
+
+  # Dev regressions
   if [[ $ret == 0 && -n "$regball" ]]
   then
     cd $RUNLOC
-    tar xf $regball
+    sudo -n -u trafodion tar xf $regball
   fi
   exit $ret
 
 elif [[ $action == "uninstall" ]]
 then
-  cd $INSTLOC
 
-  sudo -n -i -u trafodion ./trafodion_uninstall \
+  # Same location as setup
+  cd $INSTLOC
+  ./installer/trafodion_uninstaller --all \
                 --instance $RUNLOC
   exit $?
 

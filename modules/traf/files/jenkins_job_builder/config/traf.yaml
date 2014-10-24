@@ -44,6 +44,7 @@
       - git-log
       - traf-make-log
       - traf-regress-log
+      - traf-runtime-log
 
 - job-template:
     name: 'core-build-check-{dist}'
@@ -185,6 +186,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - traf-runtime-log
 
 - job-template:
     name: 'phoenix_test-{dist}'
@@ -222,6 +224,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - traf-runtime-log
 
 - job-template:
     name: 'phoenix_quick-{dist}'
@@ -259,6 +262,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - traf-runtime-log
 
 - job-template:
     name: 'phoenix_part1-{dist}'
@@ -368,6 +372,7 @@
       - console-log
       - git-log
       - pyodbc_test-log
+      - traf-runtime-log
 
 - job-template:
     name: 'pyodbc_test-{dist}'
@@ -400,6 +405,7 @@
       - console-log
       - git-log
       - pyodbc_test-log
+      - traf-runtime-log
 
 # For jdbc_test* jobs parameter tests1 should start with "--testes=" and contain a list of
 # tests seperated by a comma and NO space.
@@ -439,6 +445,7 @@
       - traf-make-log
       - git-log
       - jdbc_test-log
+      - traf-runtime-log
 
 - job-template:
     name: 'jdbc_test-{dist}'
@@ -472,6 +479,7 @@
       - traf-make-log
       - git-log
       - jdbc_test-log
+      - traf-runtime-log
 
 # Simple file type check can run on master
 # Does not need to be exclusive
