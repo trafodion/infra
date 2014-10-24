@@ -58,17 +58,7 @@ set -x
 # start trafodion
 cd $WORKSPACE
 /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
-set +x
 
-echo "INFO: Waiting 2 minutes and check DcsServer"
-sleep 120
-
-set -x
-if [ $(jps | grep -c DcsServer) -ne 6 ]; then
-  echo "ERROR: No DcsServer found. Please check your DCS setup."
-  exit 1
-fi
-echo ""
 
 # run jdbc_test
 log_banner "jdbc_test.py"

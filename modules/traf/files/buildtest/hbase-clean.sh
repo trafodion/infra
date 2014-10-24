@@ -19,6 +19,7 @@
 
 source /usr/local/bin/traf-functions.sh
 log_banner
+echo "*** Cleaning HBase"
 
 # Clean up all HBase data to start fresh test run
 
@@ -63,15 +64,16 @@ function cm_cmd {
 
 if [[ $Manager == "Cloudera" ]]
 then
-  State="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE | jq -r '.serviceState')"
+  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
   if [[ $State != "STOPPED" ]]
   then
-    CID=$(curl $Create $URL/clusters/trafcluster/services/trafHBASE/commands/stop | jq -r '.id')
+    echo "*** Stopping HBase"
+    CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/stop | jq -r '.id')
     cm_cmd $CID "HBase Stop"
   fi
 
   # Check status
-  State="$(curl $Read $URL/clusters/trafcluster/services/trafHBASE | jq -r '.serviceState')"
+  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
   if [[ $State != "STOPPED" ]] 
   then
     echo "Error: HBASE not stopped"
@@ -80,7 +82,8 @@ then
 elif [[ $Manager == "Ambari" ]]
 then
   echo "Ambari mode not yet implemented"
-  exit 1
+  /sbin/service hbase-master stop
+  echo "Return code $?"
 else
   /sbin/service hbase-master stop
   echo "Return code $?"
@@ -91,11 +94,61 @@ fi
 # Clear Data
 #
 
-echo "Removing/Creating HDFS /hbase"
+echo "*** Clearing /hbase data from HDFS & ZooKeeper"
 set -x
 sudo -u hdfs /usr/bin/hadoop fs -rm -r -f /hbase || exit $?
 sudo -u hdfs /usr/bin/hadoop fs -mkdir /hbase || exit $?
 sudo -u hdfs /usr/bin/hadoop fs -chown hbase:hbase /hbase || exit $?
+sudo -u zookeeper /usr/bin/hbase zkcli rmr /hbase 2>/dev/null || exit $?
+sudo -u hbase rm -rf /var/log/hbase/*
 set +x
+
+####
+# Remove Coprocessor config
+#  Ensure we can bring up clean HBase before installing Trafodion
+
+if [[ $Manager == "Cloudera" ]]
+then
+  echo "*** Removing any prior HBase coprocessor config"
+  curl $Update --data '
+            { "items" : [ 
+                   { "name" : "hbase_master_config_safety_valve" } 
+              ] }
+           ' $URL/clusters/trafcluster/services/trafhbase/roles/trafMAS/config | jq -r '.message'
+  curl $Update --data '
+            { "items" : [ 
+                   { "name" : "hbase_coprocessor_region_classes" }, 
+                   { "name" : "hbase_regionserver_config_safety_valve" }
+              ] } 
+           ' $URL/clusters/trafcluster/services/trafhbase/roles/trafREG/config | jq -r '.message'
+elif [[ $Manager == "Ambari" ]]
+then
+  echo "Ambari mode not yet implemented"
+## nothing to do for manual - install case
+fi
+
+
+####
+# Clear cache and re-set hbase data
+#
+if [[ $Manager == "Cloudera" ]]
+then
+  echo "*** Re-starting cluster"
+  CID=$(curl $Create $URL/clusters/trafcluster/commands/stop | jq -r '.id')
+  cm_cmd $CID "Cluster stop"
+  CID=$(curl $Create $URL/clusters/trafcluster/commands/start | jq -r '.id')
+  cm_cmd $CID "Cluster start"
+
+  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
+  if [[ $State =~ STOP ]] # stopped, stopping
+  then
+     echo "Error: HBase not started"
+     exit 2
+  fi
+elif [[ $Manager == "Ambari" ]]
+then
+  echo "Ambari mode not yet implemented"
+## nothing to do for manual - install case (leave hbase down)
+fi
 
 exit 0

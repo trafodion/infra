@@ -52,31 +52,55 @@ then
   cd $INSTLOC
   tar xzf $(basename $instball) || exit 1
 
+  # Trafodion set-up
   echo "accept" | 
      ./installer/trafodion_setup --nodes "localhost"  || exit 2
 
+  # Trafodion mods
   ./installer/trafodion_mods --trafodion_build "$trafball" || exit 2
 
   # trafodion user should exist after setup
   sudo chown trafodion $RUNLOC || exit 1
 
+  # Trafodion installer
+  # -i logs into home dir
   sudo -n -i -u trafodion ./trafodion_installer --dcs_servers 6 --init_trafodion \
 	       --build "$trafball" \
 	       --dcs_build "$dcsball" \
 	       --install_path $RUNLOC
   ret=$?
+  # Check mxosrvr processes match requested DCS servers
+  if [[ $ret == 0 ]]
+  then
+    count=$(pgrep -u trafodion ^mxosrvr | wc -l)
+    time=0
+    while [[ $count < 6 && $time < 120 ]]
+    do
+      sleep 10
+      time+=10
+      count=$(pgrep -u trafodion ^mxosrvr | wc -l)
+    done
+    if [[ $count < 6 ]]
+    then
+      echo "Error: requested mxo server processes did not come up"
+      exit 3
+    fi
+  fi
+
+  # Dev regressions
   if [[ $ret == 0 && -n "$regball" ]]
   then
     cd $RUNLOC
-    tar xf $regball
+    sudo -n -u trafodion tar xf $regball
   fi
   exit $ret
 
 elif [[ $action == "uninstall" ]]
 then
-  cd $INSTLOC
 
-  sudo -n -i -u trafodion ./trafodion_uninstall \
+  # Same location as setup
+  cd $INSTLOC
+  ./installer/trafodion_uninstaller --all \
                 --instance $RUNLOC
   exit $?
 

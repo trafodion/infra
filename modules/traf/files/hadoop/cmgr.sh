@@ -334,6 +334,18 @@ then
   fi
 fi
 
+########## End of Configurations
+
+# Check whether previously initialized
+if [[ -f /var/local/Cluster_Init_Trafodion ]]
+then
+  echo "File /var/local/Cluster_Init_Trafodion exists."
+  echo "Skipping initialization steps."
+  exit 0
+fi
+
+########## Start of Initialization
+
 # Start HDFS
 
 State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
@@ -379,6 +391,8 @@ then
   CID=$(curl $Create $URL/clusters/trafcluster/services/trafHIVE/commands/hiveCreateHiveUserDir | jq -r '.id')
   cm_cmd $CID "Hive Create User Dir"
 fi
+hadoop fs -ls /user/hive >/dev/null || exit 2
+
 hadoop fs -ls /user/hive/warehouse >/dev/null
 if [[ $? != 0 ]]
 then
@@ -386,6 +400,7 @@ then
   CID=$(curl $Create $URL/clusters/trafcluster/services/trafHIVE/commands/hiveCreateHiveWarehouse | jq -r '.id')
   cm_cmd $CID "Hive Create Warehouse"
 fi
+hadoop fs -ls /user/hive/warehouse >/dev/null || exit 2
 
 # MapReduce needs /tmp
 hadoop fs -ls /tmp >/dev/null
@@ -395,6 +410,7 @@ then
   CID=$(curl $Create $URL/clusters/trafcluster/services/hdfs/commands/hdfsCreateTmpDir | jq -r '.id')
   cm_cmd $CID "HDFS Create tmp"
 fi
+hadoop fs -ls /tmp >/dev/null || exit 2
 
 # HBase root 
 hadoop fs -ls /hbase >/dev/null
@@ -404,6 +420,7 @@ then
   CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/hbaseCreateRoot | jq -r '.id')
   cm_cmd $CID "HBase Create root"
 fi
+hadoop fs -ls /hbase >/dev/null || exit 2
 
 
 # Start Zookeeper and Hive
@@ -420,21 +437,24 @@ done
 
 # Start HBase
 
-#State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
-#if [[ $State == "STOPPED" ]]
-#then
-#  [[ $mode == "check" ]] && exit 5
-#  # Start HBase service roles
-#  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/start | jq -r '.id')
-#  cm_cmd $CID "HBase Start"
-#
-#  # Check status
-#  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
-#  if [[ $State =~ STOP ]] # stopped, stopping
-#  then
-#    echo "Error: trafhbase not started"
-#    exit 2
-#  fi
-#fi
+State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
+if [[ $State == "STOPPED" ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  # Start HBase service roles
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/start | jq -r '.id')
+  cm_cmd $CID "HBase Start"
+
+  # Check status
+  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
+  if [[ $State =~ STOP ]] # stopped, stopping
+  then
+    echo "Error: trafhbase not started"
+    exit 2
+  fi
+fi
+
+# Successfully initialized - don't repeat initialization
+echo "Cluster set-up complete $(date)" > /var/local/Cluster_Init_Trafodion
 
 exit 0

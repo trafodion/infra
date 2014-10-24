@@ -29,17 +29,22 @@ else
   USE_INSTALLER=0
 fi
 
+set -x
+
 # No hadoop management SW, just stop trafodion in place
 if [[ $USE_INSTALLER == 0 ]]
 then
   /usr/local/bin/stop-traf-instance.sh "$@"
-  exit $?
-fi
+  rc=$?
 
 # Use trafodion uninstaller
+else
+  # tinstall user has required permissions 
+  sudo -n -u tinstall /usr/local/bin/inst-sudo.sh uninstall $WORKSPACE
+  rc=$?
+fi
 
-set -x
+mkdir $WORKSPACE/hbase-logs
+cp /var/log/hbase/* $WORKSPACE/hbase-logs/
 
-# tinstall user has required permissions 
-sudo -n -u tinstall /usr/local/bin/inst-sudo.sh uninstall
-exit $?
+exit $rc

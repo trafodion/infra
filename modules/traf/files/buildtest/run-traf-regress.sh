@@ -26,104 +26,22 @@ SUITES="$*"
 
 set -x
 
-# clean up any logs from previous runs
-# in case of test time-out we don't want to archive old logs
-logarchive="$WORKSPACE/sql-regress-logs"
-rm -rf $logarchive
-mkdir $logarchive
-
-ulimit -c unlimited
-
 /usr/local/bin/install-traf.sh "sqlregress" "$DIR" || exit 1
 
-# give tests access to build tools (TOOLSDIR)
-source_env test
-
-testloc=$(loc_regress)
-
-# run SQL regression tests
-log_banner "runallsb"
-cd $testloc
-echo "Saving output in Regress.log"
-./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \
-   grep --line-buffered -C1 -E '### PASS |### FAIL ' | \
-   grep --line-buffered -v '^$' | \
-   sed --unbuffered -r \
-     '-es:(^diff |^cp )(.*/)(.+) (.+):\3:' \
-     '-es:(^diff |^cp )(.*/)(.+):\3:' \
-     '-es:(^diff |^cp )([a-zA-Z]*[0-9]*)(.*):\2:' \
-     '-es:(.*) (DIFF.+*):\2:' \
-     '-es:.KNOWN.[a-zA-Z]*::g' \
-     '-es:.flt$::' \
-     '-es:.OS$::' \
-     '-es:\.tmp2$::' \
-     '-es:^DIFF:TEST:' \
-     '-es:^EXPECTED:TEST:' \
-     '-es:^LOG:TEST:' \
-     '-es:TESTTEST:TEST:';
-echo "Return code ${PIPESTATUS[0]}"
-
-cd $WORKSPACE
-/usr/local/bin/uninstall-traf.sh "$DIR/sqf"
-
-# evaluate tests
-cd $testloc/../../sqf/rundir
-
-set +x
-echo
-
-totalCoreCount=0
-missed=0
-foundMsg=
-for dir in *
-do
-  if [[ $dir =~ tools|tmp ]]
-  then
-    continue
-  fi
-
-  echo "========= $dir"
-  if [[ -f "$dir/runregr-sb.log" ]]
-  then
-    cat $dir/runregr-sb.log
-
-    # Any core files means failure
-    report_on_corefiles
-    coreCount=$?
-    totalCoreCount=$(( totalCoreCount + coreCount ))
-
-    if grep -q FAIL "$dir/runregr-sb.log"
-    then
-      foundMsg="$foundMsg
-Found failures -- saving $dir logs to $logarchive/$dir/"
-      mkdir $logarchive/$dir
-      # Filter out core files
-      cp $(ls $dir/* | grep -v "/core.$(hostname)") $logarchive/$dir/
-    fi
-  else
-    echo "Failed -- No tests run for $dir"
-    missed=1
-  fi
-done
-echo "========================"
-fail=$(grep FAIL */runregr*.log | wc -l)
-pass=$(grep PASS */runregr*.log | wc -l)
-echo "Total Passed:   $pass"
-echo "Total Failures: $fail"
-
-if [[ $totalCoreCount -gt 0 ]]; then
-    echo
-    echo "Failure : Found $totalCoreCount core files"
-fi
-
-if [[ -n "$foundMsg" ]]; then
-  echo
-  echo "$foundMsg"
-fi
-
-if [[ $pass -gt 0 && $fail == 0 && $missed == 0 && $totalCoreCount == 0 ]]
+# trafodion id created by installer
+# if it exists, must run dev regressions as same user
+# otherwise we are running instance locally as jenkins user
+if id trafodion >/dev/null 2>&1
 then
-  exit 0
+  chmod 777 $WORKSPACE # permission to write in jenkins workspace 
+  sudo -n -u trafodion /usr/local/bin/run-dev-regress.sh $WORKSPACE $SUITES
+  rc=$?
 else
-  exit 5
+  /usr/local/bin/run-dev-regress.sh $WORKSPACE $SUITES
+  rc=$?
 fi
+
+
+/usr/local/bin/uninstall-traf.sh
+
+exit $rc

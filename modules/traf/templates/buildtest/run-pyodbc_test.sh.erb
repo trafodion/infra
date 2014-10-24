@@ -54,17 +54,7 @@ else
   # start trafodion
   cd $WORKSPACE
   /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" || exit 1
-  set +x
 
-  echo "INFO: Waiting a minute to check for DcsServer"
-  sleep 60
-
-  set -x
-  if [ $(jps | grep -c DcsServer) -ne $NUM_DCS ]; then
-    echo "ERROR: No DcsServer found. Please check your DCS setup."
-    exit 1
-  fi
-  echo ""
 
   # run pyodbc tests
   log_banner "config.sh"

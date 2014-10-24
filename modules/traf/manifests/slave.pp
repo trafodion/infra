@@ -212,6 +212,13 @@ class traf::slave (
       group  => 'root',
       mode   => '0440',
     }
+    file { '/etc/sudoers.d/jenkins-sudo-regress':
+      ensure => present,
+      source => 'puppet:///modules/traf/jenkins/jenkins-sudo-regress.sudo',
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0440',
+    }
 
     # json parser
     package { 'jq':
