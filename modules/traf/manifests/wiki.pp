@@ -91,7 +91,7 @@ class traf::wiki (
 
   # install OpenID extension
   vcsrepo { '/srv/mediawiki/w/extensions/OpenID':
-    ensure   => latest,
+    ensure   => present,
     provider => git,
     revision => 'master',
     owner    => www-data,
@@ -127,15 +127,19 @@ class traf::wiki (
     ensure   => latest,
     provider => git,
     revision => 'master',
+    owner    => www-data,
+    group    => www-data,
     source   => 'https://git.fsinf.at/mediawiki/customnavblocks.git',
     require  => Exec['install-mediawiki'],
   }
 
   # install UploadLocal extension
   vcsrepo { '/srv/mediawiki/w/extensions/UploadLocal':
-    ensure   => latest,
+    ensure   => present,
     provider => git,
     revision => 'master',
+    owner    => www-data,
+    group    => www-data,
     source   => 'https://gerrit.wikimedia.org/r/p/mediawiki/extensions/UploadLocal.git',
     require  => Exec['install-mediawiki'],
   }
@@ -155,43 +159,6 @@ class traf::wiki (
     command => '/bin/cp -p /srv/mediawiki/w/extensions/AddMetas.php.puppet /srv/mediawiki/w/extensions/AddMetas.php',
     unless  => "/bin/grep -E '^# PUPPET ME NOT' /srv/mediawiki/w/extensions/AddMetas.php",
     require => File['/srv'],
-  }
-
-  # update default CSS files
-  file { '/srv/mediawiki/w/skins/common/commonContent.css':
-    ensure  => file,
-    mode    => '0644',
-    owner   => www-data,
-    group   => www-data,
-    source  => 'puppet:///modules/traf/mediawiki/skins/common/commonContent.css',
-    require => Exec['install-mediawiki'],
-  }
-
-  file { '/srv/mediawiki/w/skins/common/commonElements.css':
-    ensure  => file,
-    mode    => '0644',
-    owner   => www-data,
-    group   => www-data,
-    source  => 'puppet:///modules/traf/mediawiki/skins/common/commonElements.css',
-    require => Exec['install-mediawiki'],
-  }
-
-  file { '/srv/mediawiki/w/skins/vector/screen.css':
-    ensure  => file,
-    mode    => '0644',
-    owner   => www-data,
-    group   => www-data,
-    source  => 'puppet:///modules/traf/mediawiki/skins/vector/screen.css',
-    require => Exec['install-mediawiki'],
-  }
-
-  file { '/srv/mediawiki/w/skins/vector/variables.less':
-    ensure  => file,
-    mode    => '0644',
-    owner   => www-data,
-    group   => www-data,
-    source  => 'puppet:///modules/traf/mediawiki/skins/vector/variables.less',
-    require => Exec['install-mediawiki'],
   }
 
   # Fix up LocalSettings.php file and configure mediawiki plugins

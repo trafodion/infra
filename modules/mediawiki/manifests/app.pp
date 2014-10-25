@@ -5,7 +5,7 @@ class mediawiki::app {
     ensure   => present,
     provider => git,
     source   => 'https://gerrit.wikimedia.org/r/p/mediawiki/core.git',
-    revision => 'origin/master',
+    revision => 'origin/REL1_23',
     owner    => 'www-data',
     group    => 'www-data',
   }
