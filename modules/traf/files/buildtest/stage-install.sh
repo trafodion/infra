@@ -55,6 +55,8 @@ then
   # Declare success, but don't leave any files to be published
   echo "This build has been previously staged. Exiting."
   exit 0
+else
+  cp $workspace/changes-* $workspace/$DestDir/changes-installer-${BLD}.txt
 fi
 
 mkdir -p "./$DestDir" || exit 2

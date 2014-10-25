@@ -62,6 +62,20 @@ then
   # Declare success, but don't leave any files to be published
   echo "This build has been previously staged. Exiting."
   exit 0
+elif [[ "$Flavor" == "release" && ${ZUUL_PIPELINE} =~ ^daily ]]
+then
+  # Publish change-logs, but only for release flavor, daily* (including side-branches)
+  #   debug flavor should be identical
+  #   change logs for release builds would be too large 
+  #    ("No, there is too much. Let me sum up.")
+  cd $workspace
+  for file in changes-*
+  do
+    if [[ -s $file ]] # non-empty
+    then
+      mv $file $DestDir/${file}-${BLD}.txt
+    fi
+  done
 fi
 
 # maven deploy of T2 and T4 drivers  -- non-debug only

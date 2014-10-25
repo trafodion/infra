@@ -40,7 +40,8 @@ log_banner
 LOGLOC="http://logs.trafodion.org/buildvers"
 LOGFILE="Versions-${BRANCH}-${ZUUL_PIPELINE}-${FLAVOR}.txt"
 
-rm -f Previous_Version
+cd $WORKSPACE
+rm -f Previous_Version changes-*
 
 echo "Retrieving Previous_Version file ($LOGFILE)"
 
@@ -72,5 +73,11 @@ then
   exit 1
 else
   echo "Code changes detected."
+  cat Previous_Version | while read repo commit comments
+  do
+    newcommit=$(grep ^$repo $WORKSPACE/Code_Versions | cut -d " " -f 2)
+    cd $WORKSPACE/$repo
+    git log ${commit}..${newcommit} > $WORKSPACE/changes-${repo#trafodion/}
+  done
   exit 0
 fi
