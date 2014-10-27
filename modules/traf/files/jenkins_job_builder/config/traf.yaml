@@ -133,8 +133,15 @@
     publishers:
       - console-log
 
-# For phoenix_test* jobs parameters tests1-4 should contain a list of tests seperated by a comma and NO space.
-# For instance : ExtendedQueryExecTest,ProductMetricsTest
+# For phoenix_test* jobs parameters tests1-4 should contain a list of tests seperated by a comma and NO space OR
+#   QUICK1 (Current tests used by the phoenix_quick job.  Approx 15 min.)
+#   QUICK2 (Tests selected based on whether it had failed before and on elapsed time.  Approx 15 min.)
+#   PART1  (First half of the phoenix test divided by time.  Approx 30 min.)
+#   PART2  (Second half of the phoenix test divided by time.  Approx 30 min.)
+#
+# For instance : ExtendedQueryExecTest,ProductMetricsTest    OR
+#                QUICK1
+#
 # If using multiple testsX parameters, be sure to include trailing comma on all but the last one.
 # If parameters tests1-4 are all "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the phoenix tests will run.
@@ -239,6 +246,78 @@
            tests2: ",CompareDecimalToLongTest,CreateTableTest,CustomEntityDataTest,DeleteRangeTest"
            tests3: ",DistinctCountTest,ExecuteStatementsTest,ExtendedQueryExecTest,FunkyNamesTest"
            tests4: ",GroupByCaseTest,IndexTest,IsNullTest,KeyOnlyTest,MultiCfQueryExecTest,OrderByTest"
+
+    publishers:
+      - phoenix-xunit
+      - console-log
+      - traf-make-log
+      - git-log
+      - phoenix_test-log
+
+- job-template:
+    name: 'phoenix_part1-{dist}'
+    node: 'redhat_{dist}'
+
+    wrappers:
+      - timeout:
+          timeout: 60
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - kill-traf
+      - multi-git-prep:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
+      - make-traf:
+           flavor: "debug"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - kill-traf
+      - run-phoenix_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/phoenix_test"
+           tests1: "PART1"
+           tests2: ""
+           tests3: ""
+           tests4: ""
+
+    publishers:
+      - phoenix-xunit
+      - console-log
+      - traf-make-log
+      - git-log
+      - phoenix_test-log
+
+- job-template:
+    name: 'phoenix_part2-{dist}'
+    node: 'redhat_{dist}'
+
+    wrappers:
+      - timeout:
+          timeout: 60
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - kill-traf
+      - multi-git-prep:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
+      - make-traf:
+           flavor: "debug"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - kill-traf
+      - run-phoenix_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/phoenix_test"
+           tests1: "PART2"
+           tests2: ""
+           tests3: ""
+           tests4: ""
 
     publishers:
       - phoenix-xunit
