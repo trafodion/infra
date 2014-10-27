@@ -247,6 +247,78 @@
       - git-log
       - phoenix_test-log
 
+- job-template:
+    name: 'phoenix_part1-{dist}'
+    node: 'redhat_{dist}'
+
+    wrappers:
+      - timeout:
+          timeout: 45
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - kill-traf
+      - multi-git-prep:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
+      - make-traf:
+           flavor: "debug"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - kill-traf
+      - run-phoenix_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/phoenix_test"
+           tests1: "AlterTableTest,ArithmeticQueryTest,AutoCommitTest,BinaryRowKeyTest,CoalesceFunctionTest"
+           tests2: ",CompareDecimalToLongTest,CreateTableTest,CustomEntityDataTest,DeleteRangeTest"
+           tests3: ",DistinctCountTest,ExecuteStatementsTest,ExtendedQueryExecTest,FunkyNamesTest"
+           tests4: ",DescColumnSortOrderTest,GroupByCaseTest,IndexTest,IsNullTest,KeyOnlyTest,MultiCfQueryExecTest"
+
+    publishers:
+      - phoenix-xunit
+      - console-log
+      - traf-make-log
+      - git-log
+      - phoenix_test-log
+
+- job-template:
+    name: 'phoenix_part2-{dist}'
+    node: 'redhat_{dist}'
+
+    wrappers:
+      - timeout:
+          timeout: 45
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - kill-traf
+      - multi-git-prep:
+           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test"
+      - make-traf:
+           flavor: "debug"
+      - maven-package:
+           buildDir: "trafodion/dcs"
+      - kill-traf
+      - run-phoenix_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/phoenix_test"
+           tests1: "OrderByTest,ProductMetricsTest,QueryExecTest,QueryExecWithoutSCNTest,QueryPlanTest,ReadIsolationLevelTest"
+           tests2: ",SaltedTableTest,SaltedTableUpsertSelectTest,SaltedTableVarLengthRowKeyTest,ServerExceptionTest"
+           tests3: ",SkipScanQueryTest,StatementHintsTest,StddevTest,ToCharFunctionTest,ToNumberFunctionTest,TopNTest"
+           tests4: ",UpsertBigValuesTest,UpsertSelectAutoCommitTest,UpsertSelectTest,UpsertValuesTest,VariableLengthPKTest"
+
+    publishers:
+      - phoenix-xunit
+      - console-log
+      - traf-make-log
+      - git-log
+      - phoenix_test-log
+
 # For pyodbc_test* jobs parameter tests1 should contain a list of tests seperated by a space. For instance : test_p2.ConnectTest.test11 test_p2.ConnectTest.test12
 # If parameter tests1 is "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the pyodbc tests will run.  This should only be used in pyodbc_test-experimental if pyodbc_test is running all tests.
