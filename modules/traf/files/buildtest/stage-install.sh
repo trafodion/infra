@@ -49,6 +49,8 @@ set +x
 rm -rf ./publish
 rm -f $workspace/Versions*
 
+mkdir -p "./$DestDir" || exit 2
+
 # Check if we have already staged a build for this version of code
 if ! /usr/local/bin/build-version-check.sh "$Branch" "$Flavor"
 then
@@ -58,8 +60,6 @@ then
 else
   cp $workspace/changes-* $workspace/$DestDir/changes-installer-${BLD}.txt
 fi
-
-mkdir -p "./$DestDir" || exit 2
 
 cp trafodion/install/installer*gz "$workspace/$DestDir/$DestFile"  || exit 2
 

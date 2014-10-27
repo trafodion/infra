@@ -56,6 +56,9 @@ set -x
 rm -rf ./collect ./publish
 rm -f $workspace/Versions*
 
+mkdir -p "./$DestDir" || exit 2
+mkdir -p "./collect" || exit 2
+
 # Check if we have already staged a build for this version of code
 if ! /usr/local/bin/build-version-check.sh "$Branch" "$Flavor"
 then
@@ -113,9 +116,6 @@ else
 fi
 
 cd $workspace
-# create server/clients tarballs
-mkdir -p "./$DestDir" || exit 2
-mkdir -p "./collect" || exit 2
 
 # clients tarfile
 cp ./trafodion/core/trafodion_clients-*.tgz ./$DestDir/clients$FileSuffix  || exit 2
