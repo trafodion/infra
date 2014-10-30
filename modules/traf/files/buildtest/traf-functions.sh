@@ -68,7 +68,8 @@ function loc_regress () {
 # source_env - find and source env file
 #
 # Option: -v -- verbose
-# 1st Parameter: build | run -- build space or running instance
+# 1st Parameter: build | run | test
+# 	-- build or run an instance or test against an instance
 # 2nd Parameter: (optional) release | debug -- build flavor
 # 		Leave parameter blank to use prior build flavor
 
@@ -93,14 +94,22 @@ function source_env () {
   then
     # test environment build tools
     export TOOLSDIR=/opt/traf/tools
+    echo "TOOLSDIR=${TOOLSDIR}"
+  else
+    # build tools - unset for run-time
+    unset TOOLSDIR
+    echo "unset TOOLSDIR"
+  fi
 
+  if [[ $1 == "build" ]]
+  then
     cd "$WORKSPACE/trafodion/core/sqf"
 
     # If no flavor specified, has a flavor been specified previously?
     if [[ -z "$2" && -r ./BuildFlavor ]]
     then
       ENVfile=$(< ./BuildFlavor)
-    elif [[ "$2" =~ r.* ]]   # anything beginning with r, is "release"
+    elif [[ "$2" =~ ^r.* ]]   # anything beginning with r, is "release"
     then
       ENVfile="sqenvr.sh"
     else			   # default to debug
@@ -118,24 +127,25 @@ function source_env () {
     echo "Sourcing ./$ENVfile"
     source ./$ENVfile
     rc=$?
-    echo "TOOLSDIR=${TOOLSDIR}"
 
-  elif [[ $1 == "run" ]]
+  elif [[ $1 == "run" || $1 == "test" ]]
   then
-    # build tools - unset for run-time
-    unset TOOLSDIR
-
     source "$WORKSPACE/InstallEnv.sh"
     echo "Sourcing $ILOC/$IENV"
     cd "$ILOC"
     source "./$IENV"
     rc=$?
-    echo "TOOLSDIR=${TOOLSDIR}"
 
   else
-    echo "Error: specify build or run environment"
+    echo "Error: specify build, run, or test environment"
     rc=1
 
+  fi
+  if [[ $1 == "test" ]]
+  then
+    # run-time mode, plus tools after the fact
+    export TOOLSDIR=/opt/traf/tools
+    echo "TOOLSDIR=${TOOLSDIR}"
   fi
 
   # restore environment
