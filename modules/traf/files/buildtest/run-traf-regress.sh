@@ -37,7 +37,7 @@ ulimit -c unlimited
 /usr/local/bin/install-traf.sh "sqlregress" "$DIR" || exit 1
 
 # give tests access to build tools (TOOLSDIR)
-source_env build
+source_env test
 
 testloc=$(loc_regress)
 
