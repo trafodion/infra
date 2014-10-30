@@ -151,7 +151,7 @@ class traf::horton (
   exec { 'namenode-format':
     command => '/usr/bin/hadoop namenode -format -force',
     user    => 'hdfs',
-    require => [ File['/data/dfs'],Exec['hadoop-default'],File['/usr/lib/bigtop-utils/bigtop-detect-javahome'] ],
+    require => [ File['/data/dfs'],File['/usr/lib/bigtop-utils/bigtop-detect-javahome'] ],
     creates => '/data/dfs/name',
   }
   # HBase services are not started, since
