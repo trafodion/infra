@@ -40,13 +40,19 @@ class traf::tpcds {
   }
   exec { 'unzip-tools':
     require => Exec['download-tpc-ds'],
-    creates => "${tools_dir}/tools",
-    command => "/usr/bin/unzip -d ${tools_dir} ${tools_file}",
+    creates => "${tools_dir}/DS Tools/tools",
+    command => "/usr/bin/unzip -od ${tools_dir} ${tools_file}",
+  }
+  # for backward compatiblity for earlier tool installs, which had no "DS Tools" dir
+  exec { 'check-DS':
+    require => Exec['unzip-tools'],
+    creates => "${tools_dir}/DS Tools",
+    command => "/bin/ln -s ${tools_dir} '${tools_dir}/DS Tools'",
   }
   exec { 'build-tools':
-    require => Exec['unzip-tools'],
-    creates => "${tools_dir}/tools/dsdgen",
-    command => "/usr/bin/make -C ${tools_dir}/tools",
+    require => Exec['check-DS'],
+    creates => "${tools_dir}/DS Tools/tools/dsdgen",
+    command => "/usr/bin/make -C '${tools_dir}/DS Tools/tools'",
   }
   exec { 'gen_and_load_data':
     require => [
@@ -56,7 +62,7 @@ class traf::tpcds {
     command => '/usr/local/bin/load_tpcds_data.sh',
     user    => 'hdfs',
     timeout => 600,
-    cwd     => "${tools_dir}/tools",
+    cwd     => "${tools_dir}/DS Tools/tools",
     unless  => '/usr/bin/hadoop dfs -ls /hive/tpcds',
   }
   exec { 'hive_tables':
