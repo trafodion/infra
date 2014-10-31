@@ -232,13 +232,6 @@ class traf::horton (
     unless  => '/bin/grep "/var/log/zookeeper" /etc/zookeeper/conf/zookeeper-env.sh',
     require => [Package['zookeeper-server'] ]
   }
-  exec { 'zookeeper-init':
-    command =>
-          '/usr/lib/zookeeper/bin/zkServer.sh start /etc/zookeeper/conf/zoo.cfg',
-    user    => 'zookeeper',
-    creates => $zoopidfile,
-    require => [Exec['zookeeper-env'],Group['zookeeper'] ]
-  }
   group { 'zookeeper':
     ensure  => present,
   }
