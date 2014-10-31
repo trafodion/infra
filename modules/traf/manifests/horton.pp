@@ -175,7 +175,7 @@ class traf::horton (
   }
   exec { 'hdfs-jenkins':
     command =>
-      '/usr/bin/hadoop fs -mkdir /user/jenkins
+      '/usr/bin/hadoop fs -mkdir -p /user/jenkins
 	   /usr/bin/hadoop fs -chown jenkins /user/jenkins',
     unless  => '/usr/bin/hadoop fs -ls /user/jenkins',
     user    => 'hdfs',
@@ -183,7 +183,7 @@ class traf::horton (
   }
   exec { 'hdfs-hive-dir':
     command =>
-      '/usr/bin/hadoop fs -mkdir /user/hive
+      '/usr/bin/hadoop fs -mkdir -p /user/hive
 	   /usr/bin/hadoop fs -chown jenkins /user/hive',
     unless  => '/usr/bin/hadoop fs -ls /user/hive',
     user    => 'hdfs',
