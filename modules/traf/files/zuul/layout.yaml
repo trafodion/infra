@@ -209,18 +209,31 @@ projects:
       - traf-pub-release-cdh5.1
       - traf-pub-debug-cdh5.1
       - core-regress-core-cdh5.1
+      - core-regress-core-hdp2.1
       - core-regress-charsets-cdh5.1
+      - core-regress-charsets-hdp2.1
       - core-regress-qat-cdh5.1
+      - core-regress-qat-hdp2.1
       - core-regress-udr-cdh5.1
+      - core-regress-udr-hdp2.1
       - core-regress-catman1-cdh5.1
+      - core-regress-catman1-hdp2.1
       - core-regress-compGeneral-cdh5.1
+      - core-regress-compGeneral-hdp2.1
       - core-regress-executor-cdh5.1
+      - core-regress-executor-hdp2.1
       - core-regress-fullstack2-cdh5.1
+      - core-regress-fullstack2-hdp2.1
       - core-regress-hive-cdh5.1
+      - core-regress-hive-hdp2.1
       - core-regress-seabase-cdh5.1
+      - core-regress-seabase-hdp2.1
       - phoenix_test-cdh5.1
+      - phoenix_test-hdp2.1
       - pyodbc_test-cdh5.1
+      - pyodbc_test-hdp2.1
       - jdbc_test-cdh5.1
+      - jdbc_test-hdp2.1
     release:
       - traf-pub-release-cdh5.1
     pre-release:
