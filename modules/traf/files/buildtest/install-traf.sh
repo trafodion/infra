@@ -29,17 +29,14 @@ else
   REGRESS=""
 fi
 
-# Check if Cloudera-Manager or Ambari is installed
-USE_INSTALLER=0
-
-for pkg in cloudera-manager-server #ambari-server
-do
-  rpm -q $pkg >/dev/null
-  if [[ $? == 0 ]]
-  then
-    USE_INSTALLER=1
-  fi
-done
+# if we have tinstall user defined, we are
+# configured for trafodion installer
+if id tinstall 2>/dev/null
+then
+  USE_INSTALLER=1
+else
+  USE_INSTALLER=0
+fi
 
 # No hadoop management SW, just start trafodion in place
 if [[ $USE_INSTALLER == 0 ]]
