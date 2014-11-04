@@ -402,6 +402,10 @@
       - scp:
           site: 'logs.trafodion.org'
           files:
+            - target: 'logs/$LOG_PATH'
+              source: 'dcs/dcs*/logs/*'
+              copy-after-failure: true
+              keep-hierarchy: true
             - target: 'logs/$LOG_PATH/surefire-reports'
               source: 'trafodion/dcs/src/test/jdbc_test/target/surefire-reports/**'
               copy-after-failure: true
