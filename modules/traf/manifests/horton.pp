@@ -40,6 +40,7 @@ class traf::horton (
     $coresite = 'puppet:///modules/traf/hadoop/core-site.xml'
     $hdfssite = 'puppet:///modules/traf/hadoop/hdfs-site.xml'
     $hbasefile = 'hbase-site.xml-0.9'
+    $yarnsite = 'yarn-site.xml-2.4'
     $hdfs_services = ['hadoop-hdfs-datanode','hadoop-hdfs-namenode']
     $zoopidfile = '/var/lib/zookeeper/zookeeper_server.pid'
     $hive_ver = '0.13.0'
@@ -77,24 +78,34 @@ class traf::horton (
     require => Package['hadoop'],
   }
   file { '/etc/hadoop/conf.localtest/core-site.xml':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     source  => $coresite,
     require => Exec['hadoop-conf'],
   }
   file { '/etc/hadoop/conf.localtest/hdfs-site.xml':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
     source  => $hdfssite,
     require => Exec['hadoop-conf'],
   }
-  if $distro == 'HDP2.1' {
-    file { '/etc/hadoop/conf.localtest/mapred-site.xml':
-      source  => 'puppet:///modules/traf/hadoop/mapred-site.xml',
-      require => Exec['hadoop-conf'],
-    }
-    ##### Yarn managers not set up as standard services. 
-    #     /usr/lib/hadoop/sbin/yarn-daemon.sh 
-    #     No way to easy way to check if it is already running
-    #     Skip yarn set-up. Not required by trafodion at this point.
+  file { '/etc/hadoop/conf.localtest/mapred-site.xml':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    source  => 'puppet:///modules/traf/hadoop/mapred-site.xml',
+    require => Exec['hadoop-conf'],
+  }
+  file { '/etc/hadoop/conf.localtest/yarn-site.xml':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    source  => "puppet:///modules/traf/hadoop/${yarnsite}",
+    require => Exec['hadoop-conf'],
+  }
 
-  } # HDP2.1 
 
   exec { 'hbase-conf':
     command => '/bin/cp -r /etc/hbase/conf.dist /etc/hbase/conf.localtest;
@@ -225,7 +236,54 @@ class traf::horton (
     require => [ Exec['hdfs-trafodion'] ]
   }
 
+  # Yarn
+  exec { 'hdfs-yarnlog':
+      command =>
+          '/usr/bin/hadoop fs -mkdir -p /var/log/hadoop-yarn
+           /usr/bin/hadoop fs -chown yarn:mapred /var/log/hadoop-yarn',
+      unless  => '/usr/bin/hadoop fs -ls -d /var/log/hadoop-yarn',
+      user    => 'hdfs',
+      require => Service[$hdfs_services],
+  }
+  exec { 'yarn-env':
+    command =>
+          '/bin/echo "export YARN_LOG_DIR=/var/log/hadoop-yarn" >> /etc/hadoop/conf/yarn-env.sh',
+    unless  => '/bin/grep "/var/log/hadoop-yarn" /etc/hadoop/conf/yarn-env.sh',
+    require => [Package['hadoop-yarn'] ]
+  }
+  exec { 'yarn-deamons':
+    environment => ['JAVA_HOME=/usr/lib/jvm/java-1.7.0',
+                    'HADOOP_LIBEXEC_DIR=/usr/lib/hadoop/libexec' ],
+    command     =>
+          '/usr/lib/hadoop-yarn/sbin/yarn-daemon.sh --config /etc/hadoop/conf start resourcemanager
+           /usr/lib/hadoop-yarn/sbin/yarn-daemon.sh --config /etc/hadoop/conf start nodemanager',
+    user        => 'yarn',
+    unless      => '/usr/bin/pgrep -u yarn -f resourcemanager',
+    require     => [Exec['yarn-env'],Exec['hdfs-yarnlog'] ]
+  }
 
+  # MapReduce
+  exec { 'mr-history':
+      command =>
+          '/usr/bin/hadoop fs -mkdir -p /user/history
+           /usr/bin/hadoop fs -chmod -R 1777 /user/history
+           /usr/bin/hadoop fs -chown -R mapred:hdfs /user/history',
+      unless  => '/usr/bin/hadoop fs -ls -d /user/history',
+      user    => 'hdfs',
+      require => Service[$hdfs_services],
+  }
+  exec { 'mapred-deamon':
+    environment => ['JAVA_HOME=/usr/lib/jvm/java-1.7.0',
+                    'HADOOP_LIBEXEC_DIR=/usr/lib/hadoop/libexec',
+                    'HADOOP_MAPRED_LOG_DIR=/var/log/hadoop-mapreduce' ],
+    command     =>
+          '/usr/lib/hadoop-mapred/sbin/mr-jobhistory-daemon.sh --config /etc/hadoop/conf start historyserver',
+    user        => 'mapred',
+    unless      => '/usr/bin/pgrep -u mapred -f historyserver',
+    require     => [Exec['mr-history'],Exec['yarn-deamons'] ]
+  }
+
+  # Zookeeper
   exec { 'zookeeper-env':
     command =>
           '/bin/echo "export ZOO_LOG_DIR=/var/log/zookeeper" >> /etc/zookeeper/conf/zookeeper-env.sh',
