@@ -50,6 +50,8 @@
       - phoenix_test-experimental-{dist}
       - phoenix_test-{dist}
       - phoenix_quick-{dist}
+      - phoenix_part1-{dist}
+      - phoenix_part2-{dist}
 
 - project:
     name: dcs
