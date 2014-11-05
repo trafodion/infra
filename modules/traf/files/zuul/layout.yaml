@@ -173,6 +173,8 @@ jobs:
     parameter-function: set_log_url
   - name: ^.*-experimental.*$
     voting: false
+  - name: phoenix_part.*$
+    voting: false
 
 projects:
   - name: trafodion/sandbox
@@ -187,12 +189,16 @@ projects:
   - name: trafodion/core
     check:
       - phoenix_quick-cdh5.1
+      - phoenix_part1-cdh5.1
+      - phoenix_part2-cdh5.1
       - core-regress-core-cdh5.1
       - core-regress-seabase-cdh5.1
       - gate-core-check-for-binary
       - core-build-check-cdh5.1
     check-full:
       - phoenix_test-cdh5.1
+      - phoenix_part1-cdh5.1
+      - phoenix_part2-cdh5.1
       - core-regress-charsets-cdh5.1
       - core-regress-qat-cdh5.1
       - core-regress-udr-cdh5.1
@@ -202,6 +208,8 @@ projects:
       - core-regress-fullstack2-cdh5.1
       - core-regress-hive-cdh5.1
     gate:
+      - phoenix_part1-cdh5.1
+      - phoenix_part2-cdh5.1
       - core-regress-seabase-cdh5.1
       - gate-core-check-for-binary
       - core-build-check-cdh5.1
@@ -258,16 +266,22 @@ projects:
       - gate-dcs-check-for-binary
       - dcs-build-cdh5.1
       - phoenix_quick-cdh5.1
+      - phoenix_part1-cdh5.1
+      - phoenix_part2-cdh5.1
       - pyodbc_test-cdh5.1
       - jdbc_test-cdh5.1
     gate:
       - gate-dcs-check-for-binary
       - dcs-build-cdh5.1
       - phoenix_quick-cdh5.1
+      - phoenix_part1-cdh5.1
+      - phoenix_part2-cdh5.1
       - pyodbc_test-cdh5.1
       - jdbc_test-cdh5.1
     check-full:
       - phoenix_test-cdh5.1
+      - phoenix_part1-cdh5.1
+      - phoenix_part2-cdh5.1
 
   - name: trafodion/infra
     check:
@@ -289,10 +303,14 @@ projects:
     check:
       - gate-phoenix_test-check-for-binary
       - phoenix_test-cdh5.1
+      - phoenix_part1-cdh5.1
+      - phoenix_part2-cdh5.1
 
     gate:
       - gate-phoenix_test-check-for-binary
       - phoenix_test-cdh5.1
+      - phoenix_part1-cdh5.1
+      - phoenix_part2-cdh5.1
 
   - name: trafodion/install
     check:
