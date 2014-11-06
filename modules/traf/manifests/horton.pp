@@ -277,7 +277,7 @@ class traf::horton (
                     'HADOOP_LIBEXEC_DIR=/usr/lib/hadoop/libexec',
                     'HADOOP_MAPRED_LOG_DIR=/var/log/hadoop-mapreduce' ],
     command     =>
-          '/usr/lib/hadoop-mapred/sbin/mr-jobhistory-daemon.sh --config /etc/hadoop/conf start historyserver',
+          '/usr/lib/hadoop-mapreduce/sbin/mr-jobhistory-daemon.sh --config /etc/hadoop/conf start historyserver',
     user        => 'mapred',
     unless      => '/usr/bin/pgrep -u mapred -f historyserver',
     require     => [Exec['mr-history'],Exec['yarn-deamons'] ]
