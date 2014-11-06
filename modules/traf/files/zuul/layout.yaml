@@ -173,7 +173,7 @@ jobs:
     parameter-function: set_log_url
   - name: ^.*-experimental.*$
     voting: false
-  - name: phoenix_part.*$
+  - name: ^phoenix_part.*$
     voting: false
 
 projects:
