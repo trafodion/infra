@@ -63,7 +63,7 @@
 - builder:
     name: pkg-install
     builders:
-      - shell: "cd ./trafodion/install && make all"
+      - shell: "/usr/local/bin/build-install.sh"
 
 - builder:
     name: stage-traf
