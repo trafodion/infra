@@ -45,23 +45,22 @@ testloc=$(loc_regress)
 log_banner "runallsb"
 cd $testloc
 echo "Saving output in Regress.log"
-./tools/runallsb $SUITES 2>&1 > $logarchive/Regress.log
-   #| tee  $logarchive/Regress.log | \
-   #grep --line-buffered -C1 -E '### PASS |### FAIL ' | \
-   #grep --line-buffered -v '^$' | \
-   #sed --unbuffered -r \
-   #  '-es:(^diff |^cp )(.*/)(.+) (.+):\3:' \
-   #  '-es:(^diff |^cp )(.*/)(.+):\3:' \
-   #  '-es:(^diff |^cp )([a-zA-Z]*[0-9]*)(.*):\2:' \
-   #  '-es:(.*) (DIFF.+*):\2:' \
-   #  '-es:.KNOWN.[a-zA-Z]*::g' \
-   #  '-es:.flt$::' \
-   #  '-es:.OS$::' \
-   #  '-es:\.tmp2$::' \
-   #  '-es:^DIFF:TEST:' \
-   #  '-es:^EXPECTED:TEST:' \
-   #  '-es:^LOG:TEST:' \
-   #  '-es:TESTTEST:TEST:';
+./tools/runallsb $SUITES 2>&1 | tee  $logarchive/Regress.log | \
+   grep --line-buffered -C1 -E '### PASS |### FAIL ' | \
+   grep --line-buffered -v '^$' | \
+   sed --unbuffered -r \
+     '-es:(^diff |^cp )(.*/)(.+) (.+):\3:' \
+     '-es:(^diff |^cp )(.*/)(.+):\3:' \
+     '-es:(^diff |^cp )([a-zA-Z]*[0-9]*)(.*):\2:' \
+     '-es:(.*) (DIFF.+*):\2:' \
+     '-es:.KNOWN.[a-zA-Z]*::g' \
+     '-es:.flt$::' \
+     '-es:.OS$::' \
+     '-es:\.tmp2$::' \
+     '-es:^DIFF:TEST:' \
+     '-es:^EXPECTED:TEST:' \
+     '-es:^LOG:TEST:' \
+     '-es:TESTTEST:TEST:';
 echo "Return code ${PIPESTATUS[0]}"
 
 cd $WORKSPACE
