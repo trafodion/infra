@@ -214,8 +214,8 @@ projects:
       - gate-core-check-for-binary
       - core-build-check-cdh5.1
     daily:
-      - traf-pub-release-cdh5.1
-      - traf-pub-debug-cdh5.1
+      - traf-pub-release
+      - traf-pub-debug
       - core-regress-core-cdh5.1
       - core-regress-core-hdp2.1
       - core-regress-charsets-cdh5.1
@@ -243,10 +243,10 @@ projects:
       - jdbc_test-cdh5.1
       - jdbc_test-hdp2.1
     release:
-      - traf-pub-release-cdh5.1
+      - traf-pub-release
     pre-release:
-      - traf-pub-release-cdh5.1
-      - traf-pub-debug-cdh5.1
+      - traf-pub-release
+      - traf-pub-debug
       - core-regress-core-cdh5.1
       - core-regress-charsets-cdh5.1
       - core-regress-qat-cdh5.1
@@ -264,7 +264,7 @@ projects:
   - name: trafodion/dcs
     check:
       - gate-dcs-check-for-binary
-      - dcs-build-cdh5.1
+      - dcs-build
       - phoenix_quick-cdh5.1
       - phoenix_part1-cdh5.1
       - phoenix_part2-cdh5.1
@@ -272,7 +272,7 @@ projects:
       - jdbc_test-cdh5.1
     gate:
       - gate-dcs-check-for-binary
-      - dcs-build-cdh5.1
+      - dcs-build
       - phoenix_quick-cdh5.1
       - phoenix_part1-cdh5.1
       - phoenix_part2-cdh5.1
