@@ -29,11 +29,11 @@ else
   REGRESS=""
 fi
 
-COREDIR="$2"
+COREDIR="$1"
 
 # DCS arguments are optional when not using installer
-DCSDIR="$3"
-DCSSERV="$4"
+DCSDIR="$2"
+DCSSERV="$3"
 
 rm -rf $WORKSPACE/hbase-logs
 
