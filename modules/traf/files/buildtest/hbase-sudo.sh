@@ -64,6 +64,7 @@ then
   sudo -u hdfs /usr/bin/hadoop fs -rm -r -f /hbase 
   sudo -u hdfs /usr/bin/hadoop fs -mkdir /hbase
   sudo -u hdfs /usr/bin/hadoop fs -chown hbase:hbase /hbase
+  sudo -u hbase rm -rf /var/log/hbase/*
   set +x
   echo "Removing HBase zookeeper data"
   set -x
