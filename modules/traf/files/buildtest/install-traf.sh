@@ -52,6 +52,7 @@ then
   # record instance location - build tree
   install_loc "build" $REGRESS
 
+  # DCS args are optional
   echo "Saving output in Install_Start.log"
   set -x
   /usr/local/bin/start-traf-instance.sh $COREDIR $DCSDIR $DCSSERV 2>&1 | tee Install_Start.log | \
@@ -78,6 +79,13 @@ then
 fi
 
 # Use trafodion installer
+
+# DCS is not optional
+#   default to 4 servers
+if [[ ! $DCSSERV =~ [0-9]+ ]]
+then
+  DCSSERV=4
+fi
 
 # record instance location - install location
 install_loc "installed" $REGRESS
