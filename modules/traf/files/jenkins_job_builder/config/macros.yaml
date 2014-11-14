@@ -217,6 +217,10 @@
               copy-after-failure: true
               keep-hierarchy: true
 
+# build & run location is trafodion/core
+#       can be removed once we no longer use manual install
+# installed location is traf_run
+#       no separate init_trafodion.log for installer
 - publisher:
     name: traf-runtime-log
     publishers:
@@ -226,6 +230,10 @@
             - target: 'logs/$LOG_PATH'
               source: 'Install_Start.log'
               copy-after-failure: true
+            - target: 'logs/$LOG_PATH'
+              source: 'hbase-logs/*'
+              copy-after-failure: true
+              keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
               source: 'trafodion/core/sqf/init_trafodion.log'
               copy-after-failure: true
@@ -263,10 +271,41 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
-              source: 'hbase-logs/*'
+              source: 'traf_run/logs/hdfs*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/logs/mvqr*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/logs/pstartd*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/logs/sqmon*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/logs/wdt*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/logs/zsb*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/sql/scripts/*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/tmp/*'
               copy-after-failure: true
               keep-hierarchy: true
 
+# "manual" install DCS is at WORKSPACE/dcs/dcs*
+#       can be removed once we no longer use manual install
+# trafodion_installer is at WORKSPACE/traf_run/dcs*
 - publisher:
     name: phoenix_test-log
     publishers:
@@ -279,6 +318,10 @@
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
               source: 'dcs/dcs*/logs/*'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/dcs*/logs/*'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH/dcs/surefire-reports'
@@ -318,6 +361,10 @@
               source: 'dcs/dcs*/logs/*'
               copy-after-failure: true
               keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/dcs*/logs/*'
+              copy-after-failure: true
+              keep-hierarchy: true
             - target: 'logs/$LOG_PATH/dcs/surefire-reports'
               source: 'trafodion/dcs/target/surefire-reports/**'
               copy-after-failure: true
@@ -346,6 +393,10 @@
           files:
             - target: 'logs/$LOG_PATH'
               source: 'dcs/dcs*/logs/*'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/dcs*/logs/*'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH/surefire-reports'
