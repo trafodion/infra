@@ -82,6 +82,8 @@ then
 
 elif [[ $action == "uninstall" ]]
 then
+  # make system logs world-readable for archival
+  chmod -R a+rX $RUNLOC
 
   # Same location as setup
   cd $INSTLOC
