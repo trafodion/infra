@@ -1,2 +1,3 @@
 jenkins	ALL = (tinstall) NOPASSWD:/usr/local/bin/inst-sudo.sh
 jenkins	ALL = (trafodion) NOPASSWD:/bin/kill
+jenkins	ALL = (trafodion) NOPASSWD:/usr/bin/jps

@@ -27,8 +27,19 @@ else
   user="jenkins"
 fi
 
+# output key instance process IDs
+function trafprocs() {
+  if [[ $user == "trafodion" ]]
+  then
+    sudo -n -u trafodion /usr/bin/jps | grep DcsMaster | cut -f1 -d' '
+  else
+    jps | grep DcsMaster | cut -f1 -d' '
+  fi
+  pgrep -u $user -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts'
+}
+
 # Look for the usual suspects
-Instance=$(pgrep -u $user -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts')
+Instance=$(trafprocs)
 
 if [[ -z "$Instance" ]]
 then
@@ -50,7 +61,7 @@ do
   fi
   sleep 3
 
-  Instance=$(pgrep -u $user -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty')
+  Instance=$(trafprocs)
   if [[ -z "$Instance" ]]
   then
     echo "Post-kill processes:"
