@@ -31,11 +31,11 @@ fi
 function trafprocs() {
   if [[ $user == "trafodion" ]]
   then
-    sudo -n -u trafodion /usr/bin/jps | grep DcsMaster | cut -f1 -d' '
+    sudo -n -u trafodion /usr/bin/jps | grep Dcs | cut -f1 -d' '
   else
-    jps | grep DcsMaster | cut -f1 -d' '
+    jps | grep Dcs | cut -f1 -d' '
   fi
-  pgrep -u $user -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts'
+  pgrep -u $user -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts|pstack|gdb'
 }
 
 # Look for the usual suspects
@@ -50,7 +50,7 @@ echo "Found running instance. Attempting to kill it"
 
 attempt=1
 
-while [[ $attempt -lt 6 ]]
+while [[ $attempt -lt 10 ]]
 do
   ps -u $user -H
   if [[ $user == "trafodion" ]]
@@ -59,7 +59,7 @@ do
   else
     kill -9 $Instance
   fi
-  sleep 3
+  sleep 4
 
   Instance=$(trafprocs)
   if [[ -z "$Instance" ]]
