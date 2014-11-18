@@ -24,23 +24,44 @@ export TRAF_DIR="$1"                   # location of trafodion/core
 export DCS_INSTALL_DIR="$2"            # location of trafodion/dcs
 export JAVA_HOME="$3"                  # Java SDK Home Directory
 export TEST_DIR="$4"                   # location of trafodion/phoenix_test
+export TEST_JDBC_TYPE="$5"             # JDBC type T4 or T2
 export PATH=$JAVA_HOME/bin:$PATH       # add $JAVA_HOME/bin to the path
 
 # check number of parameters
 # if more than 4 parameters then we are also passing in tests to run
 # NOTE: tests should be delimited by a comma with no space.  i.e. AlterTableTest,ArithmeticQueryTest
-if [ $# -gt 4 ]; then
+if [ $# -gt 5 ]; then
+  shift
   shift
   shift
   shift
   shift
   TESTS="$*"
-elif [ $# -lt 4 ]; then
+elif [ $# -lt 5 ]; then
   echo "ERROR: Incorrect number of input parameters."
   exit 1
 fi
 
 set -x
+
+# check TEST_JDBC_TYPE and set TEST_JDBC_FILE based on it
+TEST_JDBC_TYPE=$(echo $TEST_JDBC_TYPE | tr "[:lower:]" "[:upper:]")
+if [ "$TEST_JDBC_TYPE" = "T4" ]; then
+  TEST_JDBC_FILE="$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar"
+elif [ "$TEST_JDBC_TYPE" = "T2" ]; then
+  TEST_JDBC_FILE="$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT2.jar"
+  if [ $(grep -c 'sqenvd.sh' "$WORKSPACE/$TRAF_DIR/sqf/BuildFlavor") -eq 1 ]; then export SQ_MBTYPE=64d; else export SQ_MBTYPE=64; fi
+  export LANG=en_US.UTF-8
+  export MY_SQROOT="$WORKSPACE/$TRAF_DIR/sqf"
+  export MPI_TMPDIR="$WORKSPACE/$TRAF_DIR/sqf/tmp"
+  export LD_PRELOAD="$JAVA_HOME/jre/lib/amd64/libjsig.so:$WORKSPACE/$TRAF_DIR/sqf/export/lib${SQ_MBTYPE}/libseabasesig.so"
+  export LD_LIBRARY_PATH="$WORKSPACE/$TRAF_DIR/sqf/export/lib${SQ_MBTYPE}:$JAVA_HOME/jre/lib/amd64/server"
+  export PATH="$JAVA_HOME/bin:$WORKSPACE/$TRAF_DIR/sqf/export/bin${SQ_MBTYPE}:$PATH"
+else
+  echo "ERROR: $TEST_JDBC_TYPE is not a valid JDBC type."
+  echo "       T4 and T2 are the only valid JDBC types"
+  exit 1
+fi
 
 # start trafodion
 cd $WORKSPACE
@@ -54,7 +75,7 @@ cd "$WORKSPACE/$TEST_DIR"
 if [ -z "$TESTS" ]; then
   ./phoenix_test.py --target=localhost:37800 --user=<%= jenkins_test_user %> --pw=<%= jenkins_test_password %> \
        --targettype=TR --javahome=$JAVA_HOME \
-       --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar
+       --jdbccp=$TEST_JDBC_FILE --jdbctype=$TEST_JDBC_TYPE
   phoenixRes=$?
 elif [ "$TESTS" = "DONT_RUN_TESTS" ]; then
   echo "INFO: Will NOT run any phoenix tests as requested. You should not see this message in the normal Jenkins job phoenix_test! This should only be used to turn off testing of the experimetal jobs."
@@ -62,7 +83,7 @@ elif [ "$TESTS" = "DONT_RUN_TESTS" ]; then
 else
   ./phoenix_test.py --target=localhost:37800 --user=<%= jenkins_test_user %> --pw=<%= jenkins_test_password %> \
        --targettype=TR --javahome=$JAVA_HOME \
-       --jdbccp=$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar --tests=$TESTS
+       --jdbccp=$TEST_JDBC_FILE --jdbctype=$TEST_JDBC_TYPE --tests=$TESTS
   phoenixRes=$?
 fi
 

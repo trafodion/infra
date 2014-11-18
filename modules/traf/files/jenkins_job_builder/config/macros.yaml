@@ -83,7 +83,7 @@
 - builder:
     name: run-phoenix_test
     builders:
-      - shell: '/usr/local/bin/run-phoenix_test.sh {trafCoreDir} {dcsDir} /usr/lib/jvm/java-1.7.0-openjdk.x86_64 {testDir} "{tests1}{tests2}{tests3}{tests4}"'
+      - shell: '/usr/local/bin/run-phoenix_test.sh {trafCoreDir} {dcsDir} /usr/lib/jvm/java-1.7.0-openjdk.x86_64 {testDir} {jdbctype} "{tests1}{tests2}{tests3}{tests4}"'
 
 - builder:
     name: run-pyodbc_test

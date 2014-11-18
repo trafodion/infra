@@ -150,8 +150,21 @@
 # If parameters tests1-4 are all "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the phoenix tests will run.
 # This should only be used in phoenix_test-experimental if phoenix_test is running all tests.
+
+- job-group:
+    name: 'phoenix-jobs'
+    jdbcDriverType:
+      - "T4"
+      - "T2"
+    jobs:
+      - 'phoenix_test_{jdbcDriverType}-experimental-{dist}'
+      - 'phoenix_test_{jdbcDriverType}-{dist}'
+      - 'phoenix_quick_{jdbcDriverType}-{dist}'
+      - 'phoenix_part1_{jdbcDriverType}-{dist}'
+      - 'phoenix_part2_{jdbcDriverType}-{dist}'
+
 - job-template:
-    name: 'phoenix_test-experimental-{dist}'
+    name: 'phoenix_test_{jdbcDriverType}-experimental-{dist}'
     node: 'redhat_{dist}'
 
     wrappers:
@@ -175,6 +188,7 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
+           jdbctype: '{jdbcDriverType}'
            tests1: "DONT_RUN_TESTS"
            tests2: ""
            tests3: ""
@@ -189,7 +203,7 @@
       - traf-runtime-log
 
 - job-template:
-    name: 'phoenix_test-{dist}'
+    name: 'phoenix_test_{jdbcDriverType}-{dist}'
     node: 'redhat_{dist}'
 
     wrappers:
@@ -213,6 +227,7 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
+           jdbctype: '{jdbcDriverType}'
            tests1: ""
            tests2: ""
            tests3: ""
@@ -227,7 +242,7 @@
       - traf-runtime-log
 
 - job-template:
-    name: 'phoenix_quick-{dist}'
+    name: 'phoenix_quick_{jdbcDriverType}-{dist}'
     node: 'redhat_{dist}'
 
     wrappers:
@@ -251,10 +266,11 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
-           tests1: "AlterTableTest,ArithmeticQueryTest,AutoCommitTest,BinaryRowKeyTest,CoalesceFunctionTest"
-           tests2: ",CompareDecimalToLongTest,CreateTableTest,CustomEntityDataTest,DeleteRangeTest"
-           tests3: ",DistinctCountTest,ExecuteStatementsTest,ExtendedQueryExecTest,FunkyNamesTest"
-           tests4: ",GroupByCaseTest,IndexTest,IsNullTest,KeyOnlyTest,MultiCfQueryExecTest,OrderByTest"
+           jdbctype: '{jdbcDriverType}'
+           tests1: "QUICK1"
+           tests2: ""
+           tests3: ""
+           tests4: ""
 
     publishers:
       - phoenix-xunit
@@ -265,7 +281,7 @@
       - traf-runtime-log
 
 - job-template:
-    name: 'phoenix_part1-{dist}'
+    name: 'phoenix_part1_{jdbcDriverType}-{dist}'
     node: 'redhat_{dist}'
 
     wrappers:
@@ -289,6 +305,7 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
+           jdbctype: '{jdbcDriverType}'
            tests1: "PART1"
            tests2: ""
            tests3: ""
@@ -302,7 +319,7 @@
       - phoenix_test-log
 
 - job-template:
-    name: 'phoenix_part2-{dist}'
+    name: 'phoenix_part2_{jdbcDriverType}-{dist}'
     node: 'redhat_{dist}'
 
     wrappers:
@@ -326,6 +343,7 @@
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
+           jdbctype: '{jdbcDriverType}'
            tests1: "PART2"
            tests2: ""
            tests3: ""

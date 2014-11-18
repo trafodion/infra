@@ -49,11 +49,7 @@
 
     jobs:
       - gate-{name}-check-for-binary
-      - phoenix_test-experimental-{dist}
-      - phoenix_test-{dist}
-      - phoenix_quick-{dist}
-      - phoenix_part1-{dist}
-      - phoenix_part2-{dist}
+      - phoenix-jobs
 
 - project:
     name: dcs
