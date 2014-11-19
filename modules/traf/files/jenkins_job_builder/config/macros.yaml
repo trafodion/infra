@@ -46,11 +46,6 @@
       - shell: "/usr/local/bin/kill-rogue-instance.sh"
 
 - builder:
-    name: make-traf
-    builders:
-      - shell: "/usr/local/bin/build-traf.sh {flavor}"
-
-- builder:
     name: check-build
     builders:
       - shell: "/usr/local/bin/check-git-status.sh {dir}"

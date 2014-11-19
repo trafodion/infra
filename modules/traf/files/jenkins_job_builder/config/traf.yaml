@@ -295,7 +295,7 @@
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
-      - make-traf:
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
@@ -317,6 +317,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - traf-runtime-log
 
 - job-template:
     name: 'phoenix_part2_{jdbcDriverType}-{dist}'
@@ -333,7 +334,7 @@
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
-      - make-traf:
+      - pkg-traf:
            flavor: "debug"
       - maven-package:
            buildDir: "trafodion/dcs"
@@ -355,6 +356,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - traf-runtime-log
 
 # For pyodbc_test* jobs parameter tests1 should contain a list of tests seperated by a space. For instance : test_p2.ConnectTest.test11 test_p2.ConnectTest.test12
 # If parameter tests1 is "" then all tests will be run
