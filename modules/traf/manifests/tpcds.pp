@@ -40,7 +40,7 @@ class traf::tpcds {
   }
   exec { 'unzip-tools':
     require => Exec['download-tpc-ds'],
-    creates => "${tools_dir}/DS Tools/tools",
+    creates => "${tools_dir}/TPC-DS v1.3.0/tools",
     command => "/usr/bin/unzip -od ${tools_dir} ${tools_file}",
   }
   # for backward compatiblity for earlier tool installs, which had no "DS Tools" dir
@@ -49,10 +49,16 @@ class traf::tpcds {
     creates => "${tools_dir}/DS Tools",
     command => "/bin/ln -s ${tools_dir} '${tools_dir}/DS Tools'",
   }
+  # for backward compatiblity - they changed the dir name yet again
+  exec { 'check-TPC-DS':
+    require => Exec['unzip-tools'],
+    creates => "${tools_dir}/TPC-DS v1.3.0",
+    command => "/bin/ln -s '${tools_dir}/DS Tools' '${tools_dir}/TPC-DS v1.3.0'",
+  }
   exec { 'build-tools':
     require => Exec['check-DS'],
-    creates => "${tools_dir}/DS Tools/tools/dsdgen",
-    command => "/usr/bin/make -C '${tools_dir}/DS Tools/tools'",
+    creates => "${tools_dir}/TPC-DS v1.3.0/tools/dsdgen",
+    command => "/usr/bin/make -C '${tools_dir}/TPC-DS v1.3.0/tools'",
   }
   exec { 'gen_and_load_data':
     require => [
@@ -62,7 +68,7 @@ class traf::tpcds {
     command => '/usr/local/bin/load_tpcds_data.sh',
     user    => 'hdfs',
     timeout => 600,
-    cwd     => "${tools_dir}/DS Tools/tools",
+    cwd     => "${tools_dir}/TPC-DS v1.3.0/tools",
     unless  => '/usr/bin/hadoop dfs -ls /hive/tpcds',
   }
   exec { 'hive_tables':
