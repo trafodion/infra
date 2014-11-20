@@ -56,7 +56,7 @@ then
 
   # Trafodion set-up
   echo "accept" | 
-     ./installer/trafodion_setup --nodes "localhost"  || exit 2
+     ./installer/trafodion_setup --nodes "$(hostname -s)"  || exit 2
 
   # Trafodion mods
   ./installer/trafodion_mods --trafodion_build "$trafball" || exit 2
