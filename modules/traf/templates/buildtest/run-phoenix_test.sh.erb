@@ -102,8 +102,9 @@ fi
 cd $WORKSPACE
 /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"
 
+# Report on parent directory of $TRAF_DIR
 # Any core files means failure
-report_on_corefiles "$TRAF_DIR"
+report_on_corefiles "${TRAF_DIR%/*}"
 coreCount=$?
 if [[ $coreCount -gt 0 ]]; then
   echo
