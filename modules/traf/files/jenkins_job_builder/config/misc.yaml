@@ -42,6 +42,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
            jdbctype: "T4"
+           hadoopdistro: "CDH51"
            tests1: "ProductMetricsTest"
            tests2: ""
            tests3: ""
