@@ -17,6 +17,10 @@
           name: BRANCH
           default: master
           description: git branch to build
+      - string:
+          name: HADOOP_DISTRO
+          default: CDH51
+          description: Hadoop Distro being tested (CDH51 for Cloudera 5.1.x or HDP21 for Hortonworks 2.1.x)
 
     wrappers:
       - timeout:
@@ -42,6 +46,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
            jdbctype: "T4"
+           hadoopdistro: '$HADOOP_DISTRO'
            tests1: "ProductMetricsTest"
            tests2: ""
            tests3: ""
