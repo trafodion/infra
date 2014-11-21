@@ -189,6 +189,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
            jdbctype: '{jdbcDriverType}'
+           hadoopdistro: '{dist}'
            tests1: "DONT_RUN_TESTS"
            tests2: ""
            tests3: ""
@@ -228,6 +229,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
            jdbctype: '{jdbcDriverType}'
+           hadoopdistro: '{dist}'
            tests1: ""
            tests2: ""
            tests3: ""
@@ -267,6 +269,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
            jdbctype: '{jdbcDriverType}'
+           hadoopdistro: '{dist}'
            tests1: "QUICK1"
            tests2: ""
            tests3: ""
@@ -306,6 +309,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
            jdbctype: '{jdbcDriverType}'
+           hadoopdistro: '{dist}'
            tests1: "PART1"
            tests2: ""
            tests3: ""
@@ -345,6 +349,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
            jdbctype: '{jdbcDriverType}'
+           hadoopdistro: '{dist}'
            tests1: "PART2"
            tests2: ""
            tests3: ""
