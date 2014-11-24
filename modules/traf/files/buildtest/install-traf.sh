@@ -132,13 +132,13 @@ if [[ $ret == 0 ]]
 then
   count=$(pgrep -u trafodion ^mxosrvr | wc -l)
   time=0
-  while [[ $count < $DCSSERV && $time < 120 ]]
+  while (( $count < $DCSSERV && $time < 120 ))
   do
     sleep 10
-    time+=10
+    (( time+=10 ))
     count=$(pgrep -u trafodion ^mxosrvr | wc -l)
   done
-  if [[ $count < $DCSSERV ]]
+  if (( $count < $DCSSERV ))
   then
     echo "Error: requested mxo server processes did not come up"
     exit 3
