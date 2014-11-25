@@ -96,7 +96,7 @@ fi
 
 echo "*** Clearing /hbase data from HDFS & ZooKeeper"
 set -x
-sudo -u hdfs /usr/bin/hadoop fs -rm -r -f /hbase || exit $?
+sudo -u hdfs /usr/bin/hadoop fs -rm -r -f -skipTrash /hbase || exit $?
 sudo -u hdfs /usr/bin/hadoop fs -mkdir /hbase || exit $?
 sudo -u hdfs /usr/bin/hadoop fs -chown hbase:hbase /hbase || exit $?
 sudo -u zookeeper /usr/bin/hbase zkcli rmr /hbase 2>/dev/null || exit $?
