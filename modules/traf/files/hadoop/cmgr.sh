@@ -300,7 +300,7 @@ then
 fi
 
 # Configure Yarn roles
-cm_config_serv "trafYARN/roles/trafNODEMGR" "yarn_nodemanager_local_dirs" '/var/lib/hadoop-yarn/cache/${user.name}/nm-local-dir'
+cm_config_serv "trafYARN/roles/trafNODEMGR" "yarn_nodemanager_local_dirs" '/var/lib/hadoop-yarn/cache/nm-local-dir'
 
 # Hive
 Role="$(curl $Read $URL/clusters/trafcluster/services/trafHIVE/roles/trafMETA | jq -r '.name')"
