@@ -126,7 +126,7 @@ fi
 # Create Services 
 # installer cannot understand arbitrary names for hdfs and hbase services Bug:1381764
 # specify type:name
-for serv in HDFS:hdfs HIVE:trafHIVE HBASE:trafhbase ZOOKEEPER:trafZOO MAPREDUCE:trafMAPRED
+for serv in HDFS:hdfs HIVE:trafHIVE HBASE:trafhbase ZOOKEEPER:trafZOO MAPREDUCE:trafMAPRED YARN:trafYARN
 do
   stype=${serv%:*}
   sname=${serv#*:}
@@ -159,6 +159,10 @@ cm_config_serv "trafHIVE" "hive_metastore_database_password" "insecure_hive"
 
 # MapReduce config
 cm_config_serv "trafMAPRED" "hdfs_service" "hdfs"
+
+# Yarn config
+cm_config_serv "trafYARN" "hdfs_service" "hdfs"
+cm_config_serv "trafYARN" "zookeeper_service" "trafZOO"
 
 # HBase config
 cm_config_serv "trafhbase" "hdfs_service" "hdfs"
@@ -264,6 +268,39 @@ then
     exit 2
   fi
 fi
+
+# Yarn
+Role="$(curl $Read $URL/clusters/trafcluster/services/trafYARN/roles/trafRESMGR | jq -r '.name')"
+
+if [[ $Role == "null" ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  echo "Creating Yarn roles"
+  Roles=$(curl $Create -d'
+		  { "items" : [ {
+		      "name" : "trafNODEMGR",
+		      "type" : "NODEMANAGER",
+		      "hostRef" : { "hostId" : "'$host'" }
+		    }, {
+		      "name" : "trafJHIST",
+		      "type" : "JOBHISTORY",
+		      "hostRef" : { "hostId" : "'$host'" }
+		    }, {
+		      "name" : "trafRESMGR",
+		      "type" : "RESOURCEMANAGER",
+		      "hostRef" : { "hostId" : "'$host'" }
+		    } ] }
+		  ' $URL/clusters/trafcluster/services/trafYARN/roles | jq -r '.items[].name'
+       )
+  if [[ ! ($Roles =~ trafNODEMGR) ]]
+  then
+    echo "Error: failed to create Yarn roles"
+    exit 2
+  fi
+fi
+
+# Configure Yarn roles
+cm_config_serv "trafYARN/roles/trafNODEMGR" "yarn_nodemanager_local_dirs" '/var/lib/hadoop-yarn/cache/${user.name}/nm-local-dir'
 
 # Hive
 Role="$(curl $Read $URL/clusters/trafcluster/services/trafHIVE/roles/trafMETA | jq -r '.name')"
@@ -412,6 +449,27 @@ then
 fi
 hadoop fs -ls /tmp >/dev/null || exit 2
 
+# Yarn needs app log dir
+hadoop fs -ls /tmp/logs >/dev/null
+if [[ $? != 0 ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafYARN/commands/yarnNodeManagerRemoteAppLogDirCommand | jq -r '.id')
+  cm_cmd $CID "HDFS Create app logs dir"
+fi
+hadoop fs -ls /tmp/logs >/dev/null || exit 2
+
+# Yarn/MR job history 
+hadoop fs -ls /user/history >/dev/null
+if [[ $? != 0 ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafYARN/commands/yarnCreateJobHistoryDirCommand | jq -r '.id')
+  cm_cmd $CID "HDFS Create job history dir"
+fi
+hadoop fs -ls /user/history >/dev/null || exit 2
+
+
 # HBase root 
 hadoop fs -ls /hbase >/dev/null
 if [[ $? != 0 ]]
@@ -423,8 +481,8 @@ fi
 hadoop fs -ls /hbase >/dev/null || exit 2
 
 
-# Start Zookeeper and Hive
-for serv in trafZOO trafHIVE trafMAPRED
+# Start services
+for serv in trafZOO trafHIVE trafYARN trafMAPRED trafhbase
 do
   State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
   if [[ $State == "STOPPED" ]]
@@ -433,26 +491,14 @@ do
     CID=$(curl $Create $URL/clusters/trafcluster/services/${serv}/commands/start | jq -r '.id')
     cm_cmd $CID "$serv Start"
   fi
-done
-
-# Start HBase
-
-State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
-if [[ $State == "STOPPED" ]]
-then
-  [[ $mode == "check" ]] && exit 5
-  # Start HBase service roles
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/start | jq -r '.id')
-  cm_cmd $CID "HBase Start"
-
   # Check status
-  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
+  State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
   if [[ $State =~ STOP ]] # stopped, stopping
   then
-    echo "Error: trafhbase not started"
+    echo "Error: $serv not started"
     exit 2
   fi
-fi
+done
 
 # Successfully initialized - don't repeat initialization
 echo "Cluster set-up complete $(date)" > /var/local/Cluster_Init_Trafodion
