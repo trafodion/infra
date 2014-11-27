@@ -273,6 +273,14 @@ class traf::cdh (
     user    => 'hdfs',
     require => [ Exec['hdfs-trafodion'] ]
   }
+  exec { 'hdfs-trafodion-lobs':
+    command =>
+      '/usr/bin/hadoop fs -mkdir -p /lobs
+	   /usr/bin/hadoop fs -chown jenkins /lobs',
+    unless  => '/usr/bin/hadoop fs -ls -d /lobs',
+    user    => 'hdfs',
+    require => [ Exec['hdfs-trafodion'] ]
+  }
 
 
   exec { 'zookeeper-init':

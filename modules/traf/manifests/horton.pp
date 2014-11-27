@@ -235,6 +235,14 @@ class traf::horton (
     user    => 'hdfs',
     require => [ Exec['hdfs-trafodion'] ]
   }
+  exec { 'hdfs-trafodion-lobs':
+    command =>
+      '/usr/bin/hadoop fs -mkdir /lobs
+	   /usr/bin/hadoop fs -chown jenkins /lobs',
+    unless  => '/usr/bin/hadoop fs -ls /lobs',
+    user    => 'hdfs',
+    require => [ Exec['hdfs-trafodion'] ]
+  }
 
   # Yarn
   exec { 'hdfs-yarnlog':
