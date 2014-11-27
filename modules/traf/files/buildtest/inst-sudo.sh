@@ -76,6 +76,10 @@ then
   # must be HDFS superuser (hdfs) to chown
   sudo -n -u hive hadoop dfs -mkdir -p /user/hive/exttables
   sudo -n -u hdfs hadoop dfs -chown trafodion /user/hive/exttables
+  # trafodion user directory must exist to accomodate Trash folder 
+  # (or every use of hdfs rm has to use -skipTrash option)
+  sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
+  sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
 
   # Dev regressions
   if [[ $ret == 0 && -n "$regball" ]]
