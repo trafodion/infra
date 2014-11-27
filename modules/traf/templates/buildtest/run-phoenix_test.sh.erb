@@ -100,7 +100,11 @@ else
   if [[ $TEST_JDBC_TYPE == "T2" ]] && id trafodion >/dev/null 2>&1
   then
     chmod -R 777 .  # permission to write in this dir tree
-    sudo -n -u trafodion ./phoenix_test.py $TARGS
+    chmod -R +rX $TRAF_DIR $DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
+    sudo -n -u trafodion LD_PRELOAD=$LD_PRELOAD SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG \
+		MY_SQROOT=$MY_SQROOT MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$LD_PRELOAD \
+		LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
+    		./phoenix_test.py $TARGS
     phoenixRes=$?
   else
     ./phoenix_test.py $TARGS
