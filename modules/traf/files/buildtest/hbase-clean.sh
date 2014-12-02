@@ -89,6 +89,42 @@ else
   echo "Return code $?"
 fi
 
+####
+# Make sure HDFS is running
+#
+
+if [[ $Manager == "Cloudera" ]]
+then
+  State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
+
+  if [[ $State == "STOPPED" ]]
+  then
+    # Start HDFS service roles
+    CID=$(curl $Create $URL/clusters/trafcluster/services/hdfs/commands/start | jq -r '.id')
+    cm_cmd $CID "HDFS Start"
+
+    # Check status
+    State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
+    if [[ $State =~ STOP ]] # stopped, stopping
+    then
+      echo "Error: HDFS not started"
+      exit 2
+    fi
+  fi
+elif [[ $Manager == "Ambari" ]]
+then
+  echo "Ambari mode not yet implemented"
+  /sbin/service hadoop-hdfs-datanode start
+  echo "Return code $?"
+  /sbin/service hadoop-hdfs-namenode start
+  echo "Return code $?"
+else
+  /sbin/service hadoop-hdfs-datanode start
+  echo "Return code $?"
+  /sbin/service hadoop-hdfs-namenode start
+  echo "Return code $?"
+fi
+
 
 ####
 # Clear Data
