@@ -107,6 +107,13 @@ echo "Saving output to Git-Prep.log"
 set -x
 exec &>Git-Prep.log
 
+# If we are in a pipeline where many jobs are generated, delay a bit
+# to avoid simultaneously hitting the GIT_ORIGIN server.
+if [[ ${ZUUL_PIPELINE} =~ daily|release|check-full ]]
+then
+  sleep $(( $RANDOM % 45 ))
+fi
+
 # Repo-specific prep
 for repo in $PROJ_LIST
 do
