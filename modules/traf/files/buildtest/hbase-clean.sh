@@ -90,27 +90,27 @@ else
 fi
 
 ####
-# Make sure HDFS is running
+# Make sure HDFS and zookeeper are running
 #
 
 if [[ $Manager == "Cloudera" ]]
 then
-  State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
-
-  if [[ $State == "STOPPED" ]]
-  then
-    # Start HDFS service roles
-    CID=$(curl $Create $URL/clusters/trafcluster/services/hdfs/commands/start | jq -r '.id')
-    cm_cmd $CID "HDFS Start"
-
-    # Check status
-    State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
-    if [[ $State =~ STOP ]] # stopped, stopping
+  for serv in hdfs trafZOO
+  do
+    State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
+    if [[ $State == "STOPPED" ]]
     then
-      echo "Error: HDFS not started"
-      exit 2
+      CID=$(curl $Create $URL/clusters/trafcluster/services/$serv/commands/start | jq -r '.id')
+      cm_cmd $CID "$serv Start"
+      # Check status
+      State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
+      if [[ $State =~ STOP ]] # stopped, stopping
+      then
+        echo "Error: $serv service not started"
+        exit 2
+      fi
     fi
-  fi
+  done
 elif [[ $Manager == "Ambari" ]]
 then
   echo "Ambari mode not yet implemented"
