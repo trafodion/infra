@@ -311,6 +311,10 @@
               source: 'trafodion/phoenix_test/target/surefire-reports/**'
               copy-after-failure: true
               keep-hierarchy: true
+            - target: 'logs/$LOG_PATH/phoenix_test/surefire-reports'
+              source: 'phx_test_run/target/surefire-reports/**'
+              copy-after-failure: true
+              keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
               source: 'dcs/dcs*/logs/*'
               copy-after-failure: true
@@ -342,6 +346,8 @@
           types:
             - junit:
                 pattern: "trafodion/phoenix_test/target/surefire-reports/*.xml"
+            - junit:
+                pattern: "phx_test_run/target/surefire-reports/*.xml"
 
 - publisher:
     name: pyodbc_test-log
