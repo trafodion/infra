@@ -84,7 +84,6 @@ ulimit -c unlimited
 # run phoenix_test
 log_banner "phoenix_test.py"
 
-cd "$WORKSPACE/$TEST_DIR"
 
 if [ "$TESTS" = "DONT_RUN_TESTS" ]; then
   echo "INFO: Will NOT run any phoenix tests as requested. You should not see this message in the normal Jenkins job phoenix_test! This should only be used to turn off testing of the experimetal jobs."
@@ -99,14 +98,18 @@ else
   # T2 must run as same user running the instance
   if [[ $TEST_JDBC_TYPE == "T2" ]] && id trafodion >/dev/null 2>&1
   then
-    chmod -R 777 .  # permission to write in this dir tree
-    chmod -R +rX $TRAF_DIR $DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
+    rm -rf $WORKSPACE/phx_test_run
+    sudo -n -u trafodion cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
+    cd $WORKSPACE/phx_test_run
+
+    chmod -R +rX $WORKSPACE/$TRAF_DIR $WORKSPACE/$DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
     sudo -n -u trafodion LD_PRELOAD=$LD_PRELOAD SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG \
 		MY_SQROOT=$MY_SQROOT MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$LD_PRELOAD \
 		LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
     		./phoenix_test.py $TARGS
     phoenixRes=$?
   else
+    cd "$WORKSPACE/$TEST_DIR"
     ./phoenix_test.py $TARGS
     phoenixRes=$?
   fi
