@@ -308,10 +308,6 @@
           site: 'logs.trafodion.org'
           files:
             - target: 'logs/$LOG_PATH/phoenix_test/surefire-reports'
-              source: 'trafodion/phoenix_test/target/surefire-reports/**'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH/phoenix_test/surefire-reports'
               source: 'phx_test_run/target/surefire-reports/**'
               copy-after-failure: true
               keep-hierarchy: true
@@ -344,8 +340,6 @@
                 failure: '0'
                 failurenew: '0'
           types:
-            - junit:
-                pattern: "trafodion/phoenix_test/target/surefire-reports/*.xml"
             - junit:
                 pattern: "phx_test_run/target/surefire-reports/*.xml"
 

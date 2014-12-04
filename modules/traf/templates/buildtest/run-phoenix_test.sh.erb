@@ -98,7 +98,7 @@ else
   # T2 must run as same user running the instance
   if [[ $TEST_JDBC_TYPE == "T2" ]] && id trafodion >/dev/null 2>&1
   then
-    rm -rf $WORKSPACE/phx_test_run
+    sudo -n -u trafodion rm -rf $WORKSPACE/phx_test_run
     sudo -n -u trafodion cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
     cd $WORKSPACE/phx_test_run
 
@@ -109,7 +109,9 @@ else
     		./phoenix_test.py $TARGS
     phoenixRes=$?
   else
-    cd "$WORKSPACE/$TEST_DIR"
+    rm -rf $WORKSPACE/phx_test_run
+    cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
+    cd $WORKSPACE/phx_test_run
     ./phoenix_test.py $TARGS
     phoenixRes=$?
   fi
