@@ -13,7 +13,7 @@ NameVirtualHost *:80
 
   # Turn on RewriteEngine
   RewriteEngine on
-  RewriteCond %{REQUEST_URI} !\.(pdf|doc|html|css|png|gif|ico)$
+  RewriteCond %{REQUEST_URI} !\.(pdf|doc|html|css|png|gif|ico|gz|tgz|zip)$
   RewriteRule ^(.*)$ https://wiki.<%= domain %>/wiki/index.php/Documentation [L,R=301]
 
   DocumentRoot <%= docroot %>
