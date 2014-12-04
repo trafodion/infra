@@ -57,6 +57,36 @@ class traf::base(
     provider => pip,
     require  => Class['pip'],
   }
+  package { 'python-keystoneclient':
+    ensure   => '0.4.1',
+    provider => pip,
+    require  => Class['pip'],
+  }
+  package { 'python-novaclient':
+    ensure   => '2.17.0',
+    provider => pip,
+    require  => Class['pip'],
+  }
+  package { 'python-cinderclient':
+    ensure   => latest,
+    provider => pip,
+    require  => Class['pip'],
+  }
+  package { 'python-neutronclient':
+    ensure   => latest,
+    provider => pip,
+    require  => Class['pip'],
+  }
+  package { 'python-swiftclient':
+    ensure   => latest,
+    provider => pip,
+    require  => Class['pip'],
+  }
+  package { 'python-glanceclient':
+    ensure   => latest,
+    provider => pip,
+    require  => Class['pip'],
+  }
 
   if ($install_users) {
     package { $::traf::params::user_packages:

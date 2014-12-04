@@ -69,14 +69,6 @@ class traf::puppetmaster (
     }
 
 # For launch/launch-node.py.
-  package { 'python-novaclient':
-    ensure   => '2.17.0',
-    provider => pip,
-  }
-  package { 'python-cinderclient':
-    ensure   => latest,
-    provider => pip,
-  }
   package { 'python-paramiko':
     ensure => present,
   }
