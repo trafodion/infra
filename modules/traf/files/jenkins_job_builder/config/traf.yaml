@@ -21,7 +21,7 @@
 
     wrappers:
       - timeout:
-          timeout: 180
+          timeout: 200
           fail: true
       - timestamps
 
