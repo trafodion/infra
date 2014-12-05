@@ -42,7 +42,7 @@ class traf::python276 {
       command     => './configure --enable-unicode=ucs2 --prefix=/usr/local',
       creates     => '/var/python276/Python-2.7.6/Makefile',
       refreshonly => true,
-      require     => Package['libpcap-devel'],
+      require     => [ Package['libpcap-devel'], Package['bzip2-devel'], Package['zlib-devel'], Package['openssl-devel'] ],
       subscribe   => Exec['untar_Python2.7.6'],
   }
 
