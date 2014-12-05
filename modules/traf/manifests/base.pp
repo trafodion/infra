@@ -47,8 +47,16 @@ class traf::base(
 
   }
 
+  # install packages on all machines
   package { $::traf::params::packages:
     ensure => present
+  }
+
+  # install packages on all machines except jenkins slaves
+  if ($::hostname !~ /^slave.*$/) {
+    package { $::traf::params::non_slave_packages:
+      ensure => present
+    }
   }
 
   include pip
