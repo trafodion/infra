@@ -137,7 +137,7 @@ class jenkins::slave(
       require  => Class[pip::python3],
     }
     package { 'tox':
-      ensure   => '1.6.1',
+      ensure   => '1.7.2',
       provider => pip3,
       require  => Class[pip::python3],
     }
@@ -148,7 +148,7 @@ class jenkins::slave(
       require  => Class[pip],
     }
     package { 'tox':
-      ensure   => '1.6.1',
+      ensure   => '1.7.2',
       provider => pip,
       require  => Class[pip],
     }
