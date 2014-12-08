@@ -52,48 +52,65 @@ class traf::base(
     ensure => present
   }
 
-  # install packages on all machines except jenkins slaves
-  if ($::hostname !~ /^slave.*$/) {
-    package { $::traf::params::non_slave_packages:
-      ensure => present
-    }
-  }
-
   include pip
   package { 'virtualenv':
     ensure   => latest,
     provider => pip,
     require  => Class['pip'],
   }
-  package { 'python-keystoneclient':
-    ensure   => '0.4.1',
-    provider => pip,
-    require  => Class['pip'],
-  }
-  package { 'python-novaclient':
-    ensure   => '2.17.0',
-    provider => pip,
-    require  => Class['pip'],
-  }
-  package { 'python-cinderclient':
-    ensure   => latest,
-    provider => pip,
-    require  => Class['pip'],
-  }
-  package { 'python-neutronclient':
-    ensure   => latest,
-    provider => pip,
-    require  => Class['pip'],
-  }
-  package { 'python-swiftclient':
-    ensure   => latest,
-    provider => pip,
-    require  => Class['pip'],
-  }
-  package { 'python-glanceclient':
-    ensure   => latest,
-    provider => pip,
-    require  => Class['pip'],
+
+  # install packages on all machines except jenkins slaves
+  if ($::hostname !~ /^slave.*$/) {
+    package { $::traf::params::non_slave_packages:
+      ensure => present
+    }
+
+    package { 'python-novaclient':
+      ensure   => '2.17.0',
+      provider => pip,
+      require  => Class['pip'],
+    }
+
+    package { 'python-swiftclient':
+      ensure   => '2.1.0',
+      provider => pip,
+      require  => Class['pip'],
+    }
+
+    package { 'python-cinderclient':
+      ensure   => '1.0.8',
+      provider => pip,
+      require  => Class['pip'],
+    }
+
+    package { 'python-glanceclient':
+      ensure   => '0.12.0',
+      provider => pip,
+      require  => Class['pip'],
+    }
+
+    package { 'python-neutronclient':
+      ensure   => '2.3.4',
+      provider => pip,
+      require  => Class['pip'],
+    }
+
+    package { 'python-designateclient':
+      ensure   => '1.0.0',
+      provider => pip,
+      require  => Class['pip'],
+    }
+
+    package { 'python-keystoneclient':
+      ensure   => '0.4.1',
+      provider => pip,
+      require  => [
+        Class['pip'], Package['python-novaclient'], Package['python-cinderclient'],
+        Package['python-neutronclient'], Package['python-swiftclient'],
+        Package['python-glanceclient'], Package['python-designateclient'],
+      ],
+    }
+
   }
 
   if ($install_users) {
