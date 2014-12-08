@@ -99,6 +99,7 @@ else
   if [[ $TEST_JDBC_TYPE == "T2" ]] && id trafodion >/dev/null 2>&1
   then
     sudo -n -u trafodion rm -rf $WORKSPACE/phx_test_run
+    chmod 777 .   # give write permission to trafodion
     sudo -n -u trafodion cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
     cd $WORKSPACE/phx_test_run
 
