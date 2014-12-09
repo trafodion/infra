@@ -56,30 +56,32 @@ else
     exit 1
 fi
 
-# check TEST_JDBC_TYPE and set TEST_JDBC_FILE based on it
-TEST_JDBC_TYPE=$(echo $TEST_JDBC_TYPE | tr "[:lower:]" "[:upper:]")
-if [ "$TEST_JDBC_TYPE" = "T4" ]; then
-  TEST_JDBC_FILE="$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT4.jar"
-elif [ "$TEST_JDBC_TYPE" = "T2" ]; then
-  TEST_JDBC_FILE="$WORKSPACE/$TRAF_DIR/sqf/export/lib/jdbcT2.jar"
-  if [ $(grep -c 'sqenvd.sh' "$WORKSPACE/$TRAF_DIR/sqf/BuildFlavor") -eq 1 ]; then export SQ_MBTYPE=64d; else export SQ_MBTYPE=64; fi
-  export LANG=en_US.UTF-8
-  export MY_SQROOT="$WORKSPACE/$TRAF_DIR/sqf"
-  export MPI_TMPDIR="$WORKSPACE/$TRAF_DIR/sqf/tmp"
-  export LD_PRELOAD="$JAVA_HOME/jre/lib/amd64/libjsig.so:$WORKSPACE/$TRAF_DIR/sqf/export/lib${SQ_MBTYPE}/libseabasesig.so"
-  export LD_LIBRARY_PATH="$WORKSPACE/$TRAF_DIR/sqf/export/lib${SQ_MBTYPE}:$JAVA_HOME/jre/lib/amd64/server"
-  export PATH="$JAVA_HOME/bin:$WORKSPACE/$TRAF_DIR/sqf/export/bin${SQ_MBTYPE}:$PATH"
-else
-  echo "ERROR: $TEST_JDBC_TYPE is not a valid JDBC type."
-  echo "       T4 and T2 are the only valid JDBC types"
-  exit 1
-fi
-
 # start trafodion
 cd $WORKSPACE
 ulimit -c unlimited
 /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" || exit 1
 
+# source in InstallEnv.sh
+source $WORKSPACE/InstallEnv.sh
+
+# check TEST_JDBC_TYPE and set TEST_JDBC_FILE based on it
+TEST_JDBC_TYPE=$(echo $TEST_JDBC_TYPE | tr "[:lower:]" "[:upper:]")
+if [ "$TEST_JDBC_TYPE" = "T4" ]; then
+  TEST_JDBC_FILE="$ILOC/export/lib/jdbcT4.jar"
+elif [ "$TEST_JDBC_TYPE" = "T2" ]; then
+  TEST_JDBC_FILE="$ILOC/export/lib/jdbcT2.jar"
+  if [ $(grep -c 'sqenvd.sh' "$WORKSPACE/$TRAF_DIR/sqf/BuildFlavor") -eq 1 ]; then export SQ_MBTYPE=64d; else export SQ_MBTYPE=64; fi
+  export LANG=en_US.UTF-8
+  export MY_SQROOT="$ILOC"
+  export MPI_TMPDIR="$ILOC/tmp"
+  export TMP_LD_PRELOAD="$JAVA_HOME/jre/lib/amd64/libjsig.so:$ILOC/export/lib${SQ_MBTYPE}/libseabasesig.so"
+  export LD_LIBRARY_PATH="$ILOC/export/lib${SQ_MBTYPE}:$JAVA_HOME/jre/lib/amd64/server"
+  export PATH="$JAVA_HOME/bin:$ILOC/export/bin${SQ_MBTYPE}:$PATH"
+else
+  echo "ERROR: $TEST_JDBC_TYPE is not a valid JDBC type."
+  echo "       T4 and T2 are the only valid JDBC types"
+  exit 1
+fi
 
 # run phoenix_test
 log_banner "phoenix_test.py"
@@ -104,8 +106,8 @@ else
     cd $WORKSPACE/phx_test_run
 
     chmod -R +rX $WORKSPACE/$TRAF_DIR $WORKSPACE/$DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
-    sudo -n -u trafodion LD_PRELOAD=$LD_PRELOAD SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG \
-		MY_SQROOT=$MY_SQROOT MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$LD_PRELOAD \
+    sudo -n -u trafodion SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG \
+		MY_SQROOT=$MY_SQROOT MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$TMP_LD_PRELOAD \
 		LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
     		./phoenix_test.py $TARGS
     phoenixRes=$?
@@ -113,6 +115,7 @@ else
     rm -rf $WORKSPACE/phx_test_run
     cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
     cd $WORKSPACE/phx_test_run
+    export LD_PRELOAD=$TMP_LD_PRELOAD
     ./phoenix_test.py $TARGS
     phoenixRes=$?
   fi
@@ -123,7 +126,7 @@ cd $WORKSPACE
 
 # Report on parent directory of $TRAF_DIR
 # Any core files means failure
-report_on_corefiles "${TRAF_DIR%/*}"
+report_on_corefiles "${WORKSPACE}"
 coreCount=$?
 if [[ $coreCount -gt 0 ]]; then
   echo
