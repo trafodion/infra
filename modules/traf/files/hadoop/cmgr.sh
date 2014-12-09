@@ -152,6 +152,9 @@ do
   fi
 done
 
+# HDFS config for single node
+cm_config_serv "hdfs" "dfs_replication" "1"
+
 # Hive config
 cm_config_serv "trafHIVE" "mapreduce_yarn_service" "trafMAPRED"
 cm_config_serv "trafHIVE" "zookeeper_service" "trafZOO"
@@ -371,6 +374,15 @@ then
   fi
 fi
 
+# Deploy Client Config
+State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.clientConfigStalenessStatus')"
+if [[ $State =~ STALE ]]
+then
+  [[ $mode == "check" ]] && exit 5
+  CID=$(curl $Create $URL/clusters/trafcluster/commands/deployClientConfig | jq -r '.id')
+  cm_cmd $CID "Client Deploy"
+fi
+
 ########## End of Configurations
 
 # Check whether previously initialized
@@ -409,15 +421,6 @@ then
     echo "Error: HDFS not started"
     exit 2
   fi
-fi
-
-# Deploy Client Config
-State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.clientConfigStalenessStatus')"
-if [[ $State =~ STALE ]]
-then
-  [[ $mode == "check" ]] && exit 5
-  CID=$(curl $Create $URL/clusters/trafcluster/commands/deployClientConfig | jq -r '.id')
-  cm_cmd $CID "Client Deploy"
 fi
 
 # Hive set-up
