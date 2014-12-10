@@ -2,8 +2,6 @@
 #
 class traf::puppetmaster (
   $sysadmins = [],
-  $cloud_auto_user = '',
-  $cloud_auto_passwd = '',
 ) {
   class { 'traf::server':
     iptables_public_tcp_ports => [4505, 4506, 8140],
