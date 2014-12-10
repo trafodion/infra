@@ -113,6 +113,15 @@ class traf::base(
 
   }
 
+  file { '/usr/local/bin/backupToObjectStorage.sh':
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0750',
+    content => template('traf/backupToObjectStorage.sh.erb'),
+    require => File['/usr/local/bin'],
+  }
+
   if ($install_users) {
     package { $::traf::params::user_packages:
       ensure => present
