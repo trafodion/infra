@@ -72,6 +72,9 @@ elif [ "$TEST_JDBC_TYPE" = "T2" ]; then
   TEST_JDBC_FILE="$ILOC/export/lib/jdbcT2.jar"
   if [ $(grep -c 'sqenvd.sh' "$WORKSPACE/$TRAF_DIR/sqf/BuildFlavor") -eq 1 ]; then export SQ_MBTYPE=64d; else export SQ_MBTYPE=64; fi
   export LANG=en_US.UTF-8
+  export HADOOP_CNF_DIR=="/etc/hadoop/conf"
+  export HBASE_CNF_DIR="/etc/hbase/conf"
+  export HIVE_CNF_DIR="/etc/hive/conf"
   export MY_SQROOT="$ILOC"
   export MPI_TMPDIR="$ILOC/tmp"
   export TMP_LD_PRELOAD="$JAVA_HOME/jre/lib/amd64/libjsig.so:$ILOC/export/lib${SQ_MBTYPE}/libseabasesig.so"
@@ -106,9 +109,9 @@ else
     cd $WORKSPACE/phx_test_run
 
     chmod -R +rX $WORKSPACE/$TRAF_DIR $WORKSPACE/$DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
-    sudo -n -u trafodion SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG \
-		MY_SQROOT=$MY_SQROOT MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$TMP_LD_PRELOAD \
-		LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
+    sudo -n -u trafodion SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG HADOOP_CNF_DIR=$HADOOP_CNF_DIR \
+		HBASE_CNF_DIR=$HBASE_CNF_DIR HIVE_CNF_DIR=$HIVE_CNF_DIR MY_SQROOT=$MY_SQROOT \
+		MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$TMP_LD_PRELOAD LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
     		./phoenix_test.py $TARGS
     phoenixRes=$?
   else
