@@ -119,7 +119,6 @@ class traf::base(
     group   => 'root',
     mode    => '0750',
     content => template('traf/backupToObjectStorage.sh.erb'),
-    require => File['/usr/local/bin'],
   }
 
   if ($install_users) {
