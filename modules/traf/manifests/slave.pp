@@ -271,8 +271,8 @@ class traf::slave (
       require => Class['::cloudera'],
     }
     exec {'cluster_setup':
-      command => '/usr/local/bin/cmgr.sh 5.1.2',
-      unless  => '/usr/local/bin/cmgr.sh check 5.1.2',
+      command => '/usr/local/bin/cmgr.sh 5.1.4',
+      unless  => '/usr/local/bin/cmgr.sh check 5.1.4',
       require => [ Class['traf::hive_metastore'], File['/usr/local/bin/cmgr.sh'], ]
     }
 
@@ -286,7 +286,7 @@ class traf::slave (
       cm_server_host   => 'localhost',
       install_cmserver => true,
       use_parcels      => false,
-      cdh_version      => '5.1.2',
+      cdh_version      => '5.1.4',
     }
   }
 
