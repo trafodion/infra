@@ -77,7 +77,7 @@ class traf::tpcds {
       File['/usr/local/bin/init_hive_tpcds.sql'],
       Package['hive'] ],
     command => '/usr/bin/hive -f /usr/local/bin/init_hive_tpcds.sql',
-    unless  => "/usr/bin/hive -e 'describe household_demographics'",
+    unless  => "/usr/bin/hive -e 'describe store_orc;'",
   }
 }
 

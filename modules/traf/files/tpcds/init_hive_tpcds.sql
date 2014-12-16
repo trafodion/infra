@@ -236,4 +236,6 @@ create external table customer_address
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/customer_address';
 
+create table store_orc stored as orc as select * from store;
+
 quit;
