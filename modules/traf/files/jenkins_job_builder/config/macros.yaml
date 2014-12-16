@@ -151,6 +151,7 @@
           else
               echo "Detailed logs: http://logs.trafodion.org/periodic/$JOB_NAME/$NODE_NAME/$BUILD_NUMBER/"
           fi
+          echo "Jenkins build: $BUILD_URL"
 
 
 # ======================================================================
