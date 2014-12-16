@@ -227,6 +227,9 @@
               source: 'Install_Start.log'
               copy-after-failure: true
             - target: 'logs/$LOG_PATH'
+              source: 'corefiles.log'
+              copy-after-failure: true
+            - target: 'logs/$LOG_PATH'
               source: 'hbase-logs/*'
               copy-after-failure: true
               keep-hierarchy: true
@@ -311,7 +314,10 @@
             - target: 'logs/$LOG_PATH/phoenix_test/surefire-reports'
               source: 'phx_test_run/target/surefire-reports/**'
               copy-after-failure: true
-              keep-hierarchy: true
+              keep-hierarchy: false
+            - target: 'logs/$LOG_PATH'
+              source: 'test_summary.txt'
+              copy-after-failure: true
             - target: 'logs/$LOG_PATH'
               source: 'dcs/dcs*/logs/*'
               copy-after-failure: true

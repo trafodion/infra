@@ -123,6 +123,7 @@ else
     phoenixRes=$?
   fi
 fi
+cat $WORKSPACE/phx_test_run/target/surefire-reports/*.txt > $WORKSPACE/test_summary.txt
 
 cd $WORKSPACE
 /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"
