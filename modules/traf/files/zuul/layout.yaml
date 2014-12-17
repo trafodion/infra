@@ -41,7 +41,6 @@ pipelines:
         - event: comment-added
           require-approval:
             - verified: -1
-              username: jenkins
           approval:
             - workflow: 1
     start:
@@ -65,7 +64,6 @@ pipelines:
       approval:
         # must have passed check, but might have failed gate
         - verified: [-2, 1, 2]
-          username: jenkins
           newer-than: 72h
         - workflow: 1
     trigger:
@@ -82,7 +80,6 @@ pipelines:
         - event: comment-added
           approval:
             - verified: 1
-          username: jenkins
         # event is reverify comment, already approved
         - event: comment-added
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*(recheck|reverify)( (?:bug|lp)[\s#:]*(\d+))
