@@ -1,6 +1,6 @@
 -- store_sales star only
 
-create external table store_sales
+create external table if not exists store_sales
 (
     ss_sold_date_sk           int,
     ss_sold_time_sk           int,
@@ -29,7 +29,7 @@ create external table store_sales
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/store_sales';
 
-create external table customer_demographics
+create external table if not exists customer_demographics
 (
     cd_demo_sk                int,
     cd_gender                 string,
@@ -44,7 +44,7 @@ create external table customer_demographics
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/customer_demographics';
 
-create external table date_dim
+create external table if not exists date_dim
 (
     d_date_sk                 int,
     d_date_id                 string,
@@ -78,7 +78,7 @@ create external table date_dim
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/date_dim';
 
-create external table time_dim
+create external table if not exists time_dim
 (
     t_time_sk                 int,
     t_time_id                 string,
@@ -94,7 +94,7 @@ create external table time_dim
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/time_dim';
 
-create external table item
+create external table if not exists item
 (
     i_item_sk                 int,
     i_item_id                 string,
@@ -122,7 +122,7 @@ create external table item
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/item';
 
-create external table store
+create external table if not exists store
 (
     s_store_sk                int,
     s_store_id                string,
@@ -157,7 +157,7 @@ create external table store
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/store';
 
-create external table customer
+create external table if not exists customer
 (
     c_customer_sk             int,
     c_customer_id             string,
@@ -181,7 +181,7 @@ create external table customer
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/customer';
 
-create external table promotion
+create external table if not exists promotion
 (
     p_promo_sk                int,
     p_promo_id                string,
@@ -206,7 +206,7 @@ create external table promotion
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/promotion';
 
-create external table household_demographics
+create external table if not exists household_demographics
 (
     hd_demo_sk                int,
     hd_income_band_sk         int,
@@ -217,7 +217,7 @@ create external table household_demographics
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/household_demographics';
 
-create external table customer_address
+create external table if not exists customer_address
 (
     ca_address_sk             int,
     ca_address_id             string,
@@ -236,6 +236,8 @@ create external table customer_address
 row format delimited fields terminated by '|' 
 location '/hive/tpcds/customer_address';
 
-create table store_orc stored as orc as select * from store;
+create table if not exists store_orc stored as orc
+location '/hive/tpcds/store_orc'
+as select * from store;
 
 quit;

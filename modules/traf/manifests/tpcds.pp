@@ -72,6 +72,7 @@ class traf::tpcds {
     unless  => '/usr/bin/hadoop dfs -ls /hive/tpcds',
   }
   exec { 'hive_tables':
+    user    => 'hdfs',
     require => [
       Exec['gen_and_load_data'],
       File['/usr/local/bin/init_hive_tpcds.sql'],
