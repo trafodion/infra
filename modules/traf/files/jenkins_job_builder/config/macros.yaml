@@ -31,7 +31,7 @@
 - builder:
     name: clean-workspace
     builders:
-      - shell: "/usr/local/bin/ws-clean.sh"
+      - shell: "/usr/local/bin/wsclean.sh"
 
 - builder:
     name: maven-package
