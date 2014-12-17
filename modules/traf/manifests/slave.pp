@@ -30,6 +30,32 @@ class traf::slave (
     python3      => $python3,
     include_pypy => $include_pypy,
   }
+  # set up mount point for jenkins workspaces
+  file { '/mnt/jenkinsws':
+    ensure  => directory,
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    mode    => '0755',
+  }
+  file { '/home/jenkins/workspace':
+    ensure  => directory,
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    mode    => '0755',
+  }
+  mount { '/home/jenkins/workspace':
+    ensure  => mounted,
+    atboot  => true,
+    fstype  => 'none',
+    options => 'bind',
+    device  => '/mnt/jenkinsws',
+    require => [ Class['jenkins::slave'], File['/mnt/jenkinsws'], File['/home/jenkins/workspace'] ],
+  }
+
+  # swap file
+  # take the defaults - swap file in /mnt, same size as memory
+  include swap_file
+
 
   # install rake and puppetlabs_spec_helper from ruby gems
   # so puppet-lint can run on the slaves

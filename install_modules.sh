@@ -60,6 +60,7 @@ MODULES["saz-memcached"]="2.0.2"
 MODULES["spiette-selinux"]="0.5.1"
 MODULES["rafaelfc-pear"]="1.0.3"
 MODULES["maestrodev-maven"]="1.1.7"
+MODULES["petems-swap_file"]="1.0.0"
 
 # Source modules should use tags, explicit refs or remote branches because
 # we do not update local branches in this script.
