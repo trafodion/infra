@@ -1,1 +1,2 @@
 jenkins	ALL = NOPASSWD:/usr/local/bin/hbase-sudo.sh
+jenkins ALL = NOPASSWD:/usr/local/bin/wsclean-sudo.sh

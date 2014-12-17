@@ -38,7 +38,7 @@ sudo -n /usr/local/bin/wsclean-sudo.sh
 do
   if [[ ! $dir =~ ^trafodion$ && ! $dir =~ \\.* ]]
   then
-    echo rm -rf $WORKSPACE/$dir
+    rm -rf $WORKSPACE/$dir
   fi
 done
 
