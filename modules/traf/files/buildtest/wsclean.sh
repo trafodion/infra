@@ -20,16 +20,10 @@
 source /usr/local/bin/traf-functions.sh
 log_banner
 
-if [[ -z "$WORKSPACE" ]]
-then
-  echo "WORKSPACE variable not set"
-  exit 1
-fi
-
 set -x
 
 # delete dirs owned by non-jenkins users
-sudo -n /usr/local/bin/wsclean-sudo.sh
+sudo -n /usr/local/bin/wsclean-sudo.sh "$WORKSPACE"
 
 # Delete all dirs except trafodion (git workspaces)
 # Without -a we should not get "." directories, but double check
@@ -38,7 +32,7 @@ sudo -n /usr/local/bin/wsclean-sudo.sh
 do
   if [[ ! $dir =~ ^trafodion$ && ! $dir =~ \\.* ]]
   then
-    echo rm -rf $WORKSPACE/$dir
+    rm -rf $WORKSPACE/$dir
   fi
 done
 

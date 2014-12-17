@@ -17,14 +17,17 @@
 #
 # @@@ END COPYRIGHT @@@
 
-source /usr/local/bin/traf-functions.sh
-log_banner
+WORKSPACE="$1"
 
 if [[ -z "$WORKSPACE" ]]
 then
   echo "WORKSPACE variable not set"
   exit 1
 fi
+
+
+source /usr/local/bin/traf-functions.sh
+log_banner
 
 set -x
 
