@@ -30,6 +30,28 @@ class traf::slave (
     python3      => $python3,
     include_pypy => $include_pypy,
   }
+  # set up mount point for jenkins workspaces
+  file { '/mnt/jenkins':
+    ensure => directory,
+    owner  => 'jenkins',
+    group  => 'jenkins',
+    mode   => '0755',
+  }
+  mount { '/home/jenkins':
+    ensure  => mounted,
+    atboot  => true,
+    fstype  => 'none',
+    options => 'bind',
+    device  => '/mnt/jenkins',
+    require => [ Class['jenkins::slave'], File['/mnt/jenkins'] ],
+  }
+
+  # swap file
+  # take the defaults - same size as memory
+  class { 'swap_file':
+    swapfile => '/mnt/swapfile',
+  }
+
 
   # install rake and puppetlabs_spec_helper from ruby gems
   # so puppet-lint can run on the slaves
@@ -62,7 +84,7 @@ class traf::slave (
     group   => 'jenkins',
     mode    => '0600',
     content => hiera('jenkins_ssh_private_key_contents'),
-    require => Class['jenkins::slave'],
+    require => Mount['/home/jenkins'],
   }
 
   file { '/home/jenkins/.ssh/id_rsa.pub':
@@ -71,7 +93,7 @@ class traf::slave (
     group   => 'jenkins',
     mode    => '0644',
     content => $traf::jenkins_ssh_pub_key,
-    require => Class['jenkins::slave'],
+    require => Mount['/home/jenkins'],
   }
   # maven scp is too dumb to look at system known_hosts file
   file { '/home/jenkins/.ssh/known_hosts':
@@ -80,7 +102,7 @@ class traf::slave (
     group   => 'jenkins',
     mode    => '0644',
     source  => '/etc/ssh/ssh_known_hosts',
-    require => Sshkey['logs.trafodion.org'],
+    require => [ Sshkey['logs.trafodion.org'], Mount['/home/jenkins'] ],
   }
 
 
