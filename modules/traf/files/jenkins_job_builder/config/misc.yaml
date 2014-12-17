@@ -30,6 +30,7 @@
 
     builders:
       - link-logs
+      - clean-workspace
       - kill-traf
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
