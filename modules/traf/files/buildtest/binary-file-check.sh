@@ -25,11 +25,12 @@ rc=0   #so far, so good
 text_pat='ASCII|UTF-|FORTRAN|empty|very short file \(no magic\)|Deleted|text|symbolic link'
 image_pat='image|icon|data|PC bitmap'
 size_limit=80000  #image file limit in bytes
+TMPFILE=/tmp/BinaryCheckFileList.$$
 
 listcmd="git show --pretty=format:%n --name-status HEAD"
 
 echo "File list command: $listcmd"
-$listcmd > BinaryCheckFileList
+$listcmd > $TMPFILE
 
 echo "'file' command reports:"
 while read fStatus fName
@@ -59,7 +60,8 @@ do
       rc=1
     fi
   fi
-done < BinaryCheckFileList
+done < $TMPFILE
 
+rm -f $TMPFILE
 
 exit $rc

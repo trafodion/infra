@@ -45,6 +45,7 @@ DELETED=0
 MAXINGREP=5000
 fList=
 VERBOSE=y
+TMPFILE=/tmp/ChangedFilesToScan.$$
 
 while [[ $# -gt 0 ]]; do
 	ANARG=$1
@@ -72,7 +73,7 @@ log_banner
 
 listcmd="git show --pretty=format:%n --name-status $COMMIT"
 echo "File list command: $listcmd"
-$listcmd > ChangedFilesToScan
+$listcmd > $TMPFILE
 
 while read fStatus fName; do
   if [[ -n "$fName" ]]; then
@@ -85,7 +86,7 @@ while read fStatus fName; do
       fList="$fList $fName"
     fi
   fi
-done < ChangedFilesToScan
+done < $TMPFILE
 
 LISTLEN=$(echo "$fList" | wc -w)
 if [[ $LISTLEN -eq 0 ]]; then
@@ -95,7 +96,7 @@ if [[ $LISTLEN -eq 0 ]]; then
 elif [[ $LISTLEN -ne $CTR ]]; then
   echo "Number of files exceeds limit, searching only first $MAXINGREP files"
 fi
-rm ChangedFilesToScan
+rm -f $TMPFILE
 
 echo "Number of files to examine = $LISTLEN"
 if [[ -n "$VERBOSE" ]]; then
