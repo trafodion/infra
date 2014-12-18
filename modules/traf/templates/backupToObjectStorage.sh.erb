@@ -29,8 +29,9 @@ function usage {
     echo ""
 }
 
+backupContainer="BackupContainer"
 swift=/usr/local/bin/swift
-export OS_REGION_NAME=region-b.geo-1
+export OS_REGION_NAME=region-a.geo-1
 export OS_DNS_SERVICE_TYPE=hpext:dns
 export OS_AUTH_URL=https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/
 export OS_TENANT_NAME=trafodion
@@ -67,12 +68,28 @@ if [[ "$cmd" = "upload" ]]; then
         uploadOptions="$uploadOptions -S 2147483648"
     fi
 
-    echo "Uploading file $fName ..."
-    $swift upload $uploadOptions $backupContainer/$host $fName
+    # get md5sum of file from the cloud
+    fCloudMd5sum=$($swift stat $backupContainer ${host}${fName} 2>/dev/null | grep "ETag:" | awk '{print $2}')
+    # get current md5sum of file
+    fMd5sum=$(md5sum $fName | awk '{print $1}')
+
+    if [[ $fMd5sum == $fCloudMd5sum ]]; then
+        echo "File $fName has not changed since the last backup. Skipping upload ..."
+    else
+        # if fCloudMd5sum is not empty then file has been uploaded before
+        if [[ -n "$fCloudMd5sum" ]]; then
+            # set header X-Delete-After to 30 days so we do not keep
+            # more than 30 days worth of previous version of the file
+            $swift post -H 'x-delete-after: 259200' $backupContainer ${host}${fName}
+        fi
+
+        echo "Uploading file $fName ..."
+        $swift upload $uploadOptions $backupContainer/$host $fName
+    fi
     exit $?
 fi
 
-f [[ "$cmd" = "download" ]]; then
+if [[ "$cmd" = "download" ]]; then
     downloadOptions=""
 
     if [ $# -eq 3 ]; then
