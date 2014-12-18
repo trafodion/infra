@@ -29,15 +29,12 @@ fi
 source /usr/local/bin/traf-functions.sh
 log_banner
 
-set -x
-
 if id tinstall 2>/dev/null
 then
   sudo -n -u tinstall rm -rf $WORKSPACE/traf_inst 
 fi
 
-if id trafodion 2>/dev/null
-then
-  sudo -n -u trafodion rm -rf $WORKSPACE/phx_test_run $WORKSPACE/traf_run
-  sudo -n -u trafodion rm -rf $WORKSPACE/rundir $WORKSPACE/sql-regress-logs
-fi
+# trafodion id may be removed by trafodion uninstall
+# root will delete these
+rm -rf $WORKSPACE/phx_test_run $WORKSPACE/traf_run
+rm -rf $WORKSPACE/rundir $WORKSPACE/sql-regress-logs

@@ -28,6 +28,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/install trafodion/dcs"
       - pkg-traf:
@@ -79,6 +80,7 @@
 
     builders:
       - link-logs
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs"
       - pkg-traf:
@@ -113,6 +115,7 @@
 
     builders:
       - link-logs
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/install"
       - pkg-install
@@ -176,6 +179,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
@@ -216,6 +220,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
@@ -256,6 +261,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
@@ -296,6 +302,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
@@ -336,6 +343,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
@@ -379,6 +387,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/install"
       - pkg-traf:
@@ -412,6 +421,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/install"
       - pkg-traf:
@@ -451,6 +461,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/install"
       - pkg-traf:
@@ -485,6 +496,7 @@
     builders:
       - link-logs
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/install"
       - pkg-traf:

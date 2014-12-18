@@ -20,8 +20,6 @@
 source /usr/local/bin/traf-functions.sh
 log_banner
 
-set -x
-
 # delete dirs owned by non-jenkins users
 sudo -n /usr/local/bin/wsclean-sudo.sh "$WORKSPACE"
 
@@ -35,6 +33,8 @@ do
     rm -rf $WORKSPACE/$dir
   fi
 done
+echo "Post-Cleanup: ls $WORKSPACE"
+ls $WORKSPACE
 
 # do not raise an error if anything failed
 # don't want to kill a job over clean-up failure
