@@ -95,6 +95,10 @@
     builders:
       - shell: '/usr/local/bin/run-jdbc_test.sh {trafCoreDir} {dcsDir} /usr/lib/jvm/java-1.7.0-openjdk.x86_64 {testDir} "{tests1}"'
 
+- builder:
+    name: assert-no-bad-source-files
+    builders:
+      - shell: "/usr/local/bin/find-bad-source.sh"
 
 - builder:
     name: assert-no-binary-files
