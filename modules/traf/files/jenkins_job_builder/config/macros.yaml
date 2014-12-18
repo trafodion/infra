@@ -99,7 +99,9 @@
 - builder:
     name: assert-no-binary-files
     builders:
-      - shell: "/usr/local/bin/binary-file-check.sh"
+      - shell: |
+          /usr/local/bin/binary-file-check.sh
+          /usr/local/bin/find-bad-source.sh
 
 - builder:
     name: puppet-lint
