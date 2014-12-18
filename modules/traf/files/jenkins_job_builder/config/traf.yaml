@@ -516,6 +516,7 @@
       - link-logs
       - gerrit-git-prep
       - assert-no-binary-files
+      - assert-no-bad-source-files
 
     publishers:
       - console-log
