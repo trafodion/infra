@@ -87,6 +87,7 @@ while read fStatus fName; do
     fi
   fi
 done < $TMPFILE
+rm -f $TMPFILE
 
 LISTLEN=$(echo "$fList" | wc -w)
 if [[ $LISTLEN -eq 0 ]]; then
@@ -96,7 +97,6 @@ if [[ $LISTLEN -eq 0 ]]; then
 elif [[ $LISTLEN -ne $CTR ]]; then
   echo "Number of files exceeds limit, searching only first $MAXINGREP files"
 fi
-rm -f $TMPFILE
 
 echo "Number of files to examine = $LISTLEN"
 if [[ -n "$VERBOSE" ]]; then
