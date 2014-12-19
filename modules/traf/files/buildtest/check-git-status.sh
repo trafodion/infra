@@ -71,13 +71,18 @@ then
   fi
 fi
 
-# Check sqvers output
-source_env build
-sqvers -u 2>&1 | grep -q 'missing version'
-if [[ $? == 0 ]]; then
-   echo "Error: version info is missing (sqvers -u)"
-   sqvers -u 2>&1 | grep 'missing version'
-   rc=4
+# Check sqvers output - core repo only
+if [[ -x sqf/sqvers ]]
+then
+  source_env build
+  sqvers -u 2>&1 | grep -q 'missing version'
+  if [[ $? == 0 ]]; then
+     echo "Error: version info is missing (sqvers -u)"
+     sqvers -u 2>&1 | grep 'missing version'
+     rc=4
+  else
+     echo "Success: sqvers finds no missing version info"
+  fi
 fi
 
 
