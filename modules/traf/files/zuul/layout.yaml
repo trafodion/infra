@@ -172,6 +172,10 @@ jobs:
     voting: false
   - name: ^.*_T2-.*$
     voting: false
+  - name: ^pyodbc_test.*$
+    voting: false
+  - name: ^jdbc_test.*$
+    voting: false
 
 projects:
   - name: trafodion/sandbox
