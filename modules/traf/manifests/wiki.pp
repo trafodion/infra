@@ -129,7 +129,7 @@ class traf::wiki (
     revision => 'master',
     owner    => www-data,
     group    => www-data,
-    source   => 'https://git.fsinf.at/mediawiki/customnavblocks.git',
+    source   => 'https://github.com/mathiasertl/CustomNavBlocks.git',
     require  => Exec['install-mediawiki'],
   }
 
