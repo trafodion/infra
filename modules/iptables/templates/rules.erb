@@ -12,11 +12,18 @@
 -A INPUT -i lo -j ACCEPT
 -A INPUT -s <%= ipaddress %> -m comment --comment "Allow machine to talk to itself on public IP" -j ACCEPT
 
-# if source is from local subnet or from a list of IPs that shouldn't be rate limited then jump to TRAF-INPUT 
+# Detect which cloud we are in East or West and create rules accordingly
+# Allow DHCP (UDP port 67) from 192.168.0.3 or 172.16.0.3
+# Allow puppetmaster port from 192.168.0.29 or 15.125.67.174
+# If source is from local subnet or from a list of IPs that shouldn't be rate limited then jump to TRAF-INPUT 
 # this should allow it to bypass rate-limiting
 <% if @ipaddress.start_with? "192.168.0" -%>
+-A INPUT -m udp -p udp --sport 67 -s 192.168.0.3 -m comment --comment "DHCP" -j ACCEPT
+-A INPUT -p tcp -m tcp --sport 8140 -s 192.168.0.29 -m comment --comment "Puppetmaster" -j ACCEPT
 -A INPUT -s 192.168.0.0/24 -m comment --comment "Machine from local subnet in US West" -j TRAF-INPUT
 <% elsif @ipaddress.start_with? "172." -%>
+-A INPUT -m udp -p udp --sport 67 -s 172.16.0.3 -m comment --comment "DHCP" -j ACCEPT
+-A INPUT -p tcp -m tcp --sport 8140 -s 15.125.67.174 -m comment --comment "Puppetmaster" -j ACCEPT
 -A INPUT -s 172.16.0.0/12 -m comment --comment "Machine from local subnet in US East" -j TRAF-INPUT
 <% end -%>
 <% rate_unlimit_ips4.each do |ru_ip| -%>
