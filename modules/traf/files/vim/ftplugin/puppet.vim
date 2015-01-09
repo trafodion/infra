@@ -9,6 +9,16 @@ if exists("b:did_ftplugin")
 endif
 let b:did_ftplugin = 1
 
+" set tabs again since ftdetect options gets lost
+setlocal expandtab
+setlocal tabstop=2
+setlocal softtabstop=2
+setlocal shiftwidth=2
+
+" Highlight end of line whitespace.
+highlight WhitespaceEOL ctermbg=red guibg=red
+match WhitespaceEOL /\s\+$/
+
 if !exists("no_plugin_maps") && !exists("no_puppet_maps")
     if !hasmapto("<Plug>AlignRange")
         map <buffer> <LocalLeader>= <Plug>AlignRange
