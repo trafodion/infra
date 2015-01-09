@@ -68,13 +68,8 @@ class traf::server (
   }
 
   file { '/root/.vim':
-    ensure  => directory,
+    ensure  => absent,
     recurse => true,
-    purge   => false,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    source  => 'puppet:///modules/traf/vim/',
   }
 
 }
