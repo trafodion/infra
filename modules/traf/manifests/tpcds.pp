@@ -75,8 +75,7 @@ class traf::tpcds {
     user    => 'hdfs',
     require => [
       Exec['gen_and_load_data'],
-      File['/usr/local/bin/init_hive_tpcds.sql'],
-      Package['hive'] ],
+      File['/usr/local/bin/init_hive_tpcds.sql'] ],
     command => '/usr/bin/hive -f /usr/local/bin/init_hive_tpcds.sql',
     unless  => "/usr/bin/hive -e 'describe store_orc;'",
   }

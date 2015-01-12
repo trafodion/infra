@@ -213,9 +213,9 @@ class traf::slave (
       distro      => $distro,
     }
   }
-  # Cloudera Manager distros
-  if $distro =~ /^CM/ {
-    # Cloudera Manager requires selinux disabled
+  # Cloudera Manager or Ambari
+  if $distro =~ /^CM|^AHW/ {
+    # both requires selinux disabled
     class { 'selinux':
       mode => 'disabled',
     }
@@ -242,10 +242,17 @@ class traf::slave (
       mode   => '0440',
     }
 
-    # json parser
+    # json parser for API
     package { 'jq':
       ensure => present,
     }
+
+    class { 'traf::tpcds':
+      require => Exec['cluster_setup'],
+    }
+  }
+  # Cloudera Manager distros
+  if $distro =~ /^CM/ {
     # cluster set-up script
     file { '/usr/local/bin/cmgr.sh':
       ensure  => present,
@@ -256,13 +263,34 @@ class traf::slave (
       require => Package['jq'],
     }
 
-    class { 'traf::tpcds':
-      require => Exec['cluster_setup'],
-    }
     # cloudera module sets up yum repo, but does not install this package
     package { 'hadoop-libhdfs':
       ensure  => present,
       require => Class['::cloudera'],
+    }
+  }
+
+  # Ambari managed distros
+  if $distro =~ /^AHW/ {
+    # cluster set-up script
+    file { '/usr/local/bin/amcluster.sh':
+      ensure  => present,
+      source  => 'puppet:///modules/traf/hadoop/amcluster.sh',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0754',
+      require => Package['jq'],
+    }
+
+    class { 'traf::ambari' :
+      distro => $distro,
+    }
+  }
+  if $distro == 'AHW2.1' {
+    exec {'cluster_setup':
+      command => '/usr/local/bin/amcluster.sh HDP-2.1',
+      unless  => '/usr/local/bin/amcluster.sh check HDP-2.1',
+      require => [ Class['traf::ambari'], File['/usr/local/bin/amcluster.sh'], ]
     }
   }
 

@@ -238,7 +238,7 @@ class traf::python276 {
       path        => '/usr/local/bin:/usr/bin:/bin',
       environment => 'PYTHONHOME=/usr/local',
       command     => 'pip install http://dl.bintray.com/alchen99/python/pyodbc-3.0.7.1-unsupported.zip',
-      unless      => "pip freeze | grep 'pyodbc==3.0.7.1-unsupported'",
+      unless      => "pip freeze | grep -E 'pyodbc==[=]?3.0.7.1-unsupported'",
       require     => Exec['run_get-pip.py'],
   }
 
@@ -246,7 +246,7 @@ class traf::python276 {
       path        => '/usr/local/bin:/usr/bin:/bin',
       environment => 'PYTHONHOME=/usr/local',
       command     => 'pip install http://dl.bintray.com/alchen99/python/pypyodbc-1.3.3.1-unsupported.zip',
-      unless      => "pip freeze | grep 'pypyodbc==1.3.3.1-unsupported'",
+      unless      => "pip freeze | grep -E 'pypyodbc==[=]?1.3.3.1-unsupported'",
       require     => Exec['run_get-pip.py'],
   }
 
