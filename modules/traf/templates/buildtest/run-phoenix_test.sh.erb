@@ -49,7 +49,7 @@ set -x
 TEST_HADOOP_DISTRO=$(echo ${TEST_HADOOP_DISTRO//\./} | tr '[a-z]' '[A-Z]')
 if [[ $TEST_HADOOP_DISTRO == CDH51* ]] || [[ $TEST_HADOOP_DISTRO == CM51* ]]; then
     TEST_HADOOP_DISTRO="CDH51"
-elif [[ $TEST_HADOOP_DISTRO == HDP21* ]]; then
+elif [[ $TEST_HADOOP_DISTRO == HDP21* || $TEST_HADOOP_DISTRO == AHW21* ]]; then
     TEST_HADOOP_DISTRO="HDP21"
 else
     echo "ERROR: Unknown Hadoop Distro $TEST_HADOOP_DISTRO."

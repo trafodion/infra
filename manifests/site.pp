@@ -223,5 +223,17 @@ node /^slave-hdp21-\d\d.trafodion.org$/ {
   }
 }
 
+# Ambari HortonWorks
+node /^slave-ahw21-\d\d.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'AHW2.1',
+  }
+}
+
 
 # vim:sw=2:ts=2:expandtab:textwidth=79
