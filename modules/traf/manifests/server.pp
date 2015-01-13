@@ -70,6 +70,8 @@ class traf::server (
   file { '/root/.vim':
     ensure  => absent,
     recurse => true,
+    force   => true,
+    purge   => true,
   }
 
 }
