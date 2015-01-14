@@ -72,6 +72,7 @@ elif [ "$TEST_JDBC_TYPE" = "T2" ]; then
   TEST_JDBC_FILE="$ILOC/export/lib/jdbcT2.jar"
   if [ $(grep -c 'sqenvd.sh' "$WORKSPACE/$TRAF_DIR/sqf/BuildFlavor") -eq 1 ]; then export SQ_MBTYPE=64d; else export SQ_MBTYPE=64; fi
   export LANG=en_US.UTF-8
+  export SQL_NO_REGISTER_CANCEL=1
   export HADOOP_CNF_DIR="/etc/hadoop/conf"
   export HBASE_CNF_DIR="/etc/hbase/conf"
   export HIVE_CNF_DIR="/etc/hive/conf"
@@ -112,6 +113,7 @@ else
     sudo -n -u trafodion SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG HADOOP_CNF_DIR=$HADOOP_CNF_DIR \
 		HBASE_CNF_DIR=$HBASE_CNF_DIR HIVE_CNF_DIR=$HIVE_CNF_DIR MY_SQROOT=$MY_SQROOT \
 		MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$TMP_LD_PRELOAD LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
+		SQL_NO_REGISTER_CANCEL=$SQL_NO_REGISTER_CANCEL \
     		./phoenix_test.py $TARGS
     phoenixRes=$?
   else
