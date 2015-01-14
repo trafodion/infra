@@ -1,7 +1,7 @@
 #!/bin/bash
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ log_banner
 rc=0   #so far, so good
 
 text_pat='ASCII|UTF-|FORTRAN|empty|very short file \(no magic\)|Deleted|text|symbolic link'
-image_pat='image|icon|data|PC bitmap'
+image_pat='image|Image|icon|data|PC bitmap'
 size_limit=80000  #image file limit in bytes
 TMPFILE=/tmp/BinaryCheckFileList.$$
 
