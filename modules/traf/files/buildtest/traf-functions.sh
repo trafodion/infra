@@ -2,7 +2,7 @@
 
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -69,9 +69,9 @@ function loc_regress () {
 #
 # Option: -v -- verbose
 # 1st Parameter: build | run | test
-# 	-- build or run an instance or test against an instance
+#	-- build or run an instance or test against an instance
 # 2nd Parameter: (optional) release | debug -- build flavor
-# 		Leave parameter blank to use prior build flavor
+#		Leave parameter blank to use prior build flavor
 
 function source_env () {
   # tracing on?
@@ -213,8 +213,10 @@ function report_on_corefiles() {
     if [[ -n "$COREFILES" ]]; then
       echo "WARNING: Core files found in $ADIR :"
       pushd "$ADIR" > /dev/null
-      ls -l $COREFILES          > $WORKSPACE/corefiles.log
+      ls -l $COREFILES       | tee $WORKSPACE/corefiles.log
       /usr/local/bin/core_bt -t >> $WORKSPACE/corefiles.log
+      echo "core_bt output is in"
+      ls -l $WORKSPACE/corefiles.log
       popd > /dev/null
       CORECOUNT=$(echo $COREFILES | wc -w)
       echo
@@ -228,7 +230,7 @@ function report_on_corefiles() {
 
 ##############################################################
 # log_banner - make output log more readable
-# 
+#
 # put output banner indicating script running
 #
 function log_banner() {

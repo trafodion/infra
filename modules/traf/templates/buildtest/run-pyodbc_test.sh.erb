@@ -1,7 +1,7 @@
 #!/bin/bash
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -87,6 +87,17 @@ else
 
   cd $WORKSPACE
   /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"
+
+  # Report on parent directory of $TRAF_DIR
+  # Any core files means failure
+  source_env test
+  report_on_corefiles "${WORKSPACE}"
+  coreCount=$?
+  if [[ $coreCount -gt 0 ]]; then
+    echo
+    echo "ERROR : Found $coreCount core files"
+    echo
+  fi
 fi
 
 set -x
