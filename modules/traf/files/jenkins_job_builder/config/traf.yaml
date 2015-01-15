@@ -1,4 +1,4 @@
-- job-group:
+-8 job-group:
     name: 'core-regress-suites'
     suite:
       - "charsets"
@@ -295,7 +295,7 @@
 
     wrappers:
       - timeout:
-          timeout: 160
+          timeout: 180
           fail: true
       - timestamps
 
