@@ -121,6 +121,14 @@ class traf::base(
     content => template('traf/backupToObjectStorage.sh.erb'),
   }
 
+  file { '/usr/local/bin/cronic':
+    ensure => file,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+    source => 'puppet:///modules/traf/cronic',
+  }
+
   if ($install_users) {
     package { $::traf::params::user_packages:
       ensure => present
