@@ -18,8 +18,9 @@ class traf::puppetmaster (
   cron { 'updatepuppetmaster':
     user        => 'root',
     minute      => '*/15',
-    command     => 'sleep $((RANDOM\%600)) && cd /opt/config/production && git fetch -q && git reset -q --hard @{u} && ./install_modules.sh && touch manifests/site.pp',
-    environment => 'PATH=/var/lib/gems/1.8/bin:/usr/bin:/bin:/usr/sbin:/sbin',
+    command     => 'sleep $((RANDOM\%600)) && cd /opt/config/production && git fetch -q && git reset -q --hard @{u} && cronic ./install_modules.sh && touch manifests/site.pp',
+    environment => 'PATH=/var/lib/gems/1.8/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
+    require     => File['/usr/local/bin/cronic'],
   }
 
   cron { 'deleteoldreports':
@@ -28,6 +29,15 @@ class traf::puppetmaster (
     minute      => '0',
     command     => 'sleep $((RANDOM\%600)) && find /var/lib/puppet/reports -name \'*.yaml\' -mtime +7 -execdir rm {} \;',
     environment => 'PATH=/var/lib/gems/1.8/bin:/usr/bin:/bin:/usr/sbin:/sbin',
+  }
+
+  cron { 'backuphiera':
+    user        => 'root',
+    hour        => '2',
+    minute      => '0',
+    command     => 'sleep $((RANDOM\%600)) && cronic backupToObjectStorage.sh upload /etc/puppet/hieradata/production/common.yaml',
+    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
+    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/backupToObjectStorage.sh'] ],
   }
 
   file { '/etc/puppet/hiera.yaml':
