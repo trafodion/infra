@@ -157,6 +157,9 @@ START_TRAF() {
     sudo /usr/local/bin/hbase-sudo.sh start "$jarpath"
     echo "Return code $?"
 
+    # enable corefiles for any processes started by sq-commands
+    ulimit -c unlimited
+
     # generate new schema
     sqgen
     echo "Return code $?"
