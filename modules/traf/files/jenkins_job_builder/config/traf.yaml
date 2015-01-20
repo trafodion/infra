@@ -1,4 +1,4 @@
--8 job-group:
+- job-group:
     name: 'core-regress-suites'
     suite:
       - "charsets"
