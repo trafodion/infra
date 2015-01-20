@@ -53,17 +53,18 @@ else
   set -x
   # start trafodion
   cd $WORKSPACE
-  /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" || exit 1
+  /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" "installdrivers" || exit 1
 
 
   # run pyodbc tests
   log_banner "config.sh"
   cd "$WORKSPACE/$TEST_DIR"
   mkdir "$WORKSPACE/$TEST_DIR/logs"
+  rm -rf "$WORKSPACE/$TEST_DIR/odbc_driver"
+  ln -s "$WORKSPACE/clients/odbc" "$WORKSPACE/$TEST_DIR/odbc_driver"
   export PATH=/usr/local/bin:$PATH
   ./config.sh -r -v -d localhost:37800 \
-    -u <%= jenkins_test_user %> -p <%= jenkins_test_password %> \
-    -t $WORKSPACE/$TRAF_DIR/conn/clients/TRAF_ODBC_Linux_Driver_64.tar.gz
+    -u <%= jenkins_test_user %> -p <%= jenkins_test_password %>
   if [ $? -ne 0 ]
   then
     echo "ERROR: Could not configure Python ODBC test properly."
