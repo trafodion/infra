@@ -1,7 +1,7 @@
 #!/bin/sh
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -35,6 +35,64 @@ COREDIR="$1"
 DCSDIR="$2"
 DCSSERV="$3"
 
+# check to see if clients should be installed
+if [[ "$4" == "installdrivers" ]]
+then
+  log_banner "Installing Trafodion clients to $WORKSPACE/clients"
+  cd $WORKSPACE
+  rm -rf clients
+  tar xvfz $WORKSPACE/trafodion/core/trafodion_clients-*.tgz
+  cd clients
+
+  # install JDBC T4 client
+  log_banner "Installing Trafodion JDBC T4 Driver"
+  mkdir jdbc
+  cd jdbc
+  unzip ../JDBCT4.zip
+  if [[ $? -ne 0 ]]
+  then
+    echo "ERROR: Could not unzip JDBC T4 driver"
+    exit 1
+  fi
+
+  # install ODBC client
+  log_banner "Installing Trafodion ODBC Driver"
+  cd $WORKSPACE/clients
+  tar xvfz TRAF_ODBC_Linux_Driver_64.tar.gz
+  echo ""
+  cd PkgTmp
+  ./install.sh <<-END_ODBC 2>&1 | tee $WORKSPACE/Traf_Odbc_Install.log | grep --line-buffered -A 4 -e '^TRAFODBC driver'
+YES
+$WORKSPACE/clients/odbc
+$WORKSPACE/clients/odbc
+$WORKSPACE/clients/odbc
+$WORKSPACE/clients/odbc
+END_ODBC
+
+  if [[ ${PIPESTATUS[0]} -ne 0 ]]
+  then
+    echo "ERROR: Could not install Trafodion ODBC Driver"
+    exit 1
+  fi
+
+  # install trafci client
+  log_banner "Installing Trafodion Command Interface"
+  cd $WORKSPACE/clients
+  unzip trafci.zip trafciInstaller.jar
+  java -jar trafciInstaller.jar cm <<-END_TRAFCI 2>&1 | tee $WORKSPACE/Trafci_Install.log
+Y
+$WORKSPACE/clients/jdbc/lib/jdbcT4.jar
+$WORKSPACE/clients
+N
+END_TRAFCI
+
+  if [[ ${PIPESTATUS[0]} -ne 0 ]]
+  then
+    echo "ERROR: Could not install Trafodion Command Interface"
+    exit 1
+  fi
+fi
+
 rm -rf $WORKSPACE/hbase-logs
 
 # if we have tinstall user defined, we are
@@ -45,6 +103,8 @@ then
 else
   USE_INSTALLER=0
 fi
+
+log_banner "Setting up Trafodion"
 
 # No hadoop management SW, just start trafodion in place
 if [[ $USE_INSTALLER == 0 ]]
