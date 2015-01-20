@@ -237,6 +237,37 @@ class traf::wiki (
     require => Class['mysql::server'],
   }
 
+  file { '/usr/local/bin/backupWiki.sh':
+    ensure => file,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+    source => 'puppet:///modules/traf/mediawiki/backupWiki.sh',
+  }
+
+  cron { 'backup-wiki-root':
+    user        => 'root',
+    hour        => '3',
+    minute      => '0',
+    weekday     => '0',
+    command     => 'sleep $((RANDOM\%600)) && cronic backupWiki.sh',
+    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
+    require     => [
+      File['/usr/local/bin/cronic'],
+      File['/usr/local/bin/backupWiki.sh'],
+      File['/usr/local/bin/backupToObjectStorage.sh']
+    ]
+  }
+
+  cron { 'backup-wiki-mysql':
+    user        => 'root',
+    hour        => '2',
+    minute      => '0',
+    command     => 'sleep $((RANDOM\%600)) && cronic backupToObjectStorage.sh upload /var/backups/mysql_backups/wiki.sql.gz',
+    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
+    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/backupToObjectStorage.sh'] ],
+  }
+
   # backup on second node
   #include bup
   #bup::site { 'rs-ord':

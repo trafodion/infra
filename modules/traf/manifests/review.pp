@@ -219,6 +219,14 @@ class traf::review (
     require => User['gerrit2'],
   }
 
+  cron { 'backup-gerrit-mysql':
+    user        => 'root',
+    hour        => '2',
+    minute      => '0',
+    command     => 'sleep $((RANDOM\%600)) && cronic backupToObjectStorage.sh upload /var/backups/mysql_backups/gerrit.sql.gz',
+    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
+    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/backupToObjectStorage.sh'] ]
+  }
 
   #### Back up -- to be added later
   #include bup

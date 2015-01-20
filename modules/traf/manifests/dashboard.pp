@@ -79,12 +79,15 @@ class traf::dashboard(
 
   cron { 'purge-dashboard-db':
     ensure      => present,
-    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin',
-    command     => 'bash /usr/share/puppet-dashboard/bin/purgeDashboardDB.sh',
+    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
+    command     => 'cronic /usr/share/puppet-dashboard/bin/purgeDashboardDB.sh',
     user        => 'root',
     hour        => '23',
     minute      => '0',
-    require     => File['/usr/share/puppet-dashboard/bin/purgeDashboardDB.sh'],
+    require     => [
+      File['/usr/share/puppet-dashboard/bin/purgeDashboardDB.sh'],
+      File['/usr/local/bin/cronic']
+    ]
   }
 
   # update apache2 security configuration
