@@ -221,7 +221,7 @@ class traf::review (
 
   cron { 'backup-gerrit-mysql':
     user        => 'root',
-    hour        => '2',
+    hour        => '7',
     minute      => '0',
     command     => 'sleep $((RANDOM\%600)) && cronic backupToObjectStorage.sh upload /var/backups/mysql_backups/gerrit.sql.gz',
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
