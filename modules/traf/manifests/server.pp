@@ -67,11 +67,13 @@ class traf::server (
     source => 'puppet:///modules/traf/vim/_vimrc',
   }
 
-  file { '/root/.vim':
-    ensure  => absent,
-    recurse => true,
-    force   => true,
-    purge   => true,
+  vcsrepo { '/root/.vim':
+    ensure   => latest,
+    provider => git,
+    revision => 'master',
+    owner    => 'root',
+    group    => 'root',
+    source   => 'https://github.com/trafodion/vim-setup.git',
   }
 
 }
