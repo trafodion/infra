@@ -234,6 +234,7 @@ class traf::wiki (
   include mysql::server::account_security
 
   mysql_backup::backup { 'wiki':
+    hour    => '6',
     require => Class['mysql::server'],
   }
 
@@ -247,7 +248,7 @@ class traf::wiki (
 
   cron { 'backup-wiki-root':
     user        => 'root',
-    hour        => '3',
+    hour        => '5',
     minute      => '0',
     weekday     => '0',
     command     => 'sleep $((RANDOM\%600)) && cronic backupWiki.sh',
@@ -261,7 +262,7 @@ class traf::wiki (
 
   cron { 'backup-wiki-mysql':
     user        => 'root',
-    hour        => '2',
+    hour        => '7',
     minute      => '0',
     command     => 'sleep $((RANDOM\%600)) && cronic backupToObjectStorage.sh upload /var/backups/mysql_backups/wiki.sql.gz',
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',

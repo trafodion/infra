@@ -82,7 +82,7 @@ class traf::dashboard(
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
     command     => 'cronic /usr/share/puppet-dashboard/bin/purgeDashboardDB.sh',
     user        => 'root',
-    hour        => '23',
+    hour        => '7',
     minute      => '0',
     require     => [
       File['/usr/share/puppet-dashboard/bin/purgeDashboardDB.sh'],
