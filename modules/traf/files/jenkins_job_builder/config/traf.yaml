@@ -33,8 +33,9 @@
            repos: "trafodion/core trafodion/install trafodion/dcs"
       - pkg-traf:
            flavor: "release"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - sql-regress:
            dir: "./trafodion/core"
@@ -85,8 +86,9 @@
            repos: "trafodion/core trafodion/dcs"
       - pkg-traf:
            flavor: "{flavor}"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - stage-traf:
            flavor: "{flavor}"
 
@@ -132,8 +134,9 @@
     builders:
       - link-logs
       - gerrit-git-prep
-      - maven-package:
+      - pkg-dcs:
            buildDir: "."
+           coreJDBC: ""
       - check-build:
            dir: "."
 
@@ -184,8 +187,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - kill-traf
       - run-phoenix_test:
@@ -225,8 +229,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - kill-traf
       - run-phoenix_test:
@@ -266,8 +271,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - kill-traf
       - run-phoenix_test:
@@ -307,8 +313,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - kill-traf
       - run-phoenix_test:
@@ -348,8 +355,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - kill-traf
       - run-phoenix_test:
@@ -392,8 +400,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - kill-traf
       - run-pyodbc_test:
@@ -426,8 +435,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - kill-traf
       - run-pyodbc_test:
@@ -466,8 +476,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"
@@ -501,8 +512,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/install"
       - pkg-traf:
            flavor: "debug"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"

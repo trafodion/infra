@@ -33,17 +33,12 @@
     builders:
       - shell: "/usr/local/bin/wsclean.sh"
 
+# second argument is optional
+# used if core and dcs built in same job
 - builder:
-    name: maven-package
+    name: pkg-dcs
     builders:
-      - shell: |
-          savedDir=`pwd`
-          cd {buildDir}
-          export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk.x86_64"
-          mvn -B clean site package install
-          rc=$?
-          cd $savedDir
-          exit $rc
+      - shell: "/usr/local/bin/build-dcs.sh {buildDir} {coreJDBC}"
 
 - builder:
     name: kill-traf

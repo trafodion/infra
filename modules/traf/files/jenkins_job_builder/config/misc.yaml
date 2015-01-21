@@ -36,8 +36,9 @@
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
            flavor: "release"
-      - maven-package:
+      - pkg-dcs:
            buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
       - pkg-install
       - sql-regress:
            dir: "./trafodion/core"
