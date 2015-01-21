@@ -25,7 +25,7 @@ class traf::puppetmaster (
 
   cron { 'deleteoldreports':
     user        => 'root',
-    hour        => '3',
+    hour        => '6',
     minute      => '0',
     command     => 'sleep $((RANDOM\%600)) && find /var/lib/puppet/reports -name \'*.yaml\' -mtime +7 -execdir rm {} \;',
     environment => 'PATH=/var/lib/gems/1.8/bin:/usr/bin:/bin:/usr/sbin:/sbin',
@@ -33,7 +33,7 @@ class traf::puppetmaster (
 
   cron { 'backuphiera':
     user        => 'root',
-    hour        => '2',
+    hour        => '7',
     minute      => '0',
     command     => 'sleep $((RANDOM\%600)) && cronic backupToObjectStorage.sh upload /etc/puppet/hieradata/production/common.yaml',
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',

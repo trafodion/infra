@@ -183,6 +183,7 @@ class traf::gerrit (
   }
 
   mysql_backup::backup { 'gerrit':
+    $hour   => '6',
     require => Class['::gerrit'],
   }
 
