@@ -228,6 +228,28 @@ class traf::review (
     require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/backupToObjectStorage.sh'] ]
   }
 
+  file { '/usr/local/bin/backupGerritGit.sh':
+    ensure => file,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+    source => 'puppet:///modules/traf/gerrit/backupGerritGit.sh',
+  }
+
+  cron { 'backup-gerrit-gitrepo':
+    user        => 'root',
+    hour        => '6',
+    minute      => '0',
+    weekday     => '0',
+    command     => 'sleep $((RANDOM\%600)) && cronic backupGerritGit.sh',
+    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
+    require     => [
+      File['/usr/local/bin/cronic'],
+      File['/usr/local/bin/backupGerritGit.sh'],
+      File['/usr/local/bin/backupToObjectStorage.sh']
+    ]
+  }
+
   #### Back up -- to be added later
   #include bup
   #bup::site { 'rs-ord':
