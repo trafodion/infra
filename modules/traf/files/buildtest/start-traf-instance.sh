@@ -97,10 +97,6 @@ CONFIGURE_DCS() {
 	    <name>dcs.dns.interface</name>
 	    <value>eth0</value>
 	  </property>
-	  <property>
-	    <name>dcs.server.user.program.statistics.enabled</name>
-	    <value>false</value>
-	  </property>
 	</configuration>
 	EOF
     fi
