@@ -242,6 +242,10 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
+              source: 'trafodion/core/sqf/logs/trafodion.dtm.log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
               source: 'trafodion/core/sqf/logs/hdfs*log'
               copy-after-failure: true
               keep-hierarchy: true
@@ -271,6 +275,10 @@
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
               source: 'trafodion/core/sqf/tmp/*'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/logs/trafodion.dtm.log'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
