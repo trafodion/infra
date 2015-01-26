@@ -35,7 +35,7 @@ function trafprocs() {
   else
     jps | grep Dcs | cut -f1 -d' '
   fi
-  pgrep -u $user -f 'mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts|pstack|pstartd|gdb'
+  pgrep -u $user -f 'SQMON|mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts|pstack|pstartd|gdb'
 }
 
 # Look for the usual suspects

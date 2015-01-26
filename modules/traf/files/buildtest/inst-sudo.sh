@@ -90,6 +90,9 @@ then
     cd $RUNLOC
     sudo -n -u trafodion tar xf $regball
   fi
+  # make system logs read-able in case of early exit of job
+  sudo chmod -R a+rX $RUNLOC
+
   exit $ret
 
 elif [[ $action == "uninstall" ]]
