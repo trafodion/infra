@@ -93,6 +93,8 @@ END_TRAFCI
   fi
 fi
 
+cd $WORKSPACE
+
 rm -rf $WORKSPACE/hbase-logs
 
 # if we have tinstall user defined, we are
