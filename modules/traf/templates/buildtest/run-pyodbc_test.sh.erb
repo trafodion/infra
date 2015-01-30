@@ -21,6 +21,27 @@ source "/usr/local/bin/traf-functions.sh"
 log_banner
 source "$HOME/.bashrc"
 
+# check to see if first argument is one of the following :
+# SKIPSTART SKIPSTOP SKIPSTARTSTOP
+SKIPSTART=""
+SKIPSTOP=""
+
+if [ "$1" = "SKIPSTART" ]
+then
+  SKIPSTART=1
+  shift
+elif [ "$1" = "SKIPSTOP" ]
+then
+  SKIPSTOP=1
+  shift
+elif [ "$1" = "SKIPSTARTSTOP" ]
+then
+  SKIPSTART=1
+  SKIPSTOP=1
+  shift
+fi
+
+# assign input parameters
 export TRAF_DIR="$1"                   # location of trafodion/core
 export DCS_INSTALL_DIR="$2"            # location of trafodion/dcs
 export TEST_DIR="$3"                   # location of pyodbc tests
@@ -53,8 +74,8 @@ else
   set -x
   # start trafodion
   cd $WORKSPACE
-  /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" "installdrivers" || exit 1
-
+  ulimit -c unlimited
+  if [ -z $SKIPSTART ]; then /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" "installdrivers" || exit 1; fi
 
   # run pyodbc tests
   log_banner "config.sh"
@@ -87,7 +108,7 @@ else
   fi
 
   cd $WORKSPACE
-  /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"
+  if [ -z $SKIPSTOP ]; then /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"; fi
 
   # Report on parent directory of $TRAF_DIR
   # Any core files means failure
@@ -99,6 +120,8 @@ else
     echo "ERROR : Found $coreCount core files"
     echo
   fi
+
+  toxRes=$(( toxRes + coreCount ))
 fi
 
 set -x
@@ -113,6 +136,6 @@ then
   cp -rp .testrepository logs
 fi
 
-# exit with tox return code
+# exit with sum of return codes from tox and report_on_corefiles
 exit $toxRes
 
