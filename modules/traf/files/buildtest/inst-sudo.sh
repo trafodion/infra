@@ -54,23 +54,45 @@ then
   cd $INSTLOC
   tar xzf $(basename $instball) || exit 1
 
-  # Trafodion set-up
-  echo "accept" | 
-     ./installer/trafodion_setup --nodes "$(hostname -s)"  || exit 2
+  # Old (multi-script) installer vs. New (single-script) installer
+  if [[ -f ./installer/trafodion_setup ]]
+  then
+    # Trafodion set-up
+    echo "accept" | 
+       ./installer/trafodion_setup --nodes "$(hostname -s)"  || exit 2
 
-  # Trafodion mods
-  ./installer/trafodion_mods --trafodion_build "$trafball" || exit 2
+    # Trafodion mods
+    ./installer/trafodion_mods --trafodion_build "$trafball" || exit 2
 
-  # trafodion user should exist after setup
-  sudo chown trafodion $RUNLOC || exit 1
+    # trafodion user should exist after setup
+    sudo chown trafodion $RUNLOC || exit 1
 
-  # Trafodion installer
-  # -i logs into home dir
-  sudo -n -i -u trafodion ./trafodion_installer --dcs_servers $dcscnt --init_trafodion \
+    # Trafodion installer
+    # -i logs into home dir
+    sudo -n -i -u trafodion ./trafodion_installer --dcs_servers $dcscnt --init_trafodion \
 	       --build "$trafball" \
 	       --dcs_build "$dcsball" \
 	       --install_path $RUNLOC
-  ret=$?
+    ret=$?
+  else
+    # prep config file  
+    cp ./installer/trafodion_config_default ./tc
+    echo "NODE_LIST=$(hostname -s)" >> ./tc
+    echo "node_count=1" >> ./tc
+    echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./tc
+    echo "OPENSTACK_VM=1" >> ./tc
+    echo "TRAF_BUILD=$trafball" >> ./tc
+    echo "DCS_BUILD=$dcsball" >> ./tc
+    echo "SQ_ROOT=$RUNLOC" >> ./tc
+    echo "START=Y" >> ./tc
+    echo "INIT_TRAFODION=Y" >> ./tc
+    echo "DCS_SERVERS_PARM=$dcscnt" >> ./tc
+    echo "URL=$(hostname -f):7180" >> ./tc
+
+    echo "accept" |
+           ./installer/trafodion_install --config_file ./tc
+    ret=$?
+  fi
 
   # Extra dir needed by hive regressions
   # must be HDFS superuser (hdfs) to chown
