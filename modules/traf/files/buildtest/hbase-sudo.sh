@@ -81,6 +81,13 @@ then
   fi
   echo "Return code $?"
 
+  echo "Setting ACLs on /hbase/archive"
+  set -x
+  sudo -u hbase hdfs dfs -mkdir -p /hbase/archive
+  sudo -u hdfs hdfs dfs -setfacl -R -m user:jenkins:rwx /hbase/archive
+  sudo -u hdfs hdfs dfs -setfacl -R -m default:user:jenkins:rwx /hbase/archive
+  sudo -u hdfs hdfs dfs -setfacl -R -m mask::rwx /hbase/archive
+
   exit 0
 fi
 
