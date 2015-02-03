@@ -25,7 +25,7 @@ class traf::ambari (
   }
 
   exec { 'ambari-setup':
-    command => '/usr/sbin/ambari-server setup --java /usr/lib/jvm/java --silent',
+    command => '/usr/sbin/ambari-server setup --java /usr/lib/jvm/java-1.7.0 --silent',
     creates => '/etc/ambari-server/conf/password.dat',
     require => Package['ambari-server'],
   }

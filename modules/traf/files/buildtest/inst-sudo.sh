@@ -1,7 +1,7 @@
 #!/bin/sh
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ set -x
 if [[ $action == "install" ]]
 then
   # first clean out hbase from previous tests
-  sudo /usr/local/bin/hbase-clean.sh
+  sudo /usr/local/bin/hbase-clean.sh initialize || exit 1
 
   sudo rm -rf $INSTLOC $RUNLOC || exit 1
 
@@ -63,6 +63,11 @@ then
 
     # Trafodion mods
     ./installer/trafodion_mods --trafodion_build "$trafball" || exit 2
+    # old installer on ambari requires manual restart of hbase
+    if rpm -q ambari-server >/dev/null
+    then
+      sudo /usr/local/bin/hbase-clean.sh restart || exit 1
+    fi
 
     # trafodion user should exist after setup
     sudo chown trafodion $RUNLOC || exit 1
@@ -87,7 +92,12 @@ then
     echo "START=Y" >> ./tc
     echo "INIT_TRAFODION=Y" >> ./tc
     echo "DCS_SERVERS_PARM=$dcscnt" >> ./tc
-    echo "URL=$(hostname -f):7180" >> ./tc
+    if rpm -q cloudera-manager-server >/dev/null
+    then
+      echo "URL=$(hostname -f):7180" >> ./tc
+    else
+      echo "URL=$(hostname -f):8080" >> ./tc
+    fi
 
     ./installer/trafodion_install --accept_license --config_file ./tc
     ret=$?

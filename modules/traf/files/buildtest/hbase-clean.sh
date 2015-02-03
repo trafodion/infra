@@ -1,7 +1,7 @@
 #!/bin/bash
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,7 +19,18 @@
 
 source /usr/local/bin/traf-functions.sh
 log_banner
-echo "*** Cleaning HBase"
+
+mode="$1"
+if [[ "$mode" == "restart" ]]
+then
+  echo "Action: Restart HBase service"
+elif [[ "$mode" == "initialize" ]]
+then
+  echo "Action: Destroy HBase data, initialize, and start service"
+else
+  echo "Error: unrecognized mode: $mode"
+  exit 1
+fi
 
 # Clean up all HBase data to start fresh test run
 
@@ -30,12 +41,18 @@ then
   Opts="-su admin:admin"
   Read="$Opts"
   Create="-X POST -H Content-Type:application/json $Opts"
-  Update="-X PUT -H Content-Type:application/json $Opts"
+  Update="-X PUT  -H Content-Type:application/json $Opts"
 elif rpm -q ambari-server >/dev/null
 then
   Manager="Ambari"
+  URL="http://localhost:8080/api/v1"
+  Opts="-su admin:admin -H X-Requested-By:traf"
+  Read="$Opts"
+  Create="-X POST $Opts"
+  Update="-X PUT  $Opts"
 else
-  Manager="None"
+  echo "Error: No cluster manager installed"
+  exit 1
 fi
 
 
@@ -57,6 +74,39 @@ function cm_cmd {
     echo "$action command did not launch"
   fi
 }
+# ambari command - poll command until it completes and report results
+function am_cmd {
+  id=$1
+  action="$2"
+  if [[ $id =~ [0-9]+ ]]
+  then
+    status=''
+    until [[ $status =~ COMPLETED|FAILED|TIMEDOUT|ABORTED ]]
+    do
+      sleep 2
+      status=$(curl $Read $URL/clusters/trafcluster/requests/$id | jq -r '.Requests.request_status')
+    done
+    echo "$action result: $status"
+    if [[ $status == "COMPLETED" ]]
+    then
+      return 0
+    else
+      echo "Detailed status for request id $id ..."
+      tasks=$(curl $Read $URL/clusters/trafcluster/requests/$id/tasks | jq -r '.items[].Tasks.id')
+      for t in $tasks
+      do
+        echo "Task id $t Command, Status, StdErr ..."
+        curl $Read $URL/clusters/trafcluster/requests/$id/tasks/$t | \
+          jq -r '.Tasks.command_detail,.Tasks.status,.Tasks.stderr'
+      done
+      return 1
+    fi
+  else
+    echo "$action command did not launch"
+    return 2
+  fi
+}
+
 
 ####
 # Stop HBase
@@ -81,110 +131,179 @@ then
   fi
 elif [[ $Manager == "Ambari" ]]
 then
-  echo "Ambari mode not yet implemented"
-  /sbin/service hbase-master stop
-  echo "Return code $?"
-else
-  /sbin/service hbase-master stop
-  echo "Return code $?"
+  echo "*** Stopping HBase"
+  reqINSTALL='{"RequestInfo": {"context" :"HBase Stop"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
+  RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/HBASE | jq -r '.Requests.id')
+  am_cmd "$RID" "HBASE Stop"
+  # Check status
+  State="$(curl $Read $URL/clusters/trafcluster/services/HBASE | jq -r '.ServiceInfo.state')"
+  if [[ $State != "INSTALLED" ]]
+  then
+    echo "Error: HBASE not stopped"
+    exit 2
+  fi
 fi
 
-####
-# Make sure HDFS and zookeeper are running
-#
-
-if [[ $Manager == "Cloudera" ]]
+if [[ "$mode" == "initialize" ]]
 then
-  for serv in hdfs trafZOO
-  do
-    State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
-    if [[ $State == "STOPPED" ]]
-    then
-      CID=$(curl $Create $URL/clusters/trafcluster/services/$serv/commands/start | jq -r '.id')
-      cm_cmd $CID "$serv Start"
-      # Check status
+  ####
+  # Make sure HDFS and zookeeper are running
+  #
+
+  if [[ $Manager == "Cloudera" ]]
+  then
+    for serv in hdfs trafZOO
+    do
       State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
-      if [[ $State =~ STOP ]] # stopped, stopping
+      if [[ $State == "STOPPED" ]]
       then
-        echo "Error: $serv service not started"
+        echo "Starting $serv"
+        CID=$(curl $Create $URL/clusters/trafcluster/services/$serv/commands/start | jq -r '.id')
+        cm_cmd $CID "$serv Start"
+        # Check status
+        State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
+        if [[ $State =~ STOP ]] # stopped, stopping
+        then
+          echo "Error: $serv service not started"
+          exit 2
+        fi
+      fi
+    done
+  elif [[ $Manager == "Ambari" ]]
+  then
+    reqINSTALL='{"RequestInfo": {"context" :"Check Start"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
+    reqSTART='{"RequestInfo": {"context" :"Check Start"}, "Body": {"ServiceInfo": {"state": "STARTED"}}}'
+
+    for serv in ZOOKEEPER HDFS
+    do
+      State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
+      if [[ $State != "STARTED" ]]
+      then
+        # first, move service (and components) to INSTALLED
+        echo "Installing $serv (just in case all components are not INSTALLED)"
+        RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/${serv} | jq -r '.Requests.id')
+        am_cmd "$RID" "$serv Install"
+        # then from INSTALLED to STARTED
+        echo "Starting $serv"
+        RID=$(curl $Update -d "$reqSTART" $URL/clusters/trafcluster/services/${serv} | jq -r '.Requests.id')
+        am_cmd "$RID" "$serv Start"
+      fi
+      # Check status
+      State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
+      if [[ $State != "STARTED" ]]
+      then
+        echo "Error: $serv not started"
         exit 2
       fi
-    fi
-  done
-elif [[ $Manager == "Ambari" ]]
-then
-  echo "Ambari mode not yet implemented"
-  /sbin/service hadoop-hdfs-datanode start
-  echo "Return code $?"
-  /sbin/service hadoop-hdfs-namenode start
-  echo "Return code $?"
-else
-  /sbin/service hadoop-hdfs-datanode start
-  echo "Return code $?"
-  /sbin/service hadoop-hdfs-namenode start
-  echo "Return code $?"
-fi
-
-
-####
-# Clear Data
-#
-
-echo "*** Clearing /hbase data from HDFS & ZooKeeper"
-set -x
-sudo -u hdfs /usr/bin/hadoop fs -rm -r -f -skipTrash /hbase || exit $?
-sudo -u hdfs /usr/bin/hadoop fs -mkdir /hbase || exit $?
-sudo -u hdfs /usr/bin/hadoop fs -chown hbase:hbase /hbase || exit $?
-sudo -u zookeeper /usr/bin/hbase zkcli rmr /hbase 2>/dev/null || exit $?
-sudo -u hbase rm -rf /var/log/hbase/*
-set +x
-
-####
-# Remove Coprocessor config
-#  Ensure we can bring up clean HBase before installing Trafodion
-
-if [[ $Manager == "Cloudera" ]]
-then
-  echo "*** Removing any prior HBase coprocessor config"
-  curl $Update --data '
-            { "items" : [ 
-                   { "name" : "hbase_master_config_safety_valve" } 
-              ] }
-           ' $URL/clusters/trafcluster/services/trafhbase/roles/trafMAS/config | jq -r '.message'
-  curl $Update --data '
-            { "items" : [ 
-                   { "name" : "hbase_coprocessor_region_classes" }, 
-                   { "name" : "hbase_regionserver_config_safety_valve" }
-              ] } 
-           ' $URL/clusters/trafcluster/services/trafhbase/roles/trafREG/config | jq -r '.message'
-elif [[ $Manager == "Ambari" ]]
-then
-  echo "Ambari mode not yet implemented"
-## nothing to do for manual - install case
-fi
-
-
-####
-# Clear cache and re-set hbase data
-#
-if [[ $Manager == "Cloudera" ]]
-then
-  echo "*** Re-starting cluster"
-  CID=$(curl $Create $URL/clusters/trafcluster/commands/stop | jq -r '.id')
-  cm_cmd $CID "Cluster stop"
-  CID=$(curl $Create $URL/clusters/trafcluster/commands/start | jq -r '.id')
-  cm_cmd $CID "Cluster start"
-
-  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
-  if [[ $State =~ STOP ]] # stopped, stopping
-  then
-     echo "Error: HBase not started"
-     exit 2
+    done
   fi
-elif [[ $Manager == "Ambari" ]]
+
+
+  ####
+  # Clear Data
+  #
+
+  echo "*** Clearing /hbase data from HDFS & ZooKeeper"
+  set -x
+  if [[ $Manager == "Cloudera" ]]
+  then
+    hdata="/hbase"
+    zkdata="/hbase"
+  elif [[ $Manager == "Ambari" ]]
+  then
+    hdata="/apps/hbase/data"
+    zkdata="/hbase-unsecure"
+  fi
+  sudo -u hdfs /usr/bin/hadoop fs -rm -r -f -skipTrash $hdata || exit $?
+  sudo -u hdfs /usr/bin/hadoop fs -mkdir $hdata || exit $?
+  sudo -u hdfs /usr/bin/hadoop fs -chown hbase:hbase $hdata || exit $?
+  sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
+  sudo -u hbase rm -rf /var/log/hbase/*
+  set +x
+
+  ####
+  # Remove Coprocessor config
+  #  Ensure we can bring up clean HBase before installing Trafodion
+
+  if [[ $Manager == "Cloudera" ]]
+  then
+    echo "*** Removing any prior HBase coprocessor config"
+    curl $Update --data '
+              { "items" : [ 
+                     { "name" : "hbase_master_config_safety_valve" } 
+                ] }
+             ' $URL/clusters/trafcluster/services/trafhbase/roles/trafMAS/config | jq -r '.message'
+    curl $Update --data '
+              { "items" : [ 
+                     { "name" : "hbase_coprocessor_region_classes" }, 
+                     { "name" : "hbase_regionserver_config_safety_valve" }
+                ] } 
+             ' $URL/clusters/trafcluster/services/trafhbase/roles/trafREG/config | jq -r '.message'
+  elif [[ $Manager == "Ambari" ]]
+  then
+    echo "*** Applying hbase-site initial config"
+    reqdata='{"Clusters" : {"desired_config" : {"type" : "hbase-site", "tag" : "version001"}}}'
+    curl $Update --data "$reqdata" $URL/clusters/trafcluster
+  fi
+
+
+  ####
+  # Clear caches by re-starting cluster
+  #
+  if [[ $Manager == "Cloudera" ]]
+  then
+    echo "*** Re-starting cluster"
+    CID=$(curl $Create $URL/clusters/trafcluster/commands/stop | jq -r '.id')
+    cm_cmd $CID "Cluster stop"
+    CID=$(curl $Create $URL/clusters/trafcluster/commands/start | jq -r '.id')
+    cm_cmd $CID "Cluster start"
+
+    State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
+    if [[ $State =~ STOP ]] # stopped, stopping
+    then
+       echo "Error: HBase not started"
+       exit 2
+    fi
+  elif [[ $Manager == "Ambari" ]]
+  then
+    echo "*** Re-starting cluster services"
+    reqINSTALL='{"RequestInfo": {"context" :"Cluster Stop"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
+    reqSTART='{"RequestInfo": {"context" :"Cluster Start"}, "Body": {"ServiceInfo": {"state": "STARTED"}}}'
+    for serv in WEBHCAT HIVE MAPREDUCE2 YARN
+    do
+      RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/$serv | jq -r '.Requests.id')
+      am_cmd "$RID" "$serv Stop"
+    done
+    for serv in YARN MAPREDUCE2 HIVE WEBHCAT HBASE
+    do
+      RID=$(curl $Update -d "$reqSTART" $URL/clusters/trafcluster/services/$serv | jq -r '.Requests.id')
+      am_cmd "$RID" "$serv Start"
+    done
+
+    # Check status
+    State="$(curl $Read $URL/clusters/trafcluster/services/HBASE | jq -r '.ServiceInfo.state')"
+    if [[ $State != "STARTED" ]]
+    then
+      echo "Error: HBASE not started"
+      exit 2
+    fi
+  fi
+fi
+
+# support restart only for Ambari
+if [[ $mode == "restart" && $Manager == "Ambari" ]]
 then
-  echo "Ambari mode not yet implemented"
-## nothing to do for manual - install case (leave hbase down)
+  echo "*** Starting HBase"
+  reqSTART='{"RequestInfo": {"context" :"HBase Start"}, "Body": {"ServiceInfo": {"state": "STARTED"}}}'
+  RID=$(curl $Update -d "$reqSTART" $URL/clusters/trafcluster/services/HBASE | jq -r '.Requests.id')
+  am_cmd "$RID" "HBASE Start"
+  # Check status
+  State="$(curl $Read $URL/clusters/trafcluster/services/HBASE | jq -r '.ServiceInfo.state')"
+  if [[ $State != "STARTED" ]]
+  then
+    echo "Error: HBASE not started"
+    exit 2
+  fi
 fi
 
 exit 0
