@@ -95,8 +95,10 @@ then
     if rpm -q cloudera-manager-server >/dev/null
     then
       echo "URL=$(hostname -f):7180" >> ./tc
+      echo "HADOOP_TYPE=cloudera" >> ./tc
     else
       echo "URL=$(hostname -f):8080" >> ./tc
+      echo "HADOOP_TYPE=hortonworks" >> ./tc
     fi
 
     ./installer/trafodion_install --accept_license --config_file ./tc
