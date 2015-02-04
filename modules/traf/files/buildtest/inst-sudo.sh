@@ -82,7 +82,7 @@ then
   else
     # prep config file  
     cp ./installer/trafodion_config_default ./tc
-    echo "NODE_LIST=$(hostname -s)" >> ./tc
+    echo "NODE_LIST=$(hostname -f)" >> ./tc
     echo "node_count=1" >> ./tc
     echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./tc
     echo "OPENSTACK_VM=1" >> ./tc
