@@ -24,6 +24,7 @@
       - "cdh5.1"
       - "hdp2.1"
       - "cm5.1"
+      - "ahw2.1"
 
     jobs:
       - traf-publish
@@ -46,6 +47,7 @@
       - "cdh5.1"
       - "hdp2.1"
       - "cm5.1"
+      - "ahw2.1"
 
     jobs:
       - gate-{name}-check-for-binary
@@ -59,6 +61,7 @@
       - "cdh5.1"
       - "hdp2.1"
       - "cm5.1"
+      - "ahw2.1"
 
     jobs:
       - gate-{name}-check-for-binary
