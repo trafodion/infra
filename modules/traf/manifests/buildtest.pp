@@ -64,7 +64,7 @@ class traf::buildtest (
       'qpid-cpp-server','qpid-cpp-server-ssl','qpid-qmf','qpid-tools',
       'saslwrapper', 'tog-pegasus', 'uuid-perl','xinetd',
       'readline-devel','alsa-lib-devel',
-      'openssl-static','libdrizzle-devel',
+      'openssl-static',
       'java-1.6.0-openjdk-devel', 'java-1.7.0-openjdk-devel',
       'ant','ant-nodeps',
       'dos2unix','expect',
