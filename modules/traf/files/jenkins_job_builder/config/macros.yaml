@@ -234,6 +234,10 @@
               source: 'corefiles.log'
               copy-after-failure: true
             - target: 'logs/$LOG_PATH'
+              source: 'var_log_trafodion/*'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
               source: 'hbase-logs/*'
               copy-after-failure: true
               keep-hierarchy: true

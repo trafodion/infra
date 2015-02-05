@@ -42,6 +42,7 @@ then
   # first clean out hbase from previous tests
   sudo /usr/local/bin/hbase-clean.sh initialize || exit 1
 
+  sudo rm -rf /var/log/trafodion/* # clean out logs from any prior jobs
   sudo rm -rf $INSTLOC $RUNLOC || exit 1
 
   sudo mkdir $INSTLOC || exit 1
@@ -59,26 +60,35 @@ then
   then
     # Trafodion set-up
     echo "accept" | 
-       ./installer/trafodion_setup --nodes "$(hostname -s)"  || exit 2
+       ./installer/trafodion_setup --nodes "$(hostname -s)"
+    ret=$?
 
     # Trafodion mods
-    ./installer/trafodion_mods --trafodion_build "$trafball" || exit 2
-    # old installer on ambari requires manual restart of hbase
-    if rpm -q ambari-server >/dev/null
+    if [[ $ret == 0 ]]
     then
-      sudo /usr/local/bin/hbase-clean.sh restart || exit 1
+      ./installer/trafodion_mods --trafodion_build "$trafball"
+      ret=$?
     fi
 
-    # trafodion user should exist after setup
-    sudo chown trafodion $RUNLOC || exit 1
-
     # Trafodion installer
-    # -i logs into home dir
-    sudo -n -i -u trafodion ./trafodion_installer --dcs_servers $dcscnt --init_trafodion \
+    if [[ $ret == 0 ]]
+    then
+      # old installer on ambari requires manual restart of hbase
+      if rpm -q ambari-server >/dev/null
+      then
+        sudo /usr/local/bin/hbase-clean.sh restart
+      fi
+
+      # trafodion user should exist after setup
+      sudo chown trafodion $RUNLOC
+
+      # -i logs into home dir
+      sudo -n -i -u trafodion ./trafodion_installer --dcs_servers $dcscnt --init_trafodion \
 	       --build "$trafball" \
 	       --dcs_build "$dcsball" \
 	       --install_path $RUNLOC
-    ret=$?
+      ret=$?
+    fi
   else
     # prep config file  
     cp ./installer/trafodion_config_default ./tc
@@ -104,18 +114,25 @@ then
     ./installer/trafodion_install --accept_license --config_file ./tc
     ret=$?
   fi
+  # save installer logs
+  mkdir -p $WORKSPACE/var_log_trafodion
+  sudo chmod -R +r /var/log/trafodion
+  cp /var/log/trafodion/* $WORKSPACE/var_log_trafodion/
 
-  # Extra dir needed by hive regressions
-  # must be HDFS superuser (hdfs) to chown
-  sudo -n -u hive hadoop dfs -mkdir -p /user/hive/exttables
-  sudo -n -u hdfs hadoop dfs -chown trafodion /user/hive/exttables
-  # trafodion user directory must exist to accomodate Trash folder 
-  # (or every use of hdfs rm has to use -skipTrash option)
-  sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
-  sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
-  # /lobs needed by executor
-  sudo -n -u hdfs hadoop dfs -mkdir -p /lobs
-  sudo -n -u hdfs hadoop dfs -chown trafodion /lobs
+  if [[ $ret == 0 ]]
+  then
+    # Extra dir needed by hive regressions
+    # must be HDFS superuser (hdfs) to chown
+    sudo -n -u hive hadoop dfs -mkdir -p /user/hive/exttables
+    sudo -n -u hdfs hadoop dfs -chown trafodion /user/hive/exttables
+    # trafodion user directory must exist to accomodate Trash folder 
+    # (or every use of hdfs rm has to use -skipTrash option)
+    sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
+    sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
+    # /lobs needed by executor
+    sudo -n -u hdfs hadoop dfs -mkdir -p /lobs
+    sudo -n -u hdfs hadoop dfs -chown trafodion /lobs
+  fi
 
   # Dev regressions
   if [[ $ret == 0 && -n "$regball" ]]
