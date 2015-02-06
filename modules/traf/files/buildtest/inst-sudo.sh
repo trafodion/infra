@@ -123,6 +123,7 @@ then
   then
     # Extra dir needed by hive regressions
     # must be HDFS superuser (hdfs) to chown
+    sudo -n -u hive hadoop dfs -chmod +rx -p /user/hive
     sudo -n -u hive hadoop dfs -mkdir -p /user/hive/exttables
     sudo -n -u hdfs hadoop dfs -chown trafodion /user/hive/exttables
     # trafodion user directory must exist to accomodate Trash folder 

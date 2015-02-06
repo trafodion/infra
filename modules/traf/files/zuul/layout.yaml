@@ -172,6 +172,8 @@ jobs:
     voting: false
   - name: ^.*_T2-.*$
     voting: false
+  - name: ^.*ahw2.1$
+    voting: false
 
 projects:
   - name: trafodion/sandbox
@@ -214,51 +216,67 @@ projects:
       - core-regress-core-cdh5.1
       - core-regress-core-cm5.1
       - core-regress-core-hdp2.1
+      - core-regress-core-ahw2.1
       - core-regress-charsets-cdh5.1
       - core-regress-charsets-cm5.1
       - core-regress-charsets-hdp2.1
+      - core-regress-charsets-ahw2.1
       - core-regress-qat-cdh5.1
       - core-regress-qat-cm5.1
       - core-regress-qat-hdp2.1
+      - core-regress-qat-ahw2.1
       - core-regress-udr-cdh5.1
       - core-regress-udr-cm5.1
       - core-regress-udr-hdp2.1
+      - core-regress-udr-ahw2.1
       - core-regress-catman1-cdh5.1
       - core-regress-catman1-cm5.1
       - core-regress-catman1-hdp2.1
+      - core-regress-catman1-ahw2.1
       - core-regress-compGeneral-cdh5.1
       - core-regress-compGeneral-cm5.1
       - core-regress-compGeneral-hdp2.1
+      - core-regress-compGeneral-ahw2.1
       - core-regress-executor-cdh5.1
       - core-regress-executor-cm5.1
       - core-regress-executor-hdp2.1
+      - core-regress-executor-ahw2.1
       - core-regress-fullstack2-cdh5.1
       - core-regress-fullstack2-cm5.1
       - core-regress-fullstack2-hdp2.1
+      - core-regress-fullstack2-ahw2.1
       - core-regress-hive-cdh5.1
       - core-regress-hive-cm5.1
       - core-regress-hive-hdp2.1
+      - core-regress-hive-ahw2.1
       - core-regress-seabase-cdh5.1
       - core-regress-seabase-cm5.1
       - core-regress-seabase-hdp2.1
+      - core-regress-seabase-ahw2.1
       - phoenix_part1_T4-cdh5.1
       - phoenix_part2_T4-cdh5.1
       - phoenix_part1_T4-cm5.1
       - phoenix_part2_T4-cm5.1
       - phoenix_part1_T4-hdp2.1
+      - phoenix_part1_T4-ahw2.1
       - phoenix_part2_T4-hdp2.1
+      - phoenix_part2_T4-ahw2.1
       - phoenix_part1_T2-cdh5.1
       - phoenix_part2_T2-cdh5.1
       - phoenix_part1_T2-cm5.1
       - phoenix_part2_T2-cm5.1
       - phoenix_part1_T2-hdp2.1
+      - phoenix_part1_T2-ahw2.1
       - phoenix_part2_T2-hdp2.1
+      - phoenix_part2_T2-ahw2.1
       - pyodbc_test-cdh5.1
       - pyodbc_test-cm5.1
       - pyodbc_test-hdp2.1
+      - pyodbc_test-ahw2.1
       - jdbc_test-cdh5.1
       - jdbc_test-cm5.1
       - jdbc_test-hdp2.1
+      - jdbc_test-ahw2.1
     release:
       - traf-pub-release
     pre-release:
