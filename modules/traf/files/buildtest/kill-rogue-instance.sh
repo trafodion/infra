@@ -38,6 +38,25 @@ function trafprocs() {
   pgrep -u $user -f 'SQMON|mpirun|monitor|sqwatchdog|mxosrvr|jetty|sqlci|sql/scripts|pstack|pstartd|gdb'
 }
 
+# Check usage of DCS port (default 37800)
+# ss will let us know if port is in use, and -p option will give us process info
+# (must be root to get info if we don't own the process)
+cmd="/usr/sbin/ss -lp src *:37800"
+
+pcount=$($cmd | wc -l)
+pids=$(sudo -n $cmd | sed -n '/users:/s/^.*users:((.*,\([0-9]*\),.*$/\1/p')
+
+if [[ $pcount > 1 ]] # always get header line
+then
+  echo "Warning: found port 37800 in use"
+  $cmd
+fi
+if [[ -n $pids ]]
+then
+  echo "Warning: processes using port 37800"
+  ps -f $pids
+fi
+
 # Look for the usual suspects
 Instance=$(trafprocs)
 
