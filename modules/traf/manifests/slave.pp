@@ -31,11 +31,13 @@ class traf::slave (
     include_pypy => $include_pypy,
   }
   # set up mount point for jenkins workspaces
+  # prevent seltype from changing to mnt_t after jenkinsuser.pp sets to user_home_t
   file { '/mnt/jenkins':
-    ensure => directory,
-    owner  => 'jenkins',
-    group  => 'jenkins',
-    mode   => '0755',
+    ensure                  => directory,
+    owner                   => 'jenkins',
+    group                   => 'jenkins',
+    mode                    => '0755',
+    selinux_ignore_defaults => true,
   }
   mount { '/home/jenkins':
     ensure  => mounted,
