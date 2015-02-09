@@ -66,6 +66,15 @@ do_stop()
 	#   1 if daemon was already stopped
 	#   2 if daemon could not be stopped
 	#   other if a failure occurred
+
+    # PIDFILE is not set after starting the daemon
+    # and it cannot be set if you want to run status
+    # since it will kill the recheckwatch daemon.
+    # Therefore we will create the PIDFILE here if 
+    # daemon is still alive
+    PID=`/bin/pidof -x $DAEMON`
+    if [ -n "$PID" ]; then echo "$PID" > $PIDFILE; fi
+
 	start-stop-daemon --stop --signal 9 --pidfile $PIDFILE
 	RETVAL="$?"
 	[ "$RETVAL" = 2 ] && return 2
@@ -78,7 +87,9 @@ do_stop()
 #
 do_graceful_stop()
 {
-	PID=`cat $PIDFILE`
+    # cannot cat the PIDFILE since it is not set after
+    # starting the daemon
+	PID=`/bin/pidof -x $DAEMON`
 	kill -USR1 $PID
 
 	# wait until really stopped
