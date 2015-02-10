@@ -115,9 +115,9 @@ then
     ret=$?
   fi
   # save installer logs
-  mkdir -p $WORKSPACE/var_log_trafodion
+  sudo -n -u jenkins mkdir -p $WORKSPACE/var_log_trafodion
   sudo chmod -R +r /var/log/trafodion
-  cp /var/log/trafodion/* $WORKSPACE/var_log_trafodion/
+  sudo -n -u jenkins cp /var/log/trafodion/* $WORKSPACE/var_log_trafodion/
 
   if [[ $ret == 0 ]]
   then
