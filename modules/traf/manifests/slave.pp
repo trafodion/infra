@@ -117,7 +117,7 @@ class traf::slave (
   include jenkins::cgroups
 
   # manual install distros - no Ambari, no Cloudera Manager
-  if $distro =~ /^(CDH|HDP)/ {
+  if $distro =~ /^(CDH)/ {
   # installer will replace this script
   file { '/etc/sudoers.d/jenkins-sudo-hbase':
     ensure => present,
@@ -181,26 +181,6 @@ class traf::slave (
   }
   } # CDH* distro
 
-  # Hadoop components
-  if $distro == 'HDP1.3' {
-    class { 'traf::tpcds':
-      require => Class['traf::horton'],
-    }
-    class { 'traf::horton':
-      hive_sql_pw => $hive_sql_pw,
-      distro      => $distro,
-    }
-  }
-  if $distro == 'HDP2.1' {
-    class { 'traf::tpcds':
-      require => Class['traf::horton'],
-    }
-
-    class { 'traf::horton':
-      hive_sql_pw => $hive_sql_pw,
-      distro      => $distro,
-    }
-  }
   if $distro == 'CDH4.4' {
     class { 'traf::tpcds':
       require => Class['traf::cdh'],

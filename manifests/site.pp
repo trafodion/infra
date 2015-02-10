@@ -210,19 +210,6 @@ node /^slave-cm51-\d\d.trafodion.org$/ {
   }
 }
 
-# HortonWorks2.1
-node /^slave-hdp21-\d\d.trafodion.org$/ {
-  include traf
-  include traf::puppet_cron
-  class { 'traf::slave':
-    ssh_key     => $traf::jenkins_ssh_key,
-    logs_host   => hiera('static_host_key'),
-    sysadmins   => hiera('sysadmins'),
-    hive_sql_pw => hiera('hive_sql_pw'),
-    distro      => 'HDP2.1',
-  }
-}
-
 # Ambari HortonWorks
 node /^slave-ahw21-\d\d.trafodion.org$/ {
   include traf
