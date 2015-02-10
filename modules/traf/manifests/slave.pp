@@ -65,6 +65,12 @@ class traf::slave (
   package { 'puppetlabs_spec_helper':
     ensure   => latest,
     provider => 'gem',
+    require  => Package['rspec'], # work-around
+  }
+  # work-around, until fix merged: https://github.com/puppetlabs/puppetlabs_spec_helper/pull/90
+  package { 'rspec':
+    ensure   => '~>2.99.0',
+    provider => 'gem',
   }
 
   # add known host keys for static server to upload logs, etc
