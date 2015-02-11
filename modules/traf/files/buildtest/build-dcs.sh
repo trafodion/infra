@@ -38,7 +38,7 @@ then
 	-DgroupId=org.trafodion.jdbc.t4.T4Driver -DartifactId=t4driver -Dversion="$BLD" \
 	-Dpackaging=jar -DgeneratePom=true
   mvn install:install-file -Dfile=$WORKSPACE/$COREDIR/conn/jdbc_type2/dist/jdbcT2.jar \
-	-DgroupId=org.trafodion.jdbc.t2.T2Driver -DartifactId=t2driver -Dversion="$BLD" \
+	-DgroupId=org.trafodion-dev.jdbc.t2.T2Driver -DartifactId=t2driver -Dversion="$BLD" \
 	-Dpackaging=jar -DgeneratePom=true
   JDBCVER="-Djdbct4.version=$BLD -Djdbct2.version=$BLD"
 else
