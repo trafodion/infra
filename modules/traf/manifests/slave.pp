@@ -69,7 +69,7 @@ class traf::slave (
   }
   # work-around, until fix merged: https://github.com/puppetlabs/puppetlabs_spec_helper/pull/90
   package { 'rspec':
-    ensure   => '~>2.99.0',
+    ensure   => '2.99.0',
     provider => 'gem',
   }
 
