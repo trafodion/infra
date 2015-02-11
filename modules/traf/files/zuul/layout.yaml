@@ -330,11 +330,11 @@ projects:
   - name: trafodion/install
     check:
       - gate-install-check-for-binary
-      - pyodbc_test-cm5.1
       - installer-build
     gate:
       - gate-install-check-for-binary
       - pyodbc_test-cm5.1
+      - jdbc_test-ahw2.1
       - installer-build
     daily:
       - installer-pub
