@@ -54,7 +54,7 @@ class traf::base(
 
   include pip
   package { 'virtualenv':
-    ensure   => latest,
+    ensure   => '1.11.6',
     provider => pip,
     require  => Class['pip'],
   }
