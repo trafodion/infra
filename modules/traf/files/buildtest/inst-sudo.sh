@@ -102,6 +102,7 @@ then
     echo "START=Y" >> ./tc
     echo "INIT_TRAFODION=Y" >> ./tc
     echo "DCS_SERVERS_PARM=$dcscnt" >> ./tc
+    echo "CLUSTER_NAME=trafcluster" >> ./tc
     if rpm -q cloudera-manager-server >/dev/null
     then
       echo "URL=$(hostname -f):7180" >> ./tc
