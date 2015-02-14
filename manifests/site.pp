@@ -182,7 +182,7 @@ node 'graphite.trafodion.org' {
 }
 
 # LDAP server config
-node /^ldap-\d\d.trafodion.org$/ {
+node /^ldap\d\d.trafodion.org$/ {
   class { 'traf::ldap':
     sysadmins         => hiera('sysadmins'),
   }
