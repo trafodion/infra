@@ -131,9 +131,6 @@ then
     # (or every use of hdfs rm has to use -skipTrash option)
     sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
     sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
-    # /lobs needed by executor
-    sudo -n -u hdfs hadoop dfs -mkdir -p /lobs
-    sudo -n -u hdfs hadoop dfs -chown trafodion /lobs
   fi
 
   # Dev regressions
