@@ -14,6 +14,21 @@
 
 window.zuul_enable_status_updates = true;
 window.zuul_filter = [];
+window.zuul_collapsed_exceptions = [];
+
+function format_enqueue_time(time) {
+    var hours = 60 * 60 * 1000;
+    var now = Date.now();
+    var delta = now - time;
+    var status = "queue_good";
+    var text = format_time(delta, true);
+    if (delta > (4 * hours)) {
+        status = "queue_bad";
+    } else if (delta > (2 * hours)) {
+        status = "queue_warn";
+    }
+    return '<span class="' + status + '">' + text + '</span>';
+}
 
 function format_time(ms, words) {
     if (ms == null) {
@@ -55,7 +70,7 @@ function format_progress(elapsed, remaining) {
     return r;
 }
 
-function is_hide_project(project) {
+function is_hidden(project, change_id) {
     var filters = window.zuul_filter;
     if (filters.length == 0) {
         return false;
@@ -63,6 +78,8 @@ function is_hide_project(project) {
     var hide = true;
     $.each(filters, function(filter_i, filter) {
         if(project.indexOf(filter) != -1)
+            hide = false;
+        if(change_id !== null && change_id.indexOf(filter) != -1)
             hide = false;
     });
     return hide;
@@ -91,7 +108,9 @@ function create_tree(pipeline) {
         });
         $.each(change_queue['heads'], function(head_i, head) {
             $.each(head, function(change_i, change) {
-                count += 1;
+                if (change.live === true) {
+                    count += 1;
+                }
                 var idx = tree.indexOf(change['id']);
                 if (idx > -1) {
                     change['_tree_index'] = idx;
@@ -137,8 +156,8 @@ function get_sparkline_url(pipeline_name) {
             hideAxes: true,
             hideGrid: true,
             target: [
-                "color(stats.gauges.zuul.pipeline."+pipeline_name+".current_changes, '6b8182')",
-            ],
+                "color(stats.gauges.zuul.pipeline."+pipeline_name+".current_changes, '6b8182')"
+            ]
         });
     }
     return window.zuul_sparkline_urls[pipeline_name];
@@ -166,12 +185,14 @@ function format_pipeline(data) {
     $.each(data['change_queues'], function(change_queue_i, change_queue) {
         $.each(change_queue['heads'], function(head_i, head) {
             var projects = "";
+            var change_ids = "";
             var hide_queue = true;
             $.each(head, function(change_i, change) {
                 projects += change['project'] + "|";
-                hide_queue &= is_hide_project(change['project']);
+                change_ids += change['id'];
+                hide_queue &= is_hidden(change['project'], change['id']);
             });
-            html += '<div project="' + projects + '" style="'
+            html += '<div change_id="' + change_ids + '" project="' + projects + '" style="'
                 + (hide_queue ? 'display:none;' : '') + '">';
 
             if (data['change_queues'].length > 1 && head_i == 0) {
@@ -184,11 +205,11 @@ function format_pipeline(data) {
                 }
                 html += name + '</a></div>';
             }
-            html += '<table>'
+            html += '<table>';
             $.each(head, function(change_i, change) {
                 html += format_change(change, change_queue);
             });
-            html += '</table></div>'
+            html += '</table></div>';
         });
     });
 
@@ -206,6 +227,14 @@ function safe_id(id) {
 function format_change(change, change_queue) {
     var html = '<tr>';
 
+    safe_change_id = safe_id(change['id']);
+    display = $('#expandByDefault').is(':checked');
+    collapsed_index = window.zuul_collapsed_exceptions.indexOf(safe_change_id);
+    if (collapsed_index > -1) {
+        /* listed as an exception to the current default */
+        display = !display;
+    }
+
     for (var i=0; i<change_queue['_tree_columns']; i++) {
         var cls = 'tree';
         if (i < change['_tree'].length && change['_tree'][i] !== null) {
@@ -213,9 +242,17 @@ function format_change(change, change_queue) {
         }
         html += '<td class="'+cls+'">';
         if (i == change['_tree_index']) {
-            if (change['failing_reasons'] && change['failing_reasons'].length > 0) {
-                html += '<img src="red.png" title="Failing because '+
-                    change['failing_reasons'].join(', ')+'"/>';
+            if (change['active'] != true) {
+                html += '<img src="grey.png" title="Waiting until closer to head of queue to start jobs"/>';
+            } else if (change.live != true) {
+                html += '<img src="grey.png" title="Dependent change independently tested"/>';
+            } else if (change['failing_reasons'] && change['failing_reasons'].length > 0) {
+                var reason = change['failing_reasons'].join(', ');
+                var image = 'red.png';
+                if (reason.match(/merge conflict/)) {
+                    image = 'black.png';
+                }
+                html += '<img src="' + image + '" title="Failing because ' + reason +'"/>';
             } else {
                 html += '<img src="green.png" title="Succeeding"/>';
             }
@@ -230,16 +267,28 @@ function format_change(change, change_queue) {
     }
 
     html += '<td class="change-container">';
-    html += '<div class="change" id="' + safe_id(change['id']) + '"><div class="header">';
+    html += '<div class="change" id="' + safe_change_id + '">' +
+            '<div class="header" onClick="toggle_display_jobs(event, this)" ' +
+            'onmouseover="$(this).addClass(\'hover\')" ' +
+            'onmouseout="$(this).removeClass(\'hover\')">';
 
+    // Row #1 of the header (project and remaining time)
     html += '<span class="project">' + change['project'] + '</span>';
+    if (change.live === true) {
+        html += '<span class="time" title="Remaining Time">';
+        html += format_time(change['remaining_time'], true);
+        html += '</span>';
+    }
+    html += '<br/>';
+
+    // Row #2 of the header (change id and enqueue time)
+    html += '<span class="changeid"> ';
     var id = change['id'];
     var url = change['url'];
-    if (id !== "None" && id !== null) {
+    if (id !== null) {
         if (id.length == 40) {
             id = id.substr(0,7);
         }
-        html += '<span class="changeid">';
         if (url !== null) {
             html += '<a href="'+url+'">';
         }
@@ -247,11 +296,24 @@ function format_change(change, change_queue) {
         if (url !== null) {
             html += '</a>';
         }
+    } else {
+        // if there is not changeset we still need forced content, otherwise
+        // the layout doesn't work
+        html += '&nbsp;';
     }
+    html += '</span>';
+    if (change.live === true) {
+        html += '<span class="time" title="Queued Time">';
+        html += format_enqueue_time(change['enqueue_time']) + '</span>';
+    }
+    html += '</div>';
 
-    html += '</span><span class="time">';
-    html += format_time(change['remaining_time'], true);
-    html += '</span></div><div class="jobs">';
+    // Job listing from here down
+    html += '<div class="jobs"';
+    if (display == false) {
+        html += ' style="display: none;"';
+    }
+    html += '>';
 
     $.each(change['jobs'], function(i, job) {
         result = job['result'];
@@ -271,7 +333,7 @@ function format_change(change, change_queue) {
         } else if (result == 'UNSTABLE') {
             result_class += " result_unstable";
         }
-        html += '<span class="job">';
+        html += '<span class="jobwrapper"><span class="job">';
         if (job['url'] !== null) {
             html += '<a href="'+job['url']+'">';
         }
@@ -289,11 +351,51 @@ function format_change(change, change_queue) {
         if (job['voting'] == false) {
             html += ' (non-voting)';
         }
-        html += '</span>';
+        html += '</span></span>';
     });
 
     html += '</div></div></td></tr>';
     return html;
+}
+
+function toggle_display_jobs(e, _header) {
+    e = e || window.event;  // standards compliant || IE
+    var header = $(_header);
+    var target = $(e.target || e.srcElement);
+    var link = header.find("a");
+    if (target.is(link)) {
+        return true;
+    }
+
+    content = header.next("div");
+    content.slideToggle(100, function () {
+        changeid = header.parent().attr('id');
+        collapsed_index = window.zuul_collapsed_exceptions.indexOf(changeid);
+        expand_by_default = $('#expandByDefault').is(':checked');
+        visible = content.is(":visible");
+        if (expand_by_default != visible && collapsed_index == -1) {
+            /* now an exception to the default */
+            window.zuul_collapsed_exceptions.push(changeid);
+        } else if (collapsed_index > -1) {
+            window.zuul_collapsed_exceptions.splice(collapsed_index, 1);
+        }
+    });
+}
+
+function toggle_expand_by_default(_checkbox) {
+    var checkbox = $(_checkbox);
+    expand_by_default = checkbox.is(':checked');
+    set_cookie('zuul-expand-by-default', expand_by_default ? 'true' : 'false');
+    window.zuul_collapsed_exceptions = [];
+    $.each($('div.change'), function(i, _change) {
+        change = $(_change);
+        content = change.children('div').next('div');
+        if (expand_by_default) {
+            content.show(0);
+        } else {
+            content.hide(0);
+        }
+    });
 }
 
 function update_timeout() {
@@ -314,10 +416,36 @@ function update_timeout() {
     setTimeout(update_timeout, 5000);
 }
 
+function clean_changes_lists() {
+    new_collapsed_exceptions = [];
+
+    $.each($('div.change'), function(i, change) {
+        collapsed_index = window.zuul_collapsed_exceptions.indexOf(change.id);
+        if (collapsed_index > -1) {
+            new_collapsed_exceptions.push(change.id);
+            return;
+        }
+    });
+
+    window.zuul_collapsed_exceptions = new_collapsed_exceptions;
+}
+
+function update_zuul_info(data) {
+    if ('zuul_version' in data) {
+        $('#zuul-version').text(data['zuul_version']);
+    }
+    if ('last_reconfigured' in data) {
+        var last_reconfigured = new Date(data['last_reconfigured']);
+        $('#last-reconfigured-span').text(last_reconfigured.toString());
+    }
+}
+
 function update() {
     var html = '';
 
     $.getJSON('http://zuul.trafodion.org/status.json', function(data) {
+        update_zuul_info(data);
+
         if ('message' in data) {
             $("#message").attr('class', 'alertbox');
             $("#message").html(data['message']);
@@ -339,8 +467,9 @@ function update() {
             data['trigger_event_queue']['length']);
         $("#result_event_queue_length").html(
             data['result_event_queue']['length']);
-
     });
+
+    clean_changes_lists();
 }
 
 function update_graphs() {
@@ -364,13 +493,17 @@ function update_graphs() {
 }
 
 function save_filter() {
-    var name = 'zuul-project-filter';
-    var value = $('#projects_filter').val().trim();
-    document.cookie = name+"="+value+"; path=/";
+    var name = 'zuul-filter';
+    var value = $('#filter').val().trim();
+    set_cookie(name, value);
     $('img.filter-saved').removeClass('hidden');
     window.setTimeout(function(){
         $('img.filter-saved').addClass('hidden');
     }, 1500);
+}
+
+function set_cookie(name, value) {
+    document.cookie = name + "=" + value + "; path=/";
 }
 
 function read_cookie(name) {
@@ -400,20 +533,21 @@ $(function() {
         }
     });
 
-    $('#projects_filter').live('keyup change', function () {
-        window.zuul_filter = $('#projects_filter').val().trim().split(',');
+    $('#filter').live('keyup change', function () {
+        window.zuul_filter = $('#filter').val().trim().split(/[\s,]+/);
         window.zuul_filter = window.zuul_filter.filter(function(n){
             return n;
         });
         $.each($('div[project]'), function (idx, val) {
             val = $(val);
             var project = val.attr('project');
-            if (is_hide_project(project)) {
+            var change_id = val.attr('change_id');
+            if (is_hidden(project, change_id)) {
                 val.hide(100);
             } else {
                 val.show(100);
             }
-        })
+        });
     }).live('keyup', function () {
         $('a.save-filter')
             .removeClass('hidden')
@@ -423,7 +557,10 @@ $(function() {
                 save_filter();
             });
     });
-    var cookie = read_cookie('zuul-project-filter');
+    var cookie = read_cookie('zuul-filter');
     if(cookie)
-        $('#projects_filter').val(cookie).change();
+        $('#filter').val(cookie).change();
+    cookie = read_cookie('zuul-expand-by-default');
+    if(cookie)
+        $('#expandByDefault').prop('checked', cookie == 'true' ? true : false);
 });
