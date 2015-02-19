@@ -96,6 +96,7 @@
       - console-log
       - git-log
       - traf-make-log
+      - traf-upload-to-cdn
       - traf-release-tar
 
 - job:
@@ -125,6 +126,7 @@
 
     publishers:
       - console-log
+      - traf-upload-to-cdn
       - traf-release-tar
 
 - job-template:

@@ -1,0 +1,220 @@
+#!/bin/bash
+# @@@ START COPYRIGHT @@@
+#
+# (C) Copyright 2015 Hewlett-Packard Development Company, L.P.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# @@@ END COPYRIGHT @@@
+
+#======================
+# Define variables
+#======================
+export PRGNAME=$(basename $0)
+scriptDir=$(dirname $0)
+if [[ $scriptDir == "." ]]; then scriptDir=`pwd`; fi
+backupContainer="BackupContainer"
+cdnContainer="trafcdn"
+fName=""
+outputFile=""
+container=""
+containerSub=""
+swiftVerb=""
+swiftFile=""
+swiftCmdArgs=""
+res=0
+
+# set up environment to use swift
+swift=/usr/local/bin/swift
+export OS_REGION_NAME=region-a.geo-1
+export OS_DNS_SERVICE_TYPE=hpext:dns
+export OS_AUTH_URL=https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/
+export OS_TENANT_NAME=trafodion
+export OS_USERNAME=<%= cloud_auto_user %>
+export OS_PASSWORD=<%= cloud_auto_passwd %>
+
+
+#======================
+# Define functions
+#======================
+
+#--------------------------------------
+# Desc  : Help menu
+# Usage : ProgramHelp
+#--------------------------------------
+
+ProgramHelp() {
+  echo "
+  Description : Simplify interaction with Swift to upload and download files.
+
+  Usage: $PRGNAME <OPTIONS>
+
+  Options :
+    -b                                          Use Backup Container
+    -c                                          Use CDN Container
+    -l                                          List files in container in Object Storage
+    -s <subdirectory>                           Container subdirectory.
+                                                NOTE: Only used in combination with -l or -d option.
+    -u <filename>                               Upload file to container in Object Storage
+    -d <swiftfile>                              Download file from container in Object Storage
+                                                NOTE: if <swiftfile> is ALL then -s option must be set
+    -o <outputfile>                             Output file name. 
+                                                NOTE: Only used in combination with -d option.
+    -h or -?                                    This help menu
+
+  Examples :
+    $PRGNAME -bl                                                                    # List files in Backup Container in Object Storage
+    $PRGNAME -bu /etc/puppet/hieradata/production/common.yaml                       # Upload file to Backup Container in Object Storage
+    $PRGNAME -bd puppet/etc/puppet/hieradata/production/common.yaml                 # Download file and retain the directory structure
+    $PRGNAME -bd puppet/etc/puppet/hieradata/production/common.yaml -o common.yaml  # Download file but override the directory structure
+    $PRGNAME -cl -s daily                                                           # List files in CDN Container that are in the daily subdirectory
+
+  "
+}
+
+
+#======================
+# Main Program
+#======================
+if [[ $# -eq 0 ]]; then
+    ProgramHelp
+    exit 1
+else
+    while getopts bcld:o:s:u: opt
+    do
+        case "$opt" in
+            b)  # Use Backup Container
+                container=$backupContainer
+                ;;
+            c)  # Use CDN Container
+                container=$cdnContainer
+                ;;
+            s)  # container subdirectory
+                containerSub="$OPTARG"
+                ;;
+            l)  # List container
+                swiftVerb="list"
+                ;;
+            u)  # Upload file
+                swiftVerb="upload"
+                fName="$OPTARG"
+                ;;
+            d)  # Download file
+                swiftVerb="download"
+                swiftFile="$OPTARG"
+                ;;
+            o)  # Output file
+                outputFile="$OPTARG"
+                swiftCmdArgs="--output $outputFile"
+                ;;
+            \?) # Unknown option
+                ProgramHelp
+                exit 1
+                ;;
+        esac
+    done
+fi 
+
+# check to make sure one of the options that sets the swiftVerb was invoked
+# check to make sure one of the options that sets the container was invoked
+if [[ -z $swiftVerb ]]; then
+    echo "ERROR: Additional input needed. None of the input parameters specify an action."
+    exit 1
+elif [[ -z $container ]]; then
+    echo "ERROR: Additional input needed. None of the input parameters specify a container."
+    exit 1
+fi
+
+# Parse and run Swift command
+if [[ $swiftVerb = "list" ]]; then
+    if [[ -n $containerSub ]]; then 
+        listOptions="--prefix $containerSub"
+    fi
+
+    # run swift list command
+    $swift $swiftVerb $swiftOptions $container
+    res=$?
+elif [[ $swiftVerb = "download" ]]; then
+    if [[ $swiftFile = "ALL" && -n $containerSub ]]; then
+        $swift $swiftVerb --prefix $containerSub $container
+    else
+        $swift $swiftVerb $swiftCmdArgs $container $swiftFile
+    fi
+    res=$?
+elif [[ $swiftVerb = "upload" ]]; then
+    uploadOptions="--retries=3 --changed --skip-identical"
+    host=$(hostname -s)
+
+    if [[ -f $fName ]]; then
+        # check if file size is greater than 4.99 GB (5,358,000,000 bytes)
+        # if file size is too big then segment the file to 2 GB chunks
+        fSize=$(stat -c%s "$fName")
+        if [[ $fSize -gt 5358000000 ]]; then
+            uploadOptions="$uploadOptions -S 2147483648"
+        fi
+
+        # get current md5sum of file
+        fMd5sum=$(md5sum $fName | awk '{print $1}')
+    fi
+
+    # set options based on container
+    if [[ $container = "$backupContainer" ]]; then
+        # check to see if fName contains absolute path
+        if [[ -n ${fName%%/*} ]]; then
+            echo "ERROR: Must use absolute path when uploading to the container $backupContainer"
+            exit 1
+        else
+            # get md5sum of file from the cloud
+            fCloudMd5sum=$($swift stat $container ${host}${fName} 2>/dev/null | grep "ETag:" | awk '{print $2}')
+
+            if [[ "$fMd5sum" = "$fCloudMd5sum" ]]; then
+                echo "File $fName has not changed since the last upload. Skipping upload ..."
+                res=$?
+            else
+                # if fCloudMd5sum is not empty then file has been uploaded before
+                if [[ -n $fCloudMd5sum ]]; then
+                    # set header X-Delete-After to 30 days so we do not keep
+                    # more than 30 days worth of previous version of the file
+                    echo "Setting $fName to expire in 30 days ..."
+                    $swift post -H 'x-delete-after: 259200' $container ${host}${fName}
+                    res=$?
+                fi
+
+                echo "Uploading file $fName to container $container ..."
+                $swift upload $uploadOptions $container/$host $fName
+                (( res += $? ))
+            fi
+        fi
+    elif [[ $container = "$cdnContainer" ]]; then
+        # check to see if fName starts with daily, old-release, opencart, pre-release, release, or sandbox
+        if [[ $fName =~ ^daily/.*|^old-release/.*|^opencart/.*|^pre-release/.*|^release/.*|^sandbox/.* ]]; then
+            echo "Uploading $fName to container $container ..."
+            if [[ $fName =~ ^daily/.* ]]; then
+                # set header X-Delete-After to 30 days so we do not keep
+                # more than 30 days worth of daily builds
+                echo "Setting $fName to expire in 30 days ..."
+                $swift upload $uploadOptions --header="x-delete-after: 259200" $container $fName
+            else
+                $swift upload $uploadOptions $container $fName
+            fi
+            res=$?
+        else
+            echo "ERROR: Path must start with one of the following (daily/, old-release/, opencart/, pre-release/, release/, or sandbox/)"
+            echo "       when uploading to the container $cdnContainer"
+            exit 1
+        fi
+    fi
+fi
+
+exit $res
+
