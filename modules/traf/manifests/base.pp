@@ -121,6 +121,14 @@ class traf::base(
     content => template('traf/backupToObjectStorage.sh.erb'),
   }
 
+  file { '/usr/local/bin/useObjectStorage.sh':
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0750',
+    content => template('traf/useObjectStorage.sh.erb'),
+  }
+
   file { '/usr/local/bin/cronic':
     ensure => file,
     owner  => 'root',
