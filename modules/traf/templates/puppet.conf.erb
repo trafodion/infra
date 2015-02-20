@@ -5,8 +5,8 @@ ssldir=/var/lib/puppet/ssl
 rundir=/var/run/puppet
 factpath=$vardir/lib/facter
 templatedir=$confdir/templates
-server=puppet.trafodion.org
-certname=<%= certname %>
+server=<%= @pserver %>
+certname=<%= @certname %>
 pluginsync=true
 
 [master]
@@ -19,7 +19,7 @@ modulepath=/opt/config/$environment/modules:/etc/puppet/modules
 manifest=$manifestdir/site.pp
 reports=store, http
 reporturl=http://dashboard.trafodion.org:3000/reports/upload
-certname = puppet.trafodion.org
+certname = <%= @pserver %>
 ca = true
 
 
@@ -29,5 +29,5 @@ splay=true
 runinterval=1800
 classfile = $vardir/classes.txt
 localconfig = $vardir/localconfig
-ca_server = puppet.trafodion.org
-server = puppet.trafodion.org
+ca_server = <%= @pserver %>
+server = <%= @pserver %>

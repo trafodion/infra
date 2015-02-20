@@ -23,7 +23,6 @@ declare -A SOURCE_MODULES
 if grep kickstandproject-ntp /etc/puppet/modules/ntp/Modulefile &> /dev/null; then
   remove_module "ntp"
 fi
-MODULES["puppetlabs-ntp"]="0.2.0"
 
 remove_module "gearman" #remove old saz-gearman
 remove_module "limits" # remove saz-limits (required by saz-gearman)
@@ -38,41 +37,41 @@ if puppet module list | grep puppetlabs-concat
 then
   remove_module "concat" # conflicts with ripienaar concat
 fi
-MODULES["puppetlabs-apt"]="1.6.0"
-MODULES["puppetlabs-mysql"]="2.3.1"
-MODULES["razorsedge-cloudera"]="2.2.0"
 
-# freenode #puppet 2012-09-25:
-# 18:25 < jeblair> i would like to use some code that someone wrote,
-# but it's important that i understand how the author wants me to use
-# it...
-# 18:25 < jeblair> in the case of the vcsrepo module, there is
-# ambiguity, and so we are trying to determine what the author(s)
-# intent is
-# 18:30 < jamesturnbull> jeblair: since we - being PL - are the author
-# - our intent was not to limit it's use and it should be Apache
-# licensed
-MODULES["openstackci-vcsrepo"]="0.0.8"
-
-MODULES["puppetlabs-apache"]="0.0.4"
-MODULES["puppetlabs-stdlib"]="3.2.0"
-MODULES["saz-memcached"]="2.0.2"
-MODULES["spiette-selinux"]="0.5.1"
-MODULES["rafaelfc-pear"]="1.0.3"
-MODULES["maestrodev-maven"]="1.1.7"
-MODULES["petems-swap_file"]="1.0.0"
+if [[ $(puppet --version) =~ 3.* ]]
+then
+  MODULES["puppetlabs-ntp"]="3.3.0"
+  MODULES["puppetlabs-apt"]="1.7.0"
+  MODULES["puppetlabs-mysql"]="2.3.1" 
+  MODULES["razorsedge-cloudera"]="2.2.1"
+  MODULES["puppetlabs-vcsrepo"]="1.2.0"
+  MODULES["puppetlabs-apache"]="0.8.1"   # (0.9+ reqs chgs)
+  MODULES["puppetlabs-stdlib"]="4.5.1"
+  MODULES["saz-memcached"]="2.6.0"
+  MODULES["spiette-selinux"]="0.5.4"
+  MODULES["rafaelfc-pear"]="1.0.3"
+  MODULES["maestrodev-maven"]="1.4.0"
+  MODULES["petems-swap_file"]="1.0.1"
+else
+  MODULES["puppetlabs-ntp"]="0.2.0"
+  MODULES["puppetlabs-apt"]="1.6.0"
+  MODULES["puppetlabs-mysql"]="2.3.1" 
+  MODULES["razorsedge-cloudera"]="2.2.0"
+  MODULES["openstackci-vcsrepo"]="0.0.8"
+  MODULES["puppetlabs-apache"]="0.0.4"
+  MODULES["puppetlabs-stdlib"]="3.2.0"
+  MODULES["saz-memcached"]="2.0.2"
+  MODULES["spiette-selinux"]="0.5.1"
+  MODULES["rafaelfc-pear"]="1.0.3"
+  MODULES["maestrodev-maven"]="1.1.7"
+  MODULES["petems-swap_file"]="1.0.0"
+fi
 
 # Source modules should use tags, explicit refs or remote branches because
 # we do not update local branches in this script.
 SOURCE_MODULES["https://github.com/trafodion/puppet-dashboard"]="origin/master"
 
 MODULE_LIST=`puppet module list`
-
-# Transition away from old things
-if [ -d /etc/puppet/modules/vcsrepo/.git ]
-then
-    rm -rf /etc/puppet/modules/vcsrepo
-fi
 
 for MOD in ${!MODULES[*]} ; do
   # If the module at the current version does not exist upgrade or install it.

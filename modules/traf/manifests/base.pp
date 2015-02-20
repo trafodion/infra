@@ -151,7 +151,7 @@ class traf::base(
     )
   }
 
-  # Use upstream puppet and pin to version 2.7.*
+  # Use upstream puppet and pin version
   if ($::osfamily == 'Debian') {
     apt::source { 'puppetlabs':
       location   => 'http://apt.puppetlabs.com',
@@ -159,13 +159,18 @@ class traf::base(
       key        => '4BD6EC30',
       key_server => 'pgp.mit.edu',
     }
+    if $puppetversion =~/^3/ {
+      $pinfile = 'puppet:///modules/traf/00-puppet3.pref'
+    } else {
+      $pinfile = 'puppet:///modules/traf/00-puppet2.pref'
+    }
 
     file { '/etc/apt/preferences.d/00-puppet.pref':
       ensure  => present,
       owner   => 'root',
       group   => 'root',
       mode    => '0444',
-      source  => 'puppet:///modules/openstack_project/00-puppet.pref',
+      source  => $pinfile,
       replace => true,
     }
 
