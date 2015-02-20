@@ -36,7 +36,7 @@ class traf::dashboard(
 
   file { '/etc/mysql/conf.d/mysqld_innodb_fpt.cnf':
     ensure  => present,
-    source  => 'puppet:///modules/openstack_project/dashboard/mysqld_innodb_fpt.cnf',
+    source  => 'puppet:///modules/traf/dashboard/mysqld_innodb_fpt.cnf',
     require => Class['mysql::server'],
   }
 

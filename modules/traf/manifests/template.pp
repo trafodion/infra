@@ -14,8 +14,8 @@ class traf::template (
   $ssh_hitcount = '',
 ) {
   # Turn a list of IPs into a list of iptables rules
-  $ipv4_blacklist_ips = hiera('ipv4_all_blacklist')
-  $ipv6_blacklist_ips = hiera('ipv6_all_blacklist')
+  $ipv4_blacklist_ips = hiera('ipv4_all_blacklist', '')
+  $ipv6_blacklist_ips = hiera('ipv6_all_blacklist', '')
   if $ipv4_blacklist_ips != '' {
     $block_rules4 = regsubst ($ipv4_blacklist_ips, '^(.*)$', '-s \1 -j DROP')
   }

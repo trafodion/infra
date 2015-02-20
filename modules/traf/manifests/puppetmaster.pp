@@ -9,12 +9,6 @@ class traf::puppetmaster (
     sysadmins                 => $sysadmins,
   }
 
-  class { 'salt':
-    salt_master => 'puppet.trafodion.org',
-  }
-
-  class { 'salt::master': }
-
   cron { 'updatepuppetmaster':
     user        => 'root',
     minute      => '*/15',
@@ -66,18 +60,4 @@ class traf::puppetmaster (
     content => template('traf/slave-ip.sh.erb'),
   }
 
-#### Not sure if we'll use launch-node.py script
-#
-# Cloud credentials are stored in this directory for launch-node.py.
-  file { '/root/ci-launch':
-    ensure => directory,
-    owner  => 'root',
-    group  => 'admin',
-    mode   => '0750',
-    }
-
-# For launch/launch-node.py.
-  package { 'python-paramiko':
-    ensure => present,
-  }
 }
