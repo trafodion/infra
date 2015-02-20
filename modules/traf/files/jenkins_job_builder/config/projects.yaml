@@ -6,6 +6,7 @@
       - gate-{name}-check-for-binary
       - gate-{name}-puppet-lint
       - gate-{name}-puppet-syntax
+      - gate-{name}-jjb-lint
 
 - project:
     name: infra
@@ -15,6 +16,7 @@
       - gate-{name}-puppet-lint
       - gate-{name}-puppet-syntax
       - gate-{name}-check-for-binary
+      - gate-{name}-jjb-lint
 
 - project:
     name: core

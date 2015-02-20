@@ -205,6 +205,15 @@ class traf::jenkins (
       source => 'puppet:///modules/traf/jenkins/jenkins.default',
     }
   }
+
+  file { '/etc/sudoers.d/jenkins-sudo-jjb':
+    ensure => present,
+    source => 'puppet:///modules/traf/jenkins/jenkins-sudo-jjb.sudo',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0440',
+  }
+
   # Build/test scripts - some small jobs run on jenkins master 
   file { '/usr/local/bin':
     ensure  => directory,

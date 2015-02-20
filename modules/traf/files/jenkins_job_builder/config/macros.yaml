@@ -101,6 +101,11 @@
       - shell: "/usr/local/bin/binary-file-check.sh"
 
 - builder:
+    name: jjb-lint
+    builders:
+      - shell: "sudo -n /usr/local/bin/jjblint.sh"
+
+- builder:
     name: puppet-lint
     builders:
       - shell: |

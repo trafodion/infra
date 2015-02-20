@@ -67,3 +67,16 @@
       - traf-make-log
       - pyodbc_test-log
 
+
+- job-template:
+    name: 'gate-{name}-jjb-lint'
+    node: master
+
+    builders:
+      - gerrit-git-prep
+      - jjb-lint
+
+    publishers:
+      - console-log
+
+
