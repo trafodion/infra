@@ -1,7 +1,10 @@
 # Make cloud user credentials available to all nodes
 
-$cloud_auto_user=hiera('cloud_auto_user')
-$cloud_auto_passwd=hiera('cloud_auto_passwd')
+$cloud_auto_user=hiera('cloud_auto_user', '')
+$cloud_auto_passwd=hiera('cloud_auto_passwd', '')
+
+# default puppet-master
+$pserver='puppet.trafodion.org'
 
 #
 # Default: at least puppet running regularly and sysadmin access
@@ -86,6 +89,13 @@ node 'jenkins02.trafodion.org' {
 }
 
 node 'puppet.trafodion.org' {
+  class { 'traf::puppetmaster':
+    sysadmins         => hiera('sysadmins'),
+  }
+}
+# New master running puppet 3.x
+node 'puppet3.trafodion.org' {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::puppetmaster':
     sysadmins         => hiera('sysadmins'),
   }

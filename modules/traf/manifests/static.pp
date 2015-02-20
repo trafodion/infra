@@ -240,23 +240,6 @@ class traf::static (
     require => User['jenkins'],
   }
 
-  # Not needed for now
-  #file { "${server_path}/docs/index.php":
-  #  ensure  => file,
-  #  owner   => 'jenkins',
-  #  group   => 'jenkins',
-  #  content => template('traf/docs/index.php.erb'),
-  #}
-  #
-  #file { "${server_path}/docs/robots.txt":
-  #  ensure  => present,
-  #  owner   => 'root',
-  #  group   => 'root',
-  #  mode    => '0444',
-  #  source  => 'puppet:///modules/openstack_project/disallow_robots.txt',
-  #  require => File["${server_path}/docs"],
-  #}
-
 
   ###########################################################
   # Logs
@@ -266,7 +249,7 @@ class traf::static (
     priority => '50',
     docroot  => "${server_path}/logs",
     require  => File["${server_path}/logs"],
-    template => 'openstack_project/logs.vhost.erb',
+    template => 'traf/logs.vhost.erb',
   }
 
   file { "${server_path}/logs":
@@ -281,46 +264,9 @@ class traf::static (
     owner   => 'root',
     group   => 'root',
     mode    => '0444',
-    source  => 'puppet:///modules/openstack_project/disallow_robots.txt',
+    source  => 'puppet:///modules/traf/disallow_robots.txt',
     require => File["${server_path}/logs"],
   }
-
-  vcsrepo { '/opt/os-loganalyze':
-    ensure   => latest,
-    provider => git,
-    revision => 'master',
-    source   => 'https://git.openstack.org/openstack-infra/os-loganalyze',
-  }
-
-  exec { 'install_os-loganalyze':
-    command     => 'python setup.py install',
-    cwd         => '/opt/os-loganalyze',
-    path        => '/bin:/usr/bin',
-    refreshonly => true,
-    subscribe   => Vcsrepo['/opt/os-loganalyze'],
-  }
-
-  ## os-loganalyze will replace htmlify
-  file { '/usr/local/bin/htmlify-screen-log.py':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0755',
-    source => 'puppet:///modules/openstack_project/logs/htmlify-screen-log.py',
-  }
-
-#  No log help files for Trafodion.
-#  file { "${server_path}/logs/help":
-#    ensure  => directory,
-#    recurse => true,
-#    purge   => true,
-#    force   => true,
-#    owner   => 'root',
-#    group   => 'root',
-#    mode    => '0755',
-#    source  => 'puppet:///modules/traf/logs/help',
-#    require => File["${server_path}/logs"],
-#  }
 
   file { '/usr/local/sbin/log_archive_maintenance.sh':
     ensure => present,

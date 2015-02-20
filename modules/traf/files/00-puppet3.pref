@@ -1,0 +1,15 @@
+Package: puppet puppet-common puppetmaster puppetmaster-common puppetmaster-passenger
+Pin: version 3.*
+Pin-Priority: 501
+
+Package: puppetdb puppetdb-terminus
+Pin: version 2.*
+Pin-Priority: 501
+
+Package: puppetserver
+Pin: version 1.*
+Pin-Priority: 501
+
+Package: facter
+Pin: version 2.*
+Pin-Priority: 501

@@ -34,7 +34,7 @@ class traf::server (
       group   => 'root',
       mode    => '0644',
       source  =>
-        'puppet:///modules/openstack_project/rsyslog.d_50-default.conf',
+        'puppet:///modules/traf/rsyslog.d_50-default.conf',
       replace => true,
     }
     service { 'rsyslog':
