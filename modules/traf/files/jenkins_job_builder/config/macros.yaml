@@ -486,8 +486,11 @@
                 cd $WORKSPACE/publish
                 ls -d */ | while read dirName
                 do
-                  /usr/local/bin/useObjectStorage.sh -cu $dirName
-                  (( res += $? ))
+                  # make sure there are actually files
+                  if [[ $(find $dirname -type f | wc -l) -ne 0 ]]; then
+                    /usr/local/bin/useObjectStorage.sh -cu $dirName
+                    (( res += $? ))
+                  fi
                 done
                 exit $res
 
