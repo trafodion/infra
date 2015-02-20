@@ -475,17 +475,19 @@
             - target: 'logs/buildvers'
               source: 'Versions-*'
 
--publisher:
+- publisher:
     name: traf-upload-to-cdn
     publishers:
-      -shell: |
-        #!/bin/bash
-        res=0
-        cd $WORKSPACE/publish
-        ls -d */ | while read dirName
-        do
-          /usr/local/bin/useObjectStorage.sh -cu $dirName
-          (( res += $? ))
-        done
-        exit $res
+      - postbuildscript:
+          builders:
+            - shell: |
+                #!/bin/bash
+                res=0
+                cd $WORKSPACE/publish
+                ls -d */ | while read dirName
+                do
+                  /usr/local/bin/useObjectStorage.sh -cu $dirName
+                  (( res += $? ))
+                done
+                exit $res
 
