@@ -119,7 +119,7 @@ class traf::zuul_prod(
 
   file { '/etc/zuul/merger-logging.conf':
     ensure => present,
-    source => 'puppet:///modules/openstack_project/zuul/merger-logging.conf',
+    source => 'puppet:///modules/traf/zuul/merger-logging.conf',
   }
 
   class { '::recheckwatch':
