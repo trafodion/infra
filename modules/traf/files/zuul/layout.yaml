@@ -172,6 +172,8 @@ jobs:
     voting: false
   - name: ^.*_T2-.*$
     voting: false
+  - name: ^.*-jjb-lint
+    voting: false
 
 projects:
   - name: trafodion/sandbox
@@ -182,6 +184,7 @@ projects:
     silent:
       - gate-sandbox-puppet-lint
       - gate-sandbox-puppet-syntax
+      - gate-sandbox-jjb-lint
 
   - name: trafodion/core
     check:
@@ -301,10 +304,12 @@ projects:
       - gate-infra-check-for-binary
       - gate-infra-puppet-lint
       - gate-infra-puppet-syntax
+      - gate-infra-jjb-lint
     gate:
       - gate-infra-check-for-binary
       - gate-infra-puppet-lint
       - gate-infra-puppet-syntax
+      - gate-infra-jjb-lint
 
   - name: trafodion/manuals
     check:
