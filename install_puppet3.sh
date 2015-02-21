@@ -128,6 +128,7 @@ baseurl=http://yum.puppetlabs.com/el/6/products/$basearch
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
 enabled=1
 gpgcheck=1
+exclude=puppet-4* facter-3* puppetserver-2*
 EOF
 
     yum update -y
@@ -152,6 +153,7 @@ function setup_puppet_ubuntu {
 
     PUPPET_VERSION=3.*
     PUPPETDB_VERSION=2.*
+    PUPSERVER_VERSION=1.*
     FACTER_VERSION=2.*
 
     cat > /etc/apt/preferences.d/00-puppet.pref <<EOF
@@ -161,6 +163,10 @@ Pin-Priority: 501
 
 Package: puppetdb puppetdb-terminus
 Pin: version $PUPPETDB_VERSION
+Pin-Priority: 501
+
+Package: puppetserver
+Pin: version $PUPSERVER_VERSION
 Pin-Priority: 501
 
 Package: facter
