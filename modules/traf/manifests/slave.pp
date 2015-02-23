@@ -277,31 +277,12 @@ class traf::slave (
   if $distro == 'AHW2.1' {
     exec {'cluster_setup':
       command => '/usr/local/bin/amcluster.sh HDP-2.1',
+      timeout => 0,
       unless  => '/usr/local/bin/amcluster.sh check HDP-2.1',
       require => [ Class['traf::ambari'], File['/usr/local/bin/amcluster.sh'], ]
     }
   }
 
-  if $distro == 'CM4.4' {
-    exec {'cluster_setup':
-      command => '/usr/local/bin/cmgr.sh 4.4.0',
-      unless  => '/usr/local/bin/cmgr.sh check 4.4.0',
-      require => [ Class['traf::hive_metastore'], File['/usr/local/bin/cmgr.sh'], ]
-    }
-
-    class {'traf::hive_metastore':
-      hive_sql_pw     => 'insecure_hive',
-      hive_schema_ver => '0.10.0',
-      require         => Class['::cloudera'],
-    }
-
-    class { '::cloudera':
-      cm_server_host   => 'localhost',
-      install_cmserver => true,
-      use_parcels      => false,
-      cdh_version      => '4.4.0',
-    }
-  }
   if $distro == 'CM5.1' {
     # For CDH5, header files are in separate package
     package { 'hadoop-libhdfs-devel':
@@ -310,6 +291,7 @@ class traf::slave (
     }
     exec {'cluster_setup':
       command => '/usr/local/bin/cmgr.sh 5.1.4',
+      timeout => 0,
       unless  => '/usr/local/bin/cmgr.sh check 5.1.4',
       require => [ Class['traf::hive_metastore'], File['/usr/local/bin/cmgr.sh'], ]
     }
