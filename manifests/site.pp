@@ -218,6 +218,7 @@ node /^slave-cdh51-\d\d.trafodion.org$/ {
 
 # CMgr
 node /^slave-cm51-\d\d.trafodion.org$/ {
+  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
@@ -230,6 +231,7 @@ node /^slave-cm51-\d\d.trafodion.org$/ {
 
 # Ambari HortonWorks
 node /^slave-ahw21-\d\d.trafodion.org$/ {
+  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
