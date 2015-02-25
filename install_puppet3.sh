@@ -198,36 +198,19 @@ function setup_puppet_opensuse {
 #
 
 function setup_pip {
-    # Install pip using get-pip
-    local get_pip_url=https://bootstrap.pypa.io/get-pip.py
-    local ret=1
-
-    if [ -f ./get-pip.py ]; then
-        ret=0
-    elif type curl >/dev/null 2>&1; then
-        curl -O $get_pip_url
-        ret=$?
-    elif type wget >/dev/null 2>&1; then
-        wget $get_pip_url
-        ret=$?
-    fi
-
-    if [ $ret -ne 0 ]; then
-        echo "Failed to get get-pip.py"
-        exit 1
-    fi
-
-    if is_rhel6; then
-        yum erase -y python-setuptools
-        rm -rf /usr/lib/python2.6/site-packages/setuptools*
-    fi
+    # Install pip
 
     if is_opensuse; then
         zypper --non-interactive in --force-resolution python python-xml
     fi
 
-    python get-pip.py
-    pip install -U setuptools
+    # python-setuptools includes easy_install module
+    yum install -y python-setuptools
+
+    # must specify python version, since multiple versions may be installed
+    # This should be the /usr/bin (system) version of python
+    /usr/bin/python -m easy_install -U pip 
+    /usr/bin/pip install -y -U setuptools
 }
 
 setup_pip
