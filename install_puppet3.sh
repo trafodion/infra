@@ -210,7 +210,7 @@ function setup_pip {
     # must specify python version, since multiple versions may be installed
     # This should be the /usr/bin (system) version of python
     /usr/bin/python -m easy_install -U pip 
-    /usr/bin/pip install -y -U setuptools
+    /usr/bin/pip install -U setuptools
 }
 
 setup_pip
