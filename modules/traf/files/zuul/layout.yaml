@@ -174,10 +174,6 @@ jobs:
     voting: false
   - name: ^.*-jjb-lint
     voting: false
-  - name: ^.*-ahw2.1$
-    voting: false
-  - name: ^.*-cm5.1$
-    voting: false
 
 projects:
   - name: trafodion/sandbox
@@ -192,9 +188,6 @@ projects:
 
   - name: trafodion/core
     check:
-      - phoenix_quick_T4-cdh5.1
-      - core-regress-core-cdh5.1
-      - core-regress-seabase-cdh5.1
       - core-regress-core-ahw2.1
       - core-regress-seabase-ahw2.1
       - phoenix_quick_T4-ahw2.1
@@ -214,8 +207,6 @@ projects:
       - core-regress-fullstack2-cm5.1
       - core-regress-hive-ahw2.1
     gate:
-      - phoenix_quick_T4-cdh5.1
-      - core-regress-seabase-cdh5.1
       - core-regress-core-ahw2.1
       - core-regress-seabase-ahw2.1
       - phoenix_quick_T4-ahw2.1
@@ -282,9 +273,6 @@ projects:
     check:
       - gate-dcs-check-for-binary
       - dcs-build
-      - phoenix_quick_T4-cdh5.1
-      - pyodbc_test-cdh5.1
-      - jdbc_test-cdh5.1
       - phoenix_quick_T4-ahw2.1
       - pyodbc_test-ahw2.1
       - pyodbc_test-cm5.1
@@ -293,9 +281,6 @@ projects:
     gate:
       - gate-dcs-check-for-binary
       - dcs-build
-      - phoenix_quick_T4-cdh5.1
-      - pyodbc_test-cdh5.1
-      - jdbc_test-cdh5.1
       - phoenix_quick_T4-ahw2.1
       - pyodbc_test-ahw2.1
       - pyodbc_test-cm5.1
