@@ -11,6 +11,9 @@ class traf::ambari (
   if $distro == 'AHW2.1' {
     $repoamb = 'puppet:///modules/traf/hadoop/ambari-1.6.1.repo'
   }
+  if $distro == 'AHW2.2' {
+    $repoamb = 'puppet:///modules/traf/hadoop/ambari-1.7.0.repo'
+  }
 
   file { '/etc/yum.repos.d/ambari.repo':
     owner  => 'root',
