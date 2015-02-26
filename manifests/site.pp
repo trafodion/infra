@@ -228,6 +228,17 @@ node /^slave-cm51-\d\d.trafodion.org$/ {
     distro    => 'CM5.1',
   }
 }
+node /^slave-cm53-\d\d.trafodion.org$/ {
+  $pserver='puppet3.trafodion.org'
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'CM5.3',
+  }
+}
 
 # Ambari HortonWorks
 node /^slave-ahw21-\d\d.trafodion.org$/ {
@@ -239,6 +250,17 @@ node /^slave-ahw21-\d\d.trafodion.org$/ {
     logs_host => hiera('static_host_key'),
     sysadmins => hiera('sysadmins'),
     distro    => 'AHW2.1',
+  }
+}
+node /^slave-ahw22-\d\d.trafodion.org$/ {
+  $pserver='puppet3.trafodion.org'
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'AHW2.2',
   }
 }
 
