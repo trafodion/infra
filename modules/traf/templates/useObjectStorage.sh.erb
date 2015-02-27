@@ -155,12 +155,21 @@ elif [[ $swiftVerb = "upload" ]]; then
     uploadOptions="--retries=3 --changed --skip-identical"
     host=$(hostname -s)
 
+    # Swift sets content-type for *.tar.gz files to application/x-tar
+    # This is the correct content-type. However different browsers handle 
+    # this file type differently which causes the file name to get mangled 
+    # by the browser.  We will set the content-type to application/octet-stream
+    # to force the browsers to always download these files with the correct extension
+    if [[ $fName =~ .*.tar.gz ]]; then
+      uploadOptions+=" -H content-type:application/octet-stream"
+    fi
+
     if [[ -f $fName ]]; then
         # check if file size is greater than 4.99 GB (5,358,000,000 bytes)
         # if file size is too big then segment the file to 2 GB chunks
         fSize=$(stat -c%s "$fName")
         if [[ $fSize -gt 5358000000 ]]; then
-            uploadOptions="$uploadOptions -S 2147483648"
+            uploadOptions+=" -S 2147483648"
         fi
 
         # get current md5sum of file
@@ -178,40 +187,44 @@ elif [[ $swiftVerb = "upload" ]]; then
             fCloudMd5sum=$($swift stat $container ${host}${fName} 2>/dev/null | grep "ETag:" | awk '{print $2}')
 
             if [[ "$fMd5sum" = "$fCloudMd5sum" ]]; then
-                echo "File $fName has not changed since the last upload. Skipping upload ..."
+                echo "INFO: File $fName has not changed since the last upload. Skipping upload ..."
                 res=$?
             else
                 # if fCloudMd5sum is not empty then file has been uploaded before
                 if [[ -n $fCloudMd5sum ]]; then
                     # set header X-Delete-After to 30 days so we do not keep
                     # more than 30 days worth of previous version of the file
-                    echo "Setting $fName to expire in 30 days ..."
+                    echo "INFO: Setting $fName to expire in 30 days ..."
                     $swift post -H 'x-delete-after: 259200' $container ${host}${fName}
                     res=$?
                 fi
 
-                echo "Uploading file $fName to container $container ..."
+                echo "INFO: Uploading file $fName to container $container ..."
                 $swift upload $uploadOptions $container/$host $fName
                 (( res += $? ))
             fi
         fi
     elif [[ $container = "$cdnContainer" ]]; then
-        # check to see if fName starts with daily, old-release, opencart, pre-release, release, or sandbox
-        if [[ $fName =~ ^daily/.*|^old-release/.*|^opencart/.*|^pre-release/.*|^release/.*|^sandbox/.* ]]; then
-            echo "Uploading $fName to container $container ..."
-            if [[ $fName =~ ^daily/.* ]]; then
-                # set header X-Delete-After to 30 days so we do not keep
-                # more than 30 days worth of daily builds
-                echo "Setting $fName to expire in 30 days ..."
-                $swift upload $uploadOptions --header="x-delete-after: 259200" $container $fName
-            else
+        # since fName can be a directory check to make sure that fName actually contains files to be uploaded
+        if [[ $(find $fName -type f | wc -l) -ne 0 ]]; then
+            # check to see if fName starts with daily, old-release, opencart, pre-release, release, or sandbox
+            if [[ $fName =~ ^daily/.*|^old-release/.*|^opencart/.*|^pre-release/.*|^release/.*|^sandbox/.* ]]; then
+                if [[ $fName =~ ^daily/.*|^pre-release/.* ]]; then
+                    # set header X-Delete-After to 30 days so we do not keep
+                    # more than 30 days worth of daily builds
+                    echo "INFO: Setting $fName to expire in 30 days ..."
+                    uploadOptions+=" -H x-delete-after:259200"
+                fi
+                echo "INFO: Uploading $fName to container $container ..."
                 $swift upload $uploadOptions $container $fName
+                res=$?
+            else
+                echo "ERROR: Path must start with one of the following (daily/, old-release/, opencart/, pre-release/, release/, or sandbox/)"
+                echo "       when uploading to the container $cdnContainer"
+                exit 1
             fi
-            res=$?
         else
-            echo "ERROR: Path must start with one of the following (daily/, old-release/, opencart/, pre-release/, release/, or sandbox/)"
-            echo "       when uploading to the container $cdnContainer"
-            exit 1
+            echo "WARNING: There were no files found in $fName. Upload to container $cdnContainer cancelled."
         fi
     fi
 fi
