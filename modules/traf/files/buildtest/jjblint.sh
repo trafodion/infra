@@ -34,6 +34,11 @@ do
     if [[ "$fStatus" != "D" ]] && [[ "$fName" =~ ^.*\/jenkins_job_builder\/config\/.*$ ]]; then
       found=1
       echo "INFO: Testing Jenkins Job config file $fName ..."
+      if [[ "${fName##*/}" != "defaults.yaml" ]] || [[ "${fName##*/}" != "macros.yaml" ]]; then
+        /usr/local/bin/jenkins-jobs test ${fName%/*}/macros.yaml $fName
+      else
+        /usr/local/bin/jenkins-jobs test $fName
+      fi
       /usr/local/bin/jenkins-jobs test $fName
       rc=$?
     fi
