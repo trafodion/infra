@@ -23,9 +23,10 @@
     github-org: trafodion
 
     dist:
-      - "cdh5.1"
       - "cm5.1"
+      - "cm5.3"
       - "ahw2.1"
+      - "ahw2.2"
 
     jobs:
       - traf-publish
@@ -45,9 +46,10 @@
     github-org: trafodion
 
     dist:
-      - "cdh5.1"
       - "cm5.1"
+      - "cm5.3"
       - "ahw2.1"
+      - "ahw2.2"
 
     jobs:
       - gate-{name}-check-for-binary
@@ -58,9 +60,10 @@
     github-org: trafodion
 
     dist:
-      - "cdh5.1"
       - "cm5.1"
+      - "cm5.3"
       - "ahw2.1"
+      - "ahw2.2"
 
     jobs:
       - gate-{name}-check-for-binary

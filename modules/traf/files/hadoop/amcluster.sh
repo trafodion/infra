@@ -131,7 +131,14 @@ then
 fi
 
 # Create Services 
-for serv in HDFS HIVE HBASE ZOOKEEPER MAPREDUCE2 YARN WEBHCAT HCATALOG TEZ
+if [[ $Vers == "HDP-2.1" ]]
+then
+  services="HDFS HIVE HBASE ZOOKEEPER MAPREDUCE2 YARN WEBHCAT HCATALOG TEZ"
+else
+  services="HDFS HIVE HBASE ZOOKEEPER MAPREDUCE2 YARN TEZ"
+fi
+
+for serv in $services
 do
   Service="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.service_name')"
 
@@ -151,20 +158,28 @@ done
 
 # Configurations
 
-for ctype in capacity-scheduler core-site global hbase-log4j hbase-site hdfs-log4j hdfs-site hive-exec-log4j \
-  hive-log4j hive-site mapred-site mapreduce2-log4j tez-site webhcat-site yarn-log4j yarn-site zoo.cfg zookeeper-log4j
-do
+function initconfig {
+  level=$1  # service level or stack level
+  ctype=$2
+
   ## does the config type exist?
   Config=$(curl $Read "$URL/clusters/trafcluster/configurations?type=${ctype}" | jq -r '.items[0].type')
   if [[ $Config != $ctype ]]
   then
     [[ $mode == "check" ]] && exit 5
     echo "Retrieving stack defaults for config type $ctype"
-    query="configurations/StackConfigurations/type=${ctype}.xml" # retrieve all config properties of this type
-    query+="&fields=configurations/StackConfigurations/property_value" # value field not shown by default
+    if [[ $level == "service" ]]
+    then
+      query="services?configurations/StackConfigurations/type=${ctype}.xml" # retrieve all config properties of this type
+      query+="&fields=configurations/StackConfigurations/property_value" # value field not shown by default
+      jsonparse='.items[].configurations[].StackConfigurations|{(.property_name):.property_value}'
+    else
+      query="configurations?StackLevelConfigurations/type=${ctype}.xml" 
+      query+="&fields=StackLevelConfigurations/property_value" 
+      jsonparse='.items[].StackLevelConfigurations|{(.property_name):.property_value}'
+    fi
     # parse to give property name-value pairs
-    Props=$(curl $Read "$URL/stacks/$Stack/services?$query" | \
-      	     jq -r '.items[].configurations[].StackConfigurations|{(.property_name):.property_value}')
+    Props=$(curl $Read "$URL/stacks/$Stack/$query" | jq -r $jsonparse)
     # change format to single list
     Proplist=$(echo $Props | sed 's/}\s*{/,/g')
     [[ -z "$Proplist" ]] && Proplist="{}"
@@ -203,8 +218,30 @@ do
       exit 2
     fi
   fi
+}
+
+if [[ $Vers == "HDP-2.1" ]]
+then
+  conftypes="capacity-scheduler core-site global hbase-log4j hbase-site hdfs-log4j hdfs-site hive-exec-log4j"
+  conftypes+=" hive-log4j hive-site mapred-site mapreduce2-log4j tez-site webhcat-site yarn-log4j yarn-site"
+  conftypes+=" zoo.cfg zookeeper-log4j"
+else
+  # global replaced by *-env
+  conftypes="capacity-scheduler core-site hadoop-env hbase-log4j hbase-site hbase-env hcat-env hdfs-log4j hdfs-site"
+  conftypes+=" hive-env hive-exec-log4j hive-log4j hive-site mapred-env mapred-site tez-env tez-site"
+  conftypes+=" webhcat-env webhcat-site yarn-env yarn-log4j yarn-site zoo.cfg zookeeper-env zookeeper-log4j"
+fi
+
+for ctype in $conftypes
+do
+  initconfig "service" "$ctype"
 done
 
+# cluster env replacing global
+if [[ $Vers != "HDP-2.1" ]]
+then
+  initconfig "stack" "cluster-env"
+fi
 
 # Local non-default config changes
 
@@ -229,21 +266,37 @@ function setconfig {
 
 # single-node setting
 setconfig hdfs-site dfs.replication 1
-# these not in the defaults for some reason
-setconfig global user_group "hadoop"
-setconfig global proxyuser_group "users"
-setconfig global smokeuser "ambari-qa"
-# java heapsize default was "1024" for most services, but
-# a unit is expected on some. On others, ambari scripts add it.
-# These are the ones that need it added. AMBARI-4933
-setconfig global "dtnode_heapsize" "1024m"
-setconfig global "namenode_heapsize" "1024m"
-setconfig global "namenode_opt_newsize" "200m"
-setconfig global "namenode_opt_maxnewsize" "200m"
-setconfig global "hbase_master_heapsize" "1024m"
-setconfig global "hbase_regionserver_heapsize" "1024m"
 
-setconfig global "hive_metastore_user_passwd" "notsecure"
+if [[ $Vers == "HDP-2.1" ]]
+then
+  # these not in the defaults for some reason
+  setconfig global user_group "hadoop"
+  setconfig global proxyuser_group "users"
+  setconfig global smokeuser "ambari-qa"
+  # java heapsize default was "1024" for most services, but
+  # a unit is expected on some. On others, ambari scripts add it.
+  # These are the ones that need it added. AMBARI-4933
+  setconfig global "dtnode_heapsize" "1024m"
+  setconfig global "namenode_heapsize" "1024m"
+  setconfig global "namenode_opt_newsize" "200m"
+  setconfig global "namenode_opt_maxnewsize" "200m"
+  setconfig global "hbase_master_heapsize" "1024m"
+  setconfig global "hbase_regionserver_heapsize" "1024m"
+else
+  setconfig hadoop-env "dtnode_heapsize" "1024m"
+  setconfig hadoop-env "namenode_heapsize" "1024m"
+  setconfig hadoop-env "namenode_opt_newsize" "200m"
+  setconfig hadoop-env "namenode_opt_maxnewsize" "200m"
+  setconfig hbase-env "hbase_master_heapsize" "1024m"
+  setconfig hbase-env "hbase_regionserver_heapsize" "1024m"
+fi
+
+if [[ $Vers == "HDP-2.1" ]]
+then
+  setconfig global "hive_metastore_user_passwd" "notsecure"
+else
+  setconfig hive-site "hive_metastore_user_passwd" "notsecure"
+fi
 setconfig hive-site "javax.jdo.option.ConnectionPassword" "notsecure"
 
 rm -f doSet_*.json # clean up temp files left by configs.sh
@@ -255,13 +308,18 @@ reqinstall='{"HostRoles" : {"state" : "INSTALLED" }}'
 
 # order matters somewhat
 # e.g., yarn resource manager must before mapreduce client
+if [[ $Vers == "HDP-2.1" ]]
+then
+  hcat="WEBHCAT:WEBHCAT_SERVER HCATALOG:HCAT"
+else
+  hcat="HIVE:WEBHCAT_SERVER HIVE:HCAT"
+fi
+
 for sc in HDFS:DATANODE HDFS:NAMENODE HDFS:SECONDARY_NAMENODE HDFS:HDFS_CLIENT \
       ZOOKEEPER:ZOOKEEPER_SERVER \
       YARN:APP_TIMELINE_SERVER YARN:NODEMANAGER YARN:RESOURCEMANAGER YARN:YARN_CLIENT \
       MAPREDUCE2:HISTORYSERVER MAPREDUCE2:MAPREDUCE2_CLIENT \
-      HIVE:HIVE_METASTORE HIVE:HIVE_SERVER HIVE:MYSQL_SERVER HIVE:HIVE_CLIENT \
-      WEBHCAT:WEBHCAT_SERVER \
-      HCATALOG:HCAT \
+      HIVE:HIVE_SERVER HIVE:MYSQL_SERVER HIVE:HIVE_METASTORE HIVE:HIVE_CLIENT $hcat \
       HBASE:HBASE_MASTER HBASE:HBASE_REGIONSERVER HBASE:HBASE_CLIENT \
       TEZ:TEZ_CLIENT
 do
@@ -315,7 +373,14 @@ reqSTART='{"RequestInfo": {"context" :"Initial Start"}, "Body": {"ServiceInfo": 
 
 # required for services with master or slave components
 # not for those that have only client components (e.g. TEZ)
-for serv in ZOOKEEPER HDFS YARN MAPREDUCE2 HIVE WEBHCAT HBASE
+if [[ $Vers == "HDP-2.1" ]]
+then
+  servers="ZOOKEEPER HDFS YARN MAPREDUCE2 HIVE WEBHCAT HBASE"
+else
+  servers="ZOOKEEPER HDFS YARN MAPREDUCE2 HIVE HBASE"
+fi
+
+for serv in $servers
 do
   State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
   if [[ $State != "STARTED" ]]
