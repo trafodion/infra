@@ -261,7 +261,7 @@
 
     wrappers:
       - timeout:
-          timeout: 75
+          timeout: 95
           fail: true
       - timestamps
 
