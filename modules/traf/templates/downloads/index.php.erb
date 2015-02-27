@@ -6,14 +6,11 @@
     header("Expires: " . gmdate("D, d M Y H:i:s") . " GMT");
 ?>
 
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <title>Trafodion Downloads</title>
-    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-store, no-cache" />
-    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 
     <script type="text/javascript" src="http://status.<%= domain %>/common.js"></script>
     <script type="text/javascript" src="http://status.<%= domain %>/jquery.min.js"></script>
@@ -26,24 +23,24 @@
       ga('create','UA-52287605-1','auto');ga('send','pageview');
       $(document).ready(function(){$(".postlink").postlink();});
       (function($){$.fn.extend({postlink:function(){return this.each(function() {
-      $(this).click(function(e){ga('send','event','downloads',$(this).attr('fn'),$(this).attr('rn'),1);
-      var frm = $("<form>");frm.attr({'action':'getfile.php','method':'post'});
-      frm.append('<input type="hidden" name="token" value="'+$(this).attr('token')+'" />');frm.appendTo("body");
-      setTimeout(function(){frm.submit();},400);e.preventDefault();});});}});})(jQuery);
+      $(this).click(function(e){var arr = $(this).attr('data-f').split('/');
+      ga('send','event','downloads',$(this).attr('data-f'),arr[0],1);var frm = $("<form>");
+      frm.attr({'action':'http://cdn.<%= domain %>/'+$(this).attr('data-f'),'method':'get'});
+      frm.appendTo("body");setTimeout(function(){frm.submit();},400);e.preventDefault();});});}});})(jQuery);
     /* ]]> */
     </script>
 
     <!-- Google Fonts -->
-    <link href="http://fonts.googleapis.com/css?family=PT+Sans&amp;subset=latin" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=PT+Sans&amp;subset=latin" rel="stylesheet" type="text/css" />
     <!-- Framework CSS -->
-    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/screen.css" type="text/css" media="screen, projection">
-    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/print.css" type="text/css" media="print">
+    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/screen.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/print.css" type="text/css" media="print" />
     <!-- IE CSS -->
-    <!--[if lt IE 8]><link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    <!--[if lt IE 8]><link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/ie.css" type="text/css" media="screen, projection" /><![endif]-->
     <!-- Page Specific CSS -->
-    <link rel="stylesheet" type="text/css" href="http://status.<%= domain %>/themes/trafodion/css/main.css">
+    <link rel="stylesheet" type="text/css" href="http://status.<%= domain %>/themes/trafodion/css/main.css" />
     <style type="text/css">
-        a:link {
+        a, a:link {
             color: #204A87;
         }
         li.empty {
@@ -58,77 +55,63 @@
     <div id="message-container">
         <div class="container">
             <div class="span-12 last">
-                <p id="message"/>
+                <p id="message">
                 </p>
             </div>
         </div>
     </div>
     <?php
         /**
-         * Scan directory recursively for files with certain extension.
+         * Callback function to match release items
          *
-         * Scan directory recursively for files with certain extension. 
-         * Return an array of found files.
-         *
-         * @param string $dir      Directory to start scanning files from
-         * @param bool $onlyFiles  Return only files?
-         * @param bool $fullPath   Return the full path of files/directories?
-         * @return array           Array of files/directories
+         * @param string $var   Path to file.
          */
-        function scanDirectory($dir, $onlyFiles = false, $fullPath = false) {
-            $pattern = '/\.(pdf|txt|pom|xml|cab|exe|gz|gzip|jar|msi|tar|tgz|zip|md5|sha1)$/';
-            if (isset($dir) && is_readable($dir)) {
-                $dlist = Array();
-                $dir = realpath($dir);
-                if ($onlyFiles) {
-                    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS));
-                } else {
-                    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
-                }
-
-                foreach($objects as $entry => $object) {
-                    if (!$fullPath) {
-                        $entry = str_replace($dir, '', $entry);
-                    }
-                    $dlist[] = $entry;
-                }
-
-                $mlist = preg_grep($pattern, $dlist);
-                return $mlist;
-            }
-        }
-
-        // callback function to match directory publish/release
         function release($var) {
-            if (strpos($var, 'publish/release') !== false) {
+            if (substr($var, 0, strlen("release/")) === "release/") {
                 return true;
             }
         }
 
-        // callback function to match directory publish/old-release
+        /**
+         * Callback function to match old-release items
+         *
+         * @param string $var   Path to file.
+         */
         function oldrelease($var) {
-            if (strpos($var, 'publish/old-release') !== false) {
+            if (substr($var, 0, strlen("old-release/")) === "old-release/") {
                 return true;
             }
         }
 
-        // callback function to match directory publish/pre-release
+        /**
+         * Callback function to match pre-release items
+         *
+         * @param string $var   Path to file.
+         */
         function prerelease($var) {
-            if (strpos($var, 'publish/pre-release') !== false) {
+            if (substr($var, 0, strlen("pre-release/")) === "pre-release/") {
                 return true;
             }
         }
 
-        // callback function to match directory publish/daily
+        /**
+         * Callback function to match daily items
+         *
+         * @param string $var   Path to file.
+         */
         function daily($var) {
-            if (strpos($var, 'publish/daily') !== false) {
+            if (substr($var, 0, strlen("daily/")) === "daily/") {
                 return true;
             }
         }
 
-        // callback function to match directory publish/opencart
+        /**
+         * Callback function to match opencart items
+         *
+         * @param string $var   Path to file.
+         */
         function opencart($var) {
-            if (strpos($var, 'publish/opencart') !== false) {
+            if (substr($var, 0, strlen("opencart/")) === "opencart/") {
                 return true;
             }
         }
@@ -144,112 +127,139 @@
          *                       instead of a list of files.
          */ 
         function print_links($item, $key, $rType) {
-            if (is_file($item) === true && $rType != "empty_list") {
+            if ($rType != "empty_list") {
                 $shortFname = basename($item);
-                list($z, $shortPath) = split('trafodion/publish/' . $rType . '/', $item);
-                $fName = $rType . '/' . $shortPath;
-                $salt = "<%= download_salt %>";
-                $cipher = "<%= download_cipher %>";
-                $ivSize = openssl_cipher_iv_length($cipher);
-                $iv = bin2hex(openssl_random_pseudo_bytes($ivSize / 2));
-                $hashFname = openssl_encrypt($fName, $cipher, $salt, 0, $iv);
-                echo '<li><a class="postlink" href="#" target="_blank" rn="' . $rType . '" fn="' . $fName . '" token="' . $iv . $hashFname . '">' . $shortFname . '</a></li>' . PHP_EOL;
+                $fName = $item;
+                echo '<li><a class="postlink" href="#" target="_blank" data-f="' . $fName . '">' . $shortFname . '</a></li>' . PHP_EOL;
             } else {
                 echo '<li class="empty">&nbsp;</li>' . PHP_EOL;
             }
         }
 
+
         #
         # main
         #
+
         $scriptPath = __DIR__;
-        $wPath = realpath($scriptPath . "/../downloads/trafodion/publish");
 
-        // call scanDirectory function to iterate through directory structure
-        $fArrayTemp = scanDirectory($wPath, true, true);
-        natsort($fArrayTemp);
-        $fArray = array_reverse($fArrayTemp);
+        # include HTTPFUL PHP REST Library
+        include ($scriptPath . '/lib/httpful.phar');
 
-        // create array for release
+        $swiftUser = '<%= cloud_auto_user %>';
+        $swiftPassword = '<%= cloud_auto_passwd %>';
+        $projectId = '10370712109815';
+        $tokenURI = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v3/auth/tokens';
+        $getSwiftURI = 'https://region-a.geo-1.objects.hpcloudsvc.com/v1/10370712109815/trafcdn';
+
+        # generate JSON for fetching getting authentication token
+        $tokenJson =  '{"auth":{"identity":{"methods":["password"],"password":{"user":{"name":"' . $swiftUser 
+                      . '","password":"' . $swiftPassword . '"}}},"scope":{"project":{"id":"' . $projectId . '"}}}}';
+
+        # get authentication token
+        $tokenResponse = \Httpful\Request::post($tokenURI)
+                         ->sendsJson()
+                         ->body($tokenJson)
+                         ->send();
+        $token = $tokenResponse->headers['x-subject-token'];
+
+        # override default JSON handler with one that encodes the results as an array
+        # this will apply to all new requests
+        \Httpful\Httpful::register(\Httpful\Mime::JSON, new \Httpful\Handlers\JsonHandler(array('decode_as_array' => true)));
+
+        # get list of all files in trafcdn
+        $releaseResponse = \Httpful\Request::get($getSwiftURI)
+                           ->expectsJson()
+                           ->addHeader('X-Auth-Token', $token)
+                           ->send();
+
+        # parse releaseResponse into an array but exclude all directories like opencart, release, etc.
+        $tCdnArray = array();
+        foreach ($releaseResponse->body as $releaseItem) {
+            if (preg_match('/^.*\.[^\W_]{2,}$/', $releaseItem['name'])) {
+                $tCdnArray[] = $releaseItem['name'];
+            }
+        }
+
+        # natural sort the generated array then reverse it
+        natsort($tCdnArray);
+        $cdnArray = array_reverse($tCdnArray);
+
+        # Create array for releases
         echo '<div class="span-8">' . PHP_EOL;
         echo '    <h2 class="subhead">Current Release</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
-        $releaseArray = array_filter($fArray, "release");
+        $releaseArray = array_filter($cdnArray, "release");
         array_walk($releaseArray, 'print_links', 'release');
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
-        /*
-         * Create array for previous releases
-         * If oldreleaseArray is empty print empty links using releaseArray which comes right before it.
-         * If oldreleaseArray is smaller than releaseArray then pad oldreleaseArray before printing. 
-         * NOTE: Printing empty links preserves the layout of the page.
-         */ 
+        # Create array for previous releases
+        # If oldreleaseArray is empty print empty links using releaseArray which comes right before it.
+        # If oldreleaseArray is smaller than releaseArray then pad oldreleaseArray before printing. 
+        # NOTE: Printing empty links preserves the layout of the page.
         echo '<div class="span-8">' . PHP_EOL;
         echo '    <h2 class="subhead">Previous Releases</h2>' . PHP_EOL;
-        echo '    <p><ul>' . PHP_EOL;
-        $oldreleaseArray = array_filter($fArray, "oldrelease");
+        echo '    <ul>' . PHP_EOL;
+        $oldreleaseArray = array_filter($cdnArray, "oldrelease");
         if (sizeof($oldreleaseArray) === 0) {
             array_walk($releaseArray, 'print_links', 'empty_list');
         } else if (sizeof($oldreleaseArray) >= sizeof($releaseArray)) {
             array_walk($oldreleaseArray, 'print_links', 'old-release');
         } else {
-            // pad prereleaseArray to size of releaseArray
+            # pad prereleaseArray to size of releaseArray
             $arraySizeDiff = sizeof($releaseArray) - sizeof($oldreleaseArray);
             for ($i = 1; $i <= $arraySizeDiff; $i++) {
                 $oldreleaseArray[] = 'empty';
             }
             array_walk($oldreleaseArray, 'print_links', 'old-release');
         }
-        echo '    </ul></p>' . PHP_EOL;
+        echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
-        /*
-         * Create array for pre-release
-         * If prereleaseArray is empty print empty links using oldreleaseArray which comes right before it.
-         * If prereleaseArray is smaller than oldreleaseArray then pad prereleaseArray before printing. 
-         * NOTE: Printing empty links preserves the layout of the page.
-         */ 
+        # Create array for pre-release
+        # If prereleaseArray is empty print empty links using oldreleaseArray which comes right before it.
+        # If prereleaseArray is smaller than oldreleaseArray then pad prereleaseArray before printing. 
+        # NOTE: Printing empty links preserves the layout of the page.
         echo '<div class="span-8 last">' . PHP_EOL;
         echo '    <h2 class="subhead">Pre-Release</h2>' . PHP_EOL;
-        echo '    <p><ul>' . PHP_EOL;
-        $prereleaseArray = array_filter($fArray, "prerelease");
+        echo '    <ul>' . PHP_EOL;
+        $prereleaseArray = array_filter($cdnArray, "prerelease");
         if (sizeof($prereleaseArray) === 0) {
             array_walk($oldreleaseArray, 'print_links', 'empty_list');
         } else if (sizeof($prereleaseArray) >= sizeof($oldreleaseArray)) {
             array_walk($prereleaseArray, 'print_links', 'pre-release');
         } else {
-            // pad prereleaseArray to size of oldreleaseArray
+            # pad prereleaseArray to size of oldreleaseArray
             $arraySizeDiff = sizeof($oldreleaseArray) - sizeof($prereleaseArray);
             for ($i = 1; $i <= $arraySizeDiff; $i++) {
                 $prereleaseArray[] = 'empty';
             }
             array_walk($prereleaseArray, 'print_links', 'pre-release');
         }
-        echo '    </ul></p>' . PHP_EOL;
+        echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
-        // create array for daily
+        # Create array for daily
         echo '<div class="span-11">' . PHP_EOL;
         echo '    <h2 class="subhead">Daily</h2>' . PHP_EOL;
-        echo '    <p><ul>' . PHP_EOL;
-        $dailyArray = array_filter($fArray, "daily");
+        echo '    <ul>' . PHP_EOL;
+        $dailyArray = array_filter($cdnArray, "daily");
         array_walk($dailyArray, 'print_links', 'daily');
-        echo '    </ul></p>' . PHP_EOL;
+        echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
-        // create array for OpenCart
+        # Create array for OpenCart
         echo '<div class="span-11 last">' . PHP_EOL;
         echo '    <h2 class="subhead">OpenCart Demo</h2>' . PHP_EOL;
-        echo '    <p><ul>' . PHP_EOL;
-        $opencartArray = array_filter($fArray, "opencart");
+        echo '    <ul>' . PHP_EOL;
+        $opencartArray = array_filter($cdnArray, "opencart");
         array_walk($opencartArray, 'print_links', 'opencart');
-        echo '    </ul></p>' . PHP_EOL;
+        echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
     ?>
-    </p></div>
+    </div> <!-- End div class"container" -->
     <script type="text/javascript">footer();</script>
   </body>
 </html>
-
