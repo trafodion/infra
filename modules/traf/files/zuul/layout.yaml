@@ -174,6 +174,93 @@ jobs:
     voting: false
   - name: ^.*-jjb-lint
     voting: false
+  # daily build will have no branch, so will not skip any configs
+  # daily also defaults to master, so make sure jobs are compatible
+  # master branch installer should be tested with both master & stable branch core/dcs
+  - name: ^.*-ahw2.2$
+    skip-if:
+      - branch: ^(master|stable/1.0)$
+  - name: ^.*-cm5.3$
+    skip-if:
+      - branch: ^(master|stable/1.0)$
+  - name: ^.*-ahw2.1$
+    skip-if:
+      - branch: hbase984
+      # enable these when master branch moves to new distros
+      #  project: ^(?!trafodion/install)$
+  - name: ^.*-cm5.1$
+    skip-if:
+      - branch: hbase984
+      #  project: ^(?!trafodion/install)$
+
+project-templates:
+  - name: core-distro
+    check:
+      - core-regress-core-{HW}
+      - core-regress-seabase-{HW}
+      - phoenix_quick_T4-{HW}
+      - core-build-check-{HW}
+      - jdbc_test-{Cld}
+      - pyodbc_test-{Cld}
+      - gate-core-check-for-binary
+    gate:
+      - core-regress-core-{HW}
+      - core-regress-seabase-{HW}
+      - phoenix_quick_T4-{HW}
+      - core-build-check-{HW}
+      - jdbc_test-{Cld}
+      - pyodbc_test-{Cld}
+      - gate-core-check-for-binary
+    check-full:
+      - phoenix_test_T4-{Cld}
+      - phoenix_test_T2-{HW}
+      - core-regress-charsets-{Cld}
+      - core-regress-qat-{Cld}
+      - core-regress-udr-{Cld}
+      - core-regress-catman1-{HW}
+      - core-regress-compGeneral-{HW}
+      - core-regress-executor-{HW}
+      - core-regress-fullstack2-{Cld}
+      - core-regress-hive-{HW}
+
+  - name: dcs-distro
+    check:
+      - gate-dcs-check-for-binary
+      - dcs-build-{Cld}
+      - phoenix_quick_T4-{HW}
+      - pyodbc_test-{HW}
+      - pyodbc_test-{Cld}
+      - jdbc_test-{HW}
+      - jdbc_test-{Cld}
+    gate:
+      - gate-dcs-check-for-binary
+      - dcs-build-{Cld}
+      - phoenix_quick_T4-{HW}
+      - pyodbc_test-{HW}
+      - pyodbc_test-{Cld}
+      - jdbc_test-{HW}
+      - jdbc_test-{Cld}
+    check-full:
+      - phoenix_test_T4-{Cld}
+      - phoenix_test_T2-{Cld}
+      - phoenix_test_T4-{HW}
+      - phoenix_test_T2-{HW}
+
+  - name: phxtest-distro
+    check:
+      - gate-phoenix_test-check-for-binary
+      - phoenix_part1_T4-{HW}
+      - phoenix_part2_T4-{Cld}
+      - phoenix_part1_T2-{Cld}
+      - phoenix_part2_T2-{HW}
+
+    gate:
+      - gate-phoenix_test-check-for-binary
+      - phoenix_part1_T4-{HW}
+      - phoenix_part2_T4-{Cld}
+      - phoenix_part1_T2-{Cld}
+      - phoenix_part2_T2-{HW}
+
 
 projects:
   - name: trafodion/sandbox
@@ -187,33 +274,13 @@ projects:
       - gate-sandbox-jjb-lint
 
   - name: trafodion/core
-    check:
-      - core-regress-core-ahw2.1
-      - core-regress-seabase-ahw2.1
-      - phoenix_quick_T4-ahw2.1
-      - core-build-check-ahw2.1
-      - jdbc_test-cm5.1
-      - pyodbc_test-cm5.1
-      - gate-core-check-for-binary
-    check-full:
-      - phoenix_test_T4-cm5.1
-      - phoenix_test_T2-ahw2.1
-      - core-regress-charsets-cm5.1
-      - core-regress-qat-cm5.1
-      - core-regress-udr-cm5.1
-      - core-regress-catman1-ahw2.1
-      - core-regress-compGeneral-ahw2.1
-      - core-regress-executor-ahw2.1
-      - core-regress-fullstack2-cm5.1
-      - core-regress-hive-ahw2.1
-    gate:
-      - core-regress-core-ahw2.1
-      - core-regress-seabase-ahw2.1
-      - phoenix_quick_T4-ahw2.1
-      - jdbc_test-cm5.1
-      - pyodbc_test-cm5.1
-      - gate-core-check-for-binary
-      - core-build-check-ahw2.1
+    template:
+     - name: core-distro
+       HW: ahw2.1
+       Cld: cm5.1
+     - name: core-distro
+       HW: ahw2.2
+       Cld: cm5.3
     daily:
       - traf-pub-release
       - traf-pub-debug
@@ -270,27 +337,13 @@ projects:
       - pyodbc_test-cm5.1
 
   - name: trafodion/dcs
-    check:
-      - gate-dcs-check-for-binary
-      - dcs-build
-      - phoenix_quick_T4-ahw2.1
-      - pyodbc_test-ahw2.1
-      - pyodbc_test-cm5.1
-      - jdbc_test-ahw2.1
-      - jdbc_test-cm5.1
-    gate:
-      - gate-dcs-check-for-binary
-      - dcs-build
-      - phoenix_quick_T4-ahw2.1
-      - pyodbc_test-ahw2.1
-      - pyodbc_test-cm5.1
-      - jdbc_test-ahw2.1
-      - jdbc_test-cm5.1
-    check-full:
-      - phoenix_test_T4-cm5.1
-      - phoenix_test_T2-cm5.1
-      - phoenix_test_T4-ahw2.1
-      - phoenix_test_T2-ahw2.1
+    template:
+     - name: dcs-distro
+       HW: ahw2.1
+       Cld: cm5.1
+     - name: dcs-distro
+       HW: ahw2.2
+       Cld: cm5.3
 
   - name: trafodion/infra
     check:
@@ -311,19 +364,13 @@ projects:
       - gate-noop
 
   - name: trafodion/phoenix_test
-    check:
-      - gate-phoenix_test-check-for-binary
-      - phoenix_part1_T4-ahw2.1
-      - phoenix_part2_T4-cm5.1
-      - phoenix_part1_T2-cm5.1
-      - phoenix_part2_T2-ahw2.1
-
-    gate:
-      - gate-phoenix_test-check-for-binary
-      - phoenix_part1_T4-ahw2.1
-      - phoenix_part2_T4-cm5.1
-      - phoenix_part1_T2-cm5.1
-      - phoenix_part2_T2-ahw2.1
+    template:
+     - name: phxtest-distro
+       HW: ahw2.1
+       Cld: cm5.1
+     - name: phxtest-distro
+       HW: ahw2.2
+       Cld: cm5.3
 
   - name: trafodion/install
     check:
@@ -333,6 +380,9 @@ projects:
       - gate-install-check-for-binary
       - pyodbc_test-cm5.1
       - jdbc_test-ahw2.1
+      #When hbase 98.4 is on master, enable these jobs
+      #- pyodbc_test-cm5.3
+      #- jdbc_test-ahw2.2
       - installer-build
     daily:
       - installer-pub
