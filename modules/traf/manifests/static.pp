@@ -448,6 +448,18 @@ class traf::static (
     require => File["${server_path}/status/zuul"],
   }
 
+  file { "${server_path}/status/zuul/black.png":
+    ensure  => present,
+    source  => 'puppet:///modules/traf/zuul/black.png',
+    require => File["${server_path}/status/zuul"],
+  }
+
+  file { "${server_path}/status/zuul/grey.png":
+    ensure  => present,
+    source  => 'puppet:///modules/traf/zuul/grey.png',
+    require => File["${server_path}/status/zuul"],
+  }
+
   file { "${server_path}/status/zuul/line-angle.png":
     ensure  => present,
     source  => 'puppet:///modules/traf/zuul/line-angle.png',
