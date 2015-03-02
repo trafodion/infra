@@ -104,6 +104,13 @@ class traf::static (
     group  => 'www-data',
   }
 
+  file { "${server_path}/downloads-www/lib":
+    ensure  => directory,
+    owner   => 'www-data',
+    group   => 'www-data',
+    require => File["${server_path}/downloads-www"],
+  }
+
   file { "${server_path}/downloads-www/favicon.ico":
     ensure  => present,
     owner   => 'www-data',
@@ -128,16 +135,20 @@ class traf::static (
     require => File["${server_path}/downloads-www"],
   }
 
-  file { "${server_path}/downloads-www/downloading.php":
-    ensure  => absent,
-  }
-
   file { "${server_path}/downloads-www/getfile.php":
     ensure  => file,
     owner   => 'www-data',
     group   => 'www-data',
     content => template('traf/downloads/getfile.php.erb'),
     require => File["${server_path}/downloads-www"],
+  }
+
+  exec { 'get-httpful-phar':
+    command => "/usr/bin/curl http://phphttpclient.com/downloads/httpful.phar > ${server_path}/downloads-www/lib/httpful.phar",
+    cwd     => "${server_path}/downloads-www/lib",
+    creates => "${server_path}/downloads-www/lib/httpful.phar",
+    require => [Package['curl'],
+                File["${server_path}/downloads-www/lib"]],
   }
 
   # actual location of files to download
@@ -351,7 +362,7 @@ class traf::static (
   exec { 'get-jquery-visibility.min':
     command => '/usr/bin/curl https://raw.github.com/mathiasbynens/jquery-visibility/v1.0.6/jquery-visibility.min.js > /opt/jquery-visibility/jquery-visibility.min.js',
     require => [Package['curl'],
-                    Vcsrepo['/opt/jquery-visibility']],
+                Vcsrepo['/opt/jquery-visibility']],
     cwd     => '/opt/jquery-visibility',
     creates => '/opt/jquery-visibility/jquery-visibility.min.js',
   }
