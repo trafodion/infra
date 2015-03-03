@@ -46,6 +46,7 @@
       - git-log
       - traf-make-log
       - traf-regress-log
+      - copy-system-logs
       - traf-runtime-log
 
 - job-template:
@@ -211,6 +212,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 - job-template:
@@ -253,6 +255,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 - job-template:
@@ -295,6 +298,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 - job-template:
@@ -337,6 +341,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 - job-template:
@@ -379,6 +384,7 @@
       - traf-make-log
       - git-log
       - phoenix_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 # For pyodbc_test* jobs parameter tests1 should contain a list of tests seperated by a space. For instance : test_p2.ConnectTest.test11 test_p2.ConnectTest.test12
@@ -417,6 +423,7 @@
       - console-log
       - git-log
       - pyodbc_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 - job-template:
@@ -452,6 +459,7 @@
       - console-log
       - git-log
       - pyodbc_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 # For jdbc_test* jobs parameter tests1 should start with "--testes=" and contain a list of
@@ -494,6 +502,7 @@
       - traf-make-log
       - git-log
       - jdbc_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 - job-template:
@@ -530,6 +539,7 @@
       - traf-make-log
       - git-log
       - jdbc_test-log
+      - copy-system-logs
       - traf-runtime-log
 
 # Simple file type check can run on master

@@ -499,3 +499,12 @@
                 done
                 exit $res
 
+- publisher:
+    name: copy-system-logs
+    publishers:
+      - postbuildscript:
+          builders:
+            - shell: |
+                #!/bin/bash
+                mkdir -p $WORKSPACE/hbase-logs
+                cp -r /var/log/hbase/* $WORKSPACE/hbase-logs/

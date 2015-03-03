@@ -44,7 +44,4 @@ else
   rc=$?
 fi
 
-mkdir $WORKSPACE/hbase-logs
-cp /var/log/hbase/* $WORKSPACE/hbase-logs/
-
 exit $rc
