@@ -130,8 +130,8 @@
       - traf-release-tar
 
 - job-template:
-    name: 'dcs-build'
-    node: 'redhat'
+    name: 'dcs-build-{dist}'
+    node: 'redhat_{dist}'
 
     builders:
       - link-logs

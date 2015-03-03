@@ -67,7 +67,7 @@
 
     jobs:
       - gate-{name}-check-for-binary
-      - dcs-build
+      - dcs-build-{dist}
       - jdbc_test-{dist}
       - pyodbc_test-{dist}
 
