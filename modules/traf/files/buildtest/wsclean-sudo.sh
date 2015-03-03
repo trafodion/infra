@@ -38,3 +38,7 @@ fi
 # root will delete these
 rm -rf $WORKSPACE/phx_test_run $WORKSPACE/traf_run
 rm -rf $WORKSPACE/rundir $WORKSPACE/sql-regress-logs
+
+# clean trafodion previous versions that installer generates
+# to prevent using all root disk space
+rm -rf /usr/lib/trafodion

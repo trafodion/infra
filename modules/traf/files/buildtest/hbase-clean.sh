@@ -198,6 +198,12 @@ then
     done
   fi
 
+  # make sure we are not in HDFS safemode
+  mode="$(hdfs dfsadmin -safemode get)"
+  if [[ $mode =~ ON ]]
+  then
+    sudo -u hdfs dfsadmin -safemode leave
+  fi
 
   ####
   # Clear Data
