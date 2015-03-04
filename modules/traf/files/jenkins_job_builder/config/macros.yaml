@@ -493,7 +493,7 @@
                 do
                   # make sure there are actually files
                   if [[ $(find $dirname -type f | wc -l) -ne 0 ]]; then
-                    /usr/local/bin/useObjectStorage.sh -cu $dirName
+                    sudo -n /usr/local/bin/useObjectStorage.sh -cu $dirName
                     (( res += $? ))
                   fi
                 done

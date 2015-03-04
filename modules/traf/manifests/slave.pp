@@ -113,6 +113,15 @@ class traf::slave (
     require => [ Sshkey['logs.trafodion.org'], Mount['/home/jenkins'] ],
   }
 
+  # allow Jenkins to run script to upload files to CDN
+  file { '/etc/sudoers.d/jenkins-sudo-cdn':
+    ensure => present,
+    source => 'puppet:///modules/traf/jenkins/jenkins-sudo-cdn.sudo',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0440',
+  }
+
 
   include jenkins::cgroups
 
