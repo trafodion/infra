@@ -503,6 +503,8 @@
     name: copy-system-logs
     publishers:
       - postbuildscript:
+          script-only-if-succeeded: false
+          script-only-if-failed: false
           builders:
             - shell: |
                 #!/bin/bash
