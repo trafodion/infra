@@ -20,6 +20,7 @@ node default {
 # Long lived servers:
 #
 node 'review.trafodion.org' {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::review':
     github_oauth_token              => hiera('gerrit_github_token', 'XXX'),
     github_project_username         => hiera('github_project_username', 'username'),
@@ -58,20 +59,6 @@ node 'review.trafodion.org' {
   }
 }
 
-# Jenkins master for US West
-node 'jenkins01.trafodion.org' {
-  class { 'traf::jenkins':
-    jenkins_jobs_password   => hiera('jenkins_jobs_password'),
-    jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
-    ssl_cert_file_contents  => hiera('jenkins01_ssl_cert_file_contents'),
-    ssl_key_file_contents   => hiera('jenkins01_ssl_key_file_contents'),
-    ssl_chain_file_contents => hiera('ssl_chain_file_contents'),
-    sysadmins               => hiera('sysadmins'),
-    #zmq_event_receivers     => ['logstash.openstack.org',],
-    #zmq_event_receivers     => ['nodepool.trafodion.org',
-    #],
-  }
-}
 
 # Jenkins master for US East
 node 'jenkins02.trafodion.org' {
@@ -102,6 +89,7 @@ node 'puppet3.trafodion.org' {
 }
 
 node 'wiki.trafodion.org' {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::wiki':
     wiki_admin_password     => hiera('wiki_admin_password'),
     mysql_root_password     => hiera('wiki_db_password'),
@@ -114,6 +102,7 @@ node 'wiki.trafodion.org' {
 
 # wiki for Beta Access (no anonymous access)
 node 'wiki2.trafodion.org' {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::wiki':
     wiki_admin_password     => hiera('wiki_admin_password'),
     mysql_root_password     => hiera('wiki_db_password'),
@@ -125,6 +114,7 @@ node 'wiki2.trafodion.org' {
 }
 
 node 'dashboard.trafodion.org' {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::dashboard':
     password       => hiera('dashboard_password'),
     mysql_password => hiera('dashboard_mysql_password'),
@@ -167,6 +157,7 @@ node 'zuul.trafodion.org' {
 # A machine to serve static content.
 # For instance, domain home page, ftp server, etc.
 node 'static.trafodion.org' {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::static':
     sysadmins                     => hiera('sysadmins'),
     reviewday_rsa_key_contents    => hiera('reviewday_rsa_key_contents'),
@@ -193,6 +184,7 @@ node 'graphite.trafodion.org' {
 
 # LDAP server config
 node /^ldap\d\d.trafodion.org$/ {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::ldap':
     sysadmins         => hiera('sysadmins'),
   }
@@ -202,19 +194,6 @@ node /^ldap\d\d.trafodion.org$/ {
 #
 # Jenkins slaves:
 #
-
-# Cloudera5.1
-node /^slave-cdh51-\d\d.trafodion.org$/ {
-  include traf
-  include traf::puppet_cron
-  class { 'traf::slave':
-    ssh_key     => $traf::jenkins_ssh_key,
-    logs_host   => hiera('static_host_key'),
-    sysadmins   => hiera('sysadmins'),
-    hive_sql_pw => hiera('hive_sql_pw'),
-    distro      => 'CDH5.1',
-  }
-}
 
 # CMgr
 node /^slave-cm51-\d\d.trafodion.org$/ {
