@@ -130,7 +130,11 @@
             if ($rType != "empty_list") {
                 $shortFname = basename($item);
                 $fName = $item;
-                echo '<li><a class="postlink" href="#" target="_blank" data-f="' . $fName . '">' . $shortFname . '</a></li>' . PHP_EOL;
+                if ($fName != "empty") {
+                    echo '<li><a class="postlink" href="#" target="_blank" data-f="' . $fName . '">' . $shortFname . '</a></li>' . PHP_EOL;
+                } else {
+                    echo '<li class="empty">&nbsp;</li>' . PHP_EOL;
+                }
             } else {
                 echo '<li class="empty">&nbsp;</li>' . PHP_EOL;
             }
