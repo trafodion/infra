@@ -202,7 +202,7 @@ then
   mode="$(hdfs dfsadmin -safemode get)"
   if [[ $mode =~ ON ]]
   then
-    sudo -u hdfs dfsadmin -safemode leave
+    sudo -u hdfs hdfs dfsadmin -safemode leave
   fi
 
   ####
