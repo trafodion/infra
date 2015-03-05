@@ -29,11 +29,11 @@ NameVirtualHost <%= vhost_name %>:<%= port %>
     Allow from all
   </Location>
 
-  Alias /reviews <%= server_path %>/reviewday
-  Alias /release <%= server_path %>/release
+  Alias /reviews <%= @server_path %>/reviewday
+  Alias /release <%= @server_path %>/release
 
-  <Directory <%= docroot %>>
-    Options <%= options %>
+  <Directory <%= @docroot %>>
+    Options <%= @options %>
     AllowOverride None
     Order allow,deny
     allow from all
@@ -55,8 +55,8 @@ NameVirtualHost <%= vhost_name %>:<%= port %>
       allow from all
   </Directory>
 
-  ErrorLog /var/log/apache2/<%= name %>_error.log
+  ErrorLog /var/log/apache2/<%= @name %>_error.log
   LogLevel warn
-  CustomLog /var/log/apache2/<%= name %>_access.log combined
+  CustomLog /var/log/apache2/<%= @name %>_access.log combined
   ServerSignature Off
 </VirtualHost>

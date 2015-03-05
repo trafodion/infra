@@ -18,9 +18,9 @@ NameVirtualHost *:80
     Order allow,deny
     allow from all
   </Directory>
-  ErrorLog /var/log/apache2/<%= srvname %>_error.log
+  ErrorLog /var/log/apache2/<%= @srvname %>_error.log
   LogLevel warn
-  CustomLog /var/log/apache2/<%= srvname %>_access.log combined
+  CustomLog /var/log/apache2/<%= @srvname %>_access.log combined
 
   # Turn Server Signature Off
   ServerSignature Off
@@ -31,7 +31,7 @@ NameVirtualHost *:80
   # turn on XSendFile
   XSendFile on
   # whitelist certain paths
-  XSendFilePath <%= download_path %>
+  XSendFilePath <%= @download_path %>
 
   # turn on PHP
   php_admin_flag engine On

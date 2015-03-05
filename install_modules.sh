@@ -45,7 +45,7 @@ then
   MODULES["puppetlabs-mysql"]="2.3.1" 
   MODULES["razorsedge-cloudera"]="2.2.1"
   MODULES["puppetlabs-vcsrepo"]="1.2.0"
-  MODULES["puppetlabs-apache"]="0.8.1"   # (0.9+ reqs chgs)
+  MODULES["puppetlabs-apache"]="0.0.4"
   MODULES["puppetlabs-stdlib"]="4.5.1"
   MODULES["saz-memcached"]="2.6.0"
   MODULES["spiette-selinux"]="0.5.4"
