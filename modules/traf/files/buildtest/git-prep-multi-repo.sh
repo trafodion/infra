@@ -24,6 +24,15 @@ log_banner
 
 rm -f Git-Prep.log
 
+# Optional over-ride branch
+# Useful to test cross-branch compatibility
+if [[ $1 == "-b" ]]
+then
+  ZUUL_BRANCH="$2"
+  ZUUL_REF="None"
+  shift 2
+fi
+
 # arguments: repo list
 PROJ_LIST="$*"
 

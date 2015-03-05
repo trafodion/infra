@@ -29,6 +29,11 @@
       - shell: "/usr/local/bin/git-prep-multi-repo.sh {repos}"
 
 - builder:
+    name: multi-git-stable
+    builders:
+      - shell: "/usr/local/bin/git-prep-multi-repo.sh -b {branch} {repos}"
+
+- builder:
     name: clean-workspace
     builders:
       - shell: "/usr/local/bin/wsclean.sh"

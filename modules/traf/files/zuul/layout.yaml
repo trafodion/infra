@@ -176,7 +176,6 @@ jobs:
     voting: false
   # daily build will have no branch, so will not skip any configs
   # daily also defaults to master, so make sure jobs are compatible
-  # master branch installer should be tested with both master & stable branch core/dcs
   - name: ^.*-ahw2.2$
     skip-if:
       - branch: ^(master|stable/1.0)$
@@ -186,12 +185,9 @@ jobs:
   - name: ^.*-ahw2.1$
     skip-if:
       - branch: hbase984
-      # enable these when master branch moves to new distros
-      #  project: ^(?!trafodion/install)$
   - name: ^.*-cm5.1$
     skip-if:
       - branch: hbase984
-      #  project: ^(?!trafodion/install)$
 
 project-templates:
   - name: core-distro
@@ -380,9 +376,11 @@ projects:
       - gate-install-check-for-binary
       - pyodbc_test-cm5.1
       - jdbc_test-ahw2.1
-      #When hbase 98.4 is on master, enable these jobs
+      #When hbase 98.4 is on master, enable these jobs, delete two above
       #- pyodbc_test-cm5.3
       #- jdbc_test-ahw2.2
+      #- pyodbc_test-cm5.1-stable
+      #- jdbc_test-ahw2.1-stable
       - installer-build
     daily:
       - installer-pub

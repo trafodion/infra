@@ -79,6 +79,8 @@
       - gate-{name}-check-for-binary
       - installer-build
       - installer-pub
+      - jdbc_test-ahw2.1-stable
+      - pyodbc_test-cm5.1-stable
 
 - project:
     name: win-odbc64
