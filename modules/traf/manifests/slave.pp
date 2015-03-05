@@ -85,6 +85,38 @@ class traf::slave (
     key          => $logs_host,
   }
 
+  # /etc/hosts entries
+
+  # local subnet for US East slaves
+  host { 'puppet3.trafodion.org':
+    ensure       => present,
+    host_aliases => 'puppet3',
+    ip           => '172.16.0.46',
+  }
+
+  # external IP, dashboard in US West
+  host { 'dashboard.trafodion.org':
+    ensure       => present,
+    host_aliases => 'dashboard',
+    ip           => '15.125.67.175',
+  }
+
+  # new style slave nodes have hostname != certname
+  if $certname =~ /^slave-.*-\d+\.\d+\.\d+\.\d+$/ {
+    # generic slave hostname based on distro
+    case $distro {
+      'AHW2.1': { $slavename = 'slave-ahw21' }
+      'CM5.1':  { $slavename = 'slave-cm51' }
+      'AHW2.2': { $slavename = 'slave-ahw22' }
+      'CM5.3':  { $slavename = 'slave-cm53' }
+    }
+    host { "${slavename}.trafodion.org" :
+      ensure       => present,
+      host_aliases => $slavename,
+      ip           => $ipaddress,
+    }
+  }
+
   # add jenkins public and private ssh keys
   file { '/home/jenkins/.ssh/id_rsa':
     ensure  => present,
@@ -125,91 +157,6 @@ class traf::slave (
 
   include jenkins::cgroups
 
-  # manual install distros - no Ambari, no Cloudera Manager
-  if $distro =~ /^(CDH)/ {
-  # installer will replace this script
-  file { '/etc/sudoers.d/jenkins-sudo-hbase':
-    ensure => present,
-    source => 'puppet:///modules/traf/jenkins/jenkins-sudo-hbase.sudo',
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0440',
-  }
-
-  # installer will take care of this
-  include ulimit
-  ulimit::conf { 'soft limit_jenkins_procs':
-    limit_domain => 'jenkins',
-    limit_type   => 'soft',
-    limit_item   => 'nproc',
-    limit_value  => '267263'
-  }
-  ulimit::conf { 'hard limit_jenkins_procs':
-    limit_domain => 'jenkins',
-    limit_type   => 'hard',
-    limit_item   => 'nproc',
-    limit_value  => '267263'
-  }
-  ulimit::conf { 'soft limit_jenkins_sigs':
-    limit_domain => 'jenkins',
-    limit_type   => 'soft',
-    limit_item   => 'sigpending',
-    limit_value  => '515196'
-  }
-  ulimit::conf { 'hard limit_jenkins_sigs':
-    limit_domain => 'jenkins',
-    limit_type   => 'hard',
-    limit_item   => 'sigpending',
-    limit_value  => '515196'
-  }
-  ulimit::conf { 'soft limit_jenkins_files':
-    limit_domain => 'jenkins',
-    limit_type   => 'soft',
-    limit_item   => 'nofile',
-    limit_value  => '32768'
-  }
-  ulimit::conf { 'hard limit_jenkins_files':
-    limit_domain => 'jenkins',
-    limit_type   => 'hard',
-    limit_item   => 'nofile',
-    limit_value  => '32768'
-  }
-  # 8GB
-  ulimit::conf { 'soft limit_jenkins_mem':
-    limit_domain => 'jenkins',
-    limit_type   => 'soft',
-    limit_item   => 'memlock',
-    limit_value  => '8165112'
-  }
-  # 16 GB
-  ulimit::conf { 'hard limit_jenkins_mem':
-    limit_domain => 'jenkins',
-    limit_type   => 'hard',
-    limit_item   => 'memlock',
-    limit_value  => '16330224'
-  }
-  } # CDH* distro
-
-  if $distro == 'CDH4.4' {
-    class { 'traf::tpcds':
-      require => Class['traf::cdh'],
-    }
-
-    class { 'traf::cdh':
-      hive_sql_pw => $hive_sql_pw,
-      distro      => $distro,
-    }
-  }
-  if $distro == 'CDH5.1' {
-    class { 'traf::tpcds':
-      require => Class['traf::cdh'],
-    }
-
-    class { 'traf::cdh':
-      hive_sql_pw => $hive_sql_pw,
-      distro      => $distro,
-    }
-  }
   # Cloudera Manager or Ambari
   if $distro =~ /^CM|^AHW/ {
     # both requires selinux disabled
