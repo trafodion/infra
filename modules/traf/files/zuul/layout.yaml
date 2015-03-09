@@ -174,8 +174,6 @@ jobs:
     voting: false
   - name: ^.*-jjb-lint
     voting: false
-  - name: ^.*-stable$
-    voting: false
   # daily build will have no branch, so will not skip any configs
   # daily also defaults to master, so make sure jobs are compatible
   - name: ^.*-ahw2.2$
