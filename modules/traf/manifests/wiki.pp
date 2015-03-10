@@ -256,7 +256,7 @@ class traf::wiki (
     require     => [
       File['/usr/local/bin/cronic'],
       File['/usr/local/bin/backupWiki.sh'],
-      File['/usr/local/bin/backupToObjectStorage.sh']
+      File['/usr/local/bin/useObjectStorage.sh']
     ]
   }
 
@@ -264,9 +264,9 @@ class traf::wiki (
     user        => 'root',
     hour        => '7',
     minute      => '0',
-    command     => 'sleep $((RANDOM\%600)) && cronic backupToObjectStorage.sh upload /var/backups/mysql_backups/wiki.sql.gz',
+    command     => 'sleep $((RANDOM\%600)) && cronic useObjectStorage.sh -bu /var/backups/mysql_backups/wiki.sql.gz',
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
-    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/backupToObjectStorage.sh'] ],
+    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/useObjectStorage.sh'] ],
   }
 
   # backup on second node

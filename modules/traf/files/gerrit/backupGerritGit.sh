@@ -73,7 +73,7 @@ then
 
       mv $backupDir/tmp.gerrit-git.md5 $backupDir/gerrit-git.md5
       mv $backupDir/tmp.gerrit-git.tgz $backupDir/gerrit-git.tgz
-      backupToObjectStorage.sh upload $backupDir/gerrit-git.tgz
+      useObjectStorage.sh -bu $backupDir/gerrit-git.tgz
 
     # if there is no difference in the md5sum of the tarball
     # then remove all temporary files

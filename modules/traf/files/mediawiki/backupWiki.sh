@@ -46,7 +46,7 @@ then
 
       mv $backupDir/tmp.wiki.md5 $backupDir/wiki.md5
       mv $backupDir/tmp.wiki.tgz $backupDir/wiki.tgz
-      backupToObjectStorage.sh upload $backupDir/wiki.tgz
+      useObjectStorage.sh -bu $backupDir/wiki.tgz
 
     # if there is no difference in the md5sum of the tarball
     # then remove all temporary files
