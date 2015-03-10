@@ -16,7 +16,8 @@ class mediawiki(
 ) {
 
   if ($role == 'app' or $role == 'all') {
-    require apache::dev
+    # Must install this by hand until puppet module updated LP bug 1430528
+    #require apache::dev
     include apache
     include mediawiki::php
     include mediawiki::app
