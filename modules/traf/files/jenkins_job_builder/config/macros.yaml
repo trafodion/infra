@@ -252,47 +252,7 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/init_trafodion.log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/trafodion.dtm.log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/hdfs*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/mvqr*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/pstartd*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/sqmon*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/wdt*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/logs/zsb*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/sql/scripts/*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'trafodion/core/sqf/tmp/*'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/trafodion.dtm.log'
+              source: 'traf_run/logs/trafodion.*.log'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
