@@ -62,6 +62,7 @@ node 'review.trafodion.org' {
 
 # Jenkins master for US East
 node 'jenkins02.trafodion.org' {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::jenkins':
     jenkins_jobs_password   => hiera('jenkins02_jobs_password'),
     jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
@@ -100,8 +101,8 @@ node 'wiki.trafodion.org' {
   }
 }
 
-# wiki for Beta Access (no anonymous access)
-node 'wiki2.trafodion.org' {
+# wiki development
+node 'wiki-dev.trafodion.org' {
   $pserver='puppet3.trafodion.org'
   class { 'traf::wiki':
     wiki_admin_password     => hiera('wiki_admin_password'),
@@ -125,6 +126,7 @@ node 'dashboard.trafodion.org' {
 # nodepool removed - may use in future
 
 node 'zuul.trafodion.org' {
+  $pserver='puppet3.trafodion.org'
   class { 'traf::zuul_prod':
     gerrit_server                  => 'review.trafodion.org',
     gerrit_user                    => 'jenkins',
