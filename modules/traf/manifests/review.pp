@@ -223,9 +223,9 @@ class traf::review (
     user        => 'root',
     hour        => '7',
     minute      => '0',
-    command     => 'sleep $((RANDOM\%600)) && cronic backupToObjectStorage.sh upload /var/backups/mysql_backups/gerrit.sql.gz',
+    command     => 'sleep $((RANDOM\%600)) && cronic useObjectStorage.sh -bu /var/backups/mysql_backups/gerrit.sql.gz',
     environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
-    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/backupToObjectStorage.sh'] ]
+    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/useObjectStorage.sh'] ]
   }
 
   file { '/usr/local/bin/backupGerritGit.sh':
@@ -246,7 +246,7 @@ class traf::review (
     require     => [
       File['/usr/local/bin/cronic'],
       File['/usr/local/bin/backupGerritGit.sh'],
-      File['/usr/local/bin/backupToObjectStorage.sh']
+      File['/usr/local/bin/useObjectStorage.sh']
     ]
   }
 
