@@ -4,7 +4,7 @@ $cloud_auto_user=hiera('cloud_auto_user', '')
 $cloud_auto_passwd=hiera('cloud_auto_passwd', '')
 
 # default puppet-master
-$pserver='puppet.trafodion.org'
+$pserver='puppet3.trafodion.org'
 
 #
 # Default: at least puppet running regularly and sysadmin access
@@ -20,7 +20,6 @@ node default {
 # Long lived servers:
 #
 node 'review.trafodion.org' {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::review':
     github_oauth_token              => hiera('gerrit_github_token', 'XXX'),
     github_project_username         => hiera('github_project_username', 'username'),
@@ -62,7 +61,6 @@ node 'review.trafodion.org' {
 
 # Jenkins master for US East
 node 'jenkins02.trafodion.org' {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::jenkins':
     jenkins_jobs_password   => hiera('jenkins02_jobs_password'),
     jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
@@ -76,21 +74,14 @@ node 'jenkins02.trafodion.org' {
   }
 }
 
-node 'puppet.trafodion.org' {
-  class { 'traf::puppetmaster':
-    sysadmins         => hiera('sysadmins'),
-  }
-}
 # New master running puppet 3.x
 node 'puppet3.trafodion.org' {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::puppetmaster':
     sysadmins         => hiera('sysadmins'),
   }
 }
 
 node 'wiki.trafodion.org' {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::wiki':
     wiki_admin_password     => hiera('wiki_admin_password'),
     mysql_root_password     => hiera('wiki_db_password'),
@@ -103,7 +94,6 @@ node 'wiki.trafodion.org' {
 
 # wiki development
 node 'wiki-dev.trafodion.org' {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::wiki':
     wiki_admin_password     => hiera('wiki_admin_password'),
     mysql_root_password     => hiera('wiki_db_password'),
@@ -115,7 +105,6 @@ node 'wiki-dev.trafodion.org' {
 }
 
 node 'dashboard.trafodion.org' {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::dashboard':
     password       => hiera('dashboard_password'),
     mysql_password => hiera('dashboard_mysql_password'),
@@ -126,7 +115,6 @@ node 'dashboard.trafodion.org' {
 # nodepool removed - may use in future
 
 node 'zuul.trafodion.org' {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::zuul_prod':
     gerrit_server                  => 'review.trafodion.org',
     gerrit_user                    => 'jenkins',
@@ -159,7 +147,6 @@ node 'zuul.trafodion.org' {
 # A machine to serve static content.
 # For instance, domain home page, ftp server, etc.
 node 'static.trafodion.org' {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::static':
     sysadmins                     => hiera('sysadmins'),
     reviewday_rsa_key_contents    => hiera('reviewday_rsa_key_contents'),
@@ -186,7 +173,6 @@ node 'graphite.trafodion.org' {
 
 # LDAP server config
 node /^ldap\d\d.trafodion.org$/ {
-  $pserver='puppet3.trafodion.org'
   class { 'traf::ldap':
     sysadmins         => hiera('sysadmins'),
   }
@@ -199,7 +185,6 @@ node /^ldap\d\d.trafodion.org$/ {
 
 # CMgr
 node /^slave-cm51-\d\d.trafodion.org$/ {
-  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
@@ -210,7 +195,6 @@ node /^slave-cm51-\d\d.trafodion.org$/ {
   }
 }
 node /^slave-cm51-\d+\.\d+\.\d+\.\d+$/ {
-  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
@@ -222,7 +206,6 @@ node /^slave-cm51-\d+\.\d+\.\d+\.\d+$/ {
   }
 }
 node /^slave-cm53-\d\d.trafodion.org$/ {
-  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
@@ -233,7 +216,6 @@ node /^slave-cm53-\d\d.trafodion.org$/ {
   }
 }
 node /^slave-cm53-\d+\.\d+\.\d+\.\d+$/ {
-  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
@@ -247,7 +229,6 @@ node /^slave-cm53-\d+\.\d+\.\d+\.\d+$/ {
 
 # Ambari HortonWorks
 node /^slave-ahw21-\d\d.trafodion.org$/ {
-  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
@@ -258,7 +239,6 @@ node /^slave-ahw21-\d\d.trafodion.org$/ {
   }
 }
 node /^slave-ahw21-\d+\.\d+\.\d+\.\d+$/ {
-  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
@@ -270,7 +250,6 @@ node /^slave-ahw21-\d+\.\d+\.\d+\.\d+$/ {
   }
 }
 node /^slave-ahw22-\d\d.trafodion.org$/ {
-  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
@@ -281,7 +260,6 @@ node /^slave-ahw22-\d\d.trafodion.org$/ {
   }
 }
 node /^slave-ahw22-\d+\.\d+\.\d+\.\d+$/ {
-  $pserver='puppet3.trafodion.org'
   include traf
   include traf::puppet_cron
   class { 'traf::slave':
