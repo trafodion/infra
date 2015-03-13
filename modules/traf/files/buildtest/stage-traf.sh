@@ -122,6 +122,12 @@ cp ./trafodion/core/trafodion_clients-*.tgz ./$DestDir/clients$FileSuffix  || ex
 
 # core and dcs in server tarfile
 cp trafodion/core/trafodion_server-*.tgz collect/  || exit 2
+# rest added in 1.1 release
+if [[ -f trafodion/core/rest/target/rest-*gz ]]
+then
+  rbase=$(basename trafodion/core/rest/target/rest-*gz .tar.gz)
+  cp trafodion/core/rest/target/rest-*gz collect/${rbase}.tgz  || exit 2
+fi
 
 # change suffix from tar.gz to tgz
 dcsbase=$(basename trafodion/dcs/target/dcs*gz .tar.gz)
