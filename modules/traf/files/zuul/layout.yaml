@@ -178,16 +178,16 @@ jobs:
   # daily also defaults to master, so make sure jobs are compatible
   - name: ^.*-ahw2.2$
     skip-if:
-      - branch: ^(master|stable/1.0)$
+      - branch: ^stable/1.0$
   - name: ^.*-cm5.3$
     skip-if:
-      - branch: ^(master|stable/1.0)$
+      - branch: ^stable/1.0$
   - name: ^.*-ahw2.1$
     skip-if:
-      - branch: hbase984
+      - branch: ^master$
   - name: ^.*-cm5.1$
     skip-if:
-      - branch: hbase984
+      - branch: ^master$
 
 project-templates:
   - name: core-distro
@@ -280,57 +280,57 @@ projects:
     daily:
       - traf-pub-release
       - traf-pub-debug
-      - core-regress-core-cm5.1
-      - core-regress-core-ahw2.1
-      - core-regress-charsets-cm5.1
-      - core-regress-charsets-ahw2.1
-      - core-regress-qat-cm5.1
-      - core-regress-qat-ahw2.1
-      - core-regress-udr-cm5.1
-      - core-regress-udr-ahw2.1
-      - core-regress-catman1-cm5.1
-      - core-regress-catman1-ahw2.1
-      - core-regress-compGeneral-cm5.1
-      - core-regress-compGeneral-ahw2.1
-      - core-regress-executor-cm5.1
-      - core-regress-executor-ahw2.1
-      - core-regress-fullstack2-cm5.1
-      - core-regress-fullstack2-ahw2.1
-      - core-regress-hive-cm5.1
-      - core-regress-hive-ahw2.1
-      - core-regress-seabase-cm5.1
-      - core-regress-seabase-ahw2.1
-      - phoenix_part1_T4-cm5.1
-      - phoenix_part2_T4-cm5.1
-      - phoenix_part1_T4-ahw2.1
-      - phoenix_part2_T4-ahw2.1
-      - phoenix_part1_T2-cm5.1
-      - phoenix_part2_T2-cm5.1
-      - phoenix_part1_T2-ahw2.1
-      - phoenix_part2_T2-ahw2.1
-      - pyodbc_test-cm5.1
-      - pyodbc_test-ahw2.1
-      - jdbc_test-cm5.1
-      - jdbc_test-ahw2.1
+      - core-regress-core-cm5.3
+      - core-regress-core-ahw2.2
+      - core-regress-charsets-cm5.3
+      - core-regress-charsets-ahw2.2
+      - core-regress-qat-cm5.3
+      - core-regress-qat-ahw2.2
+      - core-regress-udr-cm5.3
+      - core-regress-udr-ahw2.2
+      - core-regress-catman1-cm5.3
+      - core-regress-catman1-ahw2.2
+      - core-regress-compGeneral-cm5.3
+      - core-regress-compGeneral-ahw2.2
+      - core-regress-executor-cm5.3
+      - core-regress-executor-ahw2.2
+      - core-regress-fullstack2-cm5.3
+      - core-regress-fullstack2-ahw2.2
+      - core-regress-hive-cm5.3
+      - core-regress-hive-ahw2.2
+      - core-regress-seabase-cm5.3
+      - core-regress-seabase-ahw2.2
+      - phoenix_part1_T4-cm5.3
+      - phoenix_part2_T4-cm5.3
+      - phoenix_part1_T4-ahw2.2
+      - phoenix_part2_T4-ahw2.2
+      - phoenix_part1_T2-cm5.3
+      - phoenix_part2_T2-cm5.3
+      - phoenix_part1_T2-ahw2.2
+      - phoenix_part2_T2-ahw2.2
+      - pyodbc_test-cm5.3
+      - pyodbc_test-ahw2.2
+      - jdbc_test-cm5.3
+      - jdbc_test-ahw2.2
     release:
       - traf-pub-release
     pre-release:
       - traf-pub-release
       - traf-pub-debug
-      - phoenix_test_T4-cm5.1
-      - phoenix_test_T2-ahw2.1
-      - core-regress-core-ahw2.1
-      - core-regress-seabase-ahw2.1
-      - core-regress-charsets-cm5.1
-      - core-regress-qat-cm5.1
-      - core-regress-udr-cm5.1
-      - core-regress-catman1-ahw2.1
-      - core-regress-compGeneral-ahw2.1
-      - core-regress-executor-ahw2.1
-      - core-regress-fullstack2-cm5.1
-      - core-regress-hive-ahw2.1
-      - jdbc_test-cm5.1
-      - pyodbc_test-cm5.1
+      - phoenix_test_T4-cm5.3
+      - phoenix_test_T2-ahw2.2
+      - core-regress-core-ahw2.2
+      - core-regress-seabase-ahw2.2
+      - core-regress-charsets-cm5.3
+      - core-regress-qat-cm5.3
+      - core-regress-udr-cm5.3
+      - core-regress-catman1-ahw2.2
+      - core-regress-compGeneral-ahw2.2
+      - core-regress-executor-ahw2.2
+      - core-regress-fullstack2-cm5.3
+      - core-regress-hive-ahw2.2
+      - jdbc_test-cm5.3
+      - pyodbc_test-cm5.3
 
   - name: trafodion/dcs
     template:
@@ -374,11 +374,8 @@ projects:
       - installer-build
     gate:
       - gate-install-check-for-binary
-      - pyodbc_test-cm5.1
-      - jdbc_test-ahw2.1
-      #When hbase 98.4 is on master, enable these jobs, delete two above
-      #- pyodbc_test-cm5.3
-      #- jdbc_test-ahw2.2
+      - pyodbc_test-cm5.3
+      - jdbc_test-ahw2.2
       - pyodbc_test-cm5.1-stable
       - jdbc_test-ahw2.1-stable
       - installer-build
