@@ -69,16 +69,28 @@
 
 - job-group:
     name: 'traf-publish'
+    dist:
+      - "ahw2.2"
     jobs:
-      - traf-pub-{flavor}:
+      - traf-pub-{flavor}-{dist}:
          flavor: "release"
-      - traf-pub-{flavor}:
+      - traf-pub-{flavor}-{dist}:
+         flavor: "debug"
+
+- job-group:
+    name: 'traf-publish-stable'
+    dist:
+      - "ahw2.1"
+    jobs:
+      - traf-pub-{flavor}-{dist}:
+         flavor: "release"
+      - traf-pub-{flavor}-{dist}:
          flavor: "debug"
 
 
 - job-template:
-    name: 'traf-pub-{flavor}'
-    node: 'redhat'
+    name: 'traf-pub-{flavor}-{dist}'
+    node: 'redhat_{dist}'
 
     builders:
       - link-logs
