@@ -1,7 +1,7 @@
 #!/bin/sh -e
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ cp ./trafodion/core/trafodion_clients-*.tgz ./$DestDir/clients$FileSuffix  || ex
 # core and dcs in server tarfile
 cp trafodion/core/trafodion_server-*.tgz collect/  || exit 2
 # rest added in 1.1 release
-if [[ -f trafodion/core/rest/target/rest-*gz ]]
+if [[ -f "$(ls trafodion/core/rest/target/rest-*gz 2>/dev/null)" ]]
 then
   rbase=$(basename trafodion/core/rest/target/rest-*gz .tar.gz)
   cp trafodion/core/rest/target/rest-*gz collect/${rbase}.tgz  || exit 2
