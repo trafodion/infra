@@ -97,13 +97,13 @@ pipelines:
     window-increase-factor: 2
 
   - name: pre-release
-    description: This pipeline runs jobs on projects in response to pre-release tags.
+    description: This pipeline runs jobs on projects in response to pre-release tags 1.1+
     manager: IndependentPipelineManager
     precedence: high
     trigger:
       gerrit:
         - event: ref-updated
-          ref: ^refs/tags/([0-9]+\.)+[0-9]*(_v[0-9]+)?(alpha|beta|candidate|rc|a|b|c|r|g)[0-9]*$
+          ref: ^refs/tags/1.([1-9]+\.)+[0-9]*(_v[0-9]+)?(alpha|beta|candidate|rc|a|b|c|r|g)[0-9]*$
     success:
       smtp:
         from: jenkins@trafodion.org
@@ -116,13 +116,41 @@ pipelines:
         subject: 'Pre-Release {change.ref} -- Test Failures'
 
   - name: release
-    description: When a commit is tagged as a release, this pipeline runs jobs that publish archives and documentation.
+    description: When a commit is tagged as a release 1.1+
     manager: IndependentPipelineManager
     precedence: high
     trigger:
       gerrit:
         - event: ref-updated
-          ref: ^refs/tags/([0-9]+\.)+[0-9]+(_v[0-9]+)?$
+          ref: ^refs/tags/1.([1-9]+\.)+[0-9]+(_v[0-9]+)?$
+
+  - name: pre-release-stable
+    description: This pipeline runs jobs on projects in response to pre-release tags 1.0.*
+    manager: IndependentPipelineManager
+    precedence: high
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^refs/tags/1.0.([0-9]+\.)+(_v[0-9]+)?(alpha|beta|candidate|rc|a|b|c|r|g)[0-9]*$
+    success:
+      smtp:
+        from: jenkins@trafodion.org
+        to: traf_bld_stats_external.groups.hp.com@external.groups.hp.com
+        subject: 'Pre-Release {change.ref} -- Passed All Tests'
+    failure:
+      smtp:
+        from: jenkins@trafodion.org
+        to: traf_bld_stats_external.groups.hp.com@external.groups.hp.com
+        subject: 'Pre-Release {change.ref} -- Test Failures'
+
+  - name: release-stable
+    description: When a commit is tagged as a release 1.0.*
+    manager: IndependentPipelineManager
+    precedence: high
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^refs/tags/1.0.([0-9]+\.)+(_v[0-9]+)?$
 
   - name: silent
     description: This pipeline is used for silently testing new jobs.
@@ -178,16 +206,16 @@ jobs:
   # daily also defaults to master, so make sure jobs are compatible
   - name: ^.*-ahw2.2$
     skip-if:
-      - branch: ^(master|stable/1.0)$
+      - branch: ^stable/1.0$
   - name: ^.*-cm5.3$
     skip-if:
-      - branch: ^(master|stable/1.0)$
+      - branch: ^stable/1.0$
   - name: ^.*-ahw2.1$
     skip-if:
-      - branch: hbase984
+      - branch: ^master$
   - name: ^.*-cm5.1$
     skip-if:
-      - branch: hbase984
+      - branch: ^master$
 
 project-templates:
   - name: core-distro
@@ -278,45 +306,64 @@ projects:
        HW: ahw2.2
        Cld: cm5.3
     daily:
-      - traf-pub-release
-      - traf-pub-debug
-      - core-regress-core-cm5.1
-      - core-regress-core-ahw2.1
-      - core-regress-charsets-cm5.1
-      - core-regress-charsets-ahw2.1
-      - core-regress-qat-cm5.1
-      - core-regress-qat-ahw2.1
-      - core-regress-udr-cm5.1
-      - core-regress-udr-ahw2.1
-      - core-regress-catman1-cm5.1
-      - core-regress-catman1-ahw2.1
-      - core-regress-compGeneral-cm5.1
-      - core-regress-compGeneral-ahw2.1
-      - core-regress-executor-cm5.1
-      - core-regress-executor-ahw2.1
-      - core-regress-fullstack2-cm5.1
-      - core-regress-fullstack2-ahw2.1
-      - core-regress-hive-cm5.1
-      - core-regress-hive-ahw2.1
-      - core-regress-seabase-cm5.1
-      - core-regress-seabase-ahw2.1
-      - phoenix_part1_T4-cm5.1
-      - phoenix_part2_T4-cm5.1
-      - phoenix_part1_T4-ahw2.1
-      - phoenix_part2_T4-ahw2.1
-      - phoenix_part1_T2-cm5.1
-      - phoenix_part2_T2-cm5.1
-      - phoenix_part1_T2-ahw2.1
-      - phoenix_part2_T2-ahw2.1
-      - pyodbc_test-cm5.1
-      - pyodbc_test-ahw2.1
-      - jdbc_test-cm5.1
-      - jdbc_test-ahw2.1
+      - traf-pub-release-ahw2.2
+      - traf-pub-debug-ahw2.2
+      - core-regress-core-cm5.3
+      - core-regress-core-ahw2.2
+      - core-regress-charsets-cm5.3
+      - core-regress-charsets-ahw2.2
+      - core-regress-qat-cm5.3
+      - core-regress-qat-ahw2.2
+      - core-regress-udr-cm5.3
+      - core-regress-udr-ahw2.2
+      - core-regress-catman1-cm5.3
+      - core-regress-catman1-ahw2.2
+      - core-regress-compGeneral-cm5.3
+      - core-regress-compGeneral-ahw2.2
+      - core-regress-executor-cm5.3
+      - core-regress-executor-ahw2.2
+      - core-regress-fullstack2-cm5.3
+      - core-regress-fullstack2-ahw2.2
+      - core-regress-hive-cm5.3
+      - core-regress-hive-ahw2.2
+      - core-regress-seabase-cm5.3
+      - core-regress-seabase-ahw2.2
+      - phoenix_part1_T4-cm5.3
+      - phoenix_part2_T4-cm5.3
+      - phoenix_part1_T4-ahw2.2
+      - phoenix_part2_T4-ahw2.2
+      - phoenix_part1_T2-cm5.3
+      - phoenix_part2_T2-cm5.3
+      - phoenix_part1_T2-ahw2.2
+      - phoenix_part2_T2-ahw2.2
+      - pyodbc_test-cm5.3
+      - pyodbc_test-ahw2.2
+      - jdbc_test-cm5.3
+      - jdbc_test-ahw2.2
     release:
-      - traf-pub-release
+      - traf-pub-release-ahw2.2
+    release-stable:
+      - traf-pub-release-ahw2.1
     pre-release:
-      - traf-pub-release
-      - traf-pub-debug
+      - traf-pub-release-ahw2.2
+      - traf-pub-debug-ahw2.2
+      - phoenix_test_T4-cm5.3
+      - phoenix_test_T2-ahw2.2
+      - core-regress-core-ahw2.2
+      - core-regress-seabase-ahw2.2
+      - core-regress-charsets-cm5.3
+      - core-regress-qat-cm5.3
+      - core-regress-udr-cm5.3
+      - core-regress-catman1-ahw2.2
+      - core-regress-compGeneral-ahw2.2
+      - core-regress-executor-ahw2.2
+      - core-regress-fullstack2-cm5.3
+      - core-regress-hive-ahw2.2
+      - jdbc_test-cm5.3
+      - pyodbc_test-cm5.3
+    pre-release-stable:
+      - traf-pub-release-ahw2.1
+      - traf-pub-debug-ahw2.1
       - phoenix_test_T4-cm5.1
       - phoenix_test_T2-ahw2.1
       - core-regress-core-ahw2.1
@@ -374,11 +421,8 @@ projects:
       - installer-build
     gate:
       - gate-install-check-for-binary
-      - pyodbc_test-cm5.1
-      - jdbc_test-ahw2.1
-      #When hbase 98.4 is on master, enable these jobs, delete two above
-      #- pyodbc_test-cm5.3
-      #- jdbc_test-ahw2.2
+      - pyodbc_test-cm5.3
+      - jdbc_test-ahw2.2
       - pyodbc_test-cm5.1-stable
       - jdbc_test-ahw2.1-stable
       - installer-build
