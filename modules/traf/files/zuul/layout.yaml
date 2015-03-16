@@ -82,7 +82,7 @@ pipelines:
             - verified: 1
         # event is reverify comment, already approved
         - event: comment-added
-          comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*(recheck|reverify)( (?:bug|lp)[\s#:]*(\d+))
+          comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*(recheck|reverify)
     start:
       gerrit:
         verified: 0
