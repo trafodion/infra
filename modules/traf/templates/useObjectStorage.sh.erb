@@ -68,6 +68,7 @@ ProgramHelp() {
     -u <filename>                               Upload file to container in Object Storage
     -d <swiftfile>                              Download file from container in Object Storage
                                                 NOTE: if <swiftfile> is ALL then -s option must be set
+    -X <swiftfile>                              Delete file from container in Object Storage
     -o <outputfile>                             Output file name. 
                                                 NOTE: Only used in combination with -d option.
     -h or -?                                    This help menu
@@ -178,7 +179,7 @@ if [[ $# -eq 0 ]]; then
     ProgramHelp
     exit 1
 else
-    while getopts bcld:o:s:u: opt
+    while getopts bcld:X:o:s:u: opt
     do
         case "$opt" in
             b)  # Use Backup Container
@@ -199,6 +200,10 @@ else
                 ;;
             d)  # Download file
                 swiftVerb="download"
+                swiftFile="$OPTARG"
+                ;;
+            X)  # Delete file
+                swiftVerb="delete"
                 swiftFile="$OPTARG"
                 ;;
             o)  # Output file
@@ -230,7 +235,7 @@ if [[ $swiftVerb = "list" ]]; then
     fi
 
     # run swift list command
-    $swift $swiftVerb $swiftOptions $container
+    $swift $swiftVerb $listOptions $container
     res=$?
 elif [[ $swiftVerb = "download" ]]; then
     if [[ $swiftFile = "ALL" && -n $containerSub ]]; then
@@ -239,6 +244,8 @@ elif [[ $swiftVerb = "download" ]]; then
         $swift $swiftVerb $swiftCmdArgs $container $swiftFile
     fi
     res=$?
+elif [[ $swiftVerb = "delete" ]]; then
+    $swift $swiftVerb $container $swiftFile
 elif [[ $swiftVerb = "upload" ]]; then
     # Normally swift does not care whether you are uploading a file
     # or a directory. However, since we need special processing
