@@ -38,6 +38,11 @@
     builders:
       - shell: "/usr/local/bin/wsclean.sh"
 
+- builder:
+    name: check-node
+    builders:
+      - shell: "/usr/local/bin/check-node.sh"
+
 # second argument is optional
 # used if core and dcs built in same job
 - builder:
@@ -475,3 +480,12 @@
                 #!/bin/bash
                 mkdir -p $WORKSPACE/hbase-logs
                 cp -r /var/log/hbase/* $WORKSPACE/hbase-logs/
+
+- publisher:
+    name: post-check-node
+    publishers:
+      - postbuildscript:
+          script-only-if-succeeded: false
+          script-only-if-failed: false
+          builders:
+            - shell: "/usr/local/bin/check-node.sh"

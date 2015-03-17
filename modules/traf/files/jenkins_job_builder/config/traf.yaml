@@ -27,6 +27,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -42,6 +43,7 @@
            suites: "{suite}"
 
     publishers:
+      - post-check-node
       - console-log
       - git-log
       - traf-make-log
@@ -196,6 +198,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -219,6 +222,7 @@
            tests4: ""
 
     publishers:
+      - post-check-node
       - phoenix-xunit
       - console-log
       - traf-make-log
@@ -239,6 +243,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -262,6 +267,7 @@
            tests4: ""
 
     publishers:
+      - post-check-node
       - phoenix-xunit
       - console-log
       - traf-make-log
@@ -282,6 +288,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -305,6 +312,7 @@
            tests4: ""
 
     publishers:
+      - post-check-node
       - phoenix-xunit
       - console-log
       - traf-make-log
@@ -325,6 +333,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -348,6 +357,7 @@
            tests4: ""
 
     publishers:
+      - post-check-node
       - phoenix-xunit
       - console-log
       - traf-make-log
@@ -368,6 +378,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -391,6 +402,7 @@
            tests4: ""
 
     publishers:
+      - post-check-node
       - phoenix-xunit
       - console-log
       - traf-make-log
@@ -414,6 +426,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -432,6 +445,7 @@
            tests1: "DONT_RUN_TESTS"
 
     publishers:
+      - post-check-node
       - console-log
       - git-log
       - pyodbc_test-log
@@ -450,6 +464,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -468,6 +483,7 @@
            tests1: ""
 
     publishers:
+      - post-check-node
       - console-log
       - git-log
       - pyodbc_test-log
@@ -487,6 +503,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-stable:
@@ -508,6 +525,7 @@
            tests1: ""
 
     publishers:
+      - post-check-node
       - console-log
       - git-log
       - pyodbc_test-log
@@ -532,6 +550,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -549,6 +568,7 @@
            tests1: "DONT_RUN_TESTS"
 
     publishers:
+      - post-check-node
       - jdbc-xunit
       - console-log
       - traf-make-log
@@ -569,6 +589,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -586,6 +607,7 @@
            tests1: ""
 
     publishers:
+      - post-check-node
       - jdbc-xunit
       - console-log
       - traf-make-log
@@ -607,6 +629,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-stable:
@@ -627,6 +650,7 @@
            tests1: ""
 
     publishers:
+      - post-check-node
       - jdbc-xunit
       - console-log
       - traf-make-log
