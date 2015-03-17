@@ -29,10 +29,7 @@ fi
 source /usr/local/bin/traf-functions.sh
 log_banner
 
-if id tinstall 2>/dev/null
-then
-  sudo -n -u tinstall rm -rf $WORKSPACE/traf_inst 
-fi
+sudo -n -u tinstall rm -rf $WORKSPACE/traf_inst 
 
 # trafodion id may be removed by trafodion uninstall
 # root will delete these
