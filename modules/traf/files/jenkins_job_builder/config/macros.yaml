@@ -38,6 +38,11 @@
     builders:
       - shell: "/usr/local/bin/wsclean.sh"
 
+- builder:
+    name: check-node
+    builders:
+      - shell: "/usr/local/bin/check-node.sh"
+
 # second argument is optional
 # used if core and dcs built in same job
 - builder:
