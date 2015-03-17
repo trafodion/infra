@@ -16,7 +16,7 @@ echo "$purpose" >> ~jenkins/dspace-root.log
 echo "$root_space" >> ~jenkins/dspace-root.log
 
 # disk usage of suspect locations
-check="/hadoop/hdfs /var/log"
+check="/hadoop/hdfs /data/dfs/data /var/log"
 
 select_usage=$(sudo /usr/bin/du -sh $check  2>/dev/null | sed "s/^/$D:  /")
 

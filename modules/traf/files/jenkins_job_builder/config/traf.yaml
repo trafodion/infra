@@ -27,6 +27,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -40,6 +41,7 @@
       - sql-regress:
            dir: "./trafodion/core"
            suites: "{suite}"
+      - check-node
 
     publishers:
       - console-log
@@ -196,6 +198,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -217,6 +220,7 @@
            tests2: ""
            tests3: ""
            tests4: ""
+      - check-node
 
     publishers:
       - phoenix-xunit
@@ -239,6 +243,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -260,6 +265,7 @@
            tests2: ""
            tests3: ""
            tests4: ""
+      - check-node
 
     publishers:
       - phoenix-xunit
@@ -282,6 +288,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -303,6 +310,7 @@
            tests2: ""
            tests3: ""
            tests4: ""
+      - check-node
 
     publishers:
       - phoenix-xunit
@@ -325,6 +333,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -346,6 +355,7 @@
            tests2: ""
            tests3: ""
            tests4: ""
+      - check-node
 
     publishers:
       - phoenix-xunit
@@ -368,6 +378,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -389,6 +400,7 @@
            tests2: ""
            tests3: ""
            tests4: ""
+      - check-node
 
     publishers:
       - phoenix-xunit
@@ -414,6 +426,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -430,6 +443,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/dcs/src/test/pytests"
            tests1: "DONT_RUN_TESTS"
+      - check-node
 
     publishers:
       - console-log
@@ -450,6 +464,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -466,6 +481,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/dcs/src/test/pytests"
            tests1: ""
+      - check-node
 
     publishers:
       - console-log
@@ -487,6 +503,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-stable:
@@ -506,6 +523,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/dcs/src/test/pytests"
            tests1: ""
+      - check-node
 
     publishers:
       - console-log
@@ -532,6 +550,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -547,6 +566,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/dcs/src/test/jdbc_test"
            tests1: "DONT_RUN_TESTS"
+      - check-node
 
     publishers:
       - jdbc-xunit
@@ -569,6 +589,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-prep:
@@ -584,6 +605,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/dcs/src/test/jdbc_test"
            tests1: ""
+      - check-node
 
     publishers:
       - jdbc-xunit
@@ -607,6 +629,7 @@
 
     builders:
       - link-logs
+      - check-node
       - kill-traf
       - clean-workspace
       - multi-git-stable:
@@ -625,6 +648,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/dcs/src/test/jdbc_test"
            tests1: ""
+      - check-node
 
     publishers:
       - jdbc-xunit
