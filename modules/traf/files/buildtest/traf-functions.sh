@@ -188,11 +188,22 @@ function clear_env() {
 ############################################################
 # report_on_corefiles - find and report on corefiles
 #
+# report_on_corefiles [ -u <alternate user id> ] [ <directory> ] 
+#
+# optionally run core_bt as different user
+#
 # If argument supplied, use that, otherwise try the directory
 # above MY_SQROOT.  The return code is the number of
 # core files found.
 #
 function report_on_corefiles() {
+  if [[ "$1" == "-u" ]]
+  then
+    altuser="$2"
+    shift 2
+  else
+    altuser=""
+  fi
   ADIR="$1"
   if [[ -z "$ADIR" ]]; then
     if [[ -n "$MY_SQROOT" ]]; then
@@ -214,7 +225,12 @@ function report_on_corefiles() {
       echo "WARNING: Core files found in $ADIR :"
       pushd "$ADIR" > /dev/null
       ls -l $COREFILES       | tee $WORKSPACE/corefiles.log
-      /usr/local/bin/core_bt -t >> $WORKSPACE/corefiles.log
+      if [[ -n "$altuser" ]]
+      then
+        sudo -n -u $altuser /usr/local/bin/core_bt -t >> $WORKSPACE/corefiles.log
+      else
+        /usr/local/bin/core_bt -t >> $WORKSPACE/corefiles.log
+      fi
       echo "core_bt output is in"
       ls -l $WORKSPACE/corefiles.log
       popd > /dev/null
