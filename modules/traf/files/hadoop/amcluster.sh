@@ -17,27 +17,34 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+
 # Interact with Ambari for initial cluster set-up
 # Simple single-node cluster for test environment
 
 PATH="/bin:/usr/bin"
 
-# check mode is read-only
-# check if set-up is correct, exit as soon as problem is found
-if [[ $1 == "check" ]]
+log_banner "Checking Cluster Configuration"
+echo "*** Checking Cluster Configuration"
+
+# Distro 
+
+# previously saved?
+if [[ -r /var/local/TrafTestDistro ]]
 then
-  mode="check"
-  shift
+  Vers="$(</var/local/TrafTestDistro)"
+  echo "Retrieving distro from /var/local/TrafTestDistro: $Vers"
 else
-  mode=""
+  Vers="$1"
+  if [[ ! $Vers =~ ^HDP-[0-9][.0-9]+$ ]]
+  then
+    echo "Error: Distro not specified in /var/local/TrafTestDistro nor on command line"
+    echo "Error: Usage: $0 HDP-<full-version-number>"
+    exit 1
+  fi
+  echo "$Vers" > /var/local/TrafTestDistro
 fi
 
-Vers="$1"
-if [[ ! $Vers =~ ^HDP-[0-9][.0-9]+$ ]]
-then
-  echo "Error: Usage: $0 [check] HDP-<full-version-number>"
-  exit 1
-fi
 Stack=$(echo $Vers | sed 's%\-%/versions/%')
 
 # curl options
@@ -99,7 +106,6 @@ Cluster="$(curl $Read $URL/clusters/trafcluster | jq -r '.Clusters.cluster_name'
 
 if [[ $Cluster == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating cluster: trafcluster"
   curl $Create -d '{ "Clusters" : {
 		      "version" : "'$Vers'"
@@ -119,7 +125,6 @@ Host="$(curl $Read $URL/clusters/trafcluster/hosts/$hn | jq -r '.Hosts.host_name
 
 if [[ $Host != "$hn" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating host: $hn"
   curl $Create $URL/clusters/trafcluster/hosts/$hn
   Host="$(curl $Read $URL/clusters/trafcluster/hosts/$hn | jq -r '.Hosts.host_name')"
@@ -144,7 +149,6 @@ do
 
   if [[ $Service == "null" ]]
   then
-    [[ $mode == "check" ]] && exit 5
     echo "Creating service: $serv"
     curl $Create $URL/clusters/trafcluster/services/$serv
     Service="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.service_name')"
@@ -166,7 +170,6 @@ function initconfig {
   Config=$(curl $Read "$URL/clusters/trafcluster/configurations?type=${ctype}" | jq -r '.items[0].type')
   if [[ $Config != $ctype ]]
   then
-    [[ $mode == "check" ]] && exit 5
     echo "Retrieving stack defaults for config type $ctype"
     if [[ $level == "service" ]]
     then
@@ -205,7 +208,6 @@ function initconfig {
     		| jq -r '.Clusters.desired_configs|.["'${ctype}'"].tag') # special syntax due to '-' in json key
   if [[ $Config == "null" ]]
   then
-    [[ $mode == "check" ]] && exit 5
     echo "Applying $ctype config"
     reqdata='{"Clusters" : {"desired_config" : {"type" : "'$ctype'", "tag" : "version001"}}}'
     curl $Update -d "$reqdata" $URL/clusters/trafcluster
@@ -257,7 +259,6 @@ function setconfig {
   CVal=$($getCONF $ctype | grep '"'${cprop}'"' | sed 's/^.*:\s*"\(.*\)"/\1/;s/,$//')
   if [[ $CVal != "$cvalue" ]]
   then
-    [[ $mode == "check" ]] && exit 5
     echo "Setting $cprop config"
     # set and apply new config
     $setCONF "$ctype" "$cprop" "$cvalue" || exit $?
@@ -331,7 +332,6 @@ do
 
   if [[ $HComp == "null" ]]
   then
-    [[ $mode == "check" ]] && exit 5
     echo "Creating $comp service & host component"
     # create service component
     curl $Create $URL/clusters/trafcluster/services/$serv/components/$comp
@@ -349,49 +349,31 @@ do
                       | jq -r '.HostRoles.state')"
   if [[ $HCState =~ INIT|INSTALL_FAILED ]]
   then
-    [[ $mode == "check" ]] && exit 5
     RID=$(curl $Update -d "$reqinstall" $URL/clusters/trafcluster/hosts/$hn/host_components/$comp \
 		| jq -r '.Requests.id')
     am_cmd "$RID" "Install $comp"  || exit 2
   fi
 done
 
-
-# Check whether previously initialized
-if [[ -f /var/local/Cluster_Init_Trafodion ]]
-then
-  echo "File /var/local/Cluster_Init_Trafodion exists."
-  echo "Skipping initialization steps."
-  exit 0
-fi
-
-########## Start of Initialization
+log_banner "Start Services and Delete HBase data"
 
 # Start services
+# required for services with master or slave components
+# not for those that have only client components (e.g. TEZ)
 reqINSTALL='{"RequestInfo": {"context" :"Initial Install"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
 reqSTART='{"RequestInfo": {"context" :"Initial Start"}, "Body": {"ServiceInfo": {"state": "STARTED"}}}'
 
-# required for services with master or slave components
-# not for those that have only client components (e.g. TEZ)
-if [[ $Vers == "HDP-2.1" ]]
-then
-  servers="ZOOKEEPER HDFS YARN MAPREDUCE2 HIVE WEBHCAT HBASE"
-else
-  servers="ZOOKEEPER HDFS YARN MAPREDUCE2 HIVE HBASE"
-fi
-
-for serv in $servers
-do
+function start_service() {
+  serv=$1
   State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
   if [[ $State != "STARTED" ]]
   then
-    [[ $mode == "check" ]] && exit 5
     # first, move service (and components) from INIT to INSTALLED
     echo "Installing $serv (just in case all components are not INSTALLED)"
     RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/${serv} | jq -r '.Requests.id')
     am_cmd "$RID" "$serv Install"
     # then from INSTALLED to STARTED
-    echo "Starting $serv"
+    echo "*** Starting $serv"
     RID=$(curl $Update -d "$reqSTART" $URL/clusters/trafcluster/services/${serv} | jq -r '.Requests.id')
     am_cmd "$RID" "$serv Start"
   fi
@@ -402,10 +384,97 @@ do
     echo "Error: $serv not started"
     exit 2
   fi
-done
 
-# Successfully initialized - don't repeat initialization
-echo "Cluster set-up complete $(date)" > /var/local/Cluster_Init_Trafodion
+}
+
+start_service ZOOKEEPER
+
+# HDFS
+State="$(curl $Read $URL/clusters/trafcluster/services/HDFS | jq -r '.ServiceInfo.state')"
+if [[ $State == "STARTED" ]] 
+then
+  # make sure we are not in HDFS safemode
+  mode="$(hdfs dfsadmin -safemode get)"
+  if [[ $mode =~ ON ]]
+  then
+    sudo -u hdfs hdfs dfsadmin -safemode leave
+  fi
+else
+  start_service HDFS
+
+  # wait for safemode so we can modify hdfs data
+  sudo -u hdfs hdfs dfsadmin -safemode wait
+fi
+
+### HBase data cleaned up every time
+State="$(curl $Read $URL/clusters/trafcluster/services/HBASE | jq -r '.ServiceInfo.state')"
+if [[ $State == "STARTED" ]] 
+then
+  echo "*** Stopping HBase"
+  reqINSTALL='{"RequestInfo": {"context" :"HBase Stop"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
+  RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/HBASE | jq -r '.Requests.id')
+  am_cmd "$RID" "HBASE Stop"
+  # Check status
+  State="$(curl $Read $URL/clusters/trafcluster/services/HBASE | jq -r '.ServiceInfo.state')"
+  if [[ $State != "INSTALLED" ]]
+  then
+    echo "Error: HBASE not stopped"
+    exit 2
+  fi
+fi
+
+echo "*** Removing HBase Data"
+
+# data locations for Ambari
+hdata="/apps/hbase/data" # HDFS
+zkdata="/hbase-unsecure" # zookeeper
+
+sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
+sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
+
+# clean up logs so we can save only what is logged for this run
+sudo -u hbase rm -rf /var/log/hbase/*
+
+# recreate root
+sudo -u hdfs /usr/bin/hdfs dfs -mkdir $hdata || exit $?
+sudo -u hdfs /usr/bin/hdfs dfs -chown hbase:hbase $hdata || exit $?
+
+# verify nothing is using HBase port
+  HPort='60010'
+  # ss will let us know if port is in use, and -p option will give us process info
+  cmd="/usr/sbin/ss -lp src *:$HPort"
+
+  pcount=$($cmd | wc -l)
+  pids=$(sudo -n $cmd | sed -n '/users:/s/^.*users:((.*,\([0-9]*\),.*$/\1/p')
+  if [[ $pcount > 1 ]] # always get header line
+  then
+    echo "Warning: found port $HPort in use"
+    $cmd
+  fi
+  if [[ -n $pids ]]
+  then
+    echo "Warning: processes using port $HPort"
+    ps -f $pids
+    echo "Warning: killing pids: $pids"
+    kill $pids
+  fi
+
+# revert to initial hbase-site config so we are not running with trx
+  echo "*** Applying hbase-site initial config"
+  reqdata='{"Clusters" : {"desired_config" : {"type" : "hbase-site", "tag" : "version001"}}}'
+  curl $Update --data "$reqdata" $URL/clusters/trafcluster
+
+
+start_service YARN
+start_service MAPREDUCE2
+start_service HIVE
+if [[ $Vers == "HDP-2.1" ]]
+then
+  start_service WEBHCAT
+fi
+start_service HBASE
+
+echo "*** Cluster Check Complete"
 
 exit 0
 
