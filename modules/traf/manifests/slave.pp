@@ -191,15 +191,11 @@ class traf::slave (
     package { 'jq':
       ensure => present,
     }
-
-    class { 'traf::tpcds':
-      require => Exec['cluster_setup'],
-    }
   }
   # Cloudera Manager distros
   if $distro =~ /^CM/ {
     # cluster set-up script
-    file { '/usr/local/bin/cmgr.sh':
+    file { '/usr/local/bin/cluster_setup':
       ensure  => present,
       source  => 'puppet:///modules/traf/hadoop/cmgr.sh',
       owner   => 'root',
@@ -213,12 +209,23 @@ class traf::slave (
       ensure  => present,
       require => Class['::cloudera'],
     }
+    # For CDH5, header files are in separate package
+    package { 'hadoop-libhdfs-devel':
+      ensure  => present,
+      require => Class['::cloudera'],
+    }
+    class { '::cloudera':
+      cm_server_host   => 'localhost',
+      install_cmserver => true,
+      use_parcels      => false,
+      cdh_version      => $disto_ver,
+    }
   }
 
   # Ambari managed distros
   if $distro =~ /^AHW/ {
     # cluster set-up script
-    file { '/usr/local/bin/amcluster.sh':
+    file { '/usr/local/bin/cluster_setup':
       ensure  => present,
       source  => 'puppet:///modules/traf/hadoop/amcluster.sh',
       owner   => 'root',
@@ -231,73 +238,34 @@ class traf::slave (
       distro => $distro,
     }
   }
-  if $distro == 'AHW2.1' {
-    exec {'cluster_setup':
-      command => '/usr/local/bin/amcluster.sh HDP-2.1',
-      timeout => 0,
-      unless  => '/usr/local/bin/amcluster.sh check HDP-2.1',
-      require => [ Class['traf::ambari'], File['/usr/local/bin/amcluster.sh'], ]
-    }
+  # Establish distro parameter for lookup by cluster script
+  case $distro {
+    'AHW2.1': { $distro_ver = 'HDP-2.1' }
+    'AHW2.2': { $distro_ver = 'HDP-2.2' }
+    'CM5.1':  { $distro_ver = '5.1.4' }
+    'CM5.3':  { $distro_ver = '5.3.1' }
+    default:  { $distro_ver = 'None' } #cluster script will error out on this
   }
-  if $distro == 'AHW2.2' {
-    exec {'cluster_setup':
-      command => '/usr/local/bin/amcluster.sh HDP-2.2',
-      timeout => 0,
-      unless  => '/usr/local/bin/amcluster.sh check HDP-2.2',
-      require => [ Class['traf::ambari'], File['/usr/local/bin/amcluster.sh'], ]
-    }
+  file { '/var/local/TrafTestDistro':
+    ensure  => present,
+    content => "${distro_ver}",
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
   }
 
   if $distro == 'CM5.1' {
-    # For CDH5, header files are in separate package
-    package { 'hadoop-libhdfs-devel':
-      ensure  => present,
-      require => Class['::cloudera'],
-    }
-    exec {'cluster_setup':
-      command => '/usr/local/bin/cmgr.sh 5.1.4',
-      timeout => 0,
-      unless  => '/usr/local/bin/cmgr.sh check 5.1.4',
-      require => [ Class['traf::hive_metastore'], File['/usr/local/bin/cmgr.sh'], ]
-    }
-
     class {'traf::hive_metastore':
       hive_sql_pw     => 'insecure_hive',
       hive_schema_ver => '0.12.0',
       require         => Class['::cloudera'],
     }
-
-    class { '::cloudera':
-      cm_server_host   => 'localhost',
-      install_cmserver => true,
-      use_parcels      => false,
-      cdh_version      => '5.1.4',
-    }
   }
   if $distro == 'CM5.3' {
-    # For CDH5, header files are in separate package
-    package { 'hadoop-libhdfs-devel':
-      ensure  => present,
-      require => Class['::cloudera'],
-    }
-    exec {'cluster_setup':
-      command => '/usr/local/bin/cmgr.sh 5.3.1',
-      timeout => 0,
-      unless  => '/usr/local/bin/cmgr.sh check 5.3.1',
-      require => [ Class['traf::hive_metastore'], File['/usr/local/bin/cmgr.sh'], ]
-    }
-
     class {'traf::hive_metastore':
       hive_sql_pw     => 'insecure_hive',
       hive_schema_ver => '0.13.0',
       require         => Class['::cloudera'],
-    }
-
-    class { '::cloudera':
-      cm_server_host   => 'localhost',
-      install_cmserver => true,
-      use_parcels      => false,
-      cdh_version      => '5.3.1',
     }
   }
 

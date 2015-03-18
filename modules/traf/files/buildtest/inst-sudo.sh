@@ -40,7 +40,7 @@ set -x
 if [[ $action == "install" ]]
 then
   # first clean out hbase from previous tests
-  sudo /usr/local/bin/hbase-clean.sh initialize || exit 1
+  sudo /usr/local/bin/cluster_setup || exit 1
 
   sudo rm -rf /var/log/trafodion/* # clean out logs from any prior jobs
   sudo rm -rf $INSTLOC $RUNLOC || exit 1
@@ -55,66 +55,32 @@ then
   cd $INSTLOC
   tar xzf $(basename $instball) || exit 1
 
-  # Old (multi-script) installer vs. New (single-script) installer
-  if [[ -f ./installer/trafodion_setup ]]
+  # prep config file  
+  cp ./installer/trafodion_config_default ./tc
+  echo "NODE_LIST=$(hostname -s)" >> ./tc
+  echo "node_count=1" >> ./tc
+  echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./tc
+  echo "OPENSTACK_VM=1" >> ./tc
+  echo "TRAF_BUILD=$trafball" >> ./tc
+  echo "DCS_BUILD=$dcsball" >> ./tc
+  echo "SQ_ROOT=$RUNLOC" >> ./tc
+  echo "START=Y" >> ./tc
+  echo "INIT_TRAFODION=Y" >> ./tc
+  echo "DCS_SERVERS_PARM=$dcscnt" >> ./tc
+  echo "CLUSTER_NAME=trafcluster" >> ./tc
+  if rpm -q cloudera-manager-server >/dev/null
   then
-    # Trafodion set-up
-    echo "accept" | 
-       ./installer/trafodion_setup --nodes "$(hostname -s)"
-    ret=$?
-
-    # Trafodion mods
-    if [[ $ret == 0 ]]
-    then
-      ./installer/trafodion_mods --trafodion_build "$trafball"
-      ret=$?
-    fi
-
-    # Trafodion installer
-    if [[ $ret == 0 ]]
-    then
-      # old installer on ambari requires manual restart of hbase
-      if rpm -q ambari-server >/dev/null
-      then
-        sudo /usr/local/bin/hbase-clean.sh restart
-      fi
-
-      # trafodion user should exist after setup
-      sudo chown trafodion $RUNLOC
-
-      # -i logs into home dir
-      sudo -n -i -u trafodion ./trafodion_installer --dcs_servers $dcscnt --init_trafodion \
-	       --build "$trafball" \
-	       --dcs_build "$dcsball" \
-	       --install_path $RUNLOC
-      ret=$?
-    fi
+    echo "URL=$(hostname -f):7180" >> ./tc
+    echo "HADOOP_TYPE=cloudera" >> ./tc
   else
-    # prep config file  
-    cp ./installer/trafodion_config_default ./tc
-    echo "NODE_LIST=$(hostname -s)" >> ./tc
-    echo "node_count=1" >> ./tc
-    echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./tc
-    echo "OPENSTACK_VM=1" >> ./tc
-    echo "TRAF_BUILD=$trafball" >> ./tc
-    echo "DCS_BUILD=$dcsball" >> ./tc
-    echo "SQ_ROOT=$RUNLOC" >> ./tc
-    echo "START=Y" >> ./tc
-    echo "INIT_TRAFODION=Y" >> ./tc
-    echo "DCS_SERVERS_PARM=$dcscnt" >> ./tc
-    echo "CLUSTER_NAME=trafcluster" >> ./tc
-    if rpm -q cloudera-manager-server >/dev/null
-    then
-      echo "URL=$(hostname -f):7180" >> ./tc
-      echo "HADOOP_TYPE=cloudera" >> ./tc
-    else
-      echo "URL=$(hostname -f):8080" >> ./tc
-      echo "HADOOP_TYPE=hortonworks" >> ./tc
-    fi
-
-    ./installer/trafodion_install --accept_license --config_file ./tc
-    ret=$?
+    echo "URL=$(hostname -f):8080" >> ./tc
+    echo "HADOOP_TYPE=hortonworks" >> ./tc
   fi
+
+  echo "*** Calling trafodion_install"
+  ./installer/trafodion_install --accept_license --config_file ./tc
+  ret=$?
+
   # save installer logs
   sudo -n -u jenkins mkdir -p $WORKSPACE/var_log_trafodion
   sudo chmod -R +r /var/log/trafodion
@@ -136,6 +102,7 @@ then
   # Dev regressions
   if [[ $ret == 0 && -n "$regball" ]]
   then
+    echo "*** Installing regressions"
     cd $RUNLOC
     sudo -n -u trafodion tar xf $regball
   fi
