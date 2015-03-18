@@ -20,28 +20,11 @@
 source /usr/local/bin/traf-functions.sh
 log_banner
 
-# if we have tinstall user defined, we are
-# configured for trafodion installer
-if id tinstall 2>/dev/null
-then
-  USE_INSTALLER=1
-else
-  USE_INSTALLER=0
-fi
 
 set -x
 
-# No hadoop management SW, just stop trafodion in place
-if [[ $USE_INSTALLER == 0 ]]
-then
-  /usr/local/bin/stop-traf-instance.sh "$@"
-  rc=$?
-
-# Use trafodion uninstaller
-else
-  # tinstall user has required permissions 
-  sudo -n -u tinstall /usr/local/bin/inst-sudo.sh uninstall $WORKSPACE
-  rc=$?
-fi
+# tinstall user has required permissions 
+sudo -n -u tinstall /usr/local/bin/inst-sudo.sh uninstall $WORKSPACE
+rc=$?
 
 exit $rc

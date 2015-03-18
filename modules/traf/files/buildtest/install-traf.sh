@@ -97,50 +97,8 @@ cd $WORKSPACE
 
 rm -rf $WORKSPACE/hbase-logs
 
-# if we have tinstall user defined, we are
-# configured for trafodion installer
-if id tinstall 2>/dev/null
-then
-  USE_INSTALLER=1
-else
-  USE_INSTALLER=0
-fi
-
 log_banner "Setting up Trafodion"
 
-# No hadoop management SW, just start trafodion in place
-if [[ $USE_INSTALLER == 0 ]]
-then
-  # record instance location - build tree
-  install_loc "build" $REGRESS
-
-  # DCS args are optional
-  echo "Saving output in Install_Start.log"
-  set -x
-  /usr/local/bin/start-traf-instance.sh $COREDIR $DCSDIR $DCSSERV 2>&1 | tee Install_Start.log | \
-       grep --line-buffered -e '^\+'
-  ret=${PIPESTATUS[0]}
-  if [[ $ret == 0 && -n $DCSDIR ]]
-  then
-    set +x
-  
-    echo "INFO: Waiting a minute to check for DcsServer"
-    sleep 60
-  
-    set -x
-    if [ $(jps | grep -c DcsServer) -ne $DCSSERV ]; then
-      echo "ERROR: No DcsServer found. Please check your DCS setup."
-      exit 1
-    fi
-    echo ""
-    exit 0
-  else
-    exit $ret
-  fi
-
-fi
-
-# Use trafodion installer
 
 # DCS is not optional
 #   default to 4 servers
