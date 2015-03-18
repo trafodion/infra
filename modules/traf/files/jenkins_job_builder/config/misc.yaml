@@ -18,20 +18,49 @@
           default: master
           description: git branch to build
       - string:
+          name: TIMEOUT
+          default: "200"
+          description: Minutes to job timeout
+      - bool:
+          name: SQL
+          default: true
+          description: Run a SQL regression suite?
+      - string:
+          name: SQLSUITE
+          default: udr
+          description: Which SQL suite to run
+      - bool:
+          name: PQ
+          default: false
+          description: Run a Phoenix Quick2 test?
+      - string:
           name: HADOOP_DISTRO
-          default: CDH51
-          description: Hadoop Distro being tested (CDH51 for Cloudera 5.1.x or HDP21 for Hortonworks 2.1.x)
+          default: ahw22
+          description: Distro being tested (phoenix_test argument) ahw22, cm53,...
+      - string:
+          name: DRIVER
+          default: T4
+          description: Driver to test T2, T4
+      - bool:
+          name: PYODBC
+          default: false
+          description: Run a pyodbc test?
+      - bool:
+          name: JDBC
+          default: false
+          description: Run a jdbc test?
 
     wrappers:
       - timeout:
-          timeout: 130
+          timeout: '$TIMEOUT'
           fail: true
       - timestamps
 
     builders:
       - link-logs
-      - clean-workspace
+      - check-node
       - kill-traf
+      - clean-workspace
       - multi-git-prep:
            repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
       - pkg-traf:
@@ -40,32 +69,59 @@
            buildDir: "trafodion/dcs"
            coreJDBC: "trafodion/core"
       - pkg-install
-      - sql-regress:
-           dir: "./trafodion/core"
-           suites: "udr"
-      - run-phoenix_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/phoenix_test"
-           jdbctype: "T4"
-           hadoopdistro: '$HADOOP_DISTRO'
-           tests1: "ProductMetricsTest"
-           tests2: ""
-           tests3: ""
-           tests4: ""
-      - run-pyodbc_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/dcs/src/test/pytests"
-           tests1: "test_p2.SQLTest.test21"
+      - conditional-step:
+           condition-kind: boolean-expression
+           condition-expression: $SQL
+           steps:
+               - sql-regress:
+                    dir: "./trafodion/core"
+                    suites: "$SQLSUITE"
+      - conditional-step:
+           condition-kind: boolean-expression
+           condition-expression: $PQ
+           steps:
+               - run-phoenix_test:
+                    trafCoreDir: "trafodion/core"
+                    dcsDir: "trafodion/dcs"
+                    testDir: "trafodion/phoenix_test"
+                    jdbctype: "$DRIVER"
+                    hadoopdistro: '$HADOOP_DISTRO'
+                    tests1: "QUICK2"
+                    tests2: ""
+                    tests3: ""
+                    tests4: ""
+      - conditional-step:
+           condition-kind: boolean-expression
+           condition-expression: $PYODBC
+           steps:
+               - run-pyodbc_test:
+                    trafCoreDir: "trafodion/core"
+                    dcsDir: "trafodion/dcs"
+                    testDir: "trafodion/dcs/src/test/pytests"
+                    tests1: ""
+      - conditional-step:
+           condition-kind: boolean-expression
+           condition-expression: $JDBC
+           steps:
+               - run-jdbc_test:
+                    trafCoreDir: "trafodion/core"
+                    dcsDir: "trafodion/dcs"
+                    testDir: "trafodion/dcs/src/test/jdbc_test"
+                    tests1: ""
 
-
+    # superset here
     publishers:
-      - phoenix-xunit
+      - post-check-node
       - console-log
       - git-log
       - traf-make-log
+      - traf-runtime-log
+      - traf-regress-log
+      - phoenix-xunit
+      - phoenix_test-log
       - pyodbc_test-log
+      - jdbc_test-log
+      - jdbc-xunit
 
 
 - job-template:
