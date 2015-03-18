@@ -28,6 +28,23 @@ set -x
 
 /usr/local/bin/install-traf.sh "sqlregress" "$DIR" || exit 1
 
+# Hive suite depends on pre-loaded TPC-DS data
+if [[ "$SUITES" =~ hive ]]
+then
+  # check if hive data already in place 
+  #   ideally this check will move into the regr_test_env script
+  hive -e 'describe store_orc;' >/dev/null 2>&1
+  if [[ $? != 0 ]]
+  then
+    $WORKSPACE/$DIR/sqf/sql/scripts/install_hadoop_regr_test_env \
+      --unpackDir=$WORKSPACE/tpcds-tool \
+      --dataDir=$WORKSPACE/tpcds-data \
+      --hdfsCmd="sudo -n -u hdfs /usr/bin/hdfs" \
+      --hiveCmd="sudo -n -u hdfs /usr/bin/hive" \
+      --logFile=$WORKSPACE/$DIR/sqf/sql/scripts/build_regr_test_env.log
+  fi
+fi
+
 # trafodion id created by installer
 # if it exists, must run dev regressions as same user
 # otherwise we are running instance locally as jenkins user

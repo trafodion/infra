@@ -17,27 +17,35 @@
 #
 # @@@ END COPYRIGHT @@@
 
+source /usr/local/bin/traf-functions.sh
+
 # Interact with Cloudera Manager for initial cluster set-up
 # Simple single-node cluster for test environment
 
 PATH="/bin:/usr/bin"
 
-# check mode is read-only
-# check if set-up is correct, exit as soon as problem is found
-if [[ $1 == "check" ]]
+log_banner "Checking Cluster Configuration"
+echo "*** Checking Cluster Configuration"
+
+# Distro
+
+
+# previously saved?
+if [[ -r /var/local/TrafTestDistro ]]
 then
-  mode="check"
-  shift
+  Vers="$(</var/local/TrafTestDistro)"
+  echo "Retriving distro from /var/local/TrafTestDistro: $Vers"
 else
-  mode=""
+  Vers="$1"
+  if [[ ! $Vers =~ ^[0-9][.0-9]+$ ]]
+  then
+    echo "Error: Distro not specified in /var/local/TrafTestDistro nor on command line"
+    echo "Error: Usage: $0 <CDH-full-version-number>"
+    exit 1
+  fi
+  echo "$Vers" > /var/local/TrafTestDistro
 fi
 
-Vers="$1"
-if [[ ! $Vers =~ ^[0-9][.0-9]+$ ]]
-then
-  echo "Error: Usage: $0 [check] <CDH-full-version-number>"
-  exit 1
-fi
 
 # curl options
 URL="http://localhost:7180/api/v7"
@@ -76,7 +84,6 @@ function cm_config_serv {
 
   if [[ ! $Config =~ $param ]]
   then
-    [[ $mode == "check" ]] && exit 5
     echo "Updating $service $param config"
     Config=$(curl $Update -d'
 		  { "items" : [ {
@@ -106,7 +113,6 @@ Cluster="$(curl $Read $URL/clusters/trafcluster | jq -r '.name')"
 
 if [[ $Cluster == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating cluster: trafcluster"
   Cluster=$(curl $Create -d'
 		  { "items" : [ {
@@ -134,7 +140,6 @@ do
 
   if [[ $Service == "null" ]]
   then
-    [[ $mode == "check" ]] && exit 5
     echo "Creating service: $sname"
     Service=$(curl $Create -d'
 		  { "items" : [ {
@@ -179,7 +184,6 @@ Role="$(curl $Read $URL/clusters/trafcluster/services/hdfs/roles/trafSEC | jq -r
 
 if [[ $Role == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating HDFS roles"
   Roles=$(curl $Create -d'
 		  { "items" : [ {
@@ -221,7 +225,6 @@ Role="$(curl $Read $URL/clusters/trafcluster/services/trafZOO/roles/trafSERV | j
 
 if [[ $Role == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating Zookeeper role"
   Roles=$(curl $Create -d'
 		  { "items" : [ {
@@ -243,7 +246,6 @@ Role="$(curl $Read $URL/clusters/trafcluster/services/trafMAPRED/roles/trafJOB |
 
 if [[ $Role == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating MapReduce role"
   Roles=$(curl $Create -d'
 		  { "items" : [ {
@@ -277,7 +279,6 @@ Role="$(curl $Read $URL/clusters/trafcluster/services/trafYARN/roles/trafRESMGR 
 
 if [[ $Role == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating Yarn roles"
   Roles=$(curl $Create -d'
 		  { "items" : [ {
@@ -310,7 +311,6 @@ Role="$(curl $Read $URL/clusters/trafcluster/services/trafHIVE/roles/trafMETA | 
 
 if [[ $Role == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating Hive role"
   Roles=$(curl $Create -d'
 		  { "items" : [ {
@@ -331,7 +331,6 @@ Role="$(curl $Read $URL/clusters/trafcluster/services/trafHIVE/roles/trafHSRV | 
 
 if [[ $Role == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating Hive role"
   Roles=$(curl $Create -d'
 		  { "items" : [ {
@@ -353,7 +352,6 @@ Role="$(curl $Read $URL/clusters/trafcluster/services/trafhbase/roles/trafMAS | 
 
 if [[ $Role == "null" ]]
 then
-  [[ $mode == "check" ]] && exit 5
   echo "Creating HBase roles"
   Roles=$(curl $Create -d'
 		  { "items" : [ {
@@ -372,34 +370,62 @@ then
     echo "Error: failed to create HBase roles"
     exit 2
   fi
+  echo "*** Removing any prior HBase coprocessor config"
+  curl $Update --data '
+              { "items" : [
+                     { "name" : "hbase_master_config_safety_valve" }
+                ] }
+             ' $URL/clusters/trafcluster/services/trafhbase/roles/trafMAS/config | jq -r '.message'
+  curl $Update --data '
+              { "items" : [
+                     { "name" : "hbase_coprocessor_region_classes" },
+                     { "name" : "hbase_regionserver_config_safety_valve" }
+                ] }
+             ' $URL/clusters/trafcluster/services/trafhbase/roles/trafREG/config | jq -r '.message'
 fi
 
 # Deploy Client Config
 State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.clientConfigStalenessStatus')"
 if [[ $State =~ STALE ]]
 then
-  [[ $mode == "check" ]] && exit 5
   CID=$(curl $Create $URL/clusters/trafcluster/commands/deployClientConfig | jq -r '.id')
   cm_cmd $CID "Client Deploy"
 fi
 
-########## End of Configurations
 
-# Check whether previously initialized
-if [[ -f /var/local/Cluster_Init_Trafodion ]]
-then
-  echo "File /var/local/Cluster_Init_Trafodion exists."
-  echo "Skipping initialization steps."
-  exit 0
-fi
+log_banner "Start Services and Delete HBase data"
 
-########## Start of Initialization
+function start_service() {
+  serv=$1
+  State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
+  if [[ $State == "STOPPED" ]]
+  then
+    echo "*** Starting $serv"
+    CID=$(curl $Create $URL/clusters/trafcluster/services/${serv}/commands/start | jq -r '.id')
+    cm_cmd $CID "$serv Start"
+    # Check status
+    State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
+    if [[ $State =~ STOP ]] # stopped, stopping
+    then
+      echo "Error: $serv not started"
+      exit 2
+    fi
+  fi
+}
 
-# Start HDFS
+# HDFS
 
 State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
 
-if [[ $State == "STOPPED" ]]
+if [[ $State != "STOPPED" ]]
+then
+  # make sure we are not in HDFS safemode
+  mode="$(hdfs dfsadmin -safemode get)"
+  if [[ $mode =~ ON ]]
+  then
+    sudo -u hdfs hdfs dfsadmin -safemode leave
+  fi
+elif [[ $State == "STOPPED" ]]
 then
   # Make sure namenode is formatted
   CID=$(curl $Create -d'
@@ -409,101 +435,112 @@ then
 	)
   cm_cmd $CID "HDFS Format"
 
-  [[ $mode == "check" ]] && exit 5
-  # Start HDFS service roles
-  CID=$(curl $Create $URL/clusters/trafcluster/services/hdfs/commands/start | jq -r '.id')
-  cm_cmd $CID "HDFS Start"
+  start_service hdfs
 
-  # Check status
-  State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.serviceState')"
-  if [[ $State =~ STOP ]] # stopped, stopping
-  then
-    echo "Error: HDFS not started"
-    exit 2
-  fi
+  # wait for safemode so we can modify hdfs data
+  sudo -u hdfs hdfs dfsadmin -safemode wait
 fi
+
+### Standard directories that need only to be created once
 
 # Hive set-up
-hadoop fs -ls /user/hive >/dev/null
+hdfs dfs -ls /user/hive >/dev/null
 if [[ $? != 0 ]]
 then
-  [[ $mode == "check" ]] && exit 5
   CID=$(curl $Create $URL/clusters/trafcluster/services/trafHIVE/commands/hiveCreateHiveUserDir | jq -r '.id')
   cm_cmd $CID "Hive Create User Dir"
+  hdfs dfs -ls /user/hive >/dev/null || exit 2
 fi
-hadoop fs -ls /user/hive >/dev/null || exit 2
 
-hadoop fs -ls /user/hive/warehouse >/dev/null
+hdfs dfs -ls /user/hive/warehouse >/dev/null
 if [[ $? != 0 ]]
 then
-  [[ $mode == "check" ]] && exit 5
   CID=$(curl $Create $URL/clusters/trafcluster/services/trafHIVE/commands/hiveCreateHiveWarehouse | jq -r '.id')
   cm_cmd $CID "Hive Create Warehouse"
+  hdfs dfs -ls /user/hive/warehouse >/dev/null || exit 2
 fi
-hadoop fs -ls /user/hive/warehouse >/dev/null || exit 2
 
 # MapReduce needs /tmp
-hadoop fs -ls /tmp >/dev/null
+hdfs dfs -ls /tmp >/dev/null
 if [[ $? != 0 ]]
 then
-  [[ $mode == "check" ]] && exit 5
   CID=$(curl $Create $URL/clusters/trafcluster/services/hdfs/commands/hdfsCreateTmpDir | jq -r '.id')
   cm_cmd $CID "HDFS Create tmp"
+  hdfs dfs -ls /tmp >/dev/null || exit 2
 fi
-hadoop fs -ls /tmp >/dev/null || exit 2
 
 # Yarn needs app log dir
-hadoop fs -ls /tmp/logs >/dev/null
+hdfs dfs -ls /tmp/logs >/dev/null
 if [[ $? != 0 ]]
 then
-  [[ $mode == "check" ]] && exit 5
   CID=$(curl $Create $URL/clusters/trafcluster/services/trafYARN/commands/yarnNodeManagerRemoteAppLogDirCommand | jq -r '.id')
   cm_cmd $CID "HDFS Create app logs dir"
+  hdfs dfs -ls /tmp/logs >/dev/null || exit 2
 fi
-hadoop fs -ls /tmp/logs >/dev/null || exit 2
 
 # Yarn/MR job history 
-hadoop fs -ls /user/history >/dev/null
+hdfs dfs -ls /user/history >/dev/null
 if [[ $? != 0 ]]
 then
-  [[ $mode == "check" ]] && exit 5
   CID=$(curl $Create $URL/clusters/trafcluster/services/trafYARN/commands/yarnCreateJobHistoryDirCommand | jq -r '.id')
   cm_cmd $CID "HDFS Create job history dir"
+  hdfs dfs -ls /user/history >/dev/null || exit 2
 fi
-hadoop fs -ls /user/history >/dev/null || exit 2
 
+### HBase data should be cleaned up every time
+echo "*** Removing HBase Data"
 
-# HBase root 
-hadoop fs -ls /hbase >/dev/null
-if [[ $? != 0 ]]
+# requires zookeeper up
+start_service trafZOO
+
+# hbase must be down
+State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
+if [[ $State != "STOPPED" ]]
 then
-  [[ $mode == "check" ]] && exit 5
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/hbaseCreateRoot | jq -r '.id')
-  cm_cmd $CID "HBase Create root"
+  echo "*** Stopping HBase"
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/stop | jq -r '.id')
+  cm_cmd $CID "HBase Stop"
 fi
-hadoop fs -ls /hbase >/dev/null || exit 2
 
+# data locations for Cloudera
+hdata="/hbase"  # HDFS
+zkdata="/hbase" # zookeeper
 
-# Start services
-for serv in trafZOO trafHIVE trafYARN trafMAPRED trafhbase
-do
-  State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
-  if [[ $State == "STOPPED" ]]
+sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
+sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
+
+# clean up logs so we can save only what is logged for this run
+sudo -u hbase rm -rf /var/log/hbase/*
+
+# recreate root
+CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/hbaseCreateRoot | jq -r '.id')
+cm_cmd $CID "HBase Create root"
+
+# verify nothing is using HBase port
+  HPort='60010'
+  # ss will let us know if port is in use, and -p option will give us process info
+  cmd="/usr/sbin/ss -lp src *:$HPort"
+
+  pcount=$($cmd | wc -l)
+  pids=$(sudo -n $cmd | sed -n '/users:/s/^.*users:((.*,\([0-9]*\),.*$/\1/p')
+  if [[ $pcount > 1 ]] # always get header line
   then
-    [[ $mode == "check" ]] && exit 5
-    CID=$(curl $Create $URL/clusters/trafcluster/services/${serv}/commands/start | jq -r '.id')
-    cm_cmd $CID "$serv Start"
+    echo "Warning: found port $HPort in use"
+    $cmd
   fi
-  # Check status
-  State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.serviceState')"
-  if [[ $State =~ STOP ]] # stopped, stopping
+  if [[ -n $pids ]]
   then
-    echo "Error: $serv not started"
-    exit 2
+    echo "Warning: processes using port $HPort"
+    ps -f $pids
+    echo "Warning: killing pids: $pids"
+    kill $pids
   fi
-done
 
-# Successfully initialized - don't repeat initialization
-echo "Cluster set-up complete $(date)" > /var/local/Cluster_Init_Trafodion
+start_service trafHIVE
+start_service trafYARN
+start_service trafMAPRED
+start_service trafhbase
+
+echo "*** Cluster Check Complete"
 
 exit 0
