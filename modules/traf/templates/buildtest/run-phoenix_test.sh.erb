@@ -135,6 +135,7 @@ else
 		MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$TMP_LD_PRELOAD LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
     		./phoenix_test.py $TARGS
     phoenixRes=$?
+    reportarg="-u trafodion"
   else
     rm -rf $WORKSPACE/phx_test_run
     cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
@@ -142,17 +143,15 @@ else
     export LD_PRELOAD=$TMP_LD_PRELOAD
     ./phoenix_test.py $TARGS
     phoenixRes=$?
+    reportarg=""
   fi
 fi
 cat $WORKSPACE/phx_test_run/target/surefire-reports/*.txt > $WORKSPACE/test_summary.txt
 
-cd $WORKSPACE
-if [ -z $SKIPSTOP ]; then /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"; fi
-
 # Report on parent directory of $TRAF_DIR
 # Any core files means failure
 source_env test
-report_on_corefiles "${WORKSPACE}"
+report_on_corefiles $reportarg "${WORKSPACE}"
 coreCount=$?
 if [[ $coreCount -gt 0 ]]; then
   echo
@@ -161,6 +160,10 @@ if [[ $coreCount -gt 0 ]]; then
 fi
 
 phoenixRes=$(( phoenixRes + coreCount ))
+
+# uninstall removes trafodion user, so must come last
+cd $WORKSPACE
+if [ -z $SKIPSTOP ]; then /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"; fi
 
 # exit with sum of return codes from phoenix_test.py and report_on_corefiles
 exit $phoenixRes
