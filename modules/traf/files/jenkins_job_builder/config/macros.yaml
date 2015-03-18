@@ -289,6 +289,10 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
+              source: 'traf_run/sql/scripts/stdout_*'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
               source: 'traf_run/tmp/*'
               copy-after-failure: true
               keep-hierarchy: true

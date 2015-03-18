@@ -1,3 +1,4 @@
 jenkins	ALL = (trafodion) NOPASSWD:/usr/local/bin/run-dev-regress.sh
 jenkins	ALL = (trafodion) SETENV: NOPASSWD:/home/jenkins/workspace/*/phx_test_run/phoenix_test.py
 jenkins	ALL = (trafodion) NOPASSWD:/bin/rm,/bin/cp
+jenkins	ALL = (trafodion) NOPASSWD:/usr/local/bin/core_bt
