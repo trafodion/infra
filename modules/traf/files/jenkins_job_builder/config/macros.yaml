@@ -1,6 +1,6 @@
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -257,35 +257,15 @@
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/trafodion.*.log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/hdfs*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/mvqr*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/pstartd*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/sqmon*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/wdt*log'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/zsb*log'
+              source: 'traf_run/logs/*.log'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
               source: 'traf_run/sql/scripts/*log'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/sql/scripts/stdout_*'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
