@@ -123,7 +123,7 @@ SwiftUpload() {
                     # set header X-Delete-After to 30 days so we do not keep
                     # more than 30 days worth of previous version of the file
                     echo "INFO: Setting $fName to expire in 30 days ..."
-                    $swift post -H 'x-delete-after: 259200' $container ${host}${fName}
+                    $swift post -H 'x-delete-after: 2592000' $container ${host}${fName}
                     rc=$?
                 fi
 
@@ -149,7 +149,7 @@ SwiftUpload() {
             # more than 30 days worth of daily builds
             if [[ $fName =~ ^daily/.*|^pre-release/.* ]]; then
                 echo "INFO: Setting $fName to expire in 30 days ..."
-                headerOptions+=" -H x-delete-after:259200"
+                headerOptions+=" -H x-delete-after:2592000"
             fi
 
             echo "INFO: Uploading $fName to container $container ..."
