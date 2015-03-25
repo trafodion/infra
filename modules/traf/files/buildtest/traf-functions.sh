@@ -222,6 +222,15 @@ function report_on_corefiles() {
     echo
     COREFILES=$(find-corefiles.pl "$ADIR")
     if [[ -n "$COREFILES" ]]; then
+      # for any core owned by current user, make it world-readable
+      # so altuser can read it too
+      for cfile in $COREFILES
+      do
+	if [[ -O $cfile ]]
+	then
+	  chmod a+r $cfile
+	fi
+      done
       echo "WARNING: Core files found in $ADIR :"
       pushd "$ADIR" > /dev/null
       ls -l $COREFILES       | tee $WORKSPACE/corefiles.log
