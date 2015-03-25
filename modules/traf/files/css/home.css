@@ -526,6 +526,11 @@ a.pager-active {
     color: #7F7F7F!important;
 }
 
+/* over-ride blueprint style-sheet - do not set different color for
+ * every other table row (i.e., zuul job)
+ * The line between jobs gets hidden
+ */
+tbody tr:nth-child(even) td, tbody tr.even td {background: inherit;}
 
 /* @end */
 
