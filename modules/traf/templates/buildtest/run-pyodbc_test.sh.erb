@@ -113,7 +113,7 @@ else
   # Report on parent directory of $TRAF_DIR
   # Any core files means failure
   source_env test
-  report_on_corefiles "${WORKSPACE}"
+  report_on_corefiles -u trafodion "${WORKSPACE}"
   coreCount=$?
   if [[ $coreCount -gt 0 ]]; then
     echo
