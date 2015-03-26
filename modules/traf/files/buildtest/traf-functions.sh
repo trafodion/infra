@@ -101,6 +101,7 @@ function source_env () {
     echo "unset TOOLSDIR"
   fi
 
+  local rc
   if [[ $1 == "build" ]]
   then
     cd "$WORKSPACE/trafodion/core/sqf"
