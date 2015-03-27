@@ -17,10 +17,6 @@
           name: BRANCH
           default: master
           description: git branch to build
-      - string:
-          name: TIMEOUT
-          default: "200"
-          description: Minutes to job timeout
       - bool:
           name: SQL
           default: true
@@ -51,9 +47,6 @@
           description: Run a jdbc test?
 
     wrappers:
-      - timeout:
-          timeout-var: 'TIMEOUT'
-          fail: true
       - timestamps
 
     builders:
