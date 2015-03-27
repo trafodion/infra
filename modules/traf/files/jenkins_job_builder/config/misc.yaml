@@ -52,7 +52,7 @@
 
     wrappers:
       - timeout:
-          timeout: '$TIMEOUT'
+          timeout-var: 'TIMEOUT'
           fail: true
       - timestamps
 
