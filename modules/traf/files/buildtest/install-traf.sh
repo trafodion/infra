@@ -115,6 +115,7 @@ install_loc "installed" $REGRESS
 trafball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion_server-*.tgz)"
 dcsball="$(/bin/ls $WORKSPACE/trafodion/dcs/target/dcs*gz)"
 instball="$(/bin/ls $WORKSPACE/trafodion/install/installer*gz)"
+restball="$(/bin/ls $WORKSPACE/trafodion/core/rest/target/rest-*gz)"
 
 flist="$instball $trafball $dcsball"
 if [[ $REGRESS == "regress" ]]
@@ -142,6 +143,7 @@ chmod o+r $flist
 sudo -n -u tinstall /usr/local/bin/inst-sudo.sh install "$WORKSPACE" \
        "$instball" \
        "$trafball" \
+       "$restball" \
        "$dcsball" "$DCSSERV" \
        "$regball" 2>&1 | tee Install_Start.log | \
           grep --line-buffered -e '\*\*\*'
