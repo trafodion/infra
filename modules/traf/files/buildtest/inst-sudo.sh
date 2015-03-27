@@ -26,11 +26,12 @@ WORKSPACE="$2"
 # required tarballs for install
 instball="$3"
 trafball="$4"
-dcsball="$5"
+restball="$5"
+dcsball="$6"
 # dcs server number
-dcscnt="$6"
+dcscnt="$7"
 # optional sql regression tarball
-regball="$7"
+regball="$8"
 
 source "/usr/local/bin/traf-functions.sh"
 log_banner "Trafodion $action"
@@ -97,6 +98,7 @@ then
     echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./tc
     echo "OPENSTACK_VM=1" >> ./tc
     echo "TRAF_BUILD=$trafball" >> ./tc
+    echo "REST_BUILD=$restball" >> ./tc  ## may be empty for pre-1.1 builds
     echo "DCS_BUILD=$dcsball" >> ./tc
     echo "SQ_ROOT=$RUNLOC" >> ./tc
     echo "START=Y" >> ./tc
