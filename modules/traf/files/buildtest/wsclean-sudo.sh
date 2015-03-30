@@ -42,4 +42,4 @@ rm -rf /usr/lib/trafodion
 
 # ensure trafodion user is deleted
 # this will force installer to go through full install, rather than upgrade path
-userdel -rf trafodion
+/usr/sbin/userdel -rf trafodion
