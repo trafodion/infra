@@ -20,6 +20,15 @@
 source "/usr/local/bin/traf-functions.sh"
 log_banner
 
+# Option to configure LDAP
+if [[ "$1" == "--ldap" ]]
+then
+  LDAP="$1"
+  shift
+else
+  LDAP=""
+fi
+
 # Option to install regression tests
 if [[ "$1" == "sqlregress" ]]
 then
@@ -140,7 +149,7 @@ set -x
 chmod o+r $flist
 
 # tinstall user has required permissions to run installer
-sudo -n -u tinstall /usr/local/bin/inst-sudo.sh install "$WORKSPACE" \
+sudo -n -u tinstall /usr/local/bin/inst-sudo.sh $LDAP install "$WORKSPACE" \
        "$instball" \
        "$trafball" \
        "$restball" \

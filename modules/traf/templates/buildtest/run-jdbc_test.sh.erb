@@ -80,7 +80,16 @@ set -x
 # start trafodion
 cd $WORKSPACE
 ulimit -c unlimited
-if [ -z $SKIPSTART ]; then /usr/local/bin/install-traf.sh "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" "installdrivers" || exit 1; fi
+
+# experimental
+if [[ $JOB_NAME == "node-test" || $ZUUL_PIPELINE == "daily" ]]
+then
+  LDAP="--ldap"
+else
+  LDAP=""
+fi
+
+if [ -z $SKIPSTART ]; then /usr/local/bin/install-traf.sh $LDAP "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" "installdrivers" || exit 1; fi
 
 # run jdbc_test
 log_banner "jdbc_test.py"
