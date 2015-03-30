@@ -17,6 +17,15 @@
 #
 # @@@ END COPYRIGHT @@@
 
+# optional ldap config
+if [[ "$1" == "--ldap" ]]
+then
+  LDAP="true"
+  shift
+else
+  LDAP="false"
+fi
+
 # install or uninstall
 action="$1"
 
@@ -99,6 +108,30 @@ then
     # (or every use of hdfs rm has to use -skipTrash option)
     sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
     sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
+
+    # Temporary -- until installer supports authentication config
+    if [[ $LDAP == "true" ]]
+    then
+      # add config file
+      sudo -n -u jenkins touch $WORKSPACE/traf_authentication_config
+      sudo -n -u jenkins chmod 666 $WORKSPACE/traf_authentication_config
+      cat > $WORKSPACE/traf_authentication_config <<-EOF
+	LdapHostname:ldap01.trafodion.org
+	LdapPort:389
+	UniqueIdentifier:uid=,ou=users,dc=trafldap,dc=com
+	EOF
+      # run authentication on command
+      sudo -n -i -u trafodion traf_authentication_setup --on --file $WORKSPACE/traf_authentication_config
+      # restart DCS -- wait?
+      sudo -n -i -u trafodion stop-dcs.sh
+      sudo -n -i -u trafodion start-dcs.sh
+      sudo -n -i -u trafodion traf_authentication_setup --status | grep -q 'ENABLED'
+      if (( $? != 0 ))
+      then
+        echo "*** Error enabling authentication"
+	exit 3
+      fi
+    fi
   fi
 
   # Dev regressions

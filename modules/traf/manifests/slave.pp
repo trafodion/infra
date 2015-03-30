@@ -93,6 +93,11 @@ class traf::slave (
     host_aliases => 'puppet3',
     ip           => '172.16.0.46',
   }
+  host { 'ldap01.trafodion.org':
+    ensure       => present,
+    host_aliases => 'puppet3',
+    ip           => '172.16.0.43',
+  }
 
   # external IP, dashboard in US West
   host { 'dashboard.trafodion.org':
