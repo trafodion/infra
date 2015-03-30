@@ -1,7 +1,7 @@
 #!/bin/sh
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -39,3 +39,7 @@ rm -rf $WORKSPACE/rundir $WORKSPACE/sql-regress-logs
 # clean trafodion previous versions that installer generates
 # to prevent using all root disk space
 rm -rf /usr/lib/trafodion
+
+# ensure trafodion user is deleted
+# this will force installer to go through full install, rather than upgrade path
+userdel -rf trafodion
