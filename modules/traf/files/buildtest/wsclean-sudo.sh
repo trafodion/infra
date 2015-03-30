@@ -39,3 +39,7 @@ rm -rf $WORKSPACE/rundir $WORKSPACE/sql-regress-logs
 # clean trafodion previous versions that installer generates
 # to prevent using all root disk space
 rm -rf /usr/lib/trafodion
+
+# ensure trafodion user is deleted
+# this will force installer to go through full install, rather than upgrade path
+userdel -rf trafodion
