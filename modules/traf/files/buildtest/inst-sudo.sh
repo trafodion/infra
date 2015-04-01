@@ -123,8 +123,8 @@ then
       # run authentication on command
       sudo -n -i -u trafodion traf_authentication_setup --on --file $WORKSPACE/traf_authentication_config
       # restart DCS 
-      sudo -n -i -u trafodion $MY_SQROOT/dcs-1.1.0/bin/stop-dcs.sh
-      sudo -n -i -u trafodion $MY_SQROOT/dcs-1.1.0/bin/start-dcs.sh
+      sudo -n -i -u trafodion $RUNLOC/dcs-1.1.0/bin/stop-dcs.sh
+      sudo -n -i -u trafodion $RUNLOC/dcs-1.1.0/bin/start-dcs.sh
       sudo -n -i -u trafodion traf_authentication_setup --status | grep -q 'ENABLED'
       if (( $? != 0 ))
       then
