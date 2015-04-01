@@ -131,6 +131,7 @@ then
         echo "*** Error enabling authentication"
 	exit 3
       fi
+      echo "register user qa001;" | sudo -n -i -u trafodion 'sqlci'
     fi
   fi
 
