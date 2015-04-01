@@ -106,6 +106,7 @@ elif [ "$TEST_JDBC_TYPE" = "T2" ]; then
   export HIVE_CNF_DIR="/etc/hive/conf"
   export MY_SQROOT="$ILOC"
   export MPI_TMPDIR="$ILOC/tmp"
+  export HBASE_TRXDIR="$ILOC/export/lib"
   export TMP_LD_PRELOAD="$JAVA_HOME/jre/lib/amd64/libjsig.so:$ILOC/export/lib${SQ_MBTYPE}/libseabasesig.so"
   export LD_LIBRARY_PATH="$ILOC/export/lib${SQ_MBTYPE}:$JAVA_HOME/jre/lib/amd64/server"
   export PATH="$JAVA_HOME/bin:$ILOC/export/bin${SQ_MBTYPE}:$PATH"
@@ -139,7 +140,7 @@ else
 
     chmod -R +rX $WORKSPACE/$TRAF_DIR $WORKSPACE/$DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
     sudo -n -u trafodion SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG HADOOP_CNF_DIR=$HADOOP_CNF_DIR \
-		HBASE_CNF_DIR=$HBASE_CNF_DIR HIVE_CNF_DIR=$HIVE_CNF_DIR MY_SQROOT=$MY_SQROOT \
+		HBASE_CNF_DIR=$HBASE_CNF_DIR HIVE_CNF_DIR=$HIVE_CNF_DIR MY_SQROOT=$MY_SQROOT HBASE_TRXDIR=$HBASE_TRXDIR \
 		MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$TMP_LD_PRELOAD LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
     		./phoenix_test.py $TARGS
     phoenixRes=$?
