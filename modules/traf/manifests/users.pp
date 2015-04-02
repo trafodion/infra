@@ -21,6 +21,8 @@ class traf::users {
 
   $anu_sshkey = 'AAAAB3NzaC1yc2EAAAABIwAAAQEAr3/jL5FxiPgyZQT578rj5qXlLvCxDo1tGvTpwkC1HqsAghjtYByHOKMurC1izAwcs2F5ooCNUHLRpoDf4qjJlnNycxFfjdbnn6b+Qlq37hfsr8vQTL+b6heN0/BSYQGnskYL8aPdpngjoonHZ5wFEgyRPA1yIrTL8GvkgYASfSEFkGhBlfjwyA2i5/MYgM0yelkBVZCIGa6VoSn4SUIETZEckAp5w2YthgjNEvmrf141jjAeXc+IF6KSG+Nzw6OAqLc+UkoxC1vBUjFEkDpxggme4vYOnrH5JSoEALrHadQzendxgVurfCPVbts63qj2RNyH3P55YnSO9EpOpL4QoQ=='
 
+  $birdsall_sshkey = 'AAAAB3NzaC1yc2EAAAABIwAAAQEApWSD1bLa7lJi6zc/nfZRRcDq0mJf77KW5FV3tesZpDnLIInMB6XF0Xt1iBBsPVfdKtDAHLjBXv2I0Ukkdag66OqnEciuQtybhbpdAWoO2irh3hlB1rLavu0gBUx4Hr8itIad4V0IfxK00b1MxU9Nsb+ELj/ZQccnK7ykHNnAL83W80MnkM0pV4ASPKA1B5Iok7nS4QfIs10edklG5yqWp1YS+LWlcgaquic8dCEQBl00SzJ+cFZrqRZkU2trq16bv9uwBv+M31Ao9jcY03DWcFJXT52bK4GgHO8UhL8uXBvN71R/vDwXSYtmgGZXL17SfVN4jsZYccMT0Zuw0ny31Q=='
+
   @user::virtual::localuser { 'svarnau':
     realname => 'Steve Varnau',
     sshkeys  => "ssh-rsa ${svarnau_sshkey} svarnau\n",
@@ -69,5 +71,10 @@ class traf::users {
   @user::virtual::localuser { 'hegdean':
     realname => 'Anuradha Hegde',
     sshkeys  => "ssh-rsa ${anu_sshkey} hegdean\n",
+  }
+
+  @user::virtual::localuser { 'birdsall':
+    realname => 'Dave Birdsall'
+    sshkeys  => "ssh-rsa ${birdsall_sshkey} birdsall\n",
   }
 }
