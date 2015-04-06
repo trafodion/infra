@@ -124,6 +124,12 @@ then
       sudo -n -i -u trafodion traf_authentication_setup --on --file $WORKSPACE/traf_authentication_config
       # restart DCS 
       sudo -n -i -u trafodion $RUNLOC/dcs-1.1.0/bin/stop-dcs.sh
+      count=$(pgrep -u trafodion ^mxosrvr | wc -l)
+      while (( $count > 0 ))
+      do
+        sleep 15
+        count=$(pgrep -u trafodion ^mxosrvr | wc -l)
+      done
       sudo -n -i -u trafodion $RUNLOC/dcs-1.1.0/bin/start-dcs.sh
       sudo -n -i -u trafodion traf_authentication_setup --status | grep -q 'ENABLED'
       if (( $? != 0 ))
