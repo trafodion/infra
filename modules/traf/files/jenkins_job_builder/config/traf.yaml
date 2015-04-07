@@ -490,7 +490,7 @@
       - copy-system-logs
       - traf-runtime-log
 
-# test installer against stable branch
+# test installer against stable branches
 - job-template:
     name: 'pyodbc_test-cm5.1-stable'
     node: 'redhat_cm5.1'
@@ -508,6 +508,47 @@
       - clean-workspace
       - multi-git-stable:
            branch: "stable/1.0"
+           repos: "trafodion/core trafodion/dcs"
+      - multi-git-prep:
+           repos: "trafodion/install"
+      - pkg-traf:
+           flavor: "debug"
+      - pkg-dcs:
+           buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
+      - pkg-install
+      - kill-traf
+      - run-pyodbc_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/dcs/src/test/pytests"
+           tests1: ""
+
+    publishers:
+      - post-check-node
+      - console-log
+      - git-log
+      - pyodbc_test-log
+      - copy-system-logs
+      - traf-runtime-log
+
+- job-template:
+    name: 'pyodbc_test-cm5.3-stable1.1'
+    node: 'redhat_cm5.3'
+
+    wrappers:
+      - timeout:
+          timeout: 75
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - check-node
+      - kill-traf
+      - clean-workspace
+      - multi-git-stable:
+           branch: "stable/1.1"
            repos: "trafodion/core trafodion/dcs"
       - multi-git-prep:
            repos: "trafodion/install"
@@ -616,7 +657,7 @@
       - copy-system-logs
       - traf-runtime-log
 
-# test installer against stable branch
+# test installer against stable branches
 - job-template:
     name: 'jdbc_test-ahw2.1-stable'
     node: 'redhat_ahw2.1'
@@ -634,6 +675,48 @@
       - clean-workspace
       - multi-git-stable:
            branch: "stable/1.0"
+           repos: "trafodion/core trafodion/dcs"
+      - multi-git-prep:
+           repos: "trafodion/install"
+      - pkg-traf:
+           flavor: "debug"
+      - pkg-dcs:
+           buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
+      - pkg-install
+      - run-jdbc_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/dcs/src/test/jdbc_test"
+           tests1: ""
+
+    publishers:
+      - post-check-node
+      - jdbc-xunit
+      - console-log
+      - traf-make-log
+      - git-log
+      - jdbc_test-log
+      - copy-system-logs
+      - traf-runtime-log
+
+- job-template:
+    name: 'jdbc_test-ahw2.2-stable1.1'
+    node: 'redhat_ahw2.2'
+
+    wrappers:
+      - timeout:
+          timeout: 90
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - check-node
+      - kill-traf
+      - clean-workspace
+      - multi-git-stable:
+           branch: "stable/1.1"
            repos: "trafodion/core trafodion/dcs"
       - multi-git-prep:
            repos: "trafodion/install"
