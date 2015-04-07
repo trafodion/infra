@@ -1,7 +1,5 @@
 jenkins ALL = (tinstall) NOPASSWD:/usr/local/bin/inst-sudo.sh
-jenkins ALL = (trafodion) NOPASSWD:/bin/kill
-jenkins ALL = (trafodion) NOPASSWD:/usr/bin/jps
-jenkins ALL = NOPASSWD:/usr/sbin/ss
+jenkins ALL = NOPASSWD:/usr/local/bin/kill-rouge-instance.sh
 jenkins ALL = NOPASSWD:/usr/local/bin/wsclean-sudo.sh
 # for use by check-node script
 jenkins ALL = NOPASSWD:/usr/bin/du
