@@ -82,6 +82,8 @@
       - installer-pub
       - jdbc_test-ahw2.1-stable
       - pyodbc_test-cm5.1-stable
+      - jdbc_test-ahw2.2-stable1.1
+      - pyodbc_test-cm5.3-stable1.1
 
 - project:
     name: win-odbc64

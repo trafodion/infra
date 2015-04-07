@@ -212,10 +212,10 @@ jobs:
       - branch: ^stable/1.0$
   - name: ^.*-ahw2.1$
     skip-if:
-      - branch: ^master$
+      - branch: ^(master|stable/1.1)$
   - name: ^.*-cm5.1$
     skip-if:
-      - branch: ^master$
+      - branch: ^(master|stable/1.1)$
 
 project-templates:
   - name: core-distro
