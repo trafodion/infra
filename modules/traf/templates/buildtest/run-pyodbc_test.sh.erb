@@ -114,10 +114,7 @@ else
     testr last --subunit | subunit-1to2 | subunit2junitxml > "$WORKSPACE/$TEST_DIR/logs/test_report.xml"
   fi
 
-  cd $WORKSPACE
-  if [ -z $SKIPSTOP ]; then /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"; fi
-
-  # Report on parent directory of $TRAF_DIR
+  # Report on parent directory of $TRAF_DIR, before uninstall removes trafodion user
   # Any core files means failure
   source_env test
   report_on_corefiles -u trafodion "${WORKSPACE}"
@@ -127,6 +124,9 @@ else
     echo "ERROR : Found $coreCount core files"
     echo
   fi
+
+  cd $WORKSPACE
+  if [ -z $SKIPSTOP ]; then /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"; fi
 
   toxRes=$(( toxRes + coreCount ))
 fi
