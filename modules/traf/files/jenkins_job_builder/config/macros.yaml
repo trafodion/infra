@@ -50,18 +50,10 @@
     builders:
       - shell: "/usr/local/bin/build-dcs.sh {buildDir} {coreJDBC}"
 
-# if we have sudo access for jps, then old script
 - builder:
     name: kill-traf
     builders:
-      - shell: |
-         sudo -n -u trafodion /usr/bin/jps > /dev/null 2>&1
-         if [[ $? == "0" ]]
-         then
-           /usr/local/bin/kill-rogue-instance.sh
-         else
-           sudo -n /usr/local/bin/kill-rogue-instance.sh
-         fi
+      - shell: sudo -n /usr/local/bin/kill-rogue-instance.sh
 
 
 - builder:
