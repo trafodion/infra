@@ -29,8 +29,13 @@ function trafprocs() {
 # identify user ID of trafodion processes
 function trafuid() {
   # look for processes unique to trafodion
-  orphan_pid=$(pgrep -f 'mpirun|SQMON|mxosrvr' | head -1)
-  ghost_user=$(ps -o uid --pid $orphan_pid | tail -1)
+  orphan_pid=$(pgrep -f 'mpirun|SQMON|mxosrvr|traf_run' | head -1)
+  if [[ ! -z $orphan_pid ]]
+  then 
+    ghost_user=$(ps -o uid --pid $orphan_pid | tail -1)
+  else
+    ghost_user=NONE
+  fi
   echo $ghost_user
 }
 
@@ -65,9 +70,11 @@ else
   s_user="#$p_user" # special syntax for numeric ID
 fi
 
-
-# Look for the usual suspects
-Instance=$(trafprocs)
+if [[ $p_user != "NONE" ]]
+then
+    # Look for the usual suspects
+    Instance=$(trafprocs)
+fi
 
 if [[ -z "$Instance" ]]
 then
@@ -83,7 +90,7 @@ echo "Found running instance. Attempting to kill it"
 # When it was jenkins user, that was not possible.
 
 attempt=1
-
+set -x
 while [[ $attempt -lt 10 ]]
 do
   ps -u $p_user -H
