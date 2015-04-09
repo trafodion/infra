@@ -1,0 +1,8 @@
+Verified+2: Trafodion Jenkins
+Code-Review+2: Chris Sheedy <chris.sheedy@hp.com>
+Workflow+1: Chris Sheedy <chris.sheedy@hp.com>
+Submitted-by: Trafodion Jenkins
+Submitted-at: Thu, 09 Apr 2015 00:49:57 +0000
+Reviewed-on: https://review.trafodion.org/1476
+Project: trafodion/infra
+Branch: refs/heads/master
