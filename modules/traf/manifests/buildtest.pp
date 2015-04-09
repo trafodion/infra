@@ -120,6 +120,12 @@ class traf::buildtest (
       provider => shell,
       unless   => '[[ $(/sbin/sysctl -n fs.aio-max-nr) == "262144" ]]',
     }
+    # Set pid_max since trafodion cannot handle anything above 64k (65535)
+    exec { 'set pid_pax' :
+      command  => '/sbin/sysctl -w kernel.pid_max=32768',
+      provider => shell,
+      unless   => '[[ $(/sbin/sysctl -n kernel.pid_max) == "32768" ]]',
+    }
 
     # This top level dir holds both tar'd up build tool binaries and the untar'd tools.
     # Jenkins write rsync output to this dir.
