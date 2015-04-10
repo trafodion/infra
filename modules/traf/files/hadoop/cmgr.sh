@@ -1,7 +1,7 @@
 #!/bin/bash
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2010-2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ Opts="-su admin:admin"
 Read="$Opts"
 Create="-X POST -H Content-Type:application/json $Opts"
 Update="-X PUT -H Content-Type:application/json $Opts"
+Delete="-X DELETE -H Content-Type:application/json $Opts"
 
 # Function - poll command until it completes and report results
 function cm_cmd {
@@ -132,7 +133,7 @@ fi
 # Create Services 
 # installer cannot understand arbitrary names for hdfs and hbase services Bug:1381764
 # specify type:name
-for serv in HDFS:hdfs HIVE:trafHIVE HBASE:trafhbase ZOOKEEPER:trafZOO MAPREDUCE:trafMAPRED YARN:trafYARN
+for serv in HDFS:hdfs HIVE:trafHIVE HBASE:trafhbase ZOOKEEPER:trafZOO MAPREDUCE:trafMAPRED
 do
   stype=${serv%:*}
   sname=${serv#*:}
@@ -167,10 +168,6 @@ cm_config_serv "trafHIVE" "hive_metastore_database_password" "insecure_hive"
 
 # MapReduce config
 cm_config_serv "trafMAPRED" "hdfs_service" "hdfs"
-
-# Yarn config
-cm_config_serv "trafYARN" "hdfs_service" "hdfs"
-cm_config_serv "trafYARN" "zookeeper_service" "trafZOO"
 
 # HBase config
 cm_config_serv "trafhbase" "hdfs_service" "hdfs"
@@ -274,38 +271,6 @@ then
   fi
 fi
 
-# Yarn
-Role="$(curl $Read $URL/clusters/trafcluster/services/trafYARN/roles/trafRESMGR | jq -r '.name')"
-
-if [[ $Role == "null" ]]
-then
-  echo "Creating Yarn roles"
-  Roles=$(curl $Create -d'
-		  { "items" : [ {
-		      "name" : "trafNODEMGR",
-		      "type" : "NODEMANAGER",
-		      "hostRef" : { "hostId" : "'$host'" }
-		    }, {
-		      "name" : "trafJHIST",
-		      "type" : "JOBHISTORY",
-		      "hostRef" : { "hostId" : "'$host'" }
-		    }, {
-		      "name" : "trafRESMGR",
-		      "type" : "RESOURCEMANAGER",
-		      "hostRef" : { "hostId" : "'$host'" }
-		    } ] }
-		  ' $URL/clusters/trafcluster/services/trafYARN/roles | jq -r '.items[].name'
-       )
-  if [[ ! ($Roles =~ trafNODEMGR) ]]
-  then
-    echo "Error: failed to create Yarn roles"
-    exit 2
-  fi
-fi
-
-# Configure Yarn roles
-cm_config_serv "trafYARN/roles/trafNODEMGR" "yarn_nodemanager_local_dirs" '/var/lib/hadoop-yarn/cache/nm-local-dir'
-
 # Hive
 Role="$(curl $Read $URL/clusters/trafcluster/services/trafHIVE/roles/trafMETA | jq -r '.name')"
 
@@ -384,6 +349,19 @@ then
              ' $URL/clusters/trafcluster/services/trafhbase/roles/trafREG/config | jq -r '.message'
 fi
 
+# Set Java Heap Size for all server roles
+# much smaller than defaults due to small mem size of test environment
+HEAP=268435456  #256MB
+cm_config_serv "hdfs/roles/trafDATA" "datanode_java_heapsize" "$HEAP"
+cm_config_serv "hdfs/roles/trafNAME" "namenode_java_heapsize" "$HEAP"
+cm_config_serv "hdfs/roles/trafSEC"  "secondary_namenode_java_heapsize" "$HEAP"
+cm_config_serv "trafZOO/roles/trafSERV" "zookeeper_server_java_heapsize" "$HEAP"
+cm_config_serv "trafMAPRED/roles/trafJOB" "jobtracker_java_heapsize" "$HEAP"
+cm_config_serv "trafHIVE/roles/trafMETA" "hive_metastore_java_heapsize" "$HEAP"
+cm_config_serv "trafHIVE/roles/trafHSRV" "hiveserver2_java_heapsize" "$HEAP"
+cm_config_serv "trafhbase/roles/trafMAS" "hbase_master_java_heapsize" "$HEAP"
+cm_config_serv "trafhbase/roles/trafREG" "hbase_regionserver_java_heapsize" "$HEAP"
+
 # Deploy Client Config
 State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.clientConfigStalenessStatus')"
 if [[ $State =~ STALE ]]
@@ -392,6 +370,18 @@ then
   cm_cmd $CID "Client Deploy"
 fi
 
+# If Yarn service exists, stop it and delete it
+Service="$(curl $Read $URL/clusters/trafcluster/services/trafYARN | jq -r '.name')"
+if [[ $Service == "trafYARN" ]]
+then
+  State="$(curl $Read $URL/clusters/trafcluster/services/trafYARN | jq -r '.serviceState')"
+  if [[ $State != "STOPPED" ]]
+  then
+    CID=$(curl $Create $URL/clusters/trafcluster/services/trafYARN/commands/stop | jq -r '.id')
+    cm_cmd $CID "Yarn Stop"
+  fi
+  curl $Delete $URL/clusters/trafcluster/services/trafYARN
+fi
 
 log_banner "Start Services and Delete HBase data"
 
@@ -469,24 +459,6 @@ then
   hdfs dfs -ls /tmp >/dev/null || exit 2
 fi
 
-# Yarn needs app log dir
-hdfs dfs -ls /tmp/logs >/dev/null
-if [[ $? != 0 ]]
-then
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafYARN/commands/yarnNodeManagerRemoteAppLogDirCommand | jq -r '.id')
-  cm_cmd $CID "HDFS Create app logs dir"
-  hdfs dfs -ls /tmp/logs >/dev/null || exit 2
-fi
-
-# Yarn/MR job history 
-hdfs dfs -ls /user/history >/dev/null
-if [[ $? != 0 ]]
-then
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafYARN/commands/yarnCreateJobHistoryDirCommand | jq -r '.id')
-  cm_cmd $CID "HDFS Create job history dir"
-  hdfs dfs -ls /user/history >/dev/null || exit 2
-fi
-
 ### HBase data should be cleaned up every time
 echo "*** Removing HBase Data"
 
@@ -537,7 +509,6 @@ cm_cmd $CID "HBase Create root"
   fi
 
 start_service trafHIVE
-start_service trafYARN
 start_service trafMAPRED
 start_service trafhbase
 
