@@ -1,7 +1,7 @@
 #!/bin/sh
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,21 +20,39 @@
 source /usr/local/bin/traf-functions.sh
 log_banner
 
-# delete dirs owned by non-jenkins users
-sudo -n /usr/local/bin/wsclean-sudo.sh "$WORKSPACE"
+# modes:
+#   build - jenkins user only, git repo build trees
+#   test - jenkins/tinstall/trafodion users, install/test workspace
+#   <none> - legacy mode is build and install/test in same workspace
+mode="$1"
 
-# Delete all dirs except trafodion (git workspaces)
-# Without -a we should not get "." directories, but double check
-# Recursive delete of .. is bad
-/bin/ls $WORKSPACE | while read dir
-do
-  if [[ ! $dir =~ ^trafodion$ && ! $dir =~ \\.* ]]
-  then
-    rm -rf $WORKSPACE/$dir
-  fi
-done
+if [[ "$mode" != "build" ]]
+then
+  # delete dirs owned by non-jenkins users
+  sudo -n /usr/local/bin/wsclean-sudo.sh "$WORKSPACE"
+fi
+
+if [[ "$mode" == "test" ]]
+then
+  # delete everything
+  rm -rf $WORKSPACE/*
+else
+  # Delete all dirs except trafodion (git workspaces)
+  # Without -a we should not get "." directories, but double check
+  # Recursive delete of .. is bad
+  /bin/ls $WORKSPACE | while read dir
+  do
+    if [[ ! $dir =~ ^trafodion$ && ! $dir =~ \\.* ]]
+    then
+      rm -rf $WORKSPACE/$dir
+    fi
+  done
+fi
+
 echo "Post-Cleanup: ls $WORKSPACE"
+echo "---------------------"
 ls $WORKSPACE
+echo "---------------------"
 
 # do not raise an error if anything failed
 # don't want to kill a job over clean-up failure
