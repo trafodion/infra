@@ -39,6 +39,16 @@
       - shell: "/usr/local/bin/wsclean.sh"
 
 - builder:
+    name: clean-buildspace
+    builders:
+      - shell: "/usr/local/bin/wsclean.sh build"
+
+- builder:
+    name: clean-testspace
+    builders:
+      - shell: "/usr/local/bin/wsclean.sh test"
+
+- builder:
     name: check-node
     builders:
       - shell: "/usr/local/bin/check-node.sh"

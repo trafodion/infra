@@ -31,12 +31,12 @@ set -x
 # Hive suite depends on pre-loaded TPC-DS data
 if [[ "$SUITES" =~ hive ]]
 then
-    $WORKSPACE/$DIR/sqf/sql/scripts/install_hadoop_regr_test_env \
+    $WORKSPACE/traf_run/sqf/sql/scripts/install_hadoop_regr_test_env \
       --unpackDir=$WORKSPACE/tpcds-tool \
       --dataDir=$WORKSPACE/tpcds-data \
       --hdfsCmd="sudo -n -u hdfs /usr/bin/hdfs" \
       --hiveCmd="sudo -n -u hdfs /usr/bin/hive" \
-      --logFile=$WORKSPACE/$DIR/build_regr_test_env.log
+      --logFile=$WORKSPACE/build_regr_test_env.log
         # Choose log name so it will be archived along with build logs
 fi
 
