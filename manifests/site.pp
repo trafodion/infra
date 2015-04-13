@@ -98,9 +98,9 @@ node 'wiki-dev.trafodion.org' {
     wiki_admin_password     => hiera('wiki_admin_password'),
     mysql_root_password     => hiera('wiki_db_password'),
     sysadmins               => hiera('sysadmins'),
-    ssl_cert_file_contents  => hiera('wiki_ssl_cert_file_contents'),
-    ssl_key_file_contents   => hiera('wiki_ssl_key_file_contents'),
-    ssl_chain_file_contents => hiera('wiki_chain_file_contents'),
+    ssl_cert_file_contents  => hiera('wiki-dev_ssl_cert_file_contents'),
+    ssl_key_file_contents   => hiera('wiki-dev_ssl_key_file_contents'),
+    ssl_chain_file_contents => hiera('wiki-dev_ssl_chain_file_contents'),
   }
 }
 
