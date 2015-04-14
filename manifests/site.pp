@@ -183,6 +183,18 @@ node /^ldap\d\d.trafodion.org$/ {
 # Jenkins slaves:
 #
 
+# Build Server
+node /^build\d\d.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'None',
+  }
+}
+
 # CMgr
 node /^slave-cm51-\d\d.trafodion.org$/ {
   include traf
