@@ -632,3 +632,45 @@
       - jdbc_test-log
       - copy-system-logs
       - traf-runtime-log
+
+# Test-only jobs that wait on separate build job
+# For now, generate only a few suites for testing
+- job-group:
+    name: 'regress-suites'
+    suite:
+      - "qat"
+      - "seabase"
+      - "udr"
+    jobs:
+      - regress-{suite}-{dist}
+
+- job-template:
+    name: 'regress-{suite}-{dist}'
+    node: 'redhat_{dist}'
+
+    triggers:
+      - zuul
+
+    wrappers:
+      - timeout:
+          timeout: 180
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - check-node
+      - kill-traf
+      - clean-workspace
+      - get-build:
+          flavor: "release"
+      - sql-regress:
+          dir: "./trafodion/core"
+          suites: "{suite}"
+
+    publishers:
+      - console-log
+      - post-check-node
+      - traf-regress-log
+      - copy-system-logs
+      - traf-runtime-log

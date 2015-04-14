@@ -53,6 +53,21 @@
     builders:
       - shell: "/usr/local/bin/check-node.sh"
 
+# find matching build job, create properties file
+# inject those properties (BLD_*)
+# use them to copy all build artifacts
+- builder:
+    name: get-build
+    builders:
+      - shell: "/usr/local/bin/find-build-job.sh build-product-{flavor}"
+      - inject:
+          properties-file: bld.properties
+      - copyartifact:
+          project: "$BLD_PROJ"
+          which-build: specific-build
+          build-number: "$BLD_NUM"
+          filter: "**/*"
+
 # second argument is optional
 # used if core and dcs built in same job
 - builder:
