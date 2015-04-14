@@ -60,7 +60,7 @@ class traf::base(
   }
 
   # install packages on all machines except jenkins slaves
-  if ($::hostname !~ /^slave.*$/) {
+  if ($::hostname !~ /^slave.*$|^build.*$/) {
     package { $::traf::params::non_slave_packages:
       ensure => present
     }
