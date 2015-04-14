@@ -34,8 +34,7 @@
       - core-build-check-{dist}
       - core-regress-suites
       - gate-{name}-check-for-binary
-      - build-product-release
-      - build-product-debug
+      - build-product
 
 - project:
     name: manuals

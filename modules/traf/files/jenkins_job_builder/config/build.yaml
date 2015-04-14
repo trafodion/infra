@@ -122,6 +122,16 @@
     publishers:
       - console-log
 
+# Product builds of each flavor
+- job-group:
+    name: 'build-product'
+    flavor:
+      - "release"
+      - "debug"
+
+    jobs:
+      - build-product-{flavor}
+
 # Build procedure for trafodion
 # Publish jenkins artifacts to be used by downstream test jobs
 # Include build-check tests
