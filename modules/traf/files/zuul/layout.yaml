@@ -340,6 +340,11 @@ projects:
       - pyodbc_test-ahw2.2
       - jdbc_test-cm5.3
       - jdbc_test-ahw2.2
+      - build-product-release
+      - regress-udr-cm5.3
+      - regress-seabase-cm5.3
+      - regress-udr-ahw2.2
+      - regress-seabase-ahw2.2
     release:
       - traf-pub-release-ahw2.2
     release-stable:
@@ -378,6 +383,10 @@ projects:
       - core-regress-hive-ahw2.1
       - jdbc_test-cm5.1
       - pyodbc_test-cm5.1
+    silent:
+      - build-product-release
+      - build-product-debug
+      - regress-qat-cm5.3
 
   - name: trafodion/dcs
     template:
