@@ -648,9 +648,6 @@
     name: 'regress-{suite}-{dist}'
     node: 'redhat_{dist}'
 
-    triggers:
-      - zuul
-
     wrappers:
       - timeout:
           timeout: 180

@@ -139,9 +139,6 @@
     name: 'build-product-{flavor}'
     node: 'traf_bld'
 
-    triggers:
-      - zuul
-
     builders:
       - link-logs
       - clean-buildspace
