@@ -41,6 +41,9 @@ function trafuid() {
 
 function check_port() {
   portnum=$1
+
+  echo "Check usage of port $portnum"
+
   # ss will let us know if port is in use, and -p option will give us process info
   # (must be root to get info if we don't own the process)
   cmd="/usr/sbin/ss -lp src *:$portnum"
@@ -91,7 +94,6 @@ echo "Found running instance. Attempting to kill it"
 # When it was jenkins user, that was not possible.
 
 attempt=1
-set -x
 while [[ $attempt -lt 10 ]]
 do
   ps -u $p_user -H

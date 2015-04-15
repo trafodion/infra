@@ -41,9 +41,6 @@ then
   exit 1
 fi
 
-# debug
-set -x  
-
 # job name (jenkins "project") of Build providing artifacts
 BLD_PROJ_NAME="$1"
 
@@ -58,7 +55,7 @@ do
   Earliest=$($API/api/json | jq -r '.firstBuild.number' 2>/dev/null)
   if [[ -z $Latest || -z $Earliest ]]  # did not get good response from server
   then
-    echo "Waiting for jenkins server response"
+    echo "Waiting for jenkins server response (sleepint 2 min)"
     sleep 120
     continue
   fi
@@ -105,7 +102,7 @@ do
 
     Bld=$(( $Bld - 1))
   done
-
+  echo "Did not find our build. Sleeping 2 minutes to try again."
   sleep 120 # try again in a couple minutes
 done
 
@@ -113,6 +110,7 @@ done
 # Use test != false, to avoid false positive on connectivity issue
 while [[ "$($API/$MyBuild/api/json | jq -r '.building' 2>/dev/null)" != "false" ]]
 do
+  echo "Build job still running. Waiting 2 minutes."
   sleep 120
 done
 
