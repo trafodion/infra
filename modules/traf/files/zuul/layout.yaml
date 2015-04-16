@@ -220,18 +220,20 @@ jobs:
 project-templates:
   - name: core-distro
     check:
+      - build-product-release
+      - build-product-debug
       - core-regress-core-{HW}
       - core-regress-seabase-{HW}
       - phoenix_quick_T4-{HW}
-      - core-build-check-{HW}
       - jdbc_test-{Cld}
       - pyodbc_test-{Cld}
       - gate-core-check-for-binary
     gate:
+      - build-product-release
+      - build-product-debug
       - core-regress-core-{HW}
       - core-regress-seabase-{HW}
       - phoenix_quick_T4-{HW}
-      - core-build-check-{HW}
       - jdbc_test-{Cld}
       - pyodbc_test-{Cld}
       - gate-core-check-for-binary
@@ -250,7 +252,7 @@ project-templates:
   - name: dcs-distro
     check:
       - gate-dcs-check-for-binary
-      - dcs-build-{Cld}
+      - build-product-debug
       - phoenix_quick_T4-{HW}
       - pyodbc_test-{HW}
       - pyodbc_test-{Cld}
@@ -258,7 +260,7 @@ project-templates:
       - jdbc_test-{Cld}
     gate:
       - gate-dcs-check-for-binary
-      - dcs-build-{Cld}
+      - build-product-debug
       - phoenix_quick_T4-{HW}
       - pyodbc_test-{HW}
       - pyodbc_test-{Cld}
@@ -308,6 +310,8 @@ projects:
     daily:
       - traf-pub-release-ahw2.2
       - traf-pub-debug-ahw2.2
+      - build-product-release
+      - build-product-debug
       - core-regress-core-cm5.3
       - core-regress-core-ahw2.2
       - core-regress-charsets-cm5.3
@@ -340,11 +344,6 @@ projects:
       - pyodbc_test-ahw2.2
       - jdbc_test-cm5.3
       - jdbc_test-ahw2.2
-      - build-product-release
-      - regress-udr-cm5.3
-      - regress-seabase-cm5.3
-      - regress-udr-ahw2.2
-      - regress-seabase-ahw2.2
     release:
       - traf-pub-release-ahw2.2
     release-stable:
@@ -352,6 +351,8 @@ projects:
     pre-release:
       - traf-pub-release-ahw2.2
       - traf-pub-debug-ahw2.2
+      - build-product-release
+      - build-product-debug
       - phoenix_test_T4-cm5.3
       - phoenix_test_T2-ahw2.2
       - core-regress-core-ahw2.2
@@ -369,6 +370,8 @@ projects:
     pre-release-stable:
       - traf-pub-release-ahw2.1
       - traf-pub-debug-ahw2.1
+      - build-product-release
+      - build-product-debug
       - phoenix_test_T4-cm5.1
       - phoenix_test_T2-ahw2.1
       - core-regress-core-ahw2.1
@@ -383,10 +386,6 @@ projects:
       - core-regress-hive-ahw2.1
       - jdbc_test-cm5.1
       - pyodbc_test-cm5.1
-    silent:
-      - build-product-release
-      - build-product-debug
-      - regress-qat-cm5.3
 
   - name: trafodion/dcs
     template:
@@ -430,11 +429,11 @@ projects:
       - installer-build
     gate:
       - gate-install-check-for-binary
+      - build-product-release
       - pyodbc_test-cm5.3
       - jdbc_test-ahw2.2
       - pyodbc_test-cm5.1-stable
       - jdbc_test-ahw2.1-stable
-      - installer-build
     daily:
       - installer-pub
     release:
