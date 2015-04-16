@@ -33,7 +33,6 @@
       - traf-publish-stable
       - core-build-check-{dist}
       - core-regress-suites
-      - regress-suites
       - gate-{name}-check-for-binary
       - build-product
 
