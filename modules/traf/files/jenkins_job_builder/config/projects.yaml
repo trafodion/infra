@@ -57,6 +57,7 @@
     jobs:
       - gate-{name}-check-for-binary
       - phoenix-jobs
+      - phx-jobs
 
 - project:
     name: dcs
@@ -73,6 +74,8 @@
       - dcs-build-{dist}
       - jdbc_test-{dist}
       - pyodbc_test-{dist}
+      - py_test-{dist}
+      - j_test-{dist}
 
 - project:
     name: install

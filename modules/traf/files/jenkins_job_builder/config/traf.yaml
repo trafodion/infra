@@ -671,3 +671,117 @@
       - traf-regress-log
       - copy-system-logs
       - traf-runtime-log
+
+
+- job-group:
+    name: 'phx-jobs'
+    jdbcDriverType:
+      - "T4"
+    jobs:
+      - 'phx_quick_{jdbcDriverType}-{dist}'
+
+- job-template:
+    name: 'phx_quick_{jdbcDriverType}-{dist}'
+    node: 'redhat_{dist}'
+
+    wrappers:
+      - timeout:
+          timeout: 200
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - check-node
+      - kill-traf
+      - clean-workspace
+      - multi-git-prep:
+           repos: "trafodion/phoenix_test"
+      - get-build:
+          flavor: "debug"
+      - run-phoenix_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/phoenix_test"
+           jdbctype: '{jdbcDriverType}'
+           hadoopdistro: '{dist}'
+           tests1: "QUICK1"
+           tests2: ""
+           tests3: ""
+           tests4: ""
+
+    publishers:
+      - post-check-node
+      - phoenix-xunit
+      - console-log
+      - git-log
+      - phoenix_test-log
+      - copy-system-logs
+      - traf-runtime-log
+
+- job-template:
+    name: 'py_test-{dist}'
+    node: 'redhat_{dist}'
+
+    wrappers:
+      - timeout:
+          timeout: 75
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - check-node
+      - kill-traf
+      - clean-workspace
+      - multi-git-prep:
+           repos: "trafodion/dcs"
+      - get-build:
+          flavor: "debug"
+      - run-pyodbc_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/dcs/src/test/pytests"
+           tests1: ""
+
+    publishers:
+      - post-check-node
+      - console-log
+      - git-log
+      - pyodbc_test-log
+      - copy-system-logs
+      - traf-runtime-log
+
+- job-template:
+    name: 'j_test-{dist}'
+    node: 'redhat_{dist}'
+
+    wrappers:
+      - timeout:
+          timeout: 90
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - check-node
+      - kill-traf
+      - clean-workspace
+      - multi-git-prep:
+           repos: "trafodion/dcs"
+      - get-build:
+          flavor: "debug"
+      - run-jdbc_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/dcs/src/test/jdbc_test"
+           tests1: ""
+
+    publishers:
+      - post-check-node
+      - jdbc-xunit
+      - console-log
+      - git-log
+      - jdbc_test-log
+      - copy-system-logs
+      - traf-runtime-log
