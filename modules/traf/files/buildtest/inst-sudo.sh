@@ -45,6 +45,32 @@ regball="$8"
 source "/usr/local/bin/traf-functions.sh"
 log_banner "Trafodion $action"
 
+# for debugging purposes - find port conflicts
+function check_port() {
+  set +x
+  portnum=$1
+
+  echo "Check usage of port $portnum"
+
+  # ss will let us know if port is in use, and -p option will give us process info
+  # (must be root to get info if we don't own the process)
+  cmd="sudo -n /usr/sbin/ss -lp src *:$portnum"
+
+  pcount=$($cmd | wc -l)
+  pids=$($cmd | sed -n '/users:/s/^.*users:((.*,\([0-9]*\),.*$/\1/p')
+
+  if [[ $pcount > 1 ]] # always get header line
+  then
+    echo "Warning: found port $portnum in use"
+    $cmd
+  fi
+  if [[ -n $pids ]]
+  then
+    echo "Warning: processes using port $portnum"
+    ps -f $pids
+  fi
+  set -x
+}
 set -x
 
 if [[ $action == "install" ]]
@@ -88,9 +114,15 @@ then
     echo "HADOOP_TYPE=hortonworks" >> ./tc
   fi
 
+  check_port 37800
+  check_port 40010
+
   echo "*** Calling trafodion_install"
   ./installer/trafodion_install --accept_license --config_file ./tc
   ret=$?
+
+  check_port 37800
+  check_port 40010
 
   # save installer logs
   sudo -n -u jenkins mkdir -p $WORKSPACE/var_log_trafodion
