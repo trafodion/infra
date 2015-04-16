@@ -5,7 +5,7 @@ class mediawiki::app {
     ensure   => present,
     provider => git,
     source   => 'https://gerrit.wikimedia.org/r/p/mediawiki/core.git',
-    revision => 'ffb94c5ad233936e641171fbb8abb3a08ef95bb4',  # temp local branch, See LP bug 1430550
+    revision => 'b6cf0c596f376c1024dfd2834da2717f8f12b06a',  # temp local branch, See LP bug 1430550
     owner    => 'www-data',
     group    => 'www-data',
   }
