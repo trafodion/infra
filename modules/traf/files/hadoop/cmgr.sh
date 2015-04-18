@@ -81,9 +81,9 @@ function cm_config_serv {
   param=$2
   value="$3"
 
-  Config="$(curl $Read $URL/clusters/trafcluster/services/${service}/config | jq -r '.items[].name')"
+  Config="$(curl $Read $URL/clusters/trafcluster/services/${service}/config | jq -r '.items[]|{(.name):.value}' | grep \"$param\")"
 
-  if [[ ! $Config =~ $param ]]
+  if [[ ! $Config =~ "\"$param\": \"$value\"" ]]
   then
     echo "Updating $service $param config"
     Config=$(curl $Update -d'
