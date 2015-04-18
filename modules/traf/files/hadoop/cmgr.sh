@@ -351,7 +351,7 @@ fi
 
 # Set Java Heap Size for all server roles
 # much smaller than defaults due to small mem size of test environment
-HEAP=268435456  #256MB
+HEAP=1073741824 #1GB
 cm_config_serv "hdfs/roles/trafDATA" "datanode_java_heapsize" "$HEAP"
 cm_config_serv "hdfs/roles/trafNAME" "namenode_java_heapsize" "$HEAP"
 cm_config_serv "hdfs/roles/trafSEC"  "secondary_namenode_java_heapsize" "$HEAP"
