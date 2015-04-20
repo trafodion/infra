@@ -56,7 +56,6 @@
     jobs:
       - gate-{name}-check-for-binary
       - phoenix-jobs
-      - phx-jobs
 
 - project:
     name: dcs
@@ -73,8 +72,6 @@
       - dcs-build-{dist}
       - jdbc_test-{dist}
       - pyodbc_test-{dist}
-      - py_test-{dist}
-      - j_test-{dist}
 
 - project:
     name: install
@@ -84,10 +81,7 @@
       - gate-{name}-check-for-binary
       - installer-build
       - installer-pub
-      - jdbc_test-ahw2.1-stable
-      - pyodbc_test-cm5.1-stable
-      - jdbc_test-ahw2.2-stable1.1
-      - pyodbc_test-cm5.3-stable1.1
+      - install-stable-jobs
 
 - project:
     name: win-odbc64

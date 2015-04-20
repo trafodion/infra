@@ -196,7 +196,7 @@ pipelines:
 jobs:
   - name: ^.*$
     parameter-function: set_log_url
-  - name: ^.*-experimental.*$
+  - name: ^.*experimental.*$
     voting: false
   - name: ^.*_T2-.*$
     voting: false
@@ -386,10 +386,6 @@ projects:
       - core-regress-hive-ahw2.1
       - jdbc_test-cm5.1
       - pyodbc_test-cm5.1
-    silent:
-      - j_test-ahw2.2
-      - phx_quick_T4-ahw2.2
-      - py_test-cm5.3
 
   - name: trafodion/dcs
     template:

@@ -55,7 +55,7 @@
 # If using multiple testsX parameters, be sure to include trailing comma on all but the last one.
 # If parameters tests1-4 are all "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the phoenix tests will run.
-# This should only be used in phoenix_test-experimental if phoenix_test is running all tests.
+# This should only be used in phoenix_experimental if phoenix_test is running all tests.
 
 - job-group:
     name: 'phoenix-jobs'
@@ -63,14 +63,25 @@
       - "T4"
       - "T2"
     jobs:
-      - 'phoenix_test_{jdbcDriverType}-experimental-{dist}'
-      - 'phoenix_test_{jdbcDriverType}-{dist}'
-      - 'phoenix_quick_{jdbcDriverType}-{dist}'
-      - 'phoenix_part1_{jdbcDriverType}-{dist}'
-      - 'phoenix_part2_{jdbcDriverType}-{dist}'
+      - 'phoenix_{type}_{jdbcDriverType}-{dist}':
+         type: test
+         subset: ""
+      - 'phoenix_{type}_{jdbcDriverType}-{dist}':
+         type: quick
+         subset: QUICK1
+      - 'phoenix_{type}_{jdbcDriverType}-{dist}':
+         type: part1
+         subset: PART1
+      - 'phoenix_{type}_{jdbcDriverType}-{dist}':
+         type: part2
+         subset: PART2
+#      Not currently used
+#      - 'phoenix_{type}_{jdbcDriverType}-{dist}'
+#         type: experimental
+#         subset: DONT_RUN_TESTS
 
 - job-template:
-    name: 'phoenix_test_{jdbcDriverType}-experimental-{dist}'
+    name: 'phoenix_{type}_{jdbcDriverType}-{dist}'
     node: 'redhat_{dist}'
 
     wrappers:
@@ -85,21 +96,16 @@
       - kill-traf
       - clean-workspace
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
-      - pkg-traf:
+           repos: "trafodion/phoenix_test"
+      - get-build:
            flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/phoenix_test"
            jdbctype: '{jdbcDriverType}'
            hadoopdistro: '{dist}'
-           tests1: "DONT_RUN_TESTS"
+           tests1: "{subset}"
            tests2: ""
            tests3: ""
            tests4: ""
@@ -108,233 +114,15 @@
       - post-check-node
       - phoenix-xunit
       - console-log
-      - traf-make-log
       - git-log
       - phoenix_test-log
       - copy-system-logs
       - traf-runtime-log
 
-- job-template:
-    name: 'phoenix_test_{jdbcDriverType}-{dist}'
-    node: 'redhat_{dist}'
-
-    wrappers:
-      - timeout:
-          timeout: 300
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
-      - run-phoenix_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/phoenix_test"
-           jdbctype: '{jdbcDriverType}'
-           hadoopdistro: '{dist}'
-           tests1: ""
-           tests2: ""
-           tests3: ""
-           tests4: ""
-
-    publishers:
-      - post-check-node
-      - phoenix-xunit
-      - console-log
-      - traf-make-log
-      - git-log
-      - phoenix_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-- job-template:
-    name: 'phoenix_quick_{jdbcDriverType}-{dist}'
-    node: 'redhat_{dist}'
-
-    wrappers:
-      - timeout:
-          timeout: 95
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
-      - run-phoenix_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/phoenix_test"
-           jdbctype: '{jdbcDriverType}'
-           hadoopdistro: '{dist}'
-           tests1: "QUICK1"
-           tests2: ""
-           tests3: ""
-           tests4: ""
-
-    publishers:
-      - post-check-node
-      - phoenix-xunit
-      - console-log
-      - traf-make-log
-      - git-log
-      - phoenix_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-- job-template:
-    name: 'phoenix_part1_{jdbcDriverType}-{dist}'
-    node: 'redhat_{dist}'
-
-    wrappers:
-      - timeout:
-          timeout: 180
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
-      - run-phoenix_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/phoenix_test"
-           jdbctype: '{jdbcDriverType}'
-           hadoopdistro: '{dist}'
-           tests1: "PART1"
-           tests2: ""
-           tests3: ""
-           tests4: ""
-
-    publishers:
-      - post-check-node
-      - phoenix-xunit
-      - console-log
-      - traf-make-log
-      - git-log
-      - phoenix_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-- job-template:
-    name: 'phoenix_part2_{jdbcDriverType}-{dist}'
-    node: 'redhat_{dist}'
-
-    wrappers:
-      - timeout:
-          timeout: 200
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
-      - run-phoenix_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/phoenix_test"
-           jdbctype: '{jdbcDriverType}'
-           hadoopdistro: '{dist}'
-           tests1: "PART2"
-           tests2: ""
-           tests3: ""
-           tests4: ""
-
-    publishers:
-      - post-check-node
-      - phoenix-xunit
-      - console-log
-      - traf-make-log
-      - git-log
-      - phoenix_test-log
-      - copy-system-logs
-      - traf-runtime-log
 
 # For pyodbc_test* jobs parameter tests1 should contain a list of tests seperated by a space. For instance : test_p2.ConnectTest.test11 test_p2.ConnectTest.test12
 # If parameter tests1 is "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the pyodbc tests will run.  This should only be used in pyodbc_test-experimental if pyodbc_test is running all tests.
-- job-template:
-    name: 'pyodbc_test-experimental-{dist}'
-    node: 'redhat_{dist}'
-
-    wrappers:
-      - timeout:
-          timeout: 75
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
-      - run-pyodbc_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/dcs/src/test/pytests"
-           tests1: "DONT_RUN_TESTS"
-
-    publishers:
-      - post-check-node
-      - console-log
-      - git-log
-      - pyodbc_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
 - job-template:
     name: 'pyodbc_test-{dist}'
     node: 'redhat_{dist}'
@@ -351,97 +139,9 @@
       - kill-traf
       - clean-workspace
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/install"
-      - pkg-traf:
+           repos: "trafodion/dcs"
+      - get-build:
            flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
-      - run-pyodbc_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/dcs/src/test/pytests"
-           tests1: ""
-
-    publishers:
-      - post-check-node
-      - console-log
-      - git-log
-      - pyodbc_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-# test installer against stable branches
-- job-template:
-    name: 'pyodbc_test-cm5.1-stable'
-    node: 'redhat_cm5.1'
-
-    wrappers:
-      - timeout:
-          timeout: 75
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-stable:
-           branch: "stable/1.0"
-           repos: "trafodion/core trafodion/dcs"
-      - multi-git-prep:
-           repos: "trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
-      - run-pyodbc_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/dcs/src/test/pytests"
-           tests1: ""
-
-    publishers:
-      - post-check-node
-      - console-log
-      - git-log
-      - pyodbc_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-- job-template:
-    name: 'pyodbc_test-cm5.3-stable1.1'
-    node: 'redhat_cm5.3'
-
-    wrappers:
-      - timeout:
-          timeout: 75
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-stable:
-           branch: "stable/1.1"
-           repos: "trafodion/core trafodion/dcs"
-      - multi-git-prep:
-           repos: "trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - kill-traf
       - run-pyodbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
@@ -463,45 +163,6 @@
 # If parameter tests1 = DONT_RUN_TESTS then none of the jdbc tests will run.
 # This should only be used in jdbc_test-experimental if jdbc_test is running all tests.
 - job-template:
-    name: 'jdbc_test-experimental-{dist}'
-    node: 'redhat_{dist}'
-
-    wrappers:
-      - timeout:
-          timeout: 90
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - run-jdbc_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/dcs/src/test/jdbc_test"
-           tests1: "DONT_RUN_TESTS"
-
-    publishers:
-      - post-check-node
-      - jdbc-xunit
-      - console-log
-      - traf-make-log
-      - git-log
-      - jdbc_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-- job-template:
     name: 'jdbc_test-{dist}'
     node: 'redhat_{dist}'
 
@@ -517,13 +178,9 @@
       - kill-traf
       - clean-workspace
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/install"
-      - pkg-traf:
+           repos: "trafodion/dcs"
+      - get-build:
            flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
@@ -534,148 +191,35 @@
       - post-check-node
       - jdbc-xunit
       - console-log
-      - traf-make-log
       - git-log
       - jdbc_test-log
       - copy-system-logs
       - traf-runtime-log
 
 # test installer against stable branches
-- job-template:
-    name: 'jdbc_test-ahw2.1-stable'
-    node: 'redhat_ahw2.1'
-
-    wrappers:
-      - timeout:
-          timeout: 90
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-stable:
-           branch: "stable/1.0"
-           repos: "trafodion/core trafodion/dcs"
-      - multi-git-prep:
-           repos: "trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - run-jdbc_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/dcs/src/test/jdbc_test"
-           tests1: ""
-
-    publishers:
-      - post-check-node
-      - jdbc-xunit
-      - console-log
-      - traf-make-log
-      - git-log
-      - jdbc_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-- job-template:
-    name: 'jdbc_test-ahw2.2-stable1.1'
-    node: 'redhat_ahw2.2'
-
-    wrappers:
-      - timeout:
-          timeout: 90
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-stable:
-           branch: "stable/1.1"
-           repos: "trafodion/core trafodion/dcs"
-      - multi-git-prep:
-           repos: "trafodion/install"
-      - pkg-traf:
-           flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
-      - run-jdbc_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/dcs/src/test/jdbc_test"
-           tests1: ""
-
-    publishers:
-      - post-check-node
-      - jdbc-xunit
-      - console-log
-      - traf-make-log
-      - git-log
-      - jdbc_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-# Test-only jobs that wait on separate build job
-# For now, generate only a few suites for testing
-
+# need separate build of dcs/core
 - job-group:
-    name: 'phx-jobs'
-    jdbcDriverType:
-      - "T4"
+    name: 'install-stable-jobs'
     jobs:
-      - 'phx_quick_{jdbcDriverType}-{dist}'
+      - 'pyodbc_test-{dist}-{vintage}':
+         dist: cm5.1
+         vintage: stable
+         stable_branch: "stable/1.0"
+      - 'pyodbc_test-{dist}-{vintage}':
+         dist: cm5.3
+         vintage: stable1.1
+         stable_branch: stable/1.1
+      - 'jdbc_test-{dist}-{vintage}':
+         dist: ahw2.1
+         vintage: stable
+         stable_branch: stable/1.0
+      - 'jdbc_test-{dist}-{vintage}':
+         dist: ahw2.2
+         vintage: stable1.1
+         stable_branch: stable/1.1
 
 - job-template:
-    name: 'phx_quick_{jdbcDriverType}-{dist}'
-    node: 'redhat_{dist}'
-
-    wrappers:
-      - timeout:
-          timeout: 200
-          fail: true
-      - timestamps
-
-    builders:
-      - link-logs
-      - check-node
-      - kill-traf
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/phoenix_test"
-      - get-build:
-          flavor: "debug"
-      - run-phoenix_test:
-           trafCoreDir: "trafodion/core"
-           dcsDir: "trafodion/dcs"
-           testDir: "trafodion/phoenix_test"
-           jdbctype: '{jdbcDriverType}'
-           hadoopdistro: '{dist}'
-           tests1: "QUICK1"
-           tests2: ""
-           tests3: ""
-           tests4: ""
-
-    publishers:
-      - post-check-node
-      - phoenix-xunit
-      - console-log
-      - git-log
-      - phoenix_test-log
-      - copy-system-logs
-      - traf-runtime-log
-
-- job-template:
-    name: 'py_test-{dist}'
+    name: 'pyodbc_test-{dist}-{vintage}'
     node: 'redhat_{dist}'
 
     wrappers:
@@ -689,10 +233,18 @@
       - check-node
       - kill-traf
       - clean-workspace
+      - multi-git-stable:
+           branch: "{stable_branch}"
+           repos: "trafodion/core trafodion/dcs"
       - multi-git-prep:
-           repos: "trafodion/dcs"
-      - get-build:
-          flavor: "debug"
+           repos: "trafodion/install"
+      - pkg-traf:
+           flavor: "debug"
+      - pkg-dcs:
+           buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
+      - pkg-install
+      - kill-traf
       - run-pyodbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
@@ -708,7 +260,7 @@
       - traf-runtime-log
 
 - job-template:
-    name: 'j_test-{dist}'
+    name: 'jdbc_test-{dist}-{vintage}'
     node: 'redhat_{dist}'
 
     wrappers:
@@ -722,10 +274,17 @@
       - check-node
       - kill-traf
       - clean-workspace
+      - multi-git-stable:
+           branch: "{stable_branch}"
+           repos: "trafodion/core trafodion/dcs"
       - multi-git-prep:
-           repos: "trafodion/dcs"
-      - get-build:
-          flavor: "debug"
+           repos: "trafodion/install"
+      - pkg-traf:
+           flavor: "debug"
+      - pkg-dcs:
+           buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
+      - pkg-install
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
@@ -736,6 +295,7 @@
       - post-check-node
       - jdbc-xunit
       - console-log
+      - traf-make-log
       - git-log
       - jdbc_test-log
       - copy-system-logs
