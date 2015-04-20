@@ -137,10 +137,8 @@ if [ $toxRes -ne 0 ]
 then
   # if tox fails
   cd "$WORKSPACE/$TEST_DIR"
-  cp *.ini logs
-  cp env.sh logs
-  cp unix_odbc.trc logs
-  cp -rp .testrepository logs
+  echo "ERROR: The following tests are failing : "
+  testr failing --list
 fi
 
 # exit with sum of return codes from tox and report_on_corefiles
