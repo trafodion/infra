@@ -29,7 +29,7 @@
       - link-logs
       - check-node
       - kill-traf
-      - clean-workspace
+      - clean-testspace
       - get-build:
            flavor: "release"
       - sql-regress:
@@ -94,7 +94,7 @@
       - link-logs
       - check-node
       - kill-traf
-      - clean-workspace
+      - clean-testspace
       - multi-git-prep:
            repos: "trafodion/phoenix_test"
       - get-build:
@@ -137,7 +137,7 @@
       - link-logs
       - check-node
       - kill-traf
-      - clean-workspace
+      - clean-testspace
       - multi-git-prep:
            repos: "trafodion/dcs"
       - get-build:
@@ -176,7 +176,7 @@
       - link-logs
       - check-node
       - kill-traf
-      - clean-workspace
+      - clean-testspace
       - multi-git-prep:
            repos: "trafodion/dcs"
       - get-build:
