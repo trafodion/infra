@@ -1,56 +1,21 @@
-- job-template:
-    name: 'core-build-check-{dist}'
-    node: 'redhat_{dist}'
-
-    builders:
-      - link-logs
-      - multi-git-prep:
-           repos: "trafodion/core"
-      - pkg-traf:
-           flavor: "release"
-      - check-build:
-           dir: "trafodion/core"
-
-    publishers:
-      - console-log
-      - git-log
-      - traf-make-log
-
 - job-group:
     name: 'traf-publish'
-    dist:
-      - "ahw2.2"
     jobs:
-      - traf-pub-{flavor}-{dist}:
+      - traf-pub-{flavor}:
          flavor: "release"
-      - traf-pub-{flavor}-{dist}:
+      - traf-pub-{flavor}:
          flavor: "debug"
 
-- job-group:
-    name: 'traf-publish-stable'
-    dist:
-      - "ahw2.1"
-    jobs:
-      - traf-pub-{flavor}-{dist}:
-         flavor: "release"
-      - traf-pub-{flavor}-{dist}:
-         flavor: "debug"
-
-
+  # package and publish - get build artifacts ala test jobs
 - job-template:
-    name: 'traf-pub-{flavor}-{dist}'
-    node: 'redhat_{dist}'
+    name: 'traf-pub-{flavor}'
+    node: 'traf_bld'
 
     builders:
       - link-logs
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs"
-      - pkg-traf:
+      - clean-testspace
+      - get-build:
            flavor: "{flavor}"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
       - stage-traf:
            flavor: "{flavor}"
 
@@ -63,7 +28,7 @@
 
 - job:
     name: 'installer-build'
-    node: redhat
+    node: 'traf_bld'
 
     builders:
       - link-logs
@@ -76,7 +41,7 @@
 
 - job:
     name: 'installer-pub'
-    node: redhat
+    node: 'traf_bld'
 
     builders:
       - link-logs
@@ -90,22 +55,6 @@
       - console-log
       - traf-upload-to-cdn
       - traf-release-tar
-
-- job-template:
-    name: 'dcs-build-{dist}'
-    node: 'redhat_{dist}'
-
-    builders:
-      - link-logs
-      - gerrit-git-prep
-      - pkg-dcs:
-           buildDir: "."
-           coreJDBC: ""
-      - check-build:
-           dir: "."
-
-    publishers:
-      - console-log
 
 # Simple file type check can run on master
 # Does not need to be exclusive

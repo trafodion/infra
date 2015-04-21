@@ -30,8 +30,6 @@
 
     jobs:
       - traf-publish
-      - traf-publish-stable
-      - core-build-check-{dist}
       - core-regress-suites
       - gate-{name}-check-for-binary
       - build-product
@@ -69,7 +67,6 @@
 
     jobs:
       - gate-{name}-check-for-binary
-      - dcs-build-{dist}
       - jdbc_test-{dist}
       - pyodbc_test-{dist}
 
