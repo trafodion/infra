@@ -75,9 +75,6 @@ set -x
 
 if [[ $action == "install" ]]
 then
-  # first clean out hbase from previous tests
-  sudo /usr/local/bin/cluster_setup || exit 1
-
   sudo rm -rf /var/log/trafodion/* # clean out logs from any prior jobs
   sudo rm -rf $INSTLOC $RUNLOC || exit 1
 

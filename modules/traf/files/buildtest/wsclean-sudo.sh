@@ -43,3 +43,12 @@ rm -rf /usr/lib/trafodion
 # ensure trafodion user is deleted
 # this will force installer to go through full install, rather than upgrade path
 /usr/sbin/userdel -rf trafodion
+
+# check hadoop config and clean up hbase data
+# cluster script will exist only on distro slave machines, not build machines
+if [[ -x /usr/local/bin/cluster_setup ]]
+then
+  /usr/local/bin/cluster_setup || exit 1
+fi
+
+exit 0
