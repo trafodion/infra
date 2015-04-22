@@ -81,8 +81,8 @@ set -x
 cd $WORKSPACE
 ulimit -c unlimited
 
-# experimental
-if [[ $JOB_NAME == "node-test" || $ZUUL_PIPELINE == "daily" ]]
+# enable ldap setup except for stable/1.0 jobs
+if [[ ! $JOB_NAME =~ cm5.1|ahw2.1 ]]
 then
   LDAP="--ldap"
 else

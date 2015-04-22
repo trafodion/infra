@@ -72,14 +72,14 @@ if [ "$TESTS" = "DONT_RUN_TESTS" ]; then
   echo '</testsuite>' >> "$WORKSPACE/$TEST_DIR/logs/test_report.xml"
 else
   set -x
-  # start trafodion
-    # experimental
-    if [[ $JOB_NAME == "node-test" || $ZUUL_PIPELINE == "daily" ]]
-    then
-      LDAP="--ldap"
-    else
-      LDAP=""
-    fi
+  # install/start trafodion
+  # enable ldap setup except for stable/1.0 jobs
+  if [[ ! $JOB_NAME =~ cm5.1|ahw2.1 ]]
+  then
+    LDAP="--ldap"
+  else
+    LDAP=""
+  fi
   cd $WORKSPACE
   ulimit -c unlimited
   if [ -z $SKIPSTART ]; then /usr/local/bin/install-traf.sh $LDAP "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" "installdrivers" || exit 1; fi
