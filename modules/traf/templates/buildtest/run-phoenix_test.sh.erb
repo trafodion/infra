@@ -88,7 +88,15 @@ fi
 # start trafodion
 cd $WORKSPACE
 ulimit -c unlimited
+# install Trafodion
 if [ -z $SKIPSTART ]; then /usr/local/bin/install-traf.sh $LDAP "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" "installdrivers" || exit 1; fi
+
+# Ask kernel to drop/free clean caches, dentries and inodes from memory
+sudo -n /bin/sync                                    # makes sure all cached objects are freed first
+sudo -n /sbin/sysctl vm.drop_caches=3
+
+# check memory before running Maven Phoenix Tests
+free -m
 
 # source in InstallEnv.sh
 source $WORKSPACE/InstallEnv.sh
@@ -99,7 +107,7 @@ if [ "$TEST_JDBC_TYPE" = "T4" ]; then
   TEST_JDBC_FILE="$WORKSPACE/clients/jdbc/lib/jdbcT4.jar"
 elif [ "$TEST_JDBC_TYPE" = "T2" ]; then
   TEST_JDBC_FILE="$ILOC/export/lib/jdbcT2.jar"
-  if [ $(grep -c 'sqenvd.sh' "$WORKSPACE/$TRAF_DIR/sqf/BuildFlavor") -eq 1 ]; then export SQ_MBTYPE=64d; else export SQ_MBTYPE=64; fi
+  if [[ -f $ILOC/export/lib64d/libseabasesig.so ]]; then export SQ_MBTYPE=64d; else export SQ_MBTYPE=64; fi
   export LANG=en_US.UTF-8
   export HADOOP_CNF_DIR="/etc/hadoop/conf"
   export HBASE_CNF_DIR="/etc/hbase/conf"
