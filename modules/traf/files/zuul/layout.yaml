@@ -308,8 +308,8 @@ projects:
        HW: ahw2.2
        Cld: cm5.3
     daily:
-      - traf-pub-release-ahw2.2
-      - traf-pub-debug-ahw2.2
+      - traf-pub-release
+      - traf-pub-debug
       - build-product-release
       - build-product-debug
       - core-regress-core-cm5.3
@@ -345,12 +345,12 @@ projects:
       - jdbc_test-cm5.3
       - jdbc_test-ahw2.2
     release:
-      - traf-pub-release-ahw2.2
+      - traf-pub-release
     release-stable:
-      - traf-pub-release-ahw2.1
+      - traf-pub-release
     pre-release:
-      - traf-pub-release-ahw2.2
-      - traf-pub-debug-ahw2.2
+      - traf-pub-release
+      - traf-pub-debug
       - build-product-release
       - build-product-debug
       - phoenix_test_T4-cm5.3
@@ -368,8 +368,8 @@ projects:
       - jdbc_test-cm5.3
       - pyodbc_test-cm5.3
     pre-release-stable:
-      - traf-pub-release-ahw2.1
-      - traf-pub-debug-ahw2.1
+      - traf-pub-release
+      - traf-pub-debug
       - build-product-release
       - build-product-debug
       - phoenix_test_T4-cm5.1
