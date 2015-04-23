@@ -275,6 +275,7 @@ project-templates:
   - name: phxtest-distro
     check:
       - gate-phoenix_test-check-for-binary
+      - build-product-debug
       - phoenix_part1_T4-{HW}
       - phoenix_part2_T4-{Cld}
       - phoenix_part1_T2-{Cld}
@@ -282,6 +283,7 @@ project-templates:
 
     gate:
       - gate-phoenix_test-check-for-binary
+      - build-product-debug
       - phoenix_part1_T4-{HW}
       - phoenix_part2_T4-{Cld}
       - phoenix_part1_T2-{Cld}
