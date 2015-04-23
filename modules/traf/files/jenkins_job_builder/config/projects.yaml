@@ -29,7 +29,6 @@
       - "ahw2.2"
 
     jobs:
-      - traf-publish
       - core-regress-suites
       - gate-{name}-check-for-binary
       - build-product

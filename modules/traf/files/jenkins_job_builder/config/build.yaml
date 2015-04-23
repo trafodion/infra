@@ -1,31 +1,3 @@
-- job-group:
-    name: 'traf-publish'
-    jobs:
-      - traf-pub-{flavor}:
-         flavor: "release"
-      - traf-pub-{flavor}:
-         flavor: "debug"
-
-  # package and publish - get build artifacts ala test jobs
-- job-template:
-    name: 'traf-pub-{flavor}'
-    node: 'traf_bld'
-
-    builders:
-      - link-logs
-      - clean-testspace
-      - get-build:
-           flavor: "{flavor}"
-      - stage-traf:
-           flavor: "{flavor}"
-
-    publishers:
-      - console-log
-      - git-log
-      - traf-make-log
-      - traf-upload-to-cdn
-      - traf-release-tar
-
 - job:
     name: 'installer-build'
     node: 'traf_bld'
@@ -106,6 +78,8 @@
 #      no .gitignore in install
 #      - check-build:
 #           dir: "trafodion/install"
+      - stage-traf:
+           flavor: "{flavor}"
 
     publishers:
       - archive:

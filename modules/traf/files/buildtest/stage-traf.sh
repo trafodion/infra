@@ -17,14 +17,27 @@
 #
 # @@@ END COPYRIGHT @@@
 
+# Publish/Stage builds only for specific pipelines
+# ZUUL_PIPELINE indicates if this is daily, pre-release, or release build
+
+if [[ -z $ZUUL_PIPELINE ]]
+then
+  echo "stage-traf: Non-Zuul build. Skipping publishing"
+  exit 0
+elif [[ $ZUUL_PIPELINE =~ ^release|^pre-release|^daily ]]
+then
+  echo "stage-traf: Continue publishing for $ZUUL_PIPELINE pipeline"
+else # all other pipelines: check, gate, silent, etc
+then
+  echo "stage-traf: Skipping publishing for $ZUUL_PIPELINE pipeline"
+  exit 0
+fi
+
+
 source /usr/local/bin/traf-functions.sh
 log_banner
 
 workspace="$(pwd)"
-
-# ZUUL_PIPELINE indicates if this is daily, pre-release, or release build
-# If we are run from jenkins, not Zuul, then default to daily
-ZUUL_PIPELINE=${ZUUL_PIPELINE:-daily}
 
 # Build ID indicates specific date or tag
 BLD="$(< $workspace/Build_ID)"
@@ -38,14 +51,26 @@ else
   FileSuffix="-$BLD.tar.gz"
 fi
 
+# Destination dir should be daily, pre-release, or release even if pipeline
+# has an additional suffix, e.g. -stable
+
 # side-branch build?
 if [[ ${ZUUL_PIPELINE} =~ ^daily- ]]
 then
   Branch=${ZUUL_PIPELINE#daily-}
   DestDir="publish/daily/$BLD"
 else
-  Branch=master
-  DestDir="publish/$ZUUL_PIPELINE/$BLD"
+  Branch=master  # time based on master, or label-specific
+  if [[ ${ZUUL_PIPELINE} == daily ]]
+  then
+    DestDir="publish/daily/$BLD"
+  if [[ ${ZUUL_PIPELINE} =~ ^release ]]
+  then
+    DestDir="publish/release/$BLD"
+  elif [[ ${ZUUL_PIPELINE} =~ ^pre-release ]]
+  then
+    DestDir="publish/pre-release/$BLD"
+  fi
 fi
 
 
