@@ -130,10 +130,24 @@ then
   fi
 fi
 
+# If trafZOO service exists, stop it and delete it
+Service="$(curl $Read $URL/clusters/trafcluster/services/trafZOO | jq -r '.name')"
+if [[ $Service == "trafZOO" ]]
+then
+  State="$(curl $Read $URL/clusters/trafcluster/services/trafZOO | jq -r '.serviceState')"
+  if [[ $State != "STOPPED" ]]
+  then
+    CID=$(curl $Create $URL/clusters/trafcluster/services/trafZOO/commands/stop | jq -r '.id')
+    cm_cmd $CID "trafZOO Stop"
+  fi
+  echo "Deleting trafZOO"
+  curl $Delete $URL/clusters/trafcluster/services/trafZOO
+fi
+
 # Create Services 
 # installer cannot understand arbitrary names for hdfs and hbase services Bug:1381764
 # specify type:name
-for serv in HDFS:hdfs HIVE:trafHIVE HBASE:trafhbase ZOOKEEPER:trafZOO MAPREDUCE:trafMAPRED
+for serv in HDFS:hdfs HIVE:trafHIVE HBASE:trafhbase ZOOKEEPER:zookeeper MAPREDUCE:trafMAPRED
 do
   stype=${serv%:*}
   sname=${serv#*:}
@@ -163,7 +177,7 @@ cm_config_serv "hdfs" "dfs_replication" "1"
 
 # Hive config
 cm_config_serv "trafHIVE" "mapreduce_yarn_service" "trafMAPRED"
-cm_config_serv "trafHIVE" "zookeeper_service" "trafZOO"
+cm_config_serv "trafHIVE" "zookeeper_service" "zookeeper"
 cm_config_serv "trafHIVE" "hive_metastore_database_password" "insecure_hive"
 
 # MapReduce config
@@ -171,7 +185,7 @@ cm_config_serv "trafMAPRED" "hdfs_service" "hdfs"
 
 # HBase config
 cm_config_serv "trafhbase" "hdfs_service" "hdfs"
-cm_config_serv "trafhbase" "zookeeper_service" "trafZOO"
+cm_config_serv "trafhbase" "zookeeper_service" "zookeeper"
 
 # Create Service Roles -- all on local host
 host=$(hostname -f)
@@ -218,7 +232,7 @@ then
 fi
 
 # Zookeeper
-Role="$(curl $Read $URL/clusters/trafcluster/services/trafZOO/roles/trafSERV | jq -r '.name')"
+Role="$(curl $Read $URL/clusters/trafcluster/services/zookeeper/roles/trafSERV | jq -r '.name')"
 
 if [[ $Role == "null" ]]
 then
@@ -229,7 +243,7 @@ then
 		      "type" : "SERVER",
 		      "hostRef" : { "hostId" : "'$host'" }
 		    } ] }
-		  ' $URL/clusters/trafcluster/services/trafZOO/roles | jq -r '.items[].name'
+		  ' $URL/clusters/trafcluster/services/zookeeper/roles | jq -r '.items[].name'
        )
   if [[ ! ($Roles =~ trafSERV) ]]
   then
@@ -355,7 +369,7 @@ HEAP=536870912  # half GB
 cm_config_serv "hdfs/roles/trafDATA" "datanode_java_heapsize" "$HEAP"
 cm_config_serv "hdfs/roles/trafNAME" "namenode_java_heapsize" "$HEAP"
 cm_config_serv "hdfs/roles/trafSEC"  "secondary_namenode_java_heapsize" "$HEAP"
-cm_config_serv "trafZOO/roles/trafSERV" "zookeeper_server_java_heapsize" "$HEAP"
+cm_config_serv "zookeeper/roles/trafSERV" "zookeeper_server_java_heapsize" "$HEAP"
 cm_config_serv "trafMAPRED/roles/trafJOB" "jobtracker_java_heapsize" "$HEAP"
 cm_config_serv "trafHIVE/roles/trafMETA" "hive_metastore_java_heapsize" "$HEAP"
 cm_config_serv "trafHIVE/roles/trafHSRV" "hiveserver2_java_heapsize" "$HEAP"
@@ -463,7 +477,7 @@ fi
 echo "*** Removing HBase Data"
 
 # requires zookeeper up
-start_service trafZOO
+start_service zookeeper
 
 # hbase must be down
 State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
