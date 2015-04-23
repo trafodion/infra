@@ -312,6 +312,10 @@
               source: 'phx_test_run/target/surefire-reports/**'
               copy-after-failure: true
               keep-hierarchy: false
+            - target: 'logs/$LOG_PATH/phoenix_test'
+              source: 'phx_test_run/pom.xml'
+              copy-after-failure: true
+              keep-hierarchy: false
             - target: 'logs/$LOG_PATH'
               source: 'test_summary.txt'
               copy-after-failure: true
