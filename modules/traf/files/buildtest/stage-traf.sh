@@ -28,7 +28,6 @@ elif [[ $ZUUL_PIPELINE =~ ^release|^pre-release|^daily ]]
 then
   echo "stage-traf: Continue publishing for $ZUUL_PIPELINE pipeline"
 else # all other pipelines: check, gate, silent, etc
-then
   echo "stage-traf: Skipping publishing for $ZUUL_PIPELINE pipeline"
   exit 0
 fi
