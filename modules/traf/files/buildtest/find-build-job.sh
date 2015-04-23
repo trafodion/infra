@@ -106,6 +106,8 @@ do
   sleep 120 # try again in a couple minutes
 done
 
+echo "Build: $JENKINS_URL/job/$BLD_PROJ_NAME/$MyBuild"
+
 # Found our build job, now wait for it to be completed
 # Use test != false, to avoid false positive on connectivity issue
 while [[ "$($API/$MyBuild/api/json | jq -r '.building' 2>/dev/null)" != "false" ]]
@@ -115,6 +117,13 @@ do
 done
 
 bld_result=$($API/$MyBuild/api/json | jq -r '.result' 2>/dev/null)
+while [[ -z $bld_result ]]
+do
+  sleep 3
+  echo "Rechecking build result"
+  bld_result=$($API/$MyBuild/api/json | jq -r '.result' 2>/dev/null)
+done
+
 if [[ $bld_result == "SUCCESS" ]]
 then
   echo "Found successful build: $MyBuild"
