@@ -430,6 +430,7 @@ projects:
     gate:
       - gate-install-check-for-binary
       - build-product-release
+      - build-product-debug
       - pyodbc_test-cm5.3
       - jdbc_test-ahw2.2
       - pyodbc_test-cm5.1-stable
