@@ -63,7 +63,7 @@ else
   if [[ ${ZUUL_PIPELINE} == daily ]]
   then
     DestDir="publish/daily/$BLD"
-  if [[ ${ZUUL_PIPELINE} =~ ^release ]]
+  elif [[ ${ZUUL_PIPELINE} =~ ^release ]]
   then
     DestDir="publish/release/$BLD"
   elif [[ ${ZUUL_PIPELINE} =~ ^pre-release ]]
