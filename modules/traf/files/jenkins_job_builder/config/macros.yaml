@@ -484,8 +484,8 @@
           builders:
             - shell: |
                 #!/bin/bash
+                cd $WORKSPACE/publish || exit 0
                 res=0
-                cd $WORKSPACE/publish
                 ls -d */ | while read dirName
                 do
                   # make sure there are actually files

@@ -82,6 +82,7 @@
            flavor: "{flavor}"
 
     publishers:
+      - traf-upload-to-cdn
       - archive:
           artifacts: 'trafodion/install/install*.tar.gz'
       - archive:
