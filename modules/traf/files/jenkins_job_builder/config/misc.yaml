@@ -14,9 +14,12 @@
           default: node_test/$BUILD_NUMBER
           description: path on log server
       - string:
-          name: BRANCH
-          default: master
-          description: git branch to build
+          name: BLD_PROJ
+          default: build-product-release
+          description: Job type with published build artifacts
+      - string:
+          name: BLD_NUM
+          description: Job number to pick up artifacts from
       - bool:
           name: SQL
           default: true
@@ -55,13 +58,12 @@
       - kill-traf
       - clean-workspace
       - multi-git-prep:
-           repos: "trafodion/core trafodion/dcs trafodion/phoenix_test trafodion/install"
-      - pkg-traf:
-           flavor: "release"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
-      - pkg-install
+           repos: "trafodion/dcs trafodion/phoenix_test"
+      - copyartifact:
+           project: "$BLD_PROJ"
+           which-build: specific-build
+           build-number: "$BLD_NUM"
+           filter: "**/*"
       - conditional-step:
            condition-kind: boolean-expression
            condition-expression: $SQL
