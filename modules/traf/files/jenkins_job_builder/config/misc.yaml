@@ -56,7 +56,7 @@
       - link-logs
       - check-node
       - kill-traf
-      - clean-workspace
+      - clean-testspace
       - multi-git-prep:
            repos: "trafodion/dcs trafodion/phoenix_test"
       - copyartifact:
