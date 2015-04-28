@@ -71,8 +71,16 @@ function cm_cmd {
     done
     result=$(curl $Read $URL/commands/$id | jq -r '.resultMessage')
     echo "$action result: $result"
+    success=$(curl $Read $URL/commands/$id | jq -r '.success')
+    if [[ $success == "true" ]]
+    then
+      return 0
+    else
+      return 1
+    fi
   else
     echo "$action command did not launch"
+    return 2
   fi
 }
 # Function - configure service 
@@ -101,12 +109,46 @@ function cm_config_serv {
 fi
 }
 
+# Function - restart cldra mgr and deploy config
+function cm_restart_mgr {
+  echo "Trying to start cloudera manager"
+  set -x
+  /sbin/service cloudera-scm-agent stop
+  /sbin/service cloudera-scm-server stop
+  /sbin/service cloudera-scm-server start
+  /sbin/service cloudera-scm-agent start
+  set +x
+  echo "Waiting for cloudera manager to respond"
+  i=0
+  CM="DOWN"
+  while (( i < 25 ))
+  do
+    curl $Read $URL/tools/echoError?message="hello" | grep -q hello
+    if [[ $? == 0 ]]
+    then
+      CM="UP"
+      break
+    fi
+    ((i+=1))
+    sleep 15
+  done
+  if [[ $CM == "DOWN" ]]
+  then
+    echo "Error: cannot contact cloudera manager"
+    exit 2
+  fi
+  echo "Deploying Client Config"
+  CID=$(curl $Create $URL/clusters/trafcluster/commands/deployClientConfig | jq -r '.id')
+  cm_cmd $CID "Client Deploy"
+}
+
+
 # Check that we can talk to CM
 curl $Read $URL/tools/echoError?message="hello" | grep -q hello
 if [[ $? != 0 ]]
 then
   echo "Error: cannot contact cloudera manager"
-  exit 2
+  cm_restart_mgr
 fi
 
 # Create Cluster 
@@ -382,6 +424,10 @@ if [[ $State =~ STALE ]]
 then
   CID=$(curl $Create $URL/clusters/trafcluster/commands/deployClientConfig | jq -r '.id')
   cm_cmd $CID "Client Deploy"
+  if (( $? != 0 ))
+  then
+    cm_restart_mgr
+  fi
 fi
 
 # If Yarn service exists, stop it and delete it
