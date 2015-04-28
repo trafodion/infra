@@ -57,7 +57,7 @@ then
   # Declare success, but don't leave any files to be published
   echo "This build has been previously staged. Exiting."
   exit 0
-elif [[ $ZUUL_PIPELINE =~ ^daily|pre-release ]]
+elif [[ $ZUUL_PIPELINE =~ ^daily ]]
 then
   cp $workspace/changes-* $workspace/$DestDir/changes-installer-${BLD}.txt
 fi
