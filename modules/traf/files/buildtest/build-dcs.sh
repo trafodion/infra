@@ -40,6 +40,11 @@ then
   mvn install:install-file -Dfile=$WORKSPACE/$COREDIR/conn/jdbc_type2/dist/jdbcT2.jar \
 	-DgroupId=org.trafodion-dev.jdbc.t2.T2Driver -DartifactId=t2driver -Dversion="$BLD" \
 	-Dpackaging=jar -DgeneratePom=true
+  # T2 driver with both trafodion-dev and trafodion
+  # enables to work with code before and after T2 officially released
+  mvn install:install-file -Dfile=$WORKSPACE/$COREDIR/conn/jdbc_type2/dist/jdbcT2.jar \
+	-DgroupId=org.trafodion.jdbc.t2.T2Driver -DartifactId=t2driver -Dversion="$BLD" \
+	-Dpackaging=jar -DgeneratePom=true
   JDBCVER="-Djdbct4.version=$BLD -Djdbct2.version=$BLD"
 else
   JDBCVER=""  # use default specified in pom.xml
