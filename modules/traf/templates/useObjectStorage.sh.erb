@@ -26,6 +26,7 @@ if [[ $scriptDir == "." ]]; then scriptDir=`pwd`; fi
 export backupContainer="BackupContainer"
 export cdnContainer="trafcdn"
 export container=""
+export API_TOKEN=""
 containerSub=""
 tfName=""
 outputFile=""
@@ -38,10 +39,14 @@ res=0
 export swift=/usr/local/bin/swift
 export OS_REGION_NAME=region-a.geo-1
 export OS_DNS_SERVICE_TYPE=hpext:dns
-export OS_AUTH_URL=https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/
+export OS_TENANT_ID=<%= cloud_auto_tenant_id %>
 export OS_TENANT_NAME=trafodion
 export OS_USERNAME=<%= cloud_auto_user %>
 export OS_PASSWORD=<%= cloud_auto_passwd %>
+
+# For US West Only
+export OS_AUTH_URL="https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0"
+export OBJECT_URL="https://region-a.geo-1.objects.hpcloudsvc.com/v1/$OS_TENANT_ID"
 
 
 #======================
@@ -64,11 +69,14 @@ ProgramHelp() {
     -c                                          Use CDN Container
     -l                                          List files in container in Object Storage
     -s <subdirectory>                           Container subdirectory.
-                                                NOTE: Only used in combination with -l or -d option.
+                                                NOTE: Only used in combination with -l, -d, or -m option.
     -u <filename>                               Upload file to container in Object Storage
     -d <swiftfile>                              Download file from container in Object Storage
                                                 NOTE: if <swiftfile> is ALL then -s option must be set
     -X <swiftfile>                              Delete file from container in Object Storage
+    -m <swiftfile>                              Move file from one subdirectory to another.
+                                                NOTE: Only used with CDN container. The -s option must be set
+                                                NOTE: To indicate a directory end directory name with a slash
     -o <outputfile>                             Output file name. 
                                                 NOTE: Only used in combination with -d option.
     -h or -?                                    This help menu
@@ -79,9 +87,90 @@ ProgramHelp() {
     $PRGNAME -bd puppet/etc/puppet/hieradata/production/common.yaml                 # Download file and retain the directory structure
     $PRGNAME -bd puppet/etc/puppet/hieradata/production/common.yaml -o common.yaml  # Download file but override the directory structure
     $PRGNAME -cl -s daily                                                           # List files in CDN Container that are in the daily subdirectory
+    $PRGNAME -cm release/1.1.0/clients-1.1.0.tar.gz -s old-release                  # Moves release/1.1.0/clients-1.1.0.tar.gz to old-release/1.1.0/clients-1.1.0.tar.gz
+    $PRGNAME -cm release/ -s old-release                                            # Moves all files in release to old-release. NOTE the trailing slash after release
 
   "
 }
+
+
+#-----------------------------------------
+# Desc  : Parse HTTP Header
+# Usage : ParseHttpHeader <header_file>
+#-----------------------------------------
+
+ParseHttpHeader() {
+    hFile="$1"
+    if [[ $(grep -c -E 'HTTP/1.1 201 Created' $hFile) == 1 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+#-----------------------------------------
+# Desc  : Get Authentication Token
+# Usage : GetAuthToken
+#-----------------------------------------
+
+GetAuthToken() {
+    tokenURL="https://region-a.geo-1.identity.hpcloudsvc.com:35357/v3/auth/tokens"
+    tokenJson='{"auth":{"identity":{"methods":["password"],"password":{"user":{"name":"'
+    tokenJson+=$OS_USERNAME
+    tokenJson+='","password":"'
+    tokenJson+=$OS_PASSWORD
+    tokenJson+='"}}},"scope":{"project":{"id":"'
+    tokenJson+=$OS_TENANT_ID
+    tokenJson+='"}}}}'
+    headerFile=$(mktemp -t "$(basename $0).XXXXXXXXXX")
+
+    # Ignoring response body as it is not needed. Only the response header is needed.
+    curl -D $headerFile $tokenURL -s -i -k -X POST -H 'Content-type:application/json' -H 'Accept:application/json' -d $tokenJson 2>&1 >/dev/null
+    ParseHttpHeader $headerFile
+    retCode=$?
+    if [[ $retCode -eq 0 ]]; then
+        tmpToken=$(grep -E '^X-Subject-Token:' $headerFile | cut -d' ' -f2 | tr -d '\r')
+        API_TOKEN=$(echo $tmpToken)
+        API_TOKEN="X-Auth-Token: $API_TOKEN"
+        rm $headerFile
+    else
+        echo "ERROR: Could not get Authentication Token from the HP Cloud. Response was :"
+        cat $headerFile
+        rm $headerFile
+        exit 1
+    fi
+}
+
+
+#---------------------------------------------------------------
+# Desc  : Move Object Storage file from one location to another 
+# Usage : SwiftMove <fromLoc> <toLoc>    
+#---------------------------------------------------------------
+
+SwiftMove() {
+    fromLoc="$1"
+    toLoc="$2"
+    copyHeaderFile=$(mktemp -t "$(basename $0).XXXXXXXXXX")
+
+    echo "INFO: Moving ${OBJECT_URL}/${cdnContainer}/${fromLoc} to ${OBJECT_URL}/${cdnContainer}/${toLoc}/${fromLoc#*/}"
+    # Ignoring response body as it is not needed. Only the response header is needed.
+    curl -D $copyHeaderFile -i -k -X COPY -H ''"$API_TOKEN"'' -H "Destination: ${cdnContainer}/${toLoc}/${fromLoc#*/}" ${OBJECT_URL}/${cdnContainer}/${fromLoc} 2>&1 >/dev/null
+    ParseHttpHeader $copyHeaderFile
+    retCode=$?
+    if [[ $retCode -eq 0 ]]; then
+        # copy was successful now delete original file
+        $swift delete $cdnContainer $fromLoc
+        rm $copyHeaderFile
+        return 0
+    else
+        echo "ERROR: Could not copy ${OBJECT_URL}/${cdnContainer}/${fromLoc} to ${cdnContainer}/${toLoc}/${fromLoc#*/}. Response was :"
+        cat $copyHeaderFile
+        rm $copyHeaderFile
+        return 1
+    fi
+}
+
 
 #-----------------------------------------
 # Desc  : Upload a file to object storage
@@ -179,7 +268,7 @@ if [[ $# -eq 0 ]]; then
     ProgramHelp
     exit 1
 else
-    while getopts bcld:X:o:s:u: opt
+    while getopts bcld:X:m:o:s:u: opt
     do
         case "$opt" in
             b)  # Use Backup Container
@@ -204,6 +293,10 @@ else
                 ;;
             X)  # Delete file
                 swiftVerb="delete"
+                swiftFile="$OPTARG"
+                ;;
+            m)  # Move file
+                swiftVerb="move"
                 swiftFile="$OPTARG"
                 ;;
             o)  # Output file
@@ -268,6 +361,32 @@ elif [[ $swiftVerb = "upload" ]]; then
         else
             echo "WARNING: There were no files found in $fName. Upload to container $cdnContainer cancelled."
         fi
+    fi
+elif [[ $swiftVerb = "move" ]]; then
+    # make sure required parameters were passed in
+    if [[ $container != $cdnContainer ]] || [[ -z $containerSub ]]; then
+        echo "ERROR: The move parameter must be used with the -c and -s parameters."
+        exit 1
+    fi
+
+    GetAuthToken
+
+    # check if swiftFile is a file or directory (best guess)
+    fileName="${swiftFile##*/}"
+    extension="${fileName##*.}"
+
+    if [[ -n $extension ]]; then
+        # if there is some content in extension variable then assume it's a file we are moving
+        SwiftMove "$swiftFile" "$containerSub"
+        res=$?
+    else
+        # assuming this is a directory since extension variable is empty
+        res=0
+        for fName in $($swift list $cdnContainer --prefix=$swiftFile)
+        do
+            SwiftMove "$fName" "$containerSub"
+            ((res+=$?))
+        done
     fi
 fi
 
