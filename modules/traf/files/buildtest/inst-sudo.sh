@@ -88,6 +88,11 @@ then
   cd $INSTLOC
   tar xzf $(basename $instball) || exit 1
 
+  # prep ldap config
+  sed -e 's/LdapHostname:/LdapHostname:ldap01.trafodion.org/' \
+      -e 's/UniqueIdentifier:/UniqueIdentifier:uid=,ou=users,dc=trafldap,dc=com/' \
+      ./installer/traf_authentication_conf_default > ./installer/traf_auth_config
+
   # prep config file  
   cp ./installer/trafodion_config_default ./tc
   echo "NODE_LIST=$(hostname -s)" >> ./tc
@@ -109,6 +114,11 @@ then
   else
     echo "URL=$(hostname -f):8080" >> ./tc
     echo "HADOOP_TYPE=hortonworks" >> ./tc
+  fi
+  if [[ $LDAP == "true" ]]
+  then
+    echo "LDAP_SECURITY=Y" >> ./tc
+    echo "LDAP_AUTH_FILE=traf_auth_config" >> ./tc
   fi
 
   check_port 37800
@@ -138,35 +148,8 @@ then
     sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
     sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
 
-    # Temporary -- until installer supports authentication config
     if [[ $LDAP == "true" ]]
     then
-      # add config file
-      sudo -n -u jenkins touch $WORKSPACE/traf_authentication_config
-      sudo -n -u jenkins chmod 666 $WORKSPACE/traf_authentication_config
-      cat > $WORKSPACE/traf_authentication_config <<-EOF
-	LdapHostname:ldap01.trafodion.org
-	LdapPort:389
-	UniqueIdentifier:uid=,ou=users,dc=trafldap,dc=com
-	EOF
-      # run authentication on command
-      sudo -n -i -u trafodion traf_authentication_setup --on --file $WORKSPACE/traf_authentication_config
-      # restart DCS 
-      dcsdir=$(ls -d $RUNLOC/dcs-* 2>/dev/null)
-      sudo -n -i -u trafodion $dcsdir/bin/stop-dcs.sh
-      count=$(pgrep -u trafodion ^mxosrvr | wc -l)
-      while (( $count > 0 ))
-      do
-        sleep 15
-        count=$(pgrep -u trafodion ^mxosrvr | wc -l)
-      done
-      sudo -n -i -u trafodion $dcsdir/bin/start-dcs.sh
-      sudo -n -i -u trafodion traf_authentication_setup --status | grep -q 'ENABLED'
-      if (( $? != 0 ))
-      then
-        echo "*** Error enabling authentication"
-	exit 3
-      fi
       echo "register user qa001;" | sudo -n -i -u trafodion 'sqlci'
     fi
   fi
