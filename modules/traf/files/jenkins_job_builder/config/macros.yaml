@@ -247,6 +247,8 @@
               copy-after-failure: true
               keep-hierarchy: true
 
+# rundir will be empty unless the job
+# was aborted part way thru (e.g., timeout)
 - publisher:
     name: traf-regress-log
     publishers:
@@ -255,6 +257,10 @@
           files:
             - target: 'logs/$LOG_PATH'
               source: 'sql-regress-logs/**'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH/sql-regress-logs'
+              source: 'rundir/**'
               copy-after-failure: true
               keep-hierarchy: true
 

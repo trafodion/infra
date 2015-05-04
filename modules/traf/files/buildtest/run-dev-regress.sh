@@ -85,6 +85,7 @@ for dir in *
 do
   if [[ $dir =~ tools|tmp ]]
   then
+    rm -rf $dir
     continue
   fi
 
@@ -106,6 +107,10 @@ Found failures -- saving $dir logs to $logarchive/$dir/"
       # Filter out core files
       cp $(ls $dir/* | grep -v "/core.$(hostname)") $logarchive/$dir/
     fi
+    # remove directories as we process them.
+    # jenkins will upload these logs,
+    # in case test times out before we get this far.
+    rm -rf $dir
   else
     echo "Failed -- No tests run for $dir"
     missed=1
