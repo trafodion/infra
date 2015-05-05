@@ -107,10 +107,6 @@ Found failures -- saving $dir logs to $logarchive/$dir/"
       # Filter out core files
       cp $(ls $dir/* | grep -v "/core.$(hostname)") $logarchive/$dir/
     fi
-    # remove directories as we process them.
-    # jenkins will upload these logs,
-    # in case test times out before we get this far.
-    rm -rf $dir
   else
     echo "Failed -- No tests run for $dir"
     missed=1
@@ -121,6 +117,10 @@ fail=$(grep FAIL */runregr*.log | wc -l)
 pass=$(grep PASS */runregr*.log | wc -l)
 echo "Total Passed:   $pass"
 echo "Total Failures: $fail"
+# remove rundir logs
+# jenkins will upload these logs,
+# in case test times out before we get this far.
+rm -rf *
 
 if [[ $totalCoreCount -gt 0 ]]; then
     echo
