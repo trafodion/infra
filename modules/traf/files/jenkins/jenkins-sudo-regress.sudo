@@ -8,3 +8,4 @@ jenkins	ALL = (hdfs) NOPASSWD:/usr/bin/hdfs,/usr/bin/hive
 jenkins ALL = NOPASSWD:/bin/sync
 # free pagecache, dentries, and inodes
 jenkins ALL = NOPASSWD:/sbin/sysctl
+jenkins ALL = NOPASSWD:/bin/chown,/bin/mkdir
