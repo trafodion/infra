@@ -264,13 +264,23 @@
               copy-after-failure: true
               keep-hierarchy: true
 
-# build & run location is trafodion/core
-#       can be removed once we no longer use manual install
-# installed location is traf_run
-#       no separate init_trafodion.log for installer
 - publisher:
     name: traf-runtime-log
     publishers:
+      # corefile check if job aborted
+      - postbuildscript:
+          script-only-if-succeeded: false
+          script-only-if-failed: false
+          builders:
+            - conditional-step:
+                 condition-kind:  current-status
+                 condition-worst: ABORTED
+                 condition-best:  ABORTED
+                 steps:
+                     - shell: |
+                         #!/bin/bash
+                         source /usr/local/bin/traf-functions.sh
+                         report_on_corefiles -u trafodion "${WORKSPACE}"
       - scp:
           site: 'logs.trafodion.org'
           files:
@@ -305,9 +315,6 @@
               copy-after-failure: true
               keep-hierarchy: true
 
-# "manual" install DCS is at WORKSPACE/dcs/dcs*
-#       can be removed once we no longer use manual install
-# trafodion_installer is at WORKSPACE/traf_run/dcs*
 - publisher:
     name: phoenix_test-log
     publishers:
@@ -329,10 +336,6 @@
             - target: 'logs/$LOG_PATH'
               source: 'test_summary.txt'
               copy-after-failure: true
-            - target: 'logs/$LOG_PATH'
-              source: 'dcs/dcs*/logs/*'
-              copy-after-failure: true
-              keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
               source: 'traf_run/dcs*/logs/*'
               copy-after-failure: true
