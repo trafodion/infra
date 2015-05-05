@@ -107,6 +107,19 @@
     # superset here
     publishers:
       - post-check-node
+      - postbuildscript:
+          script-only-if-succeeded: false
+          script-only-if-failed: false
+          builders:
+            - conditional-step:
+                 condition-kind:  current-status
+                 condition-worst: ABORTED
+                 condition-best:  ABORTED
+                 steps:
+                     - shell: |
+                         #!/bin/bash
+                         source /usr/local/bin/traf-functions.sh
+                         report_on_corefiles -u trafodion "${WORKSPACE}"
       - console-log
       - git-log
       - traf-make-log
