@@ -164,6 +164,12 @@ then
   # make system logs read-able in case of early exit of job
   sudo chmod -R a+rX $RUNLOC
 
+  # create alternate directory for Maven Local repo for T2 tests
+  if [[ ! -d /var/local/traf_mvn_repo ]]; then
+    sudo mkdir /var/local/traf_mvn_repo
+  fi
+  sudo chown -R trafodion:trafodion /var/local/traf_mvn_repo
+
   exit $ret
 
 elif [[ $action == "uninstall" ]]

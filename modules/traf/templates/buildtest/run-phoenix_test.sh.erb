@@ -141,6 +141,7 @@ else
   # T2 must run as same user running the instance
   if [[ $TEST_JDBC_TYPE == "T2" ]] && id trafodion >/dev/null 2>&1
   then
+    TARGS=" --mvnlocalrepo=/var/local/traf_mvn_repo $TARGS"
     sudo -n -u trafodion rm -rf $WORKSPACE/phx_test_run
     chmod 777 $WORKSPACE   # give write permission to trafodion
     sudo -n -u trafodion cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
