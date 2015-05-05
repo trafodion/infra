@@ -173,8 +173,7 @@ then
 
   # Same location as setup
   cd $INSTLOC
-  ./installer/trafodion_uninstaller --all \
-                --instance $RUNLOC
+  echo "Y" | ./installer/trafodion_uninstaller
   exit $?
 
 else
