@@ -239,7 +239,8 @@ project-templates:
       - gate-core-check-for-binary
     check-full:
       - phoenix_test_T4-{Cld}
-      - phoenix_test_T2-{HW}
+      - phoenix_part1_T2-{HW}
+      - phoenix_part2_T2-{HW}
       - core-regress-charsets-{Cld}
       - core-regress-qat-{Cld}
       - core-regress-udr-{Cld}
@@ -268,9 +269,11 @@ project-templates:
       - jdbc_test-{Cld}
     check-full:
       - phoenix_test_T4-{Cld}
-      - phoenix_test_T2-{Cld}
+      - phoenix_part1_T2-{Cld}
+      - phoenix_part2_T2-{Cld}
       - phoenix_test_T4-{HW}
-      - phoenix_test_T2-{HW}
+      - phoenix_part1_T2-{HW}
+      - phoenix_part2_T2-{HW}
 
   - name: phxtest-distro
     check:
@@ -289,9 +292,11 @@ project-templates:
       - phoenix_quick_T2-{Cld}
     check-full:
       - phoenix_test_T4-{Cld}
-      - phoenix_test_T2-{Cld}
+      - phoenix_part1_T2-{Cld}
+      - phoenix_part2_T2-{Cld}
       - phoenix_test_T4-{HW}
-      - phoenix_test_T2-{HW}
+      - phoenix_part1_T2-{HW}
+      - phoenix_part2_T2-{HW}
 
 
 projects:
@@ -356,7 +361,8 @@ projects:
       - build-product-release
       - build-product-debug
       - phoenix_test_T4-cm5.3
-      - phoenix_test_T2-ahw2.2
+      - phoenix_part1_T2-ahw2.2
+      - phoenix_part2_T2-ahw2.2
       - core-regress-core-ahw2.2
       - core-regress-seabase-ahw2.2
       - core-regress-charsets-cm5.3
@@ -373,7 +379,8 @@ projects:
       - build-product-release
       - build-product-debug
       - phoenix_test_T4-cm5.1
-      - phoenix_test_T2-ahw2.1
+      - phoenix_part1_T2-ahw2.1
+      - phoenix_part2_T2-ahw2.1
       - core-regress-core-ahw2.1
       - core-regress-seabase-ahw2.1
       - core-regress-charsets-cm5.1
