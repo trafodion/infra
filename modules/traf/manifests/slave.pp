@@ -138,6 +138,32 @@ class traf::slave (
     mode   => '0440',
   }
 
+  # keep intermediate SSL certificates up to date
+  # keep Gerrit server's SSL certificates up to date
+  file { '/etc/pki/ca-trust/source/anchors/intermediate.crt':
+    ensure  => present,
+    content => hiera('jenkins02_ssl_chain_file_contents'),
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    notify  => Exec['update-ca-trust'],
+  }
+
+  file { '/etc/pki/ca-trust/source/anchors/review.crt':
+    ensure  => present,
+    content => hiera('gerrit_ssl_cert_file_contents'),
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    notify  => Exec['update-ca-trust'],
+  }
+
+  exec { 'update-ca-trust':
+    cwd         => '/etc/pki/ca-trust/source/anchors',
+    command     => '/usr/bin/update-ca-trust enable; /usr/bin/update-ca-trust extract',
+    refreshonly => true,
+  }
+
   include jenkins::cgroups
 
   if $distro =~ /^AHW|^CM/ {
