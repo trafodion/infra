@@ -57,7 +57,7 @@ class traf::jenkins (
   }
 
   # jenkins master needs Gerrit's SSL cert
-  file { '/etc/ssl/certs/review.crt':
+  file { '/usr/local/share/ca-certificates/review.crt':
     ensure  => present,
     content => hiera('gerrit_ssl_cert_file_contents'),
     owner   => 'root',
@@ -67,8 +67,7 @@ class traf::jenkins (
   }
 
   exec { 'update-ca-trust':
-    cwd         => '/etc/ssl/certs',
-    command     => '/usr/bin/c_rehash',
+    command     => '/usr/sbin/update-ca-certificates; /usr/sbin/update-ca-certificates --fresh',
     refreshonly => true,
   }
 
