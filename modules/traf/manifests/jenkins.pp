@@ -56,6 +56,22 @@ class traf::jenkins (
     jenkins_ssh_public_key  => $traf::jenkins_ssh_pub_key,
   }
 
+  # jenkins master needs Gerrit's SSL cert
+  file { '/etc/ssl/certs/review.crt':
+    ensure  => present,
+    content => hiera('gerrit_ssl_cert_file_contents'),
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    notify  => Exec['update-ca-trust'],
+  }
+
+  exec { 'update-ca-trust':
+    cwd     => '/etc/ssl/certs',
+    command => '/usr/bin/c_rehash',
+    refreshonly => true,
+  }
+
   # ensure user jenkins home directory is set correctly in /etc/passwd
   group { 'jenkins':
     ensure => present,
