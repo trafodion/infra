@@ -280,6 +280,7 @@
                      - shell: |
                          #!/bin/bash
                          source /usr/local/bin/traf-functions.sh
+                         source_env run
                          report_on_corefiles -u trafodion "${WORKSPACE}"
       - scp:
           site: 'logs.trafodion.org'
