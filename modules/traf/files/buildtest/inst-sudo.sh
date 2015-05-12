@@ -179,16 +179,8 @@ then
 
   # Same location as setup
   cd $INSTLOC 
-   # try old interface first
-  ./installer/trafodion_uninstaller --all --instance $RUNLOC
-  if [[ $? != 0 ]]
-  then
-    # if that fails, try new interface
-    echo "Y" | ./installer/trafodion_uninstaller
-    exit $?
-  else
-    exit 0
-  fi
+  echo "Y" | ./installer/trafodion_uninstaller
+  exit $?
 
 else
   echo "Error: unsupported action: $action"
