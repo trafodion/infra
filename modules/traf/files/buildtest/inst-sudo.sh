@@ -174,13 +174,24 @@ then
 
 elif [[ $action == "uninstall" ]]
 then
-  # make system logs world-readable for archival
-  sudo chmod -R a+rX $RUNLOC
+  # uninstaller will remove $RUNLOC, so save logs we need
+  # see list: traf/files/jenkins_job_builder/config/macros.yaml
+  mkdir -p $WORKSPACE/traf_run.save/sql
+  sudo cp -r $RUNLOC/logs $WORKSPACE/traf_run.save/
+  sudo cp -r $RUNLOC/sql/scripts $WORKSPACE/traf_run.save/sql
+  sudo cp -r $RUNLOC/tmp $WORKSPACE/traf_run.save/
+  sudo cp -r $RUNLOC/dcs* $WORKSPACE/traf_run.save/
 
-  # Same location as setup
+  # Same location as install
   cd $INSTLOC 
   echo "Y" | ./installer/trafodion_uninstaller
-  exit $?
+  uninst_ret=$?
+
+  sudo rm -rf $RUNLOC                   # just in case uninstaller left it
+  mv $WORKSPACE/traf_run.save $RUNLOC   # back to the expected location
+  sudo chmod -R a+rX $RUNLOC            # make system logs world-readable for archival
+
+  exit $uninst_ret
 
 else
   echo "Error: unsupported action: $action"

@@ -299,6 +299,7 @@
               source: 'hbase-logs/*'
               copy-after-failure: true
               keep-hierarchy: true
+            # traf_run files saved in traf/files/buildtest/inst-sudo.sh
             - target: 'logs/$LOG_PATH'
               source: 'traf_run/logs/*.log'
               copy-after-failure: true
@@ -313,6 +314,10 @@
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
               source: 'traf_run/tmp/*'
+              copy-after-failure: true
+              keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/dcs*/logs/*'
               copy-after-failure: true
               keep-hierarchy: true
 
@@ -337,10 +342,6 @@
             - target: 'logs/$LOG_PATH'
               source: 'test_summary.txt'
               copy-after-failure: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/dcs*/logs/*'
-              copy-after-failure: true
-              keep-hierarchy: true
             - target: 'logs/$LOG_PATH/dcs/surefire-reports'
               source: 'trafodion/dcs/target/surefire-reports/**'
               copy-after-failure: true
@@ -391,10 +392,6 @@
               source: 'dcs/dcs*/logs/*'
               copy-after-failure: true
               keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/dcs*/logs/*'
-              copy-after-failure: true
-              keep-hierarchy: true
             - target: 'logs/$LOG_PATH/dcs/surefire-reports'
               source: 'trafodion/dcs/target/surefire-reports/**'
               copy-after-failure: true
@@ -423,10 +420,6 @@
           files:
             - target: 'logs/$LOG_PATH'
               source: 'dcs/dcs*/logs/*'
-              copy-after-failure: true
-              keep-hierarchy: true
-            - target: 'logs/$LOG_PATH'
-              source: 'traf_run/dcs*/logs/*'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH/surefire-reports'
