@@ -275,12 +275,13 @@
             - conditional-step:
                  condition-kind:  current-status
                  condition-worst: ABORTED
-                 condition-best:  ABORTED
+                 condition-best:  FAILURE
                  steps:
                      - shell: |
                          #!/bin/bash
                          source /usr/local/bin/traf-functions.sh
                          source_env run
+                         [[ -f $WORKSPACE/corefiles.log ]] && exit 0
                          report_on_corefiles -u trafodion "${WORKSPACE}"
       - scp:
           site: 'logs.trafodion.org'
