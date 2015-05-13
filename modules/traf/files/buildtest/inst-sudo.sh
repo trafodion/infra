@@ -176,7 +176,7 @@ elif [[ $action == "uninstall" ]]
 then
   # uninstaller will remove $RUNLOC, so save logs we need
   # see list: traf/files/jenkins_job_builder/config/macros.yaml
-  mkdir -p $WORKSPACE/traf_run.save/sql
+  sudo mkdir -p $WORKSPACE/traf_run.save/sql
   sudo cp -r $RUNLOC/logs $WORKSPACE/traf_run.save/
   sudo cp -r $RUNLOC/sql/scripts $WORKSPACE/traf_run.save/sql
   sudo cp -r $RUNLOC/tmp $WORKSPACE/traf_run.save/
@@ -188,7 +188,7 @@ then
   uninst_ret=$?
 
   sudo rm -rf $RUNLOC                   # just in case uninstaller left it
-  mv $WORKSPACE/traf_run.save $RUNLOC   # back to the expected location
+  sudo mv $WORKSPACE/traf_run.save $RUNLOC   # back to the expected location
   sudo chmod -R a+rX $RUNLOC            # make system logs world-readable for archival
 
   exit $uninst_ret
