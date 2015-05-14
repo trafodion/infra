@@ -96,7 +96,7 @@ then
   #   change logs for release builds would be too large 
   #    ("No, there is too much. Let me sum up.")
   cd $workspace
-  for file in changes-*
+  for file in changes-core changes-dcs
   do
     if [[ -s $file ]] # non-empty
     then
