@@ -93,10 +93,7 @@ class jenkins::master(
   }
 
   $packages = [
-    'python-babel',
-    'python-sqlalchemy',  # devstack-gate
     'ssl-cert',
-    'sqlite3', # interact with devstack-gate DB
   ]
 
   package { $packages:
@@ -148,43 +145,36 @@ class jenkins::master(
     require => File['/var/lib/jenkins/.ssh/'],
   }
 
-  file { '/var/lib/jenkins/plugins':
+  file { '/var/lib/jenkins/userContent':
     ensure  => directory,
     owner   => 'jenkins',
     group   => 'nogroup',
-    mode    => '0750',
+    mode    => '0755',
     require => File['/var/lib/jenkins'],
   }
 
-  file { '/var/lib/jenkins/plugins/simple-theme-plugin':
-    ensure  => directory,
-    owner   => 'jenkins',
-    group   => 'nogroup',
-    require => File['/var/lib/jenkins/plugins'],
-  }
-
-  file { '/var/lib/jenkins/plugins/simple-theme-plugin/openstack.css':
+  file { '/var/lib/jenkins/userContent/traf.css':
     ensure  => present,
     owner   => 'jenkins',
     group   => 'nogroup',
-    source  => 'puppet:///modules/jenkins/openstack.css',
-    require => File['/var/lib/jenkins/plugins/simple-theme-plugin'],
+    source  => 'puppet:///modules/jenkins/traf.css',
+    require => File['/var/lib/jenkins/userContent'],
   }
 
-  file { '/var/lib/jenkins/plugins/simple-theme-plugin/openstack.js':
+  file { '/var/lib/jenkins/userContent/traf.js':
     ensure  => present,
     owner   => 'jenkins',
     group   => 'nogroup',
-    content => template('jenkins/openstack.js.erb'),
-    require => File['/var/lib/jenkins/plugins/simple-theme-plugin'],
+    content => template('jenkins/traf.js.erb'),
+    require => File['/var/lib/jenkins/userContent'],
   }
 
-  file { '/var/lib/jenkins/plugins/simple-theme-plugin/openstack-page-bkg.jpg':
+  file { '/var/lib/jenkins/userContent/Trafodion-page-bkg.jpg':
     ensure  => present,
     owner   => 'jenkins',
     group   => 'nogroup',
-    source  => 'puppet:///modules/jenkins/openstack-page-bkg.jpg',
-    require => File['/var/lib/jenkins/plugins/simple-theme-plugin'],
+    source  => 'puppet:///modules/traf/Trafodion-page-bkg.jpg',
+    require => File['/var/lib/jenkins/userContent'],
   }
 
   file { '/var/lib/jenkins/logger.conf':
@@ -195,12 +185,12 @@ class jenkins::master(
     require => File['/var/lib/jenkins'],
   }
 
-  file { '/var/lib/jenkins/plugins/simple-theme-plugin/title.png':
+  file { '/var/lib/jenkins/userContent/title.png':
     ensure  => present,
     owner   => 'jenkins',
     group   => 'nogroup',
     source  => "puppet:///modules/traf/${logo}",
-    require => File['/var/lib/jenkins/plugins/simple-theme-plugin'],
+    require => File['/var/lib/jenkins/userContent'],
   }
 
   file { '/usr/local/jenkins':
