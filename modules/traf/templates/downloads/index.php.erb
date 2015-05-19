@@ -117,6 +117,17 @@
         }
 
         /**
+         * Callback function to match sandbox items
+         *
+         * @param string $var   Path to file.
+         */
+        function sandbox($var) {
+            if (substr($var, 0, strlen("sandbox/")) === "sandbox/") {
+                return true;
+            }
+        }
+
+        /**
          * Callback function to print links to files.
          *
          * @param string $item   The absolute path to a file or empty for blank line
@@ -245,7 +256,7 @@
         echo '</div>' . PHP_EOL;
 
         # Create array for daily
-        echo '<div class="span-11">' . PHP_EOL;
+        echo '<div class="span-8">' . PHP_EOL;
         echo '    <h2 class="subhead">Daily</h2>' . PHP_EOL;
         echo '    <ul>' . PHP_EOL;
         $dailyArray = array_filter($cdnArray, "daily");
@@ -254,11 +265,26 @@
         echo '</div>' . PHP_EOL;
 
         # Create array for OpenCart
-        echo '<div class="span-11 last">' . PHP_EOL;
+        echo '<div class="span-8">' . PHP_EOL;
         echo '    <h2 class="subhead">OpenCart Demo</h2>' . PHP_EOL;
         echo '    <ul>' . PHP_EOL;
         $opencartArray = array_filter($cdnArray, "opencart");
         array_walk($opencartArray, 'print_links', 'opencart');
+        echo '    </ul>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+
+        # Create array for Sandbox
+        /* Commented out array portion of the code until we figure out how to 
+           download a segmented Swfit file from the CDN without using the Swift CLI
+        */
+        echo '<div class="span-8 last">' . PHP_EOL;
+        echo '    <h2 class="subhead">Sandbox</h2>' . PHP_EOL;
+        echo '    <ul>' . PHP_EOL;
+        /*
+        $sandboxArray = array_filter($cdnArray, "sandbox");
+        array_walk($sandboxArray, 'print_links', 'sandbox');
+        */
+        echo '        <li><a href="http://downloads.trafodion.org/trafodion_release.ova" target="_blank">trafodion_release.ova</a></li>' . PHP_EOL;
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
