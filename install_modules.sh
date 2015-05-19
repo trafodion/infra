@@ -41,7 +41,7 @@ fi
 if [[ $(puppet --version) =~ 3.* ]]
 then
   MODULES["puppetlabs-ntp"]="3.3.0"
-  MODULES["puppetlabs-apt"]="1.7.0"
+  MODULES["puppetlabs-apt"]="1.8.0"
   MODULES["puppetlabs-mysql"]="2.3.1" 
   MODULES["razorsedge-cloudera"]="2.2.1"
   MODULES["puppetlabs-vcsrepo"]="1.2.0"
