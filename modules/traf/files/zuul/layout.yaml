@@ -198,8 +198,6 @@ jobs:
     parameter-function: set_log_url
   - name: ^.*experimental.*$
     voting: false
-  - name: ^.*_T2-.*$
-    voting: false
   - name: ^.*-jjb-lint
     voting: false
   # daily build will have no branch, so will not skip any configs
