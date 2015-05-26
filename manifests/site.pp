@@ -89,7 +89,7 @@ node 'wiki.trafodion.org' {
     sysadmins               => hiera('sysadmins'),
     ssl_cert_file_contents  => hiera('wiki_ssl_cert_file_contents'),
     ssl_key_file_contents   => hiera('wiki_ssl_key_file_contents'),
-    ssl_chain_file_contents => hiera('wiki_ssl_chain_file_contents'),
+    ssl_chain_file_contents => hiera('ssl_chain_file_contents'),
   }
 }
 
