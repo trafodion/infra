@@ -67,7 +67,7 @@ node 'jenkins02.trafodion.org' {
     jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
     ssl_cert_file_contents  => hiera('jenkins02_ssl_cert_file_contents'),
     ssl_key_file_contents   => hiera('jenkins02_ssl_key_file_contents'),
-    ssl_chain_file_contents => hiera('ssl_chain_file_contents'),
+    ssl_chain_file_contents => hiera('jenkins02_ssl_chain_file_contents'),
     sysadmins               => hiera('sysadmins'),
     #zmq_event_receivers     => ['logstash.openstack.org',],
     #zmq_event_receivers     => ['nodepool.trafodion.org',
