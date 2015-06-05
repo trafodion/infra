@@ -17,8 +17,14 @@
 #
 # @@@ END COPYRIGHT @@@
 
-source /usr/local/bin/traf-functions.sh
-log_banner
+# In the current directory, look for binary files
+# which are too large or are an unexpected file type.
+
+TRAFFTNS=/usr/local/bin/traf-functions.sh
+if [[ -s "$TRAFFTNS" ]]; then
+  source "$TRAFFTNS"
+  log_banner
+fi
 
 rc=0   #so far, so good
 
@@ -27,13 +33,18 @@ image_pat='image|Image|icon|data|PC bitmap'
 size_limit=80000  #image file limit in bytes
 TMPFILE=/tmp/BinaryCheckFileList.$$
 
-listcmd="git show --pretty=format:%n --name-status HEAD"
-
+if [[ -s "$TRAFFTNS" ]]; then
+  listcmd="git show --pretty=format:%n --name-status HEAD"
+  VARS="fStatus fName"
+else
+  listcmd='find * -type f'
+  VARS="fName"
+fi
 echo "File list command: $listcmd"
-$listcmd > $TMPFILE
+$listcmd | sort > $TMPFILE
 
 echo "'file' command reports:"
-while read fStatus fName
+while read $VARS
 do
   if [[ -n "$fName" ]]; then
     if [[ "$fStatus" == "D" ]]; then
