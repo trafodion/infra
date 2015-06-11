@@ -26,6 +26,10 @@ if [[ -s "$TRAFFTNS" ]]; then
   log_banner
 fi
 
+WDIR="$1"  # work dir
+
+cd "$WDIR"
+
 rc=0   #so far, so good
 
 text_pat='ASCII|UTF-|FORTRAN|empty|very short file \(no magic\)|Deleted|text|symbolic link'
@@ -34,14 +38,15 @@ size_limit=80000  #image file limit in bytes
 TMPFILE=/tmp/BinaryCheckFileList.$$
 
 if [[ -s "$TRAFFTNS" ]]; then
-  listcmd="git show --pretty=format:%n --name-status HEAD"
+  listcmd="git show --pretty=format:%n --name-status ${ghprbTargetBranch}..${ghprbActualCommit}"
   VARS="fStatus fName"
 else
   listcmd='find * -type f'
   VARS="fName"
 fi
+
 echo "File list command: $listcmd"
-$listcmd | sort > $TMPFILE
+$listcmd | sort -u > $TMPFILE
 
 echo "'file' command reports:"
 while read $VARS

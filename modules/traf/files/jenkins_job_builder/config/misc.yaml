@@ -15,7 +15,7 @@
           description: path on log server
       - string:
           name: BLD_PROJ
-          default: build-product-release
+          default: build-PR-release
           description: Job type with published build artifacts
       - string:
           name: BLD_NUM
@@ -57,8 +57,8 @@
       - check-node
       - kill-traf
       - clean-testspace
-      - multi-git-prep:
-           repos: "trafodion/dcs trafodion/phoenix_test"
+      - single-git-prep:
+           repos: "svarnau/traf-merged" ### TEMP
       - copyartifact:
            project: "$BLD_PROJ"
            which-build: specific-build

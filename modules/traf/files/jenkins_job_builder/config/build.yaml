@@ -1,70 +1,29 @@
-- job:
-    name: 'installer-build'
-    node: 'traf_bld'
-
-    builders:
-      - link-logs
-      - multi-git-prep:
-           repos: "trafodion/install"
-      - pkg-install
-
-    publishers:
-      - console-log
-
-- job:
-    name: 'installer-pub'
-    node: 'traf_bld'
-
-    builders:
-      - link-logs
-      - clean-workspace
-      - multi-git-prep:
-           repos: "trafodion/install"
-      - pkg-install
-      - stage-install
-
-    publishers:
-      - console-log
-      - traf-upload-to-cdn
-      - traf-release-tar
-
-# Simple file type check can run on master
-# Does not need to be exclusive
-- job-template:
-    name: 'gate-{name}-check-for-binary'
-    node: master
-
-    builders:
-      - link-logs
-      - gerrit-git-prep
-      - assert-no-binary-files
-      - assert-no-bad-source-files
-
-    publishers:
-      - console-log
-
-# Product builds of each flavor
 - job-group:
-    name: 'build-product'
+    name: 'build-PR'
     flavor:
       - "release"
       - "debug"
 
     jobs:
-      - build-product-{flavor}
+      - build-PR-{flavor}
 
-# Build procedure for trafodion
-# Publish jenkins artifacts to be used by downstream test jobs
-# Include build-check tests
 - job-template:
-    name: 'build-product-{flavor}'
+    name: 'build-PR-{flavor}'
     node: 'traf_bld'
+
+    parameters:
+      - string:
+          name: LOG_PATH
+      - string:
+          name: BUILD_TYPE
+          default: ""
+          description: "Blank for manual build; check, daily, pre-release, release"
 
     builders:
       - link-logs
       - clean-buildspace
-      - multi-git-prep:
-           repos: "trafodion/core trafodion/install trafodion/dcs"
+      - single-git-prep:
+           repos: "svarnau/traf-merged"  ### TEMP
       - pkg-traf:
            flavor: "{flavor}"
       - check-build:
@@ -80,10 +39,11 @@
 #           dir: "trafodion/install"
       - stage-traf:
            flavor: "{flavor}"
+           btype: "$BUILD_TYPE"
 
     publishers:
-      - traf-upload-to-cdn
-      - traf-release-tar
+#  - traf-upload-to-cdn  ### TEMP
+#      - traf-release-tar  ### TEMP
       - archive:
           artifacts: 'trafodion/install/install*.tar.gz'
       - archive:
@@ -99,3 +59,37 @@
       - console-log
       - git-log
       - traf-make-log
+
+
+# Simple file type check can run on master
+# Does not need to be exclusive
+- job-template:
+    name: 'gate-{name}-check-for-binary'
+    node: master
+
+    builders:
+      - link-logs
+      - gerrit-git-prep
+      - assert-no-binary-files:
+           gitdir: "."
+      - assert-no-bad-source-files:
+           gitdir: "."
+
+    publishers:
+      - console-log
+
+- job:
+    name: 'static-checks'
+    node: master
+
+    builders:
+      - link-logs
+      - single-git-prep:
+           repos: "svarnau/traf-merged"  ### TEMP
+      - assert-no-binary-files:
+           gitdir: "trafodion"
+      - assert-no-bad-source-files:
+           gitdir: "trafodion"
+
+    publishers:
+      - console-log

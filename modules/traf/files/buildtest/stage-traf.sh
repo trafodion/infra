@@ -17,18 +17,24 @@
 #
 # @@@ END COPYRIGHT @@@
 
-# Publish/Stage builds only for specific pipelines
-# ZUUL_PIPELINE indicates if this is daily, pre-release, or release build
+# Publish/Stage builds only for daily builds
+# 
 
-if [[ -z $ZUUL_PIPELINE ]]
+# flavor of build
+Flavor="$1"
+# type of build
+BLD_PURPOSE="$2"
+
+
+if [[ -z $BLD_PURPOSE ]]
 then
-  echo "stage-traf: Non-Zuul build. Skipping publishing"
+  echo "stage-traf: Manual build. Skipping publishing"
   exit 0
-elif [[ $ZUUL_PIPELINE =~ ^release|^pre-release|^daily ]]
+elif [[ $BLD_PURPOSE =~ ^release|^pre-release|^daily ]]
 then
-  echo "stage-traf: Continue publishing for $ZUUL_PIPELINE pipeline"
-else # all other pipelines: check, gate, silent, etc
-  echo "stage-traf: Skipping publishing for $ZUUL_PIPELINE pipeline"
+  echo "stage-traf: Continue publishing for $BLD_PURPOSE build"
+else # all other builds: check
+  echo "stage-traf: Skipping publishing for $BLD_PURPOSE build"
   exit 0
 fi
 
@@ -41,8 +47,6 @@ workspace="$(pwd)"
 # Build ID indicates specific date or tag
 BLD="$(< $workspace/Build_ID)"
 
-# flavor of build
-Flavor="$1"
 if [[ "$Flavor" == "debug" ]]
 then
   FileSuffix="_debug-$BLD.tar.gz"
@@ -50,23 +54,23 @@ else
   FileSuffix="-$BLD.tar.gz"
 fi
 
-# Destination dir should be daily, pre-release, or release even if pipeline
+# Destination dir should be daily, pre-release, or release even if build
 # has an additional suffix, e.g. -stable
 
 # side-branch build?
-if [[ ${ZUUL_PIPELINE} =~ ^daily- ]]
+if [[ ${BLD_PURPOSE} =~ ^daily- ]]
 then
-  Branch=${ZUUL_PIPELINE#daily-}
+  Branch=${BLD_PURPOSE#daily-}
   DestDir="publish/daily/$BLD"
 else
   Branch=master  # time based on master, or label-specific
-  if [[ ${ZUUL_PIPELINE} == daily ]]
+  if [[ ${BLD_PURPOSE} == daily ]]
   then
     DestDir="publish/daily/$BLD"
-  elif [[ ${ZUUL_PIPELINE} =~ ^release ]]
+  elif [[ ${BLD_PURPOSE} =~ ^release ]]
   then
     DestDir="publish/release/$BLD"
-  elif [[ ${ZUUL_PIPELINE} =~ ^pre-release ]]
+  elif [[ ${BLD_PURPOSE} =~ ^pre-release ]]
   then
     DestDir="publish/pre-release/$BLD"
   fi
@@ -84,12 +88,12 @@ mkdir -p "./$DestDir" || exit 2
 mkdir -p "./collect" || exit 2
 
 # Check if we have already staged a build for this version of code
-if ! /usr/local/bin/build-version-check.sh "$Branch" "$Flavor"
+if ! /usr/local/bin/build-version-check.sh "$Branch" "$Flavor" "$BLD_PURPOSE"
 then
   # Declare success, but don't leave any files to be published
   echo "This build has been previously staged. Exiting."
   exit 0
-elif [[ "$Flavor" == "release" && ${ZUUL_PIPELINE} =~ ^daily ]]
+elif [[ "$Flavor" == "release" && ${BLD_PURPOSE} =~ ^daily ]]
 then
   # Publish change-logs, but only for release flavor, daily* (including side-branches)
   #   debug flavor should be identical
@@ -141,6 +145,9 @@ fi
 
 cd $workspace
 
+# installer
+cp ./trafodion/install/installer*gz ./$DestDir/installer-$BLD.tar.gz  || exit 2
+
 # clients tarfile
 cp ./trafodion/core/trafodion_clients-*.tgz ./$DestDir/clients$FileSuffix  || exit 2
 
@@ -157,12 +164,7 @@ fi
 dcsbase=$(basename trafodion/dcs/target/dcs*gz .tar.gz)
 cp trafodion/dcs/target/dcs*gz collect/${dcsbase}.tgz  || exit 2
 
-for repo in core dcs 
-do
-  cat trafodion/$repo/build-version.txt >> collect/build-version.txt
-  echo "==========================" >> collect/build-version.txt
-  echo "" >> collect/build-version.txt
-done
+cat trafodion/build-version.txt >> collect/build-version.txt
 cat collect/build-version.txt
 
 # publish (DestDir) dir will be uploaded by scp rules in jenkins job
@@ -178,6 +180,6 @@ fi
 
 # Declare success - make this the latest good build 
 # Versions* file will be uploaded by scp rules in jenkins job
-mv $workspace/Code_Versions $workspace/Versions-${Branch}-${ZUUL_PIPELINE}-${Flavor}.txt
+mv $workspace/Code_Versions $workspace/Versions-${Branch}-${BLD_PURPOSE}-${Flavor}.txt
 
 exit 0

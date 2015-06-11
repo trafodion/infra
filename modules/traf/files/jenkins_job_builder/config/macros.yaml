@@ -33,6 +33,17 @@
     builders:
       - shell: "/usr/local/bin/git-prep-multi-repo.sh -b {branch} {repos}"
 
+# use for combined repo
+- builder:
+    name: single-git-prep
+    builders:
+      - shell: "/usr/local/bin/git-prep-single.sh {repos}"
+
+- builder:
+    name: single-git-stable
+    builders:
+      - shell: "/usr/local/bin/git-prep-single.sh -b {branch} {repos}"
+
 - builder:
     name: clean-workspace
     builders:
@@ -59,7 +70,7 @@
 - builder:
     name: get-build
     builders:
-      - shell: "/usr/local/bin/find-build-job.sh build-product-{flavor}"
+      - shell: "/usr/local/bin/find-build-job.sh build-PR-{flavor}"
       - inject:
           properties-file: bld.properties
       - copyartifact:
@@ -99,7 +110,7 @@
 - builder:
     name: stage-traf
     builders:
-      - shell: "/usr/local/bin/stage-traf.sh {flavor}"
+      - shell: "/usr/local/bin/stage-traf.sh {flavor} {btype}"
 
 - builder:
     name: stage-install
@@ -129,12 +140,12 @@
 - builder:
     name: assert-no-bad-source-files
     builders:
-      - shell: "/usr/local/bin/find-bad-source.sh"
+      - shell: "/usr/local/bin/find-bad-source.sh -d {gitdir}"
 
 - builder:
     name: assert-no-binary-files
     builders:
-      - shell: "/usr/local/bin/binary-file-check.sh"
+      - shell: "/usr/local/bin/binary-file-check.sh {gitdir}"
 
 - builder:
     name: jjb-lint

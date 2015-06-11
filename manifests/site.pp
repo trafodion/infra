@@ -74,6 +74,17 @@ node 'jenkins02.trafodion.org' {
     #],
   }
 }
+node 'jenkins03.trafodion.org' {
+  class { 'traf::jenkins':
+    jenkins_jobs_username   => 'Traf-Jenkins',
+    jenkins_jobs_password   => hiera('jenkins03_jobs_password'),
+    jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
+    ssl_cert_file_contents  => hiera('jenkins03_ssl_cert_file_contents'),
+    ssl_key_file_contents   => hiera('jenkins03_ssl_key_file_contents'),
+    ssl_chain_file_contents => hiera('jenkins03_ssl_chain_file_contents'),
+    sysadmins               => hiera('sysadmins'),
+  }
+}
 
 # New master running puppet 3.x
 node 'puppet3.trafodion.org' {
