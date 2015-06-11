@@ -121,9 +121,9 @@ function source_env () {
     echo "$ENVfile" > ./BuildFlavor
 
     # add this save file to the ignored file list for this workspace
-    if ! grep -q sqf/BuildFlavor ../.git/info/exclude
+    if ! grep -q core/sqf/BuildFlavor ../../.git/info/exclude
     then
-      echo "sqf/BuildFlavor" >> ../.git/info/exclude
+      echo "core/sqf/BuildFlavor" >> ../../.git/info/exclude
     fi
     echo "Sourcing ./$ENVfile"
     source ./$ENVfile
