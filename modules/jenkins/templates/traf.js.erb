@@ -8,15 +8,12 @@ function makeDoubleDelegate(function1, function2) {
 }
 
 function chgeLogo() {
-        var imgs=document.getElementsByTagName("img");
-        var imgTag = document.createElement("img");
-        imgTag.setAttribute("src","https://<%= vhost_name %>/userContent/title.png");
-        imgTag.setAttribute("style", "vertical-align: middle;padding-left: 0.75em;");
-        imgs[0].parentNode.appendChild(imgTag);
-        var spanTag = document.createElement("span");
-        spanTag.id="heading_text";
-        spanTag.innerHTML="Jenkins";
-        imgs[0].parentNode.appendChild(spanTag);
+        var traf=document.createElement("img");
+        traf.setAttribute("id","trafodion-logo");
+        traf.setAttribute("src","https://<%= vhost_name %>/userContent/title.png");
+        traf.setAttribute("alt","trafodion");
+        var jhl=document.getElementById("jenkins-home-link");
+        jhl.insertBefore(traf,jhl.firstChild);
 }
 
 window.onload = makeDoubleDelegate(window.onload, chgeLogo);

@@ -1,12 +1,22 @@
 - project:
-    name: sandbox
-    github-org: trafodion
+    name: traf-merged   ### TEMP
+    github-org: svarnau
+
+    dist:
+      - "cm5.1"
+      - "cm5.3"
+      - "ahw2.1"
+      - "ahw2.2"
 
     jobs:
-      - gate-{name}-check-for-binary
-      - gate-{name}-puppet-lint
-      - gate-{name}-puppet-syntax
-      - gate-{name}-jjb-lint
+      - Check-PR
+      - build-PR
+      - static-checks
+      - core-regress-suites
+      - phoenix-jobs
+      - jdbc_test-{dist}
+      - pyodbc_test-{dist}
+      - install-stable-jobs
 
 - project:
     name: infra
@@ -17,72 +27,4 @@
       - gate-{name}-puppet-syntax
       - gate-{name}-check-for-binary
       - gate-{name}-jjb-lint
-
-- project:
-    name: core
-    github-org: trafodion
-
-    dist:
-      - "cm5.1"
-      - "cm5.3"
-      - "ahw2.1"
-      - "ahw2.2"
-
-    jobs:
-      - core-regress-suites
-      - gate-{name}-check-for-binary
-      - build-product
-
-- project:
-    name: manuals
-    github-org: trafodion
-
-    jobs:
-      - gate-noop
-
-- project:
-    name: phoenix_test
-    github-org: trafodion
-
-    dist:
-      - "cm5.1"
-      - "cm5.3"
-      - "ahw2.1"
-      - "ahw2.2"
-
-    jobs:
-      - gate-{name}-check-for-binary
-      - phoenix-jobs
-
-- project:
-    name: dcs
-    github-org: trafodion
-
-    dist:
-      - "cm5.1"
-      - "cm5.3"
-      - "ahw2.1"
-      - "ahw2.2"
-
-    jobs:
-      - gate-{name}-check-for-binary
-      - jdbc_test-{dist}
-      - pyodbc_test-{dist}
-
-- project:
-    name: install
-    github-org: trafodion
-
-    jobs:
-      - gate-{name}-check-for-binary
-      - installer-build
-      - installer-pub
-      - install-stable-jobs
-
-- project:
-    name: win-odbc64
-    github-org: trafodion
-
-    jobs:
-      - gate-{name}-check-for-binary
 

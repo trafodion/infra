@@ -1,0 +1,262 @@
+# To-Do: add Check-Full-PR job to be triggered only on phrase
+
+- job:
+    name: 'Check-PR'
+    node: 'master'
+    project-type: multijob
+
+    parameters:
+      - string:
+          name: LOG_PATH
+          default: 'PullReq/$ghprbPullId/$BUILD_NUMBER'
+
+    properties:
+      - github:
+          url: https://github.com/svarnau/traf-merged   ### TEMP
+
+    scm:
+      - git:
+          url: https://github.com/svarnau/traf-merged   ### TEMP
+          wipe-workspace: false
+          skip-tag: true
+          refspec: '+refs/pull/*:refs/remotes/origin/pr/*'
+          branches: 
+            - '${sha1}'
+          changelog-against:
+            remote: origin
+            branch: '${ghprbTargetBranch}'
+
+    triggers:
+      - github-pull-request:
+          # check for new PR every few minutes
+          cron: H/6 * * * *
+          # github user names for test approval
+          admin-list:
+            - svarnau
+            - alchen99
+          allow-whitelist-orgs-as-admins: true
+          org-list:
+            - trafodion-contributors
+
+    builders:
+      - link-logs
+      - multijob:
+          name: static
+          projects:
+            - name: "static-checks"
+              current-parameters: true
+      - multijob:
+          name: build_test
+          projects:
+            - name: "build-PR-debug"
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/$JOB_NAME
+                 BUILD_TYPE=check
+            - name: "build-PR-release"
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/$JOB_NAME
+                 BUILD_TYPE=check
+            - name: "pyodbc_test-ahw2.2"   ### TEMP - change back to cm5.3
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+### TEMP
+#            - name: "phoenix_quick_T4-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "jdbc_test-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-seabase-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-core-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+
+    publishers:
+      - console-log
+
+
+- job:
+    name: 'Check-Daily'
+    node: 'master'
+    project-type: multijob
+
+    parameters:
+      - string:
+          name: LOG_PATH
+          default: 'Daily/$BUILD_ID'
+
+    properties:
+      - github:
+          url: https://github.com/svarnau/traf-merged   ### TEMP
+
+    scm:
+      - git:
+          url: https://github.com/svarnau/traf-merged   ### TEMP
+          wipe-workspace: false
+          skip-tag: true
+          branches: 
+            - 'master'
+          changelog-against:
+            remote: origin
+            branch: 'master@{"yesterday 08:30"}'
+
+    triggers:
+      - timed: "30 8 * * *"
+
+    builders:
+      - link-logs
+      - multijob:
+          name: build_test
+          projects:
+            - name: "build-PR-debug"
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/$JOB_NAME
+                 BUILD_TYPE=check
+            - name: "build-PR-release"
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/$JOB_NAME
+                 BUILD_TYPE=check
+            - name: "core-regress-core-ahw2.2"
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+            - name: "core-regress-seabase-ahw2.2"
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+            - name: "pyodbc_test-ahw2.2"
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+### TEMP
+#            - name: "core-regress-charsets-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-qat-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-udr-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-catman1-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-compGeneral-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-executor-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-fullstack2-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-hive-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "phoenix_part1_T4-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "phoenix_part2_T4-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "phoenix_part1_T2-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "phoenix_part2_T2-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "jdbc_test-ahw2.2"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#   Cloudera Jobs
+#            - name: "core-regress-core-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-seabase-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "pyodbc_test-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-charsets-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-qat-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-udr-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-catman1-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-compGeneral-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-executor-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-fullstack2-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "core-regress-hive-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "phoenix_part1_T4-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "phoenix_part2_T4-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "phoenix_part1_T2-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "phoenix_part2_T2-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+#            - name: "jdbc_test-cm5.3"
+#              current-parameters: true
+#              predefined-parameters: |
+#                 LOG_PATH=${LOG_PATH}/$JOB_NAME
+
+    publishers:
+      - console-log

@@ -20,11 +20,11 @@
 
 # Find job with build artifacts that matches our job
 # based on:
-#   ZUUL_CHANGES
+#   ghprbActualCommit
 #     or
-#   ZUUL_REF
+#   (TBD: tags)
 #     or
-#   ZUUL_PIPELINE and date portion of BUILD_ID
+#   date portion of BUILD_ID
 #
 # Waits on build job to be complete.
 #
@@ -44,8 +44,10 @@ fi
 # job name (jenkins "project") of Build providing artifacts
 BLD_PROJ_NAME="$1"
 
+  ### TEMP
+# ##### -k option is temporary for testing on server with self-signed cert
 # jenkins server data cmd - jenkins provides JENKINS_URL
-API="curl -s $JENKINS_URL/job/$BLD_PROJ_NAME"
+API="curl -s -k $JENKINS_URL/job/$BLD_PROJ_NAME"
 
 # Loop forever, in case server is not responding or we are waiting for
 # gearman to start our build in jenkins
@@ -65,39 +67,41 @@ do
   while (( $Bld >= $Earliest ))
   do
     # are we looking for a specific change-set build?
-    if [[ -n "$ZUUL_CHANGES" ]]
+    if [[ -n "$ghprbActualCommit" ]]
     then
       bld_chgs=$($API/$Bld/api/json | 
-	  jq -r '.actions[].parameters[] | select(.name == "ZUUL_CHANGES").value' 2>/dev/null)
-      if [[ $bld_chgs == $ZUUL_CHANGES ]]
+	  jq -r '.actions[].parameters[] | select(.name == "ghprbActualCommit").value' 2>/dev/null)
+      if [[ $bld_chgs == $ghprbActualCommit ]]
       then
         MyBuild=$Bld
 	break 2
       fi
+### TEMP
+# To-Do -- tagged builds
     # or do we have a tagged build?
-    elif [[ -n "$ZUUL_REF" ]]
-    then
-      bld_ref=$($API/$Bld/api/json | 
-	  jq -r '.actions[].parameters[] | select(.name == "ZUUL_REF").value' 2>/dev/null)
-      if [[ $bld_ref == $ZUUL_REF ]]
-      then
-        MyBuild=$Bld
-	break 2
-      fi
+#    elif [[ -n "$ZUUL_REF" ]]
+#    then
+#      bld_ref=$($API/$Bld/api/json | 
+#	  jq -r '.actions[].parameters[] | select(.name == "ZUUL_REF").value' 2>/dev/null)
+#      if [[ $bld_ref == $ZUUL_REF ]]
+#      then
+#        MyBuild=$Bld
+#	break 2
+#      fi
     # otherwise look for our pipeline (e.g. daily) and date
     # assumes both build and test job got initiated on same date
     else
-      bld_pipe=$($API/$Bld/api/json | 
-	  jq -r '.actions[].parameters[] | select(.name == "ZUUL_PIPELINE").value' 2>/dev/null)
-      if [[ $bld_pipe == $ZUUL_PIPELINE ]]
-      then
+#      bld_pipe=$($API/$Bld/api/json | 
+#	  jq -r '.actions[].parameters[] | select(.name == "ZUUL_PIPELINE").value' 2>/dev/null)
+#      if [[ $bld_pipe == $ZUUL_PIPELINE ]]
+#      then
         bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_ID' 2>/dev/null)
 	if [[ ${bld_date%_*} == ${BUILD_ID%_*} ]]
 	then
           MyBuild=$Bld
 	  break 2
 	fi
-      fi
+#      fi
     fi
 
     Bld=$(( $Bld - 1))

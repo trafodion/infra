@@ -162,6 +162,7 @@ class traf::buildtest (
     exec { 'rsync-build-tool-tgz' :
       command  => "/bin/cat /dev/null > /opt/traf/rsync.out; /usr/bin/rsync -havS --log-file=/opt/traf/rsync.out --log-file-format=\"%o --- %n\" --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf",
       user     => jenkins,
+      timeout  => 900,
       provider => shell,
       onlyif   => "/usr/bin/test `/usr/bin/rsync -haS --dry-run --itemize-changes --del -e \"ssh -o StrictHostKeyChecking=no\" jenkins@downloads.trafodion.org:/srv/static/downloads/build-tool-tgz /opt/traf | /usr/bin/wc -l` -gt 0",
       require  => [ File['/opt/traf/tools'], File['/opt/traf/build-tool-tgz'] ],

@@ -28,7 +28,7 @@ class jenkins::master(
 
   #This key is at http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key
   apt::key { 'jenkins':
-    key        => 'D50582E6',
+    key        => '150FDE3F7787E7D11EF4E12A9B7D32F2D50582E6',
     key_source => 'http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key',
     require    => Package['wget'],
   }

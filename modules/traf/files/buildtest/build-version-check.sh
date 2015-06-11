@@ -23,6 +23,7 @@
 
 BRANCH="$1"
 FLAVOR="$2"
+PURPOSE="$3"
 
 if [[ -z "$BRANCH" || -z "$FLAVOR" ]]
 then
@@ -38,7 +39,7 @@ log_banner
 # and posted by the traf-pub-* log publisher in jenkins_job_builder/config/traf.yaml
 
 LOGLOC="http://logs.trafodion.org/buildvers"
-LOGFILE="Versions-${BRANCH}-${ZUUL_PIPELINE}-${FLAVOR}.txt"
+LOGFILE="Versions-${BRANCH}-${PURPOSE}-${FLAVOR}.txt"
 
 cd $WORKSPACE
 rm -f Previous_Version changes-*
@@ -76,8 +77,8 @@ else
   cat Previous_Version | while read repo commit comments
   do
     newcommit=$(grep ^$repo $WORKSPACE/Code_Versions | cut -d " " -f 2)
-    cd $WORKSPACE/$repo
-    git log ${commit}..${newcommit} > $WORKSPACE/changes-${repo#trafodion/}
+    cd $WORKSPACE/trafodion
+    git log ${commit}..${newcommit} > $WORKSPACE/changes-${repo#apache/}
   done
   exit 0
 fi
