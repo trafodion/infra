@@ -29,7 +29,7 @@ set -x
 cd $WORKSPACE/trafodion/install || exit 2
 
 # Save build version info into package
-cp ./build-version.txt ./installer/build-version-${BLD}.txt
+cp ../build-version.txt ./installer/build-version-${BLD}.txt
 
 make all
 

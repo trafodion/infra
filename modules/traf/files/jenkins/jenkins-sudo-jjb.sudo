@@ -1,1 +1,2 @@
 jenkins	ALL = NOPASSWD:/usr/local/bin/jjblint.sh
+jenkins ALL = SETENV:NOPASSWD:/usr/local/bin/cancel-prior-PR.sh

@@ -25,7 +25,9 @@ usage()
 
 Usage: $(basename $0) [-q] [<commit-id> ]
 
- <commit-id>	If omitted, use HEAD.
+ <commit-id>	If omitted, use \${ghprbTargetBranch}..\${ghprbActualCommit}.
+
+ -d <dir>	Directory to check (default: ".")
 
  -q		Quiet mode.  Do not report all examined files
 		and the context for the found lines.
@@ -45,6 +47,7 @@ DELETED=0
 MAXINGREP=5000
 fList=
 VERBOSE=y
+WDIR="."
 TMPFILE=/tmp/ChangedFilesToScan.$$
 
 while [[ $# -gt 0 ]]; do
@@ -54,6 +57,9 @@ while [[ $# -gt 0 ]]; do
 		usage 0
 		;;
   -q|--quiet)	VERBOSE=
+		;;
+  -d)		WDIR="$2"
+                shift 1
 		;;
   -*|--*)	echo "ERROR: Unrecognized option : $ANARG" >&2
 		usage 1
@@ -65,15 +71,17 @@ while [[ $# -gt 0 ]]; do
 done
 COMMIT=$1
 if [[ -z "$COMMIT" ]]; then
-  COMMIT="HEAD"
+  COMMIT="${ghprbTargetBranch}..${ghprbActualCommit}"
 fi
 
 source /usr/local/bin/traf-functions.sh
 log_banner
 
+cd "$WDIR"
+
 listcmd="git show --pretty=format:%n --name-status $COMMIT"
 echo "File list command: $listcmd"
-$listcmd > $TMPFILE
+$listcmd | sort -u > $TMPFILE
 
 while read fStatus fName; do
   if [[ -n "$fName" ]]; then

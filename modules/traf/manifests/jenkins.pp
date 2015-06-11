@@ -35,11 +35,32 @@ class traf::jenkins (
     ensure   => latest,
     provider => 'gem',
   }
+  # json parser for API
+  package { 'jq':
+    ensure => present,
+  }
 
   if $ssl_chain_file_contents != '' {
     $ssl_chain_file = '/etc/ssl/certs/intermediate.pem'
   } else {
     $ssl_chain_file = ''
+  }
+
+  # set up mount point for jenkins workspaces
+  file { '/mnt/jenkins':
+    ensure                  => directory,
+    mode                    => '0755',
+    selinux_ignore_defaults => true,
+  }
+  # depends on /var/lib/jenkins dir, but specifying it
+  # here creates a circular dependency. It must be manually created the first time
+  mount { '/var/lib/jenkins':
+    ensure  => mounted,
+    atboot  => true,
+    fstype  => 'none',
+    options => 'bind',
+    device  => '/mnt/jenkins',
+    require => [ File['/mnt/jenkins'] ],
   }
 
   class { '::jenkins::master':
@@ -54,6 +75,7 @@ class traf::jenkins (
     ssl_chain_file_contents => $ssl_chain_file_contents,
     jenkins_ssh_private_key => $jenkins_ssh_private_key,
     jenkins_ssh_public_key  => $traf::jenkins_ssh_pub_key,
+    require                 => [ Mount['/var/lib/jenkins'] ],
   }
 
   # jenkins master needs Gerrit's SSL cert
@@ -88,49 +110,55 @@ class traf::jenkins (
 
   # set up jenkins plugins
   jenkins::plugin { 'ansicolor':
-    version => '0.3.1',
-  }
-  jenkins::plugin { 'bazaar':
-    version => '1.20',
+    version => '0.4.1',
   }
   jenkins::plugin { 'build-timeout':
-    version => '1.14',
+    version => '1.14.1',
   }
   jenkins::plugin { 'build-flow-plugin':
-    version => '0.12',
+    version => '0.17',
   }
   jenkins::plugin { 'conditional-buildstep':
     version => '1.3.3',
   }
   jenkins::plugin { 'copyartifact':
-    version => '1.22',
+    version => '1.35.1',
   }
   jenkins::plugin { 'dashboard-view':
-    version => '2.3',
+    version => '2.9.4',
   }
   jenkins::plugin { 'envinject':
-    version => '1.89',
+    version => '1.90',
   }
   jenkins::plugin { 'zmq-event-publisher':
     version => '0.0.3',
   }
   jenkins::plugin { 'gearman-plugin':
-    version => '0.0.7',
+    version => '0.1.1',
   }
   jenkins::plugin { 'git':
-    version => '1.1.23',
+    version => '2.3.5',
   }
   jenkins::plugin { 'github-api':
-    version => '1.33',
+    version => '1.67',
+  }
+  jenkins::plugin { 'git-client':
+    version => '1.17.1',
+  }
+  jenkins::plugin { 'github-oauth':
+    version => '0.20',
   }
   jenkins::plugin { 'github':
-    version => '1.4',
+    version => '1.11.3',
+  }
+  jenkins::plugin { 'ghprb':
+    version => '1.20.1',
   }
   jenkins::plugin { 'greenballs':
-    version => '1.12',
+    version => '1.14',
   }
   jenkins::plugin { 'htmlpublisher':
-    version => '1.0',
+    version => '1.3',
   }
   jenkins::plugin { 'extended-read-permission':
     version => '1.0',
@@ -139,59 +167,74 @@ class traf::jenkins (
     version => '1.8',
   }
   jenkins::plugin { 'jclouds-jenkins':
-    version => '2.3.1',
+    version => '2.8',
   }
   jenkins::plugin { 'jobConfigHistory':
-    version => '1.13',
+    version => '2.11',
+  }
+  jenkins::plugin { 'mailer':
+    version => '1.15',
+  }
+  jenkins::plugin { 'matrix-auth':
+    version => '1.2',
   }
   jenkins::plugin { 'monitoring':
-    version => '1.40.0',
+    version => '1.55.0',
   }
   jenkins::plugin { 'jenkins-multijob-plugin':
-    version => '1.13',
+    version => '1.16',
   }
   jenkins::plugin { 'nodelabelparameter':
-    version => '1.2.1',
+    version => '1.5.1',
   }
   jenkins::plugin { 'notification':
-    version => '1.4',
-  }
-  jenkins::plugin { 'openid':
-    version => '1.5',
+    version => '1.9',
   }
   jenkins::plugin { 'parameterized-trigger':
-    version => '2.25',
+    version => '2.26',
+  }
+  jenkins::plugin { 'Parameterized-Remote-Trigger':
+    version => '2.1.3',
+  }
+  jenkins::plugin { 'postbuildscript':
+    version => '0.17',
   }
   jenkins::plugin { 'publish-over-ftp':
-    version => '1.7',
+    version => '1.11',
   }
   jenkins::plugin { 'rebuild':
-    version => '1.14',
+    version => '1.24',
   }
 #  TODO(jeblair): release
 #  jenkins::plugin { 'scp':
 #    version => '1.9',
 #  }
   jenkins::plugin { 'simple-theme-plugin':
-    version => '0.2',
+    version => '0.3',
+  }
+  jenkins::plugin { 'ssh-agent':
+    version => '1.6',
+  }
+  jenkins::plugin { 'ssh-slaves':
+    version => '1.9',
   }
   jenkins::plugin { 'timestamper':
-    version => '1.5.14',
+    version => '1.6',
   }
   jenkins::plugin { 'token-macro':
-    version => '1.5.1',
-  }
-  jenkins::plugin { 'url-change-trigger':
-    version => '1.2',
+    version => '1.10',
   }
   jenkins::plugin { 'urltrigger':
-    version => '0.24',
+    version => '0.37',
   }
   jenkins::plugin { 'violations':
     version => '0.7.11',
   }
+  jenkins::plugin { 'windows-slaves':
+    version => '1.0',
+  }
   jenkins::plugin { 'xunit':
-    version => '1.90',
+    version => '1.95',
   }
 
   if $manage_jenkins_jobs == true {

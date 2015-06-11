@@ -95,14 +95,14 @@
       - check-node
       - kill-traf
       - clean-testspace
-      - multi-git-prep:
-           repos: "trafodion/phoenix_test"
+      - single-git-prep:
+           repos: "svarnau/traf-merged"   ### TEMP
       - get-build:
            flavor: "debug"
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
-           testDir: "trafodion/phoenix_test"
+           testDir: "trafodion/tests/phx"
            jdbctype: '{jdbcDriverType}'
            hadoopdistro: '{dist}'
            tests1: "{subset}"
@@ -138,8 +138,8 @@
       - check-node
       - kill-traf
       - clean-testspace
-      - multi-git-prep:
-           repos: "trafodion/dcs"
+      - single-git-prep:
+           repos: "svarnau/traf-merged"   ### TEMP
       - get-build:
            flavor: "debug"
       - run-pyodbc_test:
@@ -177,8 +177,8 @@
       - check-node
       - kill-traf
       - clean-testspace
-      - multi-git-prep:
-           repos: "trafodion/dcs"
+      - single-git-prep:
+           repos: "svarnau/traf-merged"   ### TEMP
       - get-build:
            flavor: "debug"
       - run-jdbc_test:
@@ -233,16 +233,16 @@
       - check-node
       - kill-traf
       - clean-workspace
-      - multi-git-stable:
+      - single-git-stable:
            branch: "{stable_branch}"
-           repos: "trafodion/core trafodion/dcs"
-      - multi-git-prep:
-           repos: "trafodion/install"
+           repos: "svarnau/traf-merged"   ### TEMP
       - pkg-traf:
            flavor: "debug"
       - pkg-dcs:
            buildDir: "trafodion/dcs"
            coreJDBC: "trafodion/core"
+      - single-git-prep:
+           repos: "svarnau/traf-merged"   ### TEMP
       - pkg-install
       - kill-traf
       - run-pyodbc_test:
@@ -274,16 +274,16 @@
       - check-node
       - kill-traf
       - clean-workspace
-      - multi-git-stable:
+      - single-git-stable:
            branch: "{stable_branch}"
-           repos: "trafodion/core trafodion/dcs"
-      - multi-git-prep:
-           repos: "trafodion/install"
+           repos: "svarnau/traf-merged"   ### TEMP
       - pkg-traf:
            flavor: "debug"
       - pkg-dcs:
            buildDir: "trafodion/dcs"
            coreJDBC: "trafodion/core"
+      - single-git-prep:
+           repos: "svarnau/traf-merged"   ### TEMP
       - pkg-install
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"
