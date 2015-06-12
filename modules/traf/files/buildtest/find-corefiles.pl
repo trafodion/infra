@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2011-2014 Hewlett-Packard Development Company, L.P.
+# (C) Copyright 2011-2015 Hewlett-Packard Development Company, L.P.
 #
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ use File::Basename;
 use Getopt::Long;
 
 my $defaultDir = "/home/jenkins/workspace";
+my $defaultMode = "644";
 
 sub Usage {
 
@@ -35,6 +36,7 @@ Find core files in the specified directories.
 Usage : $scriptName  [ --help               ]
                            [ --xml                ]
                            [ --0                  ]
+                           [ --chmod <mode>       ]
                            [ --aliasname <alias>  ]
                            [ --aliasshort <short> ]
                            [ --debug              ]
@@ -46,6 +48,10 @@ Usage : $scriptName  [ --help               ]
        --xml                   Generate XML output, otherwise just list the files
 
        --0                     If true AND --xml is not used, then output chr(0) instead of "\\n"
+
+       --chmod <mode>          Change permissions on found files to <mode>, if they are writeable.
+                               Default is to chmod them to $defaultMode.
+                               To skip chmod, use 0 for <mode>.
 
        --aliasname <alias>     Report system is <alias> instead of hostname
 
@@ -66,6 +72,7 @@ my $aliasName = '';     # Use this instead of hostname
 my $aliasShort = '';    # Use this instead of hostname -s
 my $realHostName = '';	# Hostname without alias
 
+my $chmodMode = $defaultMode;     # Value for chmod
 my $debugFlag = 0;      # Output extra debugging information on STDERR
 my $zeroFlag = 0;       # if true AND xmlFlag is off, then output chr(0) instead of "\n"
 my $xmlFlag = 0;        # if true, generate XML output, otherwise just list the files
@@ -74,6 +81,7 @@ my $_nl="\n";
 my $status = GetOptions(
         'aliasname=s'   => \$aliasName,
         'aliasshort=s'  => \$aliasShort,
+        'chmod=s'       => \$chmodMode,
         'debug!'        => \$debugFlag,
         'xml!'          => \$xmlFlag,
         'help!'         => \$helpFlag,
@@ -85,7 +93,8 @@ my $status = GetOptions(
 $_nl=chr(0) if ($zeroFlag && ! $xmlFlag);
 
 if ( $debugFlag ) {
-	print STDERR "Debugging on\n";
+	print STDERR "Debugging is on\n";
+	print STDERR "chmod mode = $chmodMode\n";
 }
 
 $::gCurrentDirectoryForFind = '';
@@ -136,6 +145,14 @@ my $Dir = $_[0];
 	my @Files = ();
 	if (exists $FileList{$Dir} ){
 		@Files = @{$FileList{$Dir}};
+	}
+
+	if ($chmodMode) {
+		foreach my $aFile ( sort @Files) {
+			if (-w $aFile) {
+				`chmod $chmodMode $aFile`;
+			}
+		}
 	}
 
 	if (! $xmlFlag) {
