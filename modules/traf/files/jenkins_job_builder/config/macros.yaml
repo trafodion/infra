@@ -70,7 +70,7 @@
 - builder:
     name: get-build
     builders:
-      - shell: "/usr/local/bin/find-build-job.sh build-PR-{flavor}"
+      - shell: "/usr/local/bin/find-build-job.sh build-{flavor}"
       - inject:
           properties-file: bld.properties
       - copyartifact:
@@ -204,8 +204,6 @@
           #!/bin/sh
           if test "$LOG_PATH" ; then
               echo "Detailed logs: http://logs.trafodion.org/$LOG_PATH/"
-          else
-              echo "Detailed logs: http://logs.trafodion.org/periodic/$JOB_NAME/$NODE_NAME/$BUILD_NUMBER/"
           fi
           echo "Jenkins build: $BUILD_URL"
 

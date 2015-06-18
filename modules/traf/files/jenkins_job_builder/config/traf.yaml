@@ -96,7 +96,7 @@
       - kill-traf
       - clean-testspace
       - single-git-prep:
-           repos: "svarnau/traf-merged"   ### TEMP
+           repos: "apache/incubator-trafodion"
       - get-build:
            flavor: "debug"
       - run-phoenix_test:
@@ -139,7 +139,7 @@
       - kill-traf
       - clean-testspace
       - single-git-prep:
-           repos: "svarnau/traf-merged"   ### TEMP
+           repos: "apache/incubator-trafodion"
       - get-build:
            flavor: "debug"
       - run-pyodbc_test:
@@ -178,7 +178,7 @@
       - kill-traf
       - clean-testspace
       - single-git-prep:
-           repos: "svarnau/traf-merged"   ### TEMP
+           repos: "apache/incubator-trafodion"
       - get-build:
            flavor: "debug"
       - run-jdbc_test:
@@ -235,14 +235,14 @@
       - clean-workspace
       - single-git-stable:
            branch: "{stable_branch}"
-           repos: "svarnau/traf-merged"   ### TEMP
+           repos: "apache/incubator-trafodion"
       - pkg-traf:
            flavor: "debug"
       - pkg-dcs:
            buildDir: "trafodion/dcs"
            coreJDBC: "trafodion/core"
       - single-git-prep:
-           repos: "svarnau/traf-merged"   ### TEMP
+           repos: "apache/incubator-trafodion"
       - pkg-install
       - kill-traf
       - run-pyodbc_test:
@@ -276,14 +276,14 @@
       - clean-workspace
       - single-git-stable:
            branch: "{stable_branch}"
-           repos: "svarnau/traf-merged"   ### TEMP
+           repos: "apache/incubator-trafodion"
       - pkg-traf:
            flavor: "debug"
       - pkg-dcs:
            buildDir: "trafodion/dcs"
            coreJDBC: "trafodion/core"
       - single-git-prep:
-           repos: "svarnau/traf-merged"   ### TEMP
+           repos: "apache/incubator-trafodion"
       - pkg-install
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"
