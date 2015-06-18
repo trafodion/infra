@@ -1,14 +1,14 @@
 - job-group:
-    name: 'build-PR'
+    name: 'builds'
     flavor:
       - "release"
       - "debug"
 
     jobs:
-      - build-PR-{flavor}
+      - build-{flavor}
 
 - job-template:
-    name: 'build-PR-{flavor}'
+    name: 'build-{flavor}'
     node: 'traf_bld'
 
     parameters:
@@ -23,7 +23,7 @@
       - link-logs
       - clean-buildspace
       - single-git-prep:
-           repos: "svarnau/traf-merged"  ### TEMP
+           repos: "apache/incubator-trafodion"
       - pkg-traf:
            flavor: "{flavor}"
       - check-build:
@@ -89,7 +89,7 @@
     builders:
       - link-logs
       - single-git-prep:
-           repos: "svarnau/traf-merged"  ### TEMP
+           repos: "apache/incubator-trafodion"
       - assert-no-binary-files:
            gitdir: "trafodion"
       - assert-no-bad-source-files:

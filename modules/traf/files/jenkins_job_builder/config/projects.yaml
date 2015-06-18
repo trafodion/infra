@@ -1,6 +1,6 @@
 - project:
-    name: traf-merged   ### TEMP
-    github-org: svarnau
+    name: incubator-trafodion
+    github-org: apache
 
     dist:
       - "cm5.1"
@@ -10,7 +10,8 @@
 
     jobs:
       - Check-PR
-      - build-PR
+      - Check-Daily
+      - builds
       - static-checks
       - core-regress-suites
       - phoenix-jobs

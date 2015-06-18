@@ -15,7 +15,7 @@
           description: path on log server
       - string:
           name: BLD_PROJ
-          default: build-PR-release
+          default: build-release
           description: Job type with published build artifacts
       - string:
           name: BLD_NUM
@@ -58,7 +58,7 @@
       - kill-traf
       - clean-testspace
       - single-git-prep:
-           repos: "svarnau/traf-merged" ### TEMP
+           repos: "apache/incubator-trafodion"
       - copyartifact:
            project: "$BLD_PROJ"
            which-build: specific-build
