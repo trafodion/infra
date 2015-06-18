@@ -24,7 +24,7 @@
             - 'origin/pr/${ghprbPullId}/head'
           changelog-against:
             remote: origin
-            branch: 'origin/${ghprbTargetBranch}'
+            branch: '${ghprbTargetBranch}'
 
     triggers:
       - github-pull-request:
@@ -46,6 +46,8 @@
           projects:
             - name: "static-checks"
               current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/$JOB_NAME
       - multijob:
           name: build_test
           projects:

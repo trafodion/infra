@@ -38,7 +38,7 @@ size_limit=80000  #image file limit in bytes
 TMPFILE=/tmp/BinaryCheckFileList.$$
 
 if [[ -s "$TRAFFTNS" ]]; then
-  listcmd="git show --pretty=format:%n --name-status ${ghprbTargetBranch}..${ghprbActualCommit}"
+  listcmd="git show --pretty=format:%n --name-status origin/${ghprbTargetBranch}..${ghprbActualCommit}"
   VARS="fStatus fName"
 else
   listcmd='find * -type f'
