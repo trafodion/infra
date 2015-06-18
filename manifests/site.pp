@@ -63,6 +63,7 @@ node 'review.trafodion.org' {
 # Jenkins master for US East
 node 'jenkins02.trafodion.org' {
   class { 'traf::jenkins':
+    jenkins_jobs_username   => 'Traf-Jenkins',
     jenkins_jobs_password   => hiera('jenkins02_jobs_password'),
     jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
     ssl_cert_file_contents  => hiera('jenkins02_ssl_cert_file_contents'),
@@ -72,17 +73,6 @@ node 'jenkins02.trafodion.org' {
     #zmq_event_receivers     => ['logstash.openstack.org',],
     #zmq_event_receivers     => ['nodepool.trafodion.org',
     #],
-  }
-}
-node 'jenkins03.trafodion.org' {
-  class { 'traf::jenkins':
-    jenkins_jobs_username   => 'Traf-Jenkins',
-    jenkins_jobs_password   => hiera('jenkins03_jobs_password'),
-    jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
-    ssl_cert_file_contents  => hiera('jenkins03_ssl_cert_file_contents'),
-    ssl_key_file_contents   => hiera('jenkins03_ssl_key_file_contents'),
-    ssl_chain_file_contents => hiera('jenkins03_ssl_chain_file_contents'),
-    sysadmins               => hiera('sysadmins'),
   }
 }
 
