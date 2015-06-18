@@ -82,6 +82,10 @@
     name: 'static-checks'
     node: master
 
+    parameters:
+      - string:
+          name: LOG_PATH
+
     builders:
       - link-logs
       - single-git-prep:
@@ -93,3 +97,4 @@
 
     publishers:
       - console-log
+      - git-log
