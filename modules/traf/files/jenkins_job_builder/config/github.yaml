@@ -19,12 +19,12 @@
           url: https://github.com/svarnau/traf-merged   ### TEMP
           wipe-workspace: false
           skip-tag: true
-          refspec: '+refs/pull/*:refs/remotes/origin/pr/*'
+          refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
           branches: 
             - 'origin/pr/${ghprbPullId}/head'
           changelog-against:
             remote: origin
-            branch: '${ghprbTargetBranch}'
+            branch: 'origin/${ghprbTargetBranch}'
 
     triggers:
       - github-pull-request:

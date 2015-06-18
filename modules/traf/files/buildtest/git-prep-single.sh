@@ -122,7 +122,7 @@ then
 fi
 
 # fetch Branch
-git fetch $GIT_ORIGIN/$repo $TargetBranch
+git fetch $GIT_ORIGIN/$repo +refs/heads/${TargetBranch}:refs/remotes/origin/${TargetBranch}
 # fetch pull requests
 git fetch $GIT_ORIGIN/$repo +refs/pull/*:refs/remotes/origin/pr/*
 if git checkout -f $sha1
