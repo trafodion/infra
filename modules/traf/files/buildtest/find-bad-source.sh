@@ -25,7 +25,7 @@ usage()
 
 Usage: $(basename $0) [-q] [<commit-id> ]
 
- <commit-id>	If omitted, use \${ghprbTargetBranch}..\${ghprbActualCommit}.
+ <commit-id>	If omitted, use origin/\${ghprbTargetBranch}..\${ghprbActualCommit}.
 
  -d <dir>	Directory to check (default: ".")
 
@@ -71,7 +71,7 @@ while [[ $# -gt 0 ]]; do
 done
 COMMIT=$1
 if [[ -z "$COMMIT" ]]; then
-  COMMIT="${ghprbTargetBranch}..${ghprbActualCommit}"
+  COMMIT="origin/${ghprbTargetBranch}..${ghprbActualCommit}"
 fi
 
 source /usr/local/bin/traf-functions.sh
