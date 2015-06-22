@@ -38,7 +38,7 @@ size_limit=80000  #image file limit in bytes
 TMPFILE=/tmp/BinaryCheckFileList.$$
 
 if [[ -s "$TRAFFTNS" ]]; then
-  listcmd="git show --pretty=format:%n --name-status origin/${ghprbTargetBranch}..${ghprbActualCommit}"
+  listcmd="git diff --pretty=format:%n --name-status origin/${ghprbTargetBranch}  ${sha1}"
   VARS="fStatus fName"
 else
   listcmd='find * -type f'
@@ -46,7 +46,7 @@ else
 fi
 
 echo "File list command: $listcmd"
-$listcmd | sort -u > $TMPFILE
+$listcmd > $TMPFILE
 
 echo "'file' command reports:"
 while read $VARS

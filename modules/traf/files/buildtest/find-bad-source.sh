@@ -71,7 +71,7 @@ while [[ $# -gt 0 ]]; do
 done
 COMMIT=$1
 if [[ -z "$COMMIT" ]]; then
-  COMMIT="origin/${ghprbTargetBranch}..${ghprbActualCommit}"
+  COMMIT="${sha1}"
 fi
 
 source /usr/local/bin/traf-functions.sh
@@ -79,9 +79,9 @@ log_banner
 
 cd "$WDIR"
 
-listcmd="git show --pretty=format:%n --name-status $COMMIT"
+listcmd="git diff --pretty=format:%n --name-status origin/${ghprbTargetBranch} $COMMIT"
 echo "File list command: $listcmd"
-$listcmd | sort -u > $TMPFILE
+$listcmd > $TMPFILE
 
 while read fStatus fName; do
   if [[ -n "$fName" ]]; then
