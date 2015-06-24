@@ -94,6 +94,14 @@ node /^ldap\d\d.trafodion.org$/ {
   }
 }
 
+# Dev servers
+node /^build01.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::dev':
+    sysadmins => hiera('sysadmins'),
+  }
+}
 
 #
 # Jenkins slaves:
