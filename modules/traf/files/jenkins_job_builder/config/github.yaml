@@ -261,3 +261,5 @@
 
     publishers:
       - console-log
+      - email:
+          recipients: dev@trafodion.incubator.apache.org steve.varnau@esgyn.com
