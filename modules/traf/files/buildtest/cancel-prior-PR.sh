@@ -46,11 +46,16 @@ do
     continue
   fi
 
-  # Search from newest (-1, so we don't cancel our own job) for our PR
+  # Search from newest
   Bld=$Latest
   while (( $Bld > $Earliest ))
   do
-    Bld=$(( $Bld - 1))
+    # make sure we don't cancel ourself
+    if (( $Bld == $BUILD_NUMBER ))
+    then
+      Bld=$(( $Bld - 1))
+      continue
+    fi
     pr=$($API/$Bld/api/json | 
 	  jq -r '.actions[].parameters[] | select(.name == "ghprbPullId").value' 2>/dev/null)
     if [[ $pr == $ghprbPullId ]]
@@ -58,6 +63,7 @@ do
       MyBuild=$Bld
       break 2
     fi
+    Bld=$(( $Bld - 1))
   done
   echo "Did not find any prior $PROJ_NAME job for Pull Request $ghprbPullId"
   exit 0
