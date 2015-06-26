@@ -42,6 +42,10 @@ class traf::dev (
     unless  => '/usr/bin/yum grouplist "X Window System" | /bin/grep "^Installed Groups"',
     command => '/usr/bin/yum -y groupinstall "X Window System"',
   }
+  exec { 'Eclipse':
+    unless  => '/usr/bin/yum grouplist "Eclipse" | /bin/grep "^Installed Groups"',
+    command => '/usr/bin/yum -y groupinstall "Eclipse"',
+  }
 
   $hubver = "2.2.1"
   $hub_full = "hub-linux-amd64-$hubver"
@@ -95,5 +99,25 @@ class traf::dev (
     ip           => '15.125.67.175',
   }
 
+  # firefox
+  file { '/opt/dev':
+    ensure => directory,
+    owner  => 'jenkins',
+    group  => 'jenkins',
+    mode   => '0644',
+  }
+  exec { 'get_dev_tools' :
+    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/firefox-38.0.5.tar.bz2 /opt/dev",
+    timeout => 900,
+    user    => 'jenkins',
+    creates => "/opt/dev/firefox-38.0.5.tar.bz2",
+    require => File['/opt/dev'],
+  }
+  exec { 'untar-firefox' :
+    command => '/bin/tar xf /opt/dev/firefox-38.0.5.tar.bz2',
+    cwd     => "/opt", 
+    creates => "/opt/firefox",
+    require => Exec['get_dev_tools'],
+  }
 
 }
