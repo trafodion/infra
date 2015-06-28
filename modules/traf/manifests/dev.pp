@@ -119,5 +119,12 @@ class traf::dev (
     creates => "/opt/firefox",
     require => Exec['get_dev_tools'],
   }
-
+  # user accounts
+  $userlist = hiera('user_accts')
+  traf::devuser {$userlist : }
+  $useradmins = hiera('user_admins')
+  traf::devuser {$useradmins : 
+    groups => ['sudo'],
+  }
 }
+

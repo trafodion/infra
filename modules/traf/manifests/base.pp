@@ -144,9 +144,6 @@ class traf::base(
     realize (
       User::Virtual::Localuser['svarnau'],
       User::Virtual::Localuser['alchen'],
-      User::Virtual::Localuser['sjohnson'],
-      User::Virtual::Localuser['johnstac'],
-      User::Virtual::Localuser['csheedy'],
     )
   }
 
