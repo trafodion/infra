@@ -2,6 +2,7 @@
 :hierarchy:
   - "%{operatingsystem}"
   - common
+  - users
 :backends:
   - yaml
 :yaml:

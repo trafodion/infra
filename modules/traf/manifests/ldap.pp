@@ -14,9 +14,6 @@ class traf::ldap (
   realize (
     User::Virtual::Localuser['lowp'],
   )
-  realize (
-    User::Virtual::Localuser['hegdean'],
-  )
 
   if ($::osfamily == 'Debian') {
     package { ['slapd','ldap-utils']:

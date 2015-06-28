@@ -95,7 +95,7 @@ node /^ldap\d\d.trafodion.org$/ {
 }
 
 # Dev servers
-node /^build01.trafodion.org$/ {
+node /^build01.trafodion.org$|^dev\d\d.trafodion.org$/ {
   include traf
   include traf::puppet_cron
   class { 'traf::dev':
