@@ -49,9 +49,9 @@ then
 
     echo "******************************************"
     echo "Warning: Job not triggered by code change."
-    echo "         Building latest on $TargetBranch branch."
+    echo "         Building latest on origin/$TargetBranch branch."
     echo "******************************************"
-    sha1=$TargetBranch
+    sha1=origin/$TargetBranch
 fi
 
 if [[ ! -z "$ghprbPullLink" ]]
