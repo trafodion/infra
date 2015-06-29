@@ -484,15 +484,15 @@
             - target: 'downloads/trafodion'
               source: 'publish/**'
               keep-hierarchy: true
+
+- publisher:
+    name: traf-upload-to-cdn
+    publishers:
       - scp:
           site: 'logs.trafodion.org'
           files:
             - target: 'logs/buildvers'
               source: 'Versions-*'
-
-- publisher:
-    name: traf-upload-to-cdn
-    publishers:
       - postbuildscript:
           builders:
             - shell: |

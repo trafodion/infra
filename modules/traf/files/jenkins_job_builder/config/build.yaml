@@ -43,7 +43,6 @@
 
     publishers:
       - traf-upload-to-cdn
-      - traf-release-tar
       - archive:
           artifacts: 'trafodion/install/install*.tar.gz'
       - archive:
