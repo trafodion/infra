@@ -107,9 +107,6 @@
           skip-tag: true
           branches: 
             - 'remotes/origin/master'
-          changelog-against:
-            remote: origin
-            branch: 'master@{"yesterday 08:30"}'
 
     triggers:
       - timed: "30 8 * * *"
