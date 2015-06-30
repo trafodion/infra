@@ -16,4 +16,12 @@ define traf::devuser(
     sshkeys  => "ssh-rsa $userkey",
   }
 
+  file { "/mnt/$title" :
+    ensure  => directory,
+    owner   => "$title",
+    group   => "$title",
+    mode    => '0755',
+    require => User::Virtual::Localuser[$title],
+  }
+
 }

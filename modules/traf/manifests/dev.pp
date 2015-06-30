@@ -121,7 +121,9 @@ class traf::dev (
   }
   # user accounts
   $userlist = hiera('user_accts')
-  traf::devuser {$userlist : }
+  traf::devuser {$userlist :
+    groups => [],
+  }
   $useradmins = hiera('user_admins')
   traf::devuser {$useradmins : 
     groups => ['sudo'],
