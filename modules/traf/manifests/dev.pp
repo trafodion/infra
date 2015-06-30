@@ -26,7 +26,7 @@ class traf::dev (
     sysadmins                 => $sysadmins,
   }
 
-  package { ['tigervnc-server','emacs']:
+  package { ['tigervnc-server','emacs','gitk']:
     ensure => present,
   }
   # work-around for group install
@@ -42,11 +42,8 @@ class traf::dev (
     unless  => '/usr/bin/yum grouplist "X Window System" | /bin/grep "^Installed Groups"',
     command => '/usr/bin/yum -y groupinstall "X Window System"',
   }
-  exec { 'Eclipse':
-    unless  => '/usr/bin/yum grouplist "Eclipse" | /bin/grep "^Installed Groups"',
-    command => '/usr/bin/yum -y groupinstall "Eclipse"',
-  }
 
+  # hub
   $hubver = "2.2.1"
   $hub_full = "hub-linux-amd64-$hubver"
   $hub_src = "https://github.com/github/hub/releases/download/v$hubver/$hub_full.tar.gz"
@@ -68,6 +65,7 @@ class traf::dev (
     require => Exec['untar_hub'],
   }
 
+  # trafodion limits
   file { '/etc/security/limits.d/trafdev.conf':
     ensure => present,
     owner  => 'root',
@@ -119,6 +117,35 @@ class traf::dev (
     creates => "/opt/firefox",
     require => Exec['get_dev_tools'],
   }
+  # eclipse
+  exec { 'get_dev_eclipse' :
+    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz /opt/dev",
+    timeout => 900,
+    user    => 'jenkins',
+    creates => "/opt/dev/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz",
+    require => File['/opt/dev'],
+  }
+  exec { 'untar-eclipse' :
+    command => '/bin/tar xf /opt/dev/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz',
+    cwd     => "/opt", 
+    creates => "/opt/eclipse",
+    require => Exec['get_dev_eclipse'],
+  }
+  # local SW
+  exec { 'get_dev_swdist' :
+    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/local_sw_dist.tgz /opt/dev",
+    timeout => 900,
+    user    => 'jenkins',
+    creates => "/opt/dev/local_sw_dist.tgz",
+    require => File['/opt/dev'],
+  }
+  exec { 'untar-swdist' :
+    command => '/bin/tar xf /opt/dev/local_sw_dist.tgz',
+    cwd     => "/opt", 
+    creates => "/opt/local_sw_dist",
+    require => Exec['get_dev_swdist'],
+  }
+
   # user accounts
   $userlist = hiera('user_accts')
   traf::devuser {$userlist :
