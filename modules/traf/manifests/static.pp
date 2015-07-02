@@ -32,9 +32,7 @@ class traf::static (
     alchen     =>  { pub_key => $traf::users::alchen_sshkey},
     svarnau    =>  { pub_key => $traf::users::svarnau_sshkey},
     csheedy    =>  { pub_key => $traf::users::csheedy_sshkey},
-    johnstac   =>  { pub_key => $traf::users::johnstac_sshkey},
     sandstroms =>  { pub_key => $traf::users::sandstroms_sshkey},
-    birdsall   =>  { pub_key => $traf::users::birdsall_sshkey},
   }
 
   create_resources(jenkins::add_pub_key, $jenkins_auth_users)
