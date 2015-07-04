@@ -77,7 +77,7 @@ class traf::buildtest (
     # supported by the package type
     exec { 'install_Development_Tools':
         path    => '/usr/bin:/bin:/usr/local/bin',
-        command => 'yum groupinstall "Development Tools"',
+        command => 'yum -y groupinstall "Development Tools"',
         onlyif  => "test `yum grouplist \"Development Tools\" | grep -A 1 \"Installed Groups:\" | grep -c \"Development tools\"` -eq 0",
     }
 

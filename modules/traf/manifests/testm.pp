@@ -1,6 +1,6 @@
-# == Class: traf::dev
+# == Class: traf::testm
 #
-class traf::dev (
+class traf::testm (
   $bare = false,
   $certname = $::fqdn,
   $sysadmins = [],
@@ -9,16 +9,10 @@ class traf::dev (
 ) {
   include traf
   include traf::buildtest
-  include traf::tmpcleanup
-  include traf::automatic_upgrades
+  #include traf::tmpcleanup
+  #include traf::automatic_upgrades
 
-  include traf::python276
-
-  # default location for TOOLSDIR
-  file { '/opt/home' :
-    ensure => link,
-    target => '/opt/traf',
-  }
+  #include traf::python276
 
   class { 'traf::server':
     iptables_public_tcp_ports => ['5900:5999'], # VNC
@@ -68,37 +62,6 @@ class traf::dev (
     command => '/usr/bin/yum -y groupinstall "X Window System"',
   }
 
-  # hub
-  $hubver = "2.2.1"
-  $hub_full = "hub-linux-amd64-$hubver"
-  $hub_src = "https://github.com/github/hub/releases/download/v$hubver/$hub_full.tar.gz"
-
-  exec { 'get_hub':
-    command => "/usr/bin/wget $hub_src",
-    cwd     => "/opt",
-    creates => "/opt/$hub_full.tar.gz",
-  }
-  exec { 'untar_hub':
-    command => "/bin/tar -xf /opt/$hub_full.tar.gz",
-    cwd     => "/opt",
-    creates => "/opt/$hub_full/hub",
-    require => Exec['get_hub'],
-  }
-  file { '/usr/local/bin/hub':
-    ensure  => link,
-    target  => "/opt/$hub_full/hub",
-    require => Exec['untar_hub'],
-  }
-
-  # trafodion limits
-  file { '/etc/security/limits.d/trafdev.conf':
-    ensure => present,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0644',
-    source => "puppet:///modules/traf/trafdev-limits.conf",
-  }
-
   # swap file
   # take the defaults - same size as memory
   class { 'swap_file':
@@ -112,7 +75,7 @@ class traf::dev (
   host { 'puppet3.trafodion.org':
     ensure       => present,
     host_aliases => 'puppet3',
-    ip           => '172.16.0.46',
+    ip           => '15.126.214.121',
   }
 
   # external IP, dashboard in US West
@@ -142,41 +105,9 @@ class traf::dev (
     creates => "/opt/firefox",
     require => Exec['get_dev_tools'],
   }
-  # eclipse
-  exec { 'get_dev_eclipse' :
-    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz /opt/dev",
-    timeout => 900,
-    user    => 'jenkins',
-    creates => "/opt/dev/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz",
-    require => File['/opt/dev'],
-  }
-  exec { 'untar-eclipse' :
-    command => '/bin/tar xf /opt/dev/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz',
-    cwd     => "/opt", 
-    creates => "/opt/eclipse",
-    require => Exec['get_dev_eclipse'],
-  }
-  # local SW
-  exec { 'get_dev_swdist' :
-    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/local_sw_dist.tgz /opt/dev",
-    timeout => 900,
-    user    => 'jenkins',
-    creates => "/opt/dev/local_sw_dist.tgz",
-    require => File['/opt/dev'],
-  }
-  exec { 'untar-swdist' :
-    command => '/bin/tar xf /opt/dev/local_sw_dist.tgz',
-    cwd     => "/opt", 
-    creates => "/opt/local_sw_dist",
-    require => Exec['get_dev_swdist'],
-  }
 
   # user accounts
-  $userlist = hiera('user_accts')
-  traf::devuser {$userlist :
-    groups => [],
-  }
-  $useradmins = hiera('user_admins')
+  $useradmins = hiera('test_admins')
   traf::devuser {$useradmins : 
     groups => ['sudo'],
   }

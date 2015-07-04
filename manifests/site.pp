@@ -103,6 +103,15 @@ node /^build01.trafodion.org$|^dev\d\d.trafodion.org$/ {
   }
 }
 
+# hands-on test machines
+node /^mtest\d\d.trafodion.org$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::testm':
+    sysadmins => hiera('sysadmins'),
+  }
+}
+
 #
 # Jenkins slaves:
 #
