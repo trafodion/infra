@@ -90,7 +90,7 @@ class traf::python276 {
       path        => '/usr/local/bin:/usr/bin:/bin',
       cwd         => '/var/python276',
       environment => 'PYTHONHOME=/usr/local',
-      command     => 'python get-pip.py',
+      command     => 'python2.7 get-pip.py',
       creates     => '/usr/local/bin/pip',
       require     => [ Exec['download_python_pip'], Exec['link_Python2.7.6'] ],
   }
