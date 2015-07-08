@@ -55,14 +55,11 @@ define user::virtual::localuser(
     }
   }
   else {
-    file { "${title}_keys":
+    ssh_authorized_key { "${title}_keys":
       ensure  => present,
-      content => $sshkeys,
-      group   => $title,
-      mode    => '0400',
-      name    => "${home}/.ssh/authorized_keys",
-      owner   => $title,
-      require => File["${title}_sshdir"],
+      key     => "$sshkeys",
+      type    => 'ssh-rsa',
+      user    => $title,
     }
   }
 }

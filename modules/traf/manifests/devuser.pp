@@ -13,7 +13,7 @@ define traf::devuser(
   user::virtual::localuser { $title :
     groups   => $groups,
     realname => "$username",
-    sshkeys  => "ssh-rsa $userkey",
+    sshkeys  => "$userkey",
   }
 
   file { "/mnt/$title" :

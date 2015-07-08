@@ -13,17 +13,17 @@ class traf::users {
 
   @user::virtual::localuser { 'svarnau':
     realname => 'Steve Varnau',
-    sshkeys  => "ssh-rsa ${svarnau_sshkey} svarnau\n",
+    sshkeys  => "${svarnau_sshkey}",
   }
 
   @user::virtual::localuser { 'alchen':
     realname => 'Alice Chen',
-    sshkeys  => "ssh-rsa ${alchen_sshkey} alchen\n",
+    sshkeys  => "${alchen_sshkey}",
   }
 
   @user::virtual::localuser { 'sandstroms':
     realname => 'Susan Sandstrom',
-    sshkeys  => "ssh-rsa ${sandstroms_sshkey} sandstroms\n",
+    sshkeys  => "${sandstroms_sshkey}",
   }
 
 
