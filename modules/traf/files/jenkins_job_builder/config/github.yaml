@@ -34,6 +34,11 @@
           admin-list:
             - svarnau
             - alchen99
+          white-list:
+            - nonstop-qfchen
+            - selvaganesang
+            - xwq
+            - HowardQin
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
@@ -258,5 +263,29 @@
 
     publishers:
       - console-log
+      - postbuildscript:
+          script-only-if-succeeded: false
+          script-only-if-failed: false
+          builders:
+            - shell: "/usr/local/bin/job-summary.sh"
       - email:
-          recipients: dev@trafodion.incubator.apache.org steve.varnau@esgyn.com
+          recipients: dev@trafodion.incubator.apache.org
+      - email-ext:
+          recipients: steve.varnau@esgyn.com
+          reply-to: no-reply@trafodion.org
+          content-type: "text"
+          subject: Trafodion Daily Test Result - $BUILD_ID
+          save-output: true
+          always: true
+          body: |
+            Daily Automated Testing
+
+            Jenkins Job:   $BUILD_URL
+            Archived Logs: http://logs.trafodion.org/$LOG_PATH
+            
+            Changes since previous daily build:
+            ${CHANGES}
+            
+            Test Job Results:
+            
+            ${FILE,path="build_result.txt"}
