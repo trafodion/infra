@@ -1,0 +1,99 @@
+# Mechanism for developers to choose tests
+
+- job:
+    name: 'Requested-Test'
+    node: 'master'
+    project-type: multijob
+
+    parameters:
+      - string:
+          name: EMAIL
+          description: "Where to e-mail the results"
+      - string:
+          name: PULL_NUM
+          description: "Pull Request Number"
+      - string:
+          name: BRANCH
+          default: master
+          description: "Target Branch of the the Pull Request"
+      - choice:
+          name: DISTRO
+          choices:
+            - ahw2.2
+            - cm5.3
+          description: "Distro: AmbariHortonWorks or ClouderaManager"
+      - bool:
+          name: sql_charsets
+          default: false
+          description: Run SQL 'charsets' regression?
+      - bool:
+          name: sql_udr
+          default: false
+          description: Run SQL 'udr' regression?
+#      - string:
+#          name: SQLSUITE
+#          description: |
+#            Space separated list of suites to run (single test run)
+#            charsets catman1 core executor fullstack2 qat seabase hive compGeneral udr
+
+
+    properties:
+      - github:
+          url: https://github.com/apache/incubator-trafodion
+
+    scm:
+      - git:
+          url: https://github.com/apache/incubator-trafodion
+          wipe-workspace: false
+          skip-tag: true
+          refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
+          branches: 
+            - 'origin/pr/${PULL_NUM}/head'
+          changelog-against:
+            remote: origin
+            branch: "$BRANCH"
+
+    builders:
+      - inject:
+          properties-content: |
+            LOG_PATH=Requested/$BUILD_NUMBER
+      - link-logs
+      - multijob:
+          name: tests
+          projects:
+            - name: "core-regress-charsets-${DISTRO}"
+              enable-condition: "${sql_charsets} == true"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/regress-charsets-${DISTRO}
+            - name: "core-regress-udr-${DISTRO}"
+              enable-condition: "${sql_udr} == true"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/regress-udr-${DISTRO}
+
+    publishers:
+      - console-log
+      - postbuildscript:
+          script-only-if-succeeded: false
+          script-only-if-failed: false
+          builders:
+            - shell: "/usr/local/bin/job-summary.sh"
+      - email-ext:
+          recipients: $EMAIL
+          reply-to: no-reply@trafodion.org
+          content-type: "text"
+          subject: Trafodion Test Result - PR$PULL_NUM - $BUILD_ID
+          save-output: true
+          always: true
+          body: |
+            Requested Automated Testing
+
+            Jenkins Job:   $BUILD_URL
+            Archived Logs: http://logs.trafodion.org/$LOG_PATH
+            
+            Test Job Results:
+            
+            ${FILE,path="build_result.txt"}
