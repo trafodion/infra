@@ -10,11 +10,6 @@ class traf::ldap (
     sysadmins                 => $sysadmins,
   }
 
-  # LDAP admin
-  realize (
-    User::Virtual::Localuser['lowp'],
-  )
-
   if ($::osfamily == 'Debian') {
     package { ['slapd','ldap-utils']:
       ensure => present,
