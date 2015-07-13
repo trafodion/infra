@@ -65,6 +65,7 @@ do
   while (( $Bld >= $Earliest ))
   do
     # are we looking for a specific change-set build?
+    # we are triggered by PR (ghprb)
     if [[ -n "$ghprbActualCommit" ]]
     then
       bld_chgs=$($API/$Bld/api/json | 
@@ -85,20 +86,28 @@ do
 #        MyBuild=$Bld
 #	break 2
 #      fi
-    # otherwise look for our pipeline (e.g. daily) and date
+    # otherwise look for our Daily Build job and date
     # assumes both build and test job got initiated on same date
+    elif [[ "$ROOT_BUILD_CAUSE" == "TIMERTRIGGER" ]]
+    then
+      bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_ID' 2>/dev/null)
+      if [[ ${bld_date%_*} == ${BUILD_ID%_*} ]]
+      then
+        MyBuild=$Bld
+        break 2
+      fi
+    elif [[ "$ROOT_BUILD_CAUSE" == "MANUALTRIGGER" ]]
+    then
+      # look for build previously triggered by PR (ghprb)
+      bld_ref=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.ghprbPullId' 2>/dev/null)
+      if [[ $bld_ref == "$PULL_NUM" ]]
+      then
+        MyBuild=$Bld
+        break 2
+      fi
     else
-#      bld_pipe=$($API/$Bld/api/json | 
-#	  jq -r '.actions[].parameters[] | select(.name == "ZUUL_PIPELINE").value' 2>/dev/null)
-#      if [[ $bld_pipe == $ZUUL_PIPELINE ]]
-#      then
-        bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_ID' 2>/dev/null)
-	if [[ ${bld_date%_*} == ${BUILD_ID%_*} ]]
-	then
-          MyBuild=$Bld
-	  break 2
-	fi
-#      fi
+      echo "Unsupported build type"
+      exit 2
     fi
 
     Bld=$(( $Bld - 1))
