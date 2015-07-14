@@ -118,6 +118,9 @@ class traf::jenkins (
   jenkins::plugin { 'build-flow-plugin':
     version => '0.17',
   }
+  jenkins::plugin { 'build-user-vars-plugin':
+    version => '1.4',
+  }
   jenkins::plugin { 'conditional-buildstep':
     version => '1.3.3',
   }
@@ -149,7 +152,7 @@ class traf::jenkins (
     version => '1.11.3',
   }
   jenkins::plugin { 'ghprb':
-    version => '1.20.1',
+    version => '1.25',
   }
   jenkins::plugin { 'greenballs':
     version => '1.14',

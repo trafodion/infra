@@ -14,6 +14,7 @@
       - builds
       - static-checks
       - core-regress-suites
+      - core-regress-req
       - phoenix-jobs
       - jdbc_test-{dist}
       - pyodbc_test-{dist}

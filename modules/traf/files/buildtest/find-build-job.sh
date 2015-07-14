@@ -24,7 +24,9 @@
 #     or
 #   (TBD: tags)
 #     or
-#   date portion of BUILD_ID
+#   date portion of BUILD_ID (for TIMER triggered)
+#     or
+#   PULL_NUM (for MANUAL triggered)
 #
 # Waits on build job to be complete.
 #
@@ -47,9 +49,9 @@ BLD_PROJ_NAME="$1"
 # jenkins server data cmd - jenkins provides JENKINS_URL
 API="curl -s $JENKINS_URL/job/$BLD_PROJ_NAME"
 
-# Loop forever, in case server is not responding or we are waiting for
-# gearman to start our build in jenkins
-while true
+# Loop a couple times, in case server is not responding
+retry=0
+while (( $retry < 4 ))
 do
   Latest=$($API/api/json | jq -r '.lastBuild.number' 2>/dev/null)
   Earliest=$($API/api/json | jq -r '.firstBuild.number' 2>/dev/null)
@@ -57,6 +59,7 @@ do
   then
     echo "Waiting for jenkins server response (sleepint 2 min)"
     sleep 120
+    retry=$(( $retry + 1 ))
     continue
   fi
 
@@ -114,7 +117,16 @@ do
   done
   echo "Did not find our build. Sleeping 2 minutes to try again."
   sleep 120 # try again in a couple minutes
+  retry=$(( $retry + 1 ))
 done
+
+if [[ -z "$MyBuild" ]]
+then
+  echo "Error: Found no matching build."
+  echo "       Perhaps incorrect pull-request specified."
+  echo "       Or build job expired from Jenkins server."
+  exit 3
+fi
 
 echo "Build: $JENKINS_URL/job/$BLD_PROJ_NAME/$MyBuild"
 

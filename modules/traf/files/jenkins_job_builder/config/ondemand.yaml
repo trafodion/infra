@@ -5,10 +5,15 @@
     node: 'master'
     project-type: multijob
 
+    wrappers:
+      - timestamps
+      - build-user-vars
+
     parameters:
       - string:
           name: EMAIL
-          description: "Where to e-mail the results"
+          default: $BUILD_USER_EMAIL
+          description: "Comma separated destination for results (default: https://jenkins02.trafodion.org/me/configure)"
       - string:
           name: PULL_NUM
           description: "Pull Request Number"
@@ -19,23 +24,35 @@
       - choice:
           name: DISTRO
           choices:
-            - ahw2.2
             - cm5.3
+            - ahw2.2
           description: "Distro: AmbariHortonWorks or ClouderaManager"
       - bool:
-          name: sql_charsets
+          name: sql
           default: false
-          description: Run SQL 'charsets' regression?
+          description: Run SQL regression?
+      - string:
+          name: sql_tests
+          default:  "charsets executor fullstack2 qat hive compGeneral udr"
+          description: "Space separated list of suites. Non-default: core seabase catman1"
       - bool:
-          name: sql_udr
+          name: pyodbc
           default: false
-          description: Run SQL 'udr' regression?
-#      - string:
-#          name: SQLSUITE
-#          description: |
-#            Space separated list of suites to run (single test run)
-#            charsets catman1 core executor fullstack2 qat seabase hive compGeneral udr
-
+          description: Run Python ODBC tests?
+      - bool:
+          name: jdbc
+          default: false
+          description: Run JDBC tests?
+      - bool:
+          name: phoenix
+          default: false
+          description: Run Phx tests?
+      - choice:
+          name: DRIVER
+          choices:
+            - T4
+            - T2
+          description: "Driver type to use for Phoenix"
 
     properties:
       - github:
@@ -61,18 +78,68 @@
       - multijob:
           name: tests
           projects:
-            - name: "core-regress-charsets-${DISTRO}"
-              enable-condition: "${sql_charsets} == true"
+            - name: "core-regress-ahw2.2"
+              enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'ahw2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/regress-charsets-${DISTRO}
-            - name: "core-regress-udr-${DISTRO}"
-              enable-condition: "${sql_udr} == true"
+                LOG_PATH=${LOG_PATH}/regress-${DISTRO}
+                SUITES=${sql_tests}
+            - name: "core-regress-cm5.3"
+              enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'cm5.3'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/regress-udr-${DISTRO}
+                LOG_PATH=${LOG_PATH}/regress-${DISTRO}
+                SUITES=${sql_tests}
+            - name: "pyodbc_test-ahw2.2"
+              enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'ahw2.2'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
+            - name: "pyodbc_test-cm5.3"
+              enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'cm5.3'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
+            - name: "jdbc_test-ahw2.2"
+              enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'ahw2.2'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
+            - name: "jdbc_test-cm5.3"
+              enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'cm5.3'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
+            - name: "phoenix_test_T4-ahw2.2"
+              enable-condition: "'${phoenix}' == 'true' && '${DRIVER}' == 'T4' && '${DISTRO}' == 'ahw2.2'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/phoenix_test_${DRIVER}-${DISTRO}
+            - name: "phoenix_test_T2-ahw2.2"
+              enable-condition: "'${phoenix}' == 'true' && '${DRIVER}' == 'T2' && '${DISTRO}' == 'ahw2.2'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/phoenix_test_${DRIVER}-${DISTRO}
+            - name: "phoenix_test_T4-cm5.3"
+              enable-condition: "'${phoenix}' == 'true' && '${DRIVER}' == 'T4' && '${DISTRO}' == 'cm5.3'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/phoenix_test_${DRIVER}-${DISTRO}
+            - name: "phoenix_test_T2-cm5.3"
+              enable-condition: "'${phoenix}' == 'true' && '${DRIVER}' == 'T2' && '${DISTRO}' == 'cm5.3'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=${LOG_PATH}/phoenix_test_${DRIVER}-${DISTRO}
 
     publishers:
       - console-log
@@ -97,3 +164,46 @@
             Test Job Results:
             
             ${FILE,path="build_result.txt"}
+
+# run multiple suites on single slave
+# this reduces overhead of installing, etc
+# and also reduces machines consumed by manual test requests
+- job-group:
+    name: 'core-regress-req'
+
+    jobs:
+      - core-regress-{dist}
+
+- job-template:
+    name: 'core-regress-{dist}'
+    node: 'redhat_{dist}'
+
+    wrappers:
+      - timeout:
+          timeout: 600
+          fail: true
+      - timestamps
+
+    parameters:
+      - string:
+          name: SUITES
+          description: "Space separated list of test suites"
+
+    builders:
+      - link-logs
+      - check-node
+      - kill-traf
+      - clean-testspace
+      - get-build:
+           flavor: "release"
+      - sql-regress:
+           dir: "./trafodion/core"
+           suites: "$SUITES"
+
+    publishers:
+      - post-check-node
+      - console-log
+      - traf-regress-log
+      - copy-system-logs
+      - traf-runtime-log
+
