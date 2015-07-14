@@ -102,7 +102,7 @@ then
 fi
 
 # Create Cluster 
-Cluster="$(curl $Read $URL/clusters/trafcluster | jq -r '.Clusters.cluster_name')"
+Cluster="$(curl $Read $URL/clusters | jq -r '.items[].Clusters.cluster_name')"
 
 if [[ $Cluster == "null" ]]
 then
