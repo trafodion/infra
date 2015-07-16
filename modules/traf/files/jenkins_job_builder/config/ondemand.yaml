@@ -48,7 +48,7 @@
           default: false
           description: Run Phx tests?
       - choice:
-          name: DRIVER
+          name: Phx_Driver
           choices:
             - T4
             - T2
@@ -117,29 +117,29 @@
               predefined-parameters: |
                  LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
             - name: "phoenix_test_T4-ahw2.2"
-              enable-condition: "'${phoenix}' == 'true' && '${DRIVER}' == 'T4' && '${DISTRO}' == 'ahw2.2'"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'ahw2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_test_${DRIVER}-${DISTRO}
+                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
             - name: "phoenix_test_T2-ahw2.2"
-              enable-condition: "'${phoenix}' == 'true' && '${DRIVER}' == 'T2' && '${DISTRO}' == 'ahw2.2'"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'ahw2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_test_${DRIVER}-${DISTRO}
+                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
             - name: "phoenix_test_T4-cm5.3"
-              enable-condition: "'${phoenix}' == 'true' && '${DRIVER}' == 'T4' && '${DISTRO}' == 'cm5.3'"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'cm5.3'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_test_${DRIVER}-${DISTRO}
+                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
             - name: "phoenix_test_T2-cm5.3"
-              enable-condition: "'${phoenix}' == 'true' && '${DRIVER}' == 'T2' && '${DISTRO}' == 'cm5.3'"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'cm5.3'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_test_${DRIVER}-${DISTRO}
+                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
 
     publishers:
       - console-log
