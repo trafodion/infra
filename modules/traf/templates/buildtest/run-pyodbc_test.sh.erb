@@ -90,8 +90,16 @@ else
   mkdir "$WORKSPACE/$TEST_DIR/logs"
   rm -rf "$WORKSPACE/$TEST_DIR/odbc_driver"
   ln -s "$WORKSPACE/clients/odbc" "$WORKSPACE/$TEST_DIR/odbc_driver"
+  # Old/New Port
+  if [[ -f $TRAF_DIR/sqf/sql/scripts/dcscheck ]]
+  then
+    dcsport=23400
+  else
+    dcsport=37800
+  fi
+
   export PATH=/usr/local/bin:$PATH
-  ./config.sh -r -v -d localhost:37800 \
+  ./config.sh -r -v -d localhost:$dcsport \
     -u <%= jenkins_test_user %> -p <%= jenkins_test_password %>
   if [ $? -ne 0 ]
   then

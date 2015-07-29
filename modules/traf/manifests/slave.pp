@@ -19,7 +19,7 @@ class traf::slave (
   include traf::python276
 
   class { 'traf::server':
-    iptables_public_tcp_ports => [40010],
+    iptables_public_tcp_ports => [24400, 40010],
     certname                  => $certname,
     sysadmins                 => $sysadmins,
   }

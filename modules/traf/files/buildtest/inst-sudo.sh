@@ -121,15 +121,15 @@ then
     echo "LDAP_AUTH_FILE=traf_auth_config" >> ./tc
   fi
 
-  check_port 37800
-  check_port 40010
+  check_port 23400
+  check_port 24400
 
   echo "*** Calling trafodion_install"
   ./installer/trafodion_install --accept_license --config_file ./tc
   ret=$?
 
-  check_port 37800
-  check_port 40010
+  check_port 23400
+  check_port 24400
 
   # save installer logs
   sudo -n -u jenkins mkdir -p $WORKSPACE/var_log_trafodion

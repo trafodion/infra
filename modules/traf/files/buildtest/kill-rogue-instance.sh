@@ -82,8 +82,8 @@ fi
 if [[ -z "$Instance" ]]
 then
   echo "Found no trafodion processes"
-  check_port 37800  # check DCS
-  check_port 40010
+  check_port 23400  # check DCS
+  check_port 24400
   exit 0
 fi
 
@@ -105,8 +105,8 @@ do
   then
     echo "Post-kill processes:"
     ps -u $p_user -H
-    check_port 37800
-    check_port 40010
+    check_port 23400
+    check_port 24400
     exit 0
   fi
   (( attempt += 1 ))
@@ -116,7 +116,7 @@ echo "Some instance processes still hanging around:"
 ps -u $p_user -H
 
 # Check usage of DCS port (default 37800)
-check_port 37800
-check_port 40010
+check_port 23400
+check_port 24400
 
 exit 1
