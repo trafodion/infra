@@ -5,6 +5,8 @@
 class traf::ldap (
   $sysadmins = [],
 ) {
+  include traf::cloudeast
+
   class { 'traf::server':
     iptables_public_tcp_ports => [22, 389, 636],
     sysadmins                 => $sysadmins,

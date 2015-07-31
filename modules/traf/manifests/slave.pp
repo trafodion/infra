@@ -13,6 +13,7 @@ class traf::slave (
 ) {
   include traf
   include traf::buildtest
+  include traf::cloudeast
   include traf::tmpcleanup
   include traf::automatic_upgrades
 
@@ -83,22 +84,6 @@ class traf::slave (
     ],
     type         => 'ssh-rsa',
     key          => $logs_host,
-  }
-
-  # /etc/hosts entries
-
-  # local subnet for US East slaves
-  host { 'puppet3.trafodion.org':
-    ensure       => present,
-    host_aliases => 'puppet3',
-    ip           => '172.16.0.46',
-  }
-
-  # external IP, dashboard in US West
-  host { 'dashboard.trafodion.org':
-    ensure       => present,
-    host_aliases => 'dashboard',
-    ip           => '15.125.67.175',
   }
 
   # add jenkins public and private ssh keys

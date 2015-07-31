@@ -23,6 +23,7 @@ class traf::static (
   }
 
   include traf
+  include traf::cloudwest
   class { 'jenkins::jenkinsuser':
     ssh_key => $traf::jenkins_ssh_key,
   }

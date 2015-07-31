@@ -15,6 +15,7 @@ class traf::jenkins (
   $sysadmins = []
 ) {
   include traf
+  include traf::cloudeast
 
   $iptables_rule = regsubst ($zmq_event_receivers, '^(.*)$', '-m state --state NEW -m tcp -p tcp --dport 8888 -s \1 -j ACCEPT')
   class { 'traf::server':

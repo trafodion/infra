@@ -7,6 +7,8 @@ class traf::dashboard(
     $sysadmins = []
 ) {
 
+  include traf::cloudwest
+
   class { 'traf::server':
     iptables_public_tcp_ports => [80, 443, 3000],
     sysadmins                 => $sysadmins

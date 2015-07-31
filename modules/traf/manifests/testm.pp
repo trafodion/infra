@@ -9,6 +9,7 @@ class traf::testm (
 ) {
   include traf
   include traf::buildtest
+  include traf::cloudwest
   #include traf::tmpcleanup
   #include traf::automatic_upgrades
 
@@ -66,23 +67,6 @@ class traf::testm (
   # take the defaults - same size as memory
   class { 'swap_file':
     swapfile => '/mnt/swapfile',
-  }
-
-
-  # /etc/hosts entries
-
-  # local subnet for US East slaves
-  host { 'puppet3.trafodion.org':
-    ensure       => present,
-    host_aliases => 'puppet3',
-    ip           => '15.126.214.121',
-  }
-
-  # external IP, dashboard in US West
-  host { 'dashboard.trafodion.org':
-    ensure       => present,
-    host_aliases => 'dashboard',
-    ip           => '15.125.67.175',
   }
 
   # firefox
