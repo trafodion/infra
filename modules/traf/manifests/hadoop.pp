@@ -10,7 +10,7 @@ class traf::hadoop (
 
   host { 'ldap01.trafodion.org':
     ensure       => present,
-    host_aliases => 'puppet3',
+    host_aliases => 'ldap01',
     ip           => '172.16.0.43',
   }
 
