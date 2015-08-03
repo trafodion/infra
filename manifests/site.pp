@@ -5,7 +5,7 @@ $cloud_auto_passwd=hiera('cloud_auto_passwd', '')
 $cloud_auto_tenant_id=hiera('cloud_auto_tenant_id', '')
 
 # default puppet-master
-$pserver='puppet3.trafodion.org'
+$pserver='puppet3.esgyn.com'
 
 #
 # Default: at least puppet running regularly and sysadmin access
@@ -35,36 +35,13 @@ node 'jenkins02.trafodion.org' {
 }
 
 # New master running puppet 3.x
-node 'puppet3.trafodion.org' {
+node /^puppet3.*/ {
   class { 'traf::puppetmaster':
     sysadmins         => hiera('sysadmins'),
   }
 }
 
-node 'wiki.trafodion.org' {
-  class { 'traf::wiki':
-    wiki_admin_password     => hiera('wiki_admin_password'),
-    mysql_root_password     => hiera('wiki_db_password'),
-    sysadmins               => hiera('sysadmins'),
-    ssl_cert_file_contents  => hiera('wiki_ssl_cert_file_contents'),
-    ssl_key_file_contents   => hiera('wiki_ssl_key_file_contents'),
-    ssl_chain_file_contents => hiera('ssl_chain_file_contents'),
-  }
-}
-
-# wiki development
-node 'wiki-dev.trafodion.org' {
-  class { 'traf::wiki':
-    wiki_admin_password     => hiera('wiki_admin_password'),
-    mysql_root_password     => hiera('wiki_db_password'),
-    sysadmins               => hiera('sysadmins'),
-    ssl_cert_file_contents  => hiera('wiki-dev_ssl_cert_file_contents'),
-    ssl_key_file_contents   => hiera('wiki-dev_ssl_key_file_contents'),
-    ssl_chain_file_contents => hiera('wiki-dev_ssl_chain_file_contents'),
-  }
-}
-
-node 'dashboard.trafodion.org' {
+node 'dashboard.esgyn.com' {
   class { 'traf::dashboard':
     password       => hiera('dashboard_password'),
     mysql_password => hiera('dashboard_mysql_password'),
