@@ -109,40 +109,6 @@ then
   done
 fi
 
-# maven deploy of T2 and T4 drivers  -- non-debug only
-if [[ "$Flavor" == "release" ]]
-then
-  PubRepo="scp://mvnrepo.trafodion.org/srv/static/mvnrepo"
-
-  # official release goes to main repo
-  # intermediate builds goes to dev location
-  if [[ $BLD =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-  then
-    org="org.trafodion"
-  else
-    org="org.trafodion-dev"
-  fi
-
-  cd $workspace/trafodion/core/conn/jdbc_type2
-  cp /usr/local/bin/wagon.xml ./pom.xml
-  mvn deploy:deploy-file  \
-       -Durl="$PubRepo" -Dfile=./dist/jdbcT2.jar \
-       -DgroupId=${org}.jdbc.t2.T2Driver -DartifactId=t2driver \
-       -Dversion="$BLD" -DgeneratePom.description="Trafodion JDBC Type2"
-  rcA=$?
-
-  cd $workspace/trafodion/core/conn/jdbc_type4
-  cp /usr/local/bin/wagon.xml ./pom.xml
-  mvn deploy:deploy-file  \
-       -Durl="$PubRepo" -Dfile=./temp/deploy/lib/jdbcT4.jar \
-       -DgroupId=${org}.jdbc.t4.T4Driver -DartifactId=t4driver \
-       -Dversion="$BLD" -DgeneratePom.description="Trafodion JDBC Type4"
-  rcB=$?
-else
-  rcA=0
-  rcB=0
-fi
-
 cd $workspace
 
 # installer
@@ -173,7 +139,7 @@ sha512sum * > sha512.txt
 tar czvf "$workspace/$DestDir/trafodion$FileSuffix" *
 rcC=$?
 
-if [[ $rcA != 0 || $rcB != 0 || $rcC != 0 ]]
+if [[ $rcC != 0 ]]
 then
   exit 2
 fi

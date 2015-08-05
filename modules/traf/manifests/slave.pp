@@ -80,7 +80,6 @@ class traf::slave (
     host_aliases => [
       'downloads.trafodion.org',
       'static.trafodion.org',
-      'mvnrepo.trafodion.org',
     ],
     type         => 'ssh-rsa',
     key          => $logs_host,
