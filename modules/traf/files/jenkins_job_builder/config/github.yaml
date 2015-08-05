@@ -323,7 +323,7 @@
             Daily Automated Testing
 
             Jenkins Job:   $BUILD_URL
-            Archived Logs: http://logs.trafodion.org/$LOG_PATH
+            Archived Logs: http://traf-logs.esgyn.com/$LOG_PATH
             
             Changes since previous daily build:
             ${CHANGES}

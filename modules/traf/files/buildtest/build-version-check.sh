@@ -38,7 +38,7 @@ log_banner
 # file is created by the stage-traf.sh script 
 # and posted by the traf-pub-* log publisher in jenkins_job_builder/config/traf.yaml
 
-LOGLOC="http://logs.trafodion.org/buildvers"
+LOGLOC="http://traf-logs.esgyn.com/buildvers"
 LOGFILE="Versions-${BRANCH}-${PURPOSE}-${FLAVOR}.txt"
 
 cd $WORKSPACE

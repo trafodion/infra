@@ -203,7 +203,7 @@
       - shell: |
           #!/bin/sh
           if test "$LOG_PATH" ; then
-              echo "Detailed logs: http://logs.trafodion.org/$LOG_PATH/"
+              echo "Detailed logs: http://traf-logs.esgyn.com/$LOG_PATH/"
           fi
           echo "Jenkins build: $BUILD_URL"
 
@@ -236,7 +236,7 @@
     name: git-log
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/$LOG_PATH'
               source: 'Git-Prep.log'
@@ -246,7 +246,7 @@
     name: traf-make-log
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/$LOG_PATH'
               source: 'trafodion/core/Make.log'
@@ -262,7 +262,7 @@
     name: traf-regress-log
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/$LOG_PATH'
               source: 'sql-regress-logs/**'
@@ -293,7 +293,7 @@
                          [[ -f $WORKSPACE/corefiles.log ]] && exit 0
                          report_on_corefiles -u trafodion "${WORKSPACE}"
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/$LOG_PATH'
               source: 'Install_Start.log'
@@ -335,7 +335,7 @@
     name: phoenix_test-log
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/$LOG_PATH/phoenix_test/surefire-reports'
               source: 'phx_test_run/target/surefire-reports/**'
@@ -380,7 +380,7 @@
     name: pyodbc_test-log
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/$LOG_PATH/logs'
               source: 'trafodion/dcs/src/test/pytests/logs/**'
@@ -426,7 +426,7 @@
     name: jdbc_test-log
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/$LOG_PATH'
               source: 'dcs/dcs*/logs/*'
@@ -459,7 +459,7 @@
     name: console-log
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/$LOG_PATH'
               copy-console: true
@@ -469,7 +469,7 @@
     name: console-log-periodic
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/periodic/$JOB_NAME/$NODE_NAME/$BUILD_NUMBER'
               copy-console: true
@@ -489,7 +489,7 @@
     name: traf-upload-to-cdn
     publishers:
       - scp:
-          site: 'logs.trafodion.org'
+          site: 'traf-logs.esgyn.com'
           files:
             - target: 'logs/buildvers'
               source: 'Versions-*'

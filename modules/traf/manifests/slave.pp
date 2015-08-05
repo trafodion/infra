@@ -75,11 +75,13 @@ class traf::slave (
   }
 
   # add known host keys for static server to upload logs, etc
-  sshkey { 'logs.trafodion.org':
+  sshkey { 'traf-logs.esgyn.com':
     ensure       => present,
     host_aliases => [
+      'traf-downloads.esgyn.com',
       'downloads.trafodion.org',
       'static.trafodion.org',
+      'logs.trafodion.org',
     ],
     type         => 'ssh-rsa',
     key          => $logs_host,
@@ -110,7 +112,7 @@ class traf::slave (
     group   => 'jenkins',
     mode    => '0644',
     source  => '/etc/ssh/ssh_known_hosts',
-    require => [ Sshkey['logs.trafodion.org'], Mount['/home/jenkins'] ],
+    require => [ Sshkey['traf-logs.esgyn.com'], Mount['/home/jenkins'] ],
   }
 
   # allow Jenkins to run script to upload files to CDN

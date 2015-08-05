@@ -256,12 +256,13 @@ class traf::static (
   ###########################################################
   # Logs
 
-  apache::vhost { 'logs.trafodion.org':
-    port     => 80,
-    priority => '50',
-    docroot  => "${server_path}/logs",
-    require  => File["${server_path}/logs"],
-    template => 'traf/logs.vhost.erb',
+  apache::vhost { 'traf-logs.esgyn.com':
+    serveraliases  => "logs.trafodion.org",
+    port           => 80,
+    priority       => '50',
+    docroot        => "${server_path}/logs",
+    require        => File["${server_path}/logs"],
+    template       => 'traf/logs.vhost.erb',
   }
 
   file { "${server_path}/logs":

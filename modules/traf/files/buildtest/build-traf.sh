@@ -39,7 +39,7 @@ source_env -v build $FLAVOR
 cd trafodion/core
 
 # Pull latest posted Win-ODBC build if available
-WINLOC="http://logs.trafodion.org/winbld"
+WINLOC="http://traf-logs.esgyn.com/winbld"
 WFILE="TFODBC64-${TRAFODION_VER}.msi"
 
 mkdir -p conn/clients
