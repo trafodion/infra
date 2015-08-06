@@ -77,7 +77,7 @@ class traf::testm (
     mode   => '0644',
   }
   exec { 'get_dev_tools' :
-    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/firefox-38.0.5.tar.bz2 /opt/dev",
+    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/firefox-38.0.5.tar.bz2 /opt/dev",
     timeout => 900,
     user    => 'jenkins',
     creates => "/opt/dev/firefox-38.0.5.tar.bz2",

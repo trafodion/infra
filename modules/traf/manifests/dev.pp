@@ -115,7 +115,7 @@ class traf::dev (
     mode   => '0644',
   }
   exec { 'get_dev_tools' :
-    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/firefox-38.0.5.tar.bz2 /opt/dev",
+    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/firefox-38.0.5.tar.bz2 /opt/dev",
     timeout => 900,
     user    => 'jenkins',
     creates => "/opt/dev/firefox-38.0.5.tar.bz2",
@@ -129,7 +129,7 @@ class traf::dev (
   }
   # eclipse
   exec { 'get_dev_eclipse' :
-    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz /opt/dev",
+    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz /opt/dev",
     timeout => 900,
     user    => 'jenkins',
     creates => "/opt/dev/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz",
@@ -143,7 +143,7 @@ class traf::dev (
   }
   # local SW
   exec { 'get_dev_swdist' :
-    command => "/usr/bin/scp static.trafodion.org:/srv/static/downloads/dev-tools/local_sw_dist.tgz /opt/dev",
+    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/local_sw_dist.tgz /opt/dev",
     timeout => 900,
     user    => 'jenkins',
     creates => "/opt/dev/local_sw_dist.tgz",

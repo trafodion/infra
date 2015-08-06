@@ -79,9 +79,6 @@ class traf::slave (
     ensure       => present,
     host_aliases => [
       'traf-downloads.esgyn.com',
-      'downloads.trafodion.org',
-      'static.trafodion.org',
-      'logs.trafodion.org',
     ],
     type         => 'ssh-rsa',
     key          => $logs_host,
