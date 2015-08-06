@@ -90,12 +90,13 @@ class traf::static (
   ###########################################################
   # Downloads
 
-  apache::vhost { 'downloads.trafodion.org':
-    port     => 80,
-    priority => '50',
-    docroot  => "${server_path}/downloads-www",
-    template => 'traf/downloads/downloads.vhost.erb',
-    require  => File["${server_path}/downloads-www"],
+  apache::vhost { 'traf-downloads.esgyn.com':
+    serveraliases  => "downloads.trafodion.org",
+    port           => 80,
+    priority       => '50',
+    docroot        => "${server_path}/downloads-www",
+    template       => 'traf/downloads/downloads.vhost.erb',
+    require        => File["${server_path}/downloads-www"],
   }
 
   # where download site resides
@@ -117,7 +118,7 @@ class traf::static (
     owner   => 'www-data',
     group   => 'www-data',
     source  => 'puppet:///modules/traf/favicon.ico',
-    require => File["${server_path}/status"],
+    require => File["${server_path}/downloads-www"],
   }
 
   file { "${server_path}/downloads-www/favicon.png":
@@ -144,6 +145,26 @@ class traf::static (
     require => File["${server_path}/downloads-www"],
   }
 
+  file { "${server_path}/downloads-www/common.js":
+    ensure  => present,
+    source  => 'puppet:///modules/traf/status/common.js',
+    require => File["${server_path}/downloads-www"],
+  }
+
+  file { "${server_path}/downloads-www/jquery.min.js":
+    ensure  => link,
+    target  => '/usr/share/javascript/jquery/jquery.min.js',
+    require => [File["${server_path}/downloads-www"],
+                Package['libjs-jquery']],
+  }
+
+  file { "${server_path}/downloads-www/themes":
+    ensure  => link,
+    target  => "${server_path}/themes",
+    require => [File["${server_path}/downloads-www"],
+                File["${server_path}/themes"]],
+  }
+
   exec { 'get-httpful-phar':
     command => "/usr/bin/curl http://phphttpclient.com/downloads/httpful.phar > ${server_path}/downloads-www/lib/httpful.phar",
     cwd     => "${server_path}/downloads-www/lib",
@@ -168,17 +189,6 @@ class traf::static (
     require => [
       User['jenkins'],
       File[$download_path],
-    ]
-  }
-
-  file { "${download_path}/trafodion/pre-release":
-    ensure  => directory,
-    owner   => 'jenkins',
-    group   => 'jenkins',
-    mode    => '0775',
-    require => [
-      User['jenkins'],
-      File["${download_path}/trafodion"],
     ]
   }
 
@@ -302,49 +312,6 @@ class traf::static (
   ###########################################################
   # Status
 
-  apache::vhost { 'status.trafodion.org':
-    port     => 80,
-    priority => '50',
-    docroot  => "${server_path}/status",
-    template => 'traf/status.vhost.erb',
-    require  => File["${server_path}/status"],
-  }
-
-  file { "${server_path}/status":
-    ensure => directory,
-  }
-
-  file { "${server_path}/status/index.html":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/status/index.html',
-    require => File["${server_path}/status"],
-  }
-
-  file { "${server_path}/status/favicon.ico":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/favicon.ico',
-    require => File["${server_path}/status"],
-  }
-
-  file { "${server_path}/status/favicon.png":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/favicon.png',
-    require => File["${server_path}/status"],
-  }
-
-  file { "${server_path}/status/common.js":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/status/common.js',
-    require => File["${server_path}/status"],
-  }
-
-  file { "${server_path}/status/jquery.min.js":
-    ensure  => link,
-    target  => '/usr/share/javascript/jquery/jquery.min.js',
-    require => [File["${server_path}/status"],
-                Package['libjs-jquery']],
-  }
-
   vcsrepo { '/opt/jquery-visibility':
     ensure   => latest,
     provider => git,
@@ -357,8 +324,7 @@ class traf::static (
     path        => '/bin:/usr/bin',
     refreshonly => true,
     subscribe   => Vcsrepo['/opt/jquery-visibility'],
-    require     => [File["${server_path}/status"],
-                    Vcsrepo['/opt/jquery-visibility']],
+    require     => [Vcsrepo['/opt/jquery-visibility']],
   }
 
   exec { 'get-jquery-visibility.min':
@@ -369,12 +335,6 @@ class traf::static (
     creates => '/opt/jquery-visibility/jquery-visibility.min.js',
   }
 
-  file { "${server_path}/status/jquery-visibility.min.js":
-    ensure  => link,
-    target  => '/opt/jquery-visibility/jquery-visibility.min.js',
-    require => Vcsrepo['/opt/jquery-visibility'],
-  }
-
   vcsrepo { '/opt/jquery-graphite':
     ensure   => latest,
     provider => git,
@@ -382,110 +342,7 @@ class traf::static (
     source   => 'https://github.com/prestontimmons/graphitejs.git',
   }
 
-  file { "${server_path}/status/jquery-graphite.js":
-    ensure  => link,
-    target  => '/opt/jquery-graphite/jquery.graphite.js',
-    require => [File["${server_path}/status"],
-                Vcsrepo['/opt/jquery-graphite']],
-  }
 
-  vcsrepo { '/opt/flot':
-    ensure   => latest,
-    provider => git,
-    revision => 'master',
-    source   => 'https://github.com/flot/flot.git',
-  }
-
-  exec { 'install_flot' :
-    command     => "yui-compressor -o '.js$:.min.js' /opt/flot/jquery.flot*.js; mv /opt/flot/jquery.flot*.min.js ${server_path}/status",
-    path        => '/bin:/usr/bin',
-    refreshonly => true,
-    subscribe   => Vcsrepo['/opt/flot'],
-    require     => [File["${server_path}/status"],
-                    Vcsrepo['/opt/flot']],
-  }
-
-  ###########################################################
-  # Status - elastic-recheck
-
-  include elastic_recheck
-
-  cron { 'elastic-recheck':
-    user        => 'recheck',
-    minute      => '*/15',
-    hour        => '*',
-    command     => "elastic-recheck-graph /opt/elastic-recheck/queries -o ${er_state_dir}/graph-new.json && mv ${er_state_dir}/graph-new.json ${er_state_dir}/graph.json",
-    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
-    require     => Class['elastic_recheck']
-  }
-
-  ###########################################################
-  # Status - zuul
-
-  file { "${server_path}/status/zuul":
-    ensure => directory,
-  }
-
-  file { "${server_path}/status/zuul/index.html":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/status.html',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/zuul/status.js":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/status.js',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/zuul/green.png":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/green.png',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/zuul/red.png":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/red.png',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/zuul/black.png":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/black.png',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/zuul/grey.png":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/grey.png',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/zuul/line-angle.png":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/line-angle.png',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/zuul/line-t.png":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/line-t.png',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/zuul/line.png":
-    ensure  => present,
-    source  => 'puppet:///modules/traf/zuul/line.png',
-    require => File["${server_path}/status/zuul"],
-  }
-
-  file { "${server_path}/status/themes":
-    ensure  => link,
-    target  => "${server_path}/themes",
-    require => [File["${server_path}/status"],
-                File["${server_path}/themes"]],
-  }
 
   ###########################################################
   # www

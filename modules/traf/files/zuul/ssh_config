@@ -1,3 +1,0 @@
-Host *
-        IdentityFile /var/lib/zuul/ssh/id_rsa
-        User jenkins

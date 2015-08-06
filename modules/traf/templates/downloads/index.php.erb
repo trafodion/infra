@@ -12,8 +12,8 @@
     <title>Trafodion (Pre-Apache) Downloads</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 
-    <script type="text/javascript" src="http://status.<%= domain %>/common.js"></script>
-    <script type="text/javascript" src="http://status.<%= domain %>/jquery.min.js"></script>
+    <script type="text/javascript" src="http://traf-downloads.esgyn.com/common.js"></script>
+    <script type="text/javascript" src="http://traf-downloads.esgyn.com/jquery.min.js"></script>
     <script type="text/javascript">
     /* <![CDATA[ */
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -25,7 +25,7 @@
       (function($){$.fn.extend({postlink:function(){return this.each(function() {
       $(this).click(function(e){var arr = $(this).attr('data-f').split('/');
       ga('send','event','downloads',$(this).attr('data-f'),arr[0],1);var frm = $("<form>");
-      frm.attr({'action':'http://cdn.<%= domain %>/'+$(this).attr('data-f'),'method':'get'});
+      frm.attr({'action':'http://cdn.esgyn.com/'+$(this).attr('data-f'),'method':'get'});
       frm.appendTo("body");setTimeout(function(){frm.submit();},400);e.preventDefault();});});}});})(jQuery);
     /* ]]> */
     </script>
@@ -33,12 +33,12 @@
     <!-- Google Fonts -->
     <link href="http://fonts.googleapis.com/css?family=PT+Sans&amp;subset=latin" rel="stylesheet" type="text/css" />
     <!-- Framework CSS -->
-    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/screen.css" type="text/css" media="screen, projection" />
-    <link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/print.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="http://traf-downloads.esgyn.com/themes/trafodion/css/blueprint/screen.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="http://traf-downloads.esgyn.com/themes/trafodion/css/blueprint/print.css" type="text/css" media="print" />
     <!-- IE CSS -->
-    <!--[if lt IE 8]><link rel="stylesheet" href="http://status.<%= domain %>/themes/trafodion/css/blueprint/ie.css" type="text/css" media="screen, projection" /><![endif]-->
+    <!--[if lt IE 8]><link rel="stylesheet" href="http://traf-downloads.esgyn.com/themes/trafodion/css/blueprint/ie.css" type="text/css" media="screen, projection" /><![endif]-->
     <!-- Page Specific CSS -->
-    <link rel="stylesheet" type="text/css" href="http://status.<%= domain %>/themes/trafodion/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="http://traf-downloads.esgyn.com/themes/trafodion/css/main.css" />
     <style type="text/css">
         a, a:link {
             color: #204A87;
@@ -284,7 +284,7 @@
         $sandboxArray = array_filter($cdnArray, "sandbox");
         array_walk($sandboxArray, 'print_links', 'sandbox');
         */
-        echo '        <li><a href="http://downloads.trafodion.org/trafodion_release.ova" target="_blank">trafodion_release.ova</a></li>' . PHP_EOL;
+        echo '        <li><a href="http://traf-downloads.esgyn.com/trafodion_release.ova" target="_blank">trafodion_release.ova</a></li>' . PHP_EOL;
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
