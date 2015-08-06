@@ -211,28 +211,6 @@
 # ======================================================================
 
 - publisher:
-    name: tarball
-    publishers:
-      - archive:
-          artifacts: 'dist/*.tar.gz'
-      - scp:
-          site: '{site}'
-          files:
-            - target: 'downloads/{project}/'
-              source: 'dist/*.tar.gz'
-
-- publisher:
-    name: war
-    publishers:
-      - archive:
-          artifacts: '{warfile}'
-      - scp:
-          site: '{site}'
-          files:
-            - target: '{target}'
-              source: '{warfile}'
-
-- publisher:
     name: git-log
     publishers:
       - scp:
@@ -474,16 +452,6 @@
             - target: 'logs/periodic/$JOB_NAME/$NODE_NAME/$BUILD_NUMBER'
               copy-console: true
               copy-after-failure: true
-
-- publisher:
-    name: traf-release-tar
-    publishers:
-      - scp:
-          site: 'downloads.trafodion.org'
-          files:
-            - target: 'downloads/trafodion'
-              source: 'publish/**'
-              keep-hierarchy: true
 
 - publisher:
     name: traf-upload-to-cdn
