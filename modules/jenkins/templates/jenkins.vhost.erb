@@ -1,5 +1,8 @@
 <VirtualHost *:80>
              ServerName <%= scope.lookupvar("::jenkins::master::vhost_name") %>
+	     <% if scope.lookupvar("::jenkins::master::serveralias") != '' -%>
+	     ServerAlias <%= scope.lookupvar("::jenkins::master::serveralias") %>
+	     <% end -%>
              ServerAdmin <%= scope.lookupvar("::jenkins::master::serveradmin") %>
 
              ErrorLog ${APACHE_LOG_DIR}/<%= scope.lookupvar("::jenkins::master::vhost_name") %>-error.log
@@ -14,6 +17,9 @@
 
 <VirtualHost *:443>
              ServerName <%= scope.lookupvar("::jenkins::master::vhost_name") %>
+	     <% if scope.lookupvar("::jenkins::master::serveralias") != '' -%>
+	     ServerAlias <%= scope.lookupvar("::jenkins::master::serveralias") %>
+	     <% end -%>
              ServerAdmin <%= scope.lookupvar("::jenkins::master::serveradmin") %>
 
              ErrorLog ${APACHE_LOG_DIR}/<%= scope.lookupvar("::jenkins::master::vhost_name") %>-ssl-error.log

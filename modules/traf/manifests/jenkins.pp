@@ -2,6 +2,7 @@
 #
 class traf::jenkins (
   $vhost_name = $::fqdn,
+  $vhost_alias = '',
   $port = 80,
   $ssl_port = 443,
   $jenkins_jobs_password = '',
@@ -66,6 +67,7 @@ class traf::jenkins (
 
   class { '::jenkins::master':
     vhost_name              => $vhost_name,
+    vhost_alias             => $vhost_alias,
     serveradmin             => 'trafodion-infrastructure@lists.launchpad.net',
     logo                    => 'Trafodion.png',
     ssl_cert_file           => "/etc/ssl/certs/${vhost_name}.pem",

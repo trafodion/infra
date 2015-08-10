@@ -13,7 +13,7 @@
       - string:
           name: EMAIL
           default: $BUILD_USER_EMAIL
-          description: "Comma separated destination for results (default: https://jenkins02.trafodion.org/me/configure)"
+          description: "Comma separated destination for results (default: https://jenkins.esgyn.com/me/configure)"
       - string:
           name: PULL_NUM
           description: "Pull Request Number"
