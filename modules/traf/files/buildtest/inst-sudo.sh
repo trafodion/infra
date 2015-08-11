@@ -96,7 +96,10 @@ then
   # prep config file  
   cp ./installer/trafodion_config_default ./tc
   echo "NODE_LIST=$(hostname -s)" >> ./tc
+  echo "HADOOP_NODES=$(hostname -s)" >> ./tc
+  echo "MY_HADOOP_NODES=\"-w $(hostname -s)\"" >> ./tc
   echo "node_count=1" >> ./tc
+  echo "hadoop_node_count=1" >> ./tc
   echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./tc
   echo "OPENSTACK_VM=1" >> ./tc
   echo "TRAF_BUILD=$trafball" >> ./tc
@@ -120,6 +123,9 @@ then
     echo "LDAP_SECURITY=Y" >> ./tc
     echo "LDAP_AUTH_FILE=traf_auth_config" >> ./tc
   fi
+  # no SUSE yet
+  echo "SUSE_LINUX=false" >> ./tc
+
 
   check_port 23400
   check_port 24400
