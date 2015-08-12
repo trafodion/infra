@@ -3,6 +3,7 @@
 class jenkins::master(
   $logo = '',
   $vhost_name = $::fqdn,
+  $vhost_alias = '',
   $serveradmin = "webmaster@${::fqdn}",
   $ssl_cert_file = '',
   $ssl_key_file = '',
@@ -45,11 +46,12 @@ class jenkins::master(
   }
 
   apache::vhost { $vhost_name:
-    port     => 443,
-    docroot  => 'MEANINGLESS ARGUMENT',
-    priority => '50',
-    template => 'jenkins/jenkins.vhost.erb',
-    ssl      => true,
+    serveraliases => $vhost_alias,
+    port          => 443,
+    docroot       => 'MEANINGLESS ARGUMENT',
+    priority      => '50',
+    template      => 'jenkins/jenkins.vhost.erb',
+    ssl           => true,
   }
   a2mod { 'rewrite':
     ensure => present,
