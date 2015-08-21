@@ -12,6 +12,7 @@ class traf::automatic_upgrades (
   }
   if $::osfamily == 'RedHat' {
     class { 'packagekit::cron':
+      enabled    => 'no',
       check_only => 'yes',
       mailto     => 'steve.varnau@esgyn.com',
     }
