@@ -104,7 +104,7 @@ fi
 # Create Cluster 
 Cluster="$(curl $Read $URL/clusters | jq -r '.items[].Clusters.cluster_name')"
 
-if [[ $Cluster == "null" ]]
+if [[ $Cluster == "null" || -z "$Cluster" ]]
 then
   echo "Creating cluster: trafcluster"
   curl $Create -d '{ "Clusters" : {
