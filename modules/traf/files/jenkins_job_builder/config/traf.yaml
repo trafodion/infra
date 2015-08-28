@@ -168,7 +168,7 @@
 
     wrappers:
       - timeout:
-          timeout: 120
+          timeout: 150
           fail: true
       - timestamps
 
