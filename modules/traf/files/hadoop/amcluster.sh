@@ -29,6 +29,14 @@ echo "*** Checking Cluster Configuration"
 
 # Distro 
 
+if [[ "$1" == "-d" ]]
+then
+  mode="Delete"
+  shift
+else
+  mode="Create"
+fi
+
 # previously saved?
 if [[ -r /var/local/TrafTestDistro ]]
 then
@@ -55,6 +63,7 @@ Opts="-su admin:admin"
 Read="$Opts"
 Create="-X POST -H X-Requested-By:traf $Opts"
 Update="-X PUT -H X-Requested-By:traf $Opts"
+Delete="-X DELETE -H X-Requested-By:traf $Opts"
 
 
 # Function - poll command until it completes and report results
@@ -93,12 +102,46 @@ function am_cmd {
 ###############################
 # Main
 
+# service list
+if [[ $Vers == "HDP-2.1" ]]
+then
+  services="HDFS HIVE HBASE ZOOKEEPER MAPREDUCE2 YARN WEBHCAT HCATALOG TEZ"
+else
+  services="HDFS HIVE HBASE ZOOKEEPER MAPREDUCE2 YARN TEZ"
+fi
+
 # Check that we can talk to Ambari server
 curl $Read $URL/clusters | grep -q href
 if [[ $? != 0 ]]
 then
   echo "Error: cannot contact ambari server"
   exit 2
+fi
+
+if [[ $mode = "Delete" ]]
+then
+  # stop all services
+  for serv in $services
+  do
+    State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
+    if [[ $State == "STARTED" ]] 
+    then
+      echo "*** Stopping $serv"
+      reqINSTALL='{"RequestInfo": {"context" :"$serv Stop"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
+      RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/$serv | jq -r '.Requests.id')
+      am_cmd "$RID" "$serv Stop"
+      # Check status
+      State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
+      if [[ $State != "INSTALLED" ]]
+      then
+        echo "Error: $serv not stopped"
+        exit 2
+      fi
+    fi
+  done
+  echo "Deleting cluster: trafcluster"
+  curl $Delete $URL/clusters/trafcluster 
+  exit $?
 fi
 
 # Create Cluster 
@@ -136,13 +179,6 @@ then
 fi
 
 # Create Services 
-if [[ $Vers == "HDP-2.1" ]]
-then
-  services="HDFS HIVE HBASE ZOOKEEPER MAPREDUCE2 YARN WEBHCAT HCATALOG TEZ"
-else
-  services="HDFS HIVE HBASE ZOOKEEPER MAPREDUCE2 YARN TEZ"
-fi
-
 for serv in $services
 do
   Service="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.service_name')"
