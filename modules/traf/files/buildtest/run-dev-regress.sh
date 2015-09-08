@@ -36,7 +36,8 @@ umask 000  # make sure jenkins/trafodion user can read/remove files
 # in case of test time-out we don't want to archive old logs
 logarchive="$WORKSPACE/sql-regress-logs"
 rundir="$WORKSPACE/rundir"
-rm -rf $logarchive $rundir
+savedir="$WORKSPACE/rundir.save"
+rm -rf $logarchive $rundir $savedir
 mkdir $logarchive
 
 ulimit -c unlimited  # enable core files
@@ -121,10 +122,11 @@ fail=$(grep FAIL */runregr*.log | wc -l)
 pass=$(grep PASS */runregr*.log | wc -l)
 echo "Total Passed:   $pass"
 echo "Total Failures: $fail"
-# remove rundir logs
+# move rundir logs aside
 # jenkins will upload these logs,
 # in case test times out before we get this far.
-rm -rf *
+cd $WORKSPACE
+mv $rundir $savedir
 
 if [[ $totalCoreCount -gt 0 ]]; then
     echo
