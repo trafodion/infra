@@ -112,7 +112,8 @@ fi
 cd $workspace
 
 # installer
-cp ./trafodion/install/installer*gz ./$DestDir/installer-$BLD.tar.gz  || exit 2
+install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/installer*gz)
+cp $install ./$DestDir/installer-$BLD.tar.gz  || exit 2
 
 # clients tarfile
 client=$(ls ./trafodion/core/trafodion_clients-*.tgz ./trafodion/distribution/trafodion_clients-*.tgz)
