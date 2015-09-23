@@ -121,15 +121,15 @@ install_loc "installed" $REGRESS
 
 # Core, DCS, Install are all required
 
-trafball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion_server-*.tgz)"
-dcsball="$(/bin/ls $WORKSPACE/trafodion/dcs/target/dcs*gz)"
-instball="$(/bin/ls $WORKSPACE/trafodion/install/installer*gz)"
-restball="$(/bin/ls $WORKSPACE/trafodion/core/rest/target/rest-*gz)"
+trafball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion_server-*.tgz $WORKSPACE/trafodion/distribution/trafodion_server-*.tgz)"
+dcsball="$(/bin/ls $WORKSPACE/trafodion/dcs/target/dcs*gz $WORKSPACE/trafodion/distribution/dcs*gz)"
+instball="$(/bin/ls $WORKSPACE/trafodion/install/installer*gz $WORKSPACE/trafodion/distribution/dcs*gz)"
+restball="$(/bin/ls $WORKSPACE/trafodion/core/rest/target/rest-*gz $WORKSPACE/trafodion/distribution/rest-*gz)"
 
 flist="$instball $trafball $dcsball"
 if [[ $REGRESS == "regress" ]]
 then
-  regball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion-regress.tgz)"
+  regball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion-regress.tgz $WORKSPACE/trafodion/distribution/trafodion-regress.tgz)"
   flist+=" $regball"
 fi
 

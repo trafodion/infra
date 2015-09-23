@@ -115,20 +115,24 @@ cd $workspace
 cp ./trafodion/install/installer*gz ./$DestDir/installer-$BLD.tar.gz  || exit 2
 
 # clients tarfile
-cp ./trafodion/core/trafodion_clients-*.tgz ./$DestDir/clients$FileSuffix  || exit 2
+client=$(ls ./trafodion/core/trafodion_clients-*.tgz ./trafodion/distribution/trafodion_clients-*.tgz)
+cp $client ./$DestDir/clients$FileSuffix  || exit 2
 
 # core and dcs in server tarfile
-cp trafodion/core/trafodion_server-*.tgz collect/  || exit 2
+server=$(ls ./trafodion/core/trafodion_server-*.tgz ./trafodion/distribution/trafodion_server-*.tgz)
+cp $server collect/  || exit 2
 # rest added in 1.1 release
-if [[ -f "$(ls trafodion/core/rest/target/rest-*gz 2>/dev/null)" ]]
+rest=$(ls trafodion/core/rest/target/rest-*gz trafodion/distribution/rest-*gz 2>/dev/null)
+if [[ -f "$rest" ]]
 then
-  rbase=$(basename trafodion/core/rest/target/rest-*gz .tar.gz)
-  cp trafodion/core/rest/target/rest-*gz collect/${rbase}.tgz  || exit 2
+  rbase=$(basename $rest .tar.gz)
+  cp $rest collect/${rbase}.tgz  || exit 2
 fi
 
 # change suffix from tar.gz to tgz
-dcsbase=$(basename trafodion/dcs/target/dcs*gz .tar.gz)
-cp trafodion/dcs/target/dcs*gz collect/${dcsbase}.tgz  || exit 2
+dcs=$(ls trafodion/dcs/target/dcs*gz trafodion/distribution/dcs*gz)
+dcsbase=$(basename $dcs .tar.gz)
+cp $dcs collect/${dcsbase}.tgz  || exit 2
 
 cat trafodion/build-version.txt >> collect/build-version.txt
 cat collect/build-version.txt

@@ -55,6 +55,8 @@
           artifacts: 'trafodion/core/trafodion_server*.tgz'
       - archive:
           artifacts: 'trafodion/core/rest/target/rest*.tar.gz'
+      - archive:
+          artifacts: 'trafodion/distribution/*'
       - console-log
       - git-log
       - traf-make-log
