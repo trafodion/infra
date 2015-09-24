@@ -45,18 +45,25 @@
       - traf-upload-to-cdn
       - archive:
           artifacts: 'trafodion/install/install*.tar.gz'
+          allow-empty: true
       - archive:
           artifacts: 'trafodion/dcs/target/dcs*.tar.gz'
+          allow-empty: true
       - archive:
           artifacts: 'trafodion/core/trafodion-regress.tgz'
+          allow-empty: true
       - archive:
           artifacts: 'trafodion/core/trafodion_clients*.tgz'
+          allow-empty: true
       - archive:
           artifacts: 'trafodion/core/trafodion_server*.tgz'
+          allow-empty: true
       - archive:
           artifacts: 'trafodion/core/rest/target/rest*.tar.gz'
+          allow-empty: true
       - archive:
           artifacts: 'trafodion/distribution/*'
+          allow-empty: true
       - console-log
       - git-log
       - traf-make-log
