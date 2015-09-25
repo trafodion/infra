@@ -50,7 +50,7 @@ then
   log_banner "Installing Trafodion clients to $WORKSPACE/clients"
   cd $WORKSPACE
   rm -rf clients
-  tar xvfz $WORKSPACE/trafodion/core/trafodion_clients-*.tgz
+  tar xvfz $(ls $WORKSPACE/trafodion/core/trafodion_clients-*.tgz $WORKSPACE/trafodion/distribution/trafodion_clients-*.tgz)
   cd clients
 
   # install JDBC T4 client
