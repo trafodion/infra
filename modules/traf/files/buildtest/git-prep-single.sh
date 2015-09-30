@@ -24,34 +24,53 @@ log_banner
 
 rm -f Git-Prep.log
 
-# Optional over-ride branch
-# Useful to test cross-branch compatibility
-if [[ $1 == "-b" ]]
+# Defaults
+Label=""
+if [[ -n "$ghprbTargetBranch" ]]  # github pull-req
 then
-  TargetBranch="$2"
-  shift 2
-else
   TargetBranch="$ghprbTargetBranch"
+elif [[ -n $BRANCH ]]  # direct jenkins parameter
+then
+  TargetBranch="$BRANCH"
+else
+  TargetBranch="master"
 fi
+
+# Options
+while [[ $1 =~ -b|-l ]]
+do
+  # Optional over-ride branch
+  # Useful to test cross-branch compatibility
+  if [[ $1 == "-b" ]]
+  then
+    TargetBranch="$2"
+    shift 2
+  fi
+  # Option to supply label
+  if [[ $1 == "-l" ]]
+  then
+    Label="$2"
+    shift 2
+  fi
+done # options
 
 repo="$1"
 
-GIT_ORIGIN="https://github.com"
+GIT_ORIGIN="https://github.com/"
 
 if [[ -z "$sha1" ]]
 then
-    if [[ -n $BRANCH ]]  # direct jenkins parameter
-    then
-      TargetBranch="$BRANCH"
-    else
-      TargetBranch="master"
-    fi
-
     echo "******************************************"
     echo "Warning: Job not triggered by code change."
+  if [[ -n "$Label" ]]
+  then
+    echo "         Building from tag $Label."
+    sha1=$Label
+  else
     echo "         Building latest on origin/$TargetBranch branch."
-    echo "******************************************"
     sha1=origin/$TargetBranch
+  fi
+    echo "******************************************"
 fi
 
 if [[ ! -z "$ghprbPullLink" ]]
@@ -75,15 +94,14 @@ echo "Using reference: $sha1"
 BLDInfo="$BUILD_TYPE $BUILD_ID"
 rm -f "$workspace/Build_ID" "$workspace/Code_Versions"
 
-## To-Do: tag builds
-#if [[ $ZUUL_REF =~ ^refs/tags/ ]]
-#then
-#BID="${ZUUL_REF#refs/tags/}"
-#echo "Building for tag: $BID"
 if [[ -n "$ghprbPullId" ]]
 then
   BID="PR${ghprbPullId}-$ghprbActualCommit"
   echo "Building for pull request PRID-commitID: $BID"
+elif [[ -n "$Label" ]]
+then
+  BID="$Label"
+  echo "Building for tag: $BID"
 else
   BID="$(date -u +%Y%m%d_%H%M)"
   echo "Building for date: $BID"
@@ -110,10 +128,10 @@ cd ./trafodion
 if [[ ! -e .git ]]
 then
     rm -fr .[^.]* *
-	git clone $GIT_ORIGIN/$repo .
+	git clone ${GIT_ORIGIN}$repo .
 fi
 # Make sure we are pointing to right repo and fetch latest
-git remote set-url origin $GIT_ORIGIN/$repo
+git remote set-url origin ${GIT_ORIGIN}$repo
 if ! git remote update --prune
 then
     echo "The remote update failed, so garbage collecting before trying again."
@@ -122,9 +140,9 @@ then
 fi
 
 # fetch Branch
-git fetch $GIT_ORIGIN/$repo +refs/heads/${TargetBranch}:refs/remotes/origin/${TargetBranch}
+git fetch -t ${GIT_ORIGIN}$repo +refs/heads/${TargetBranch}:refs/remotes/origin/${TargetBranch}
 # fetch pull requests
-git fetch $GIT_ORIGIN/$repo +refs/pull/*:refs/remotes/origin/pr/*
+git fetch ${GIT_ORIGIN}$repo +refs/pull/*:refs/remotes/origin/pr/*
 if git checkout -f $sha1
 then
   git reset --hard HEAD
@@ -138,12 +156,12 @@ git clean -x -f -d -q
 # leave some version info around
 echo "$BLDInfo" > build-version.txt
 echo "$repo" >> build-version.txt
-#if [[ $ref =~ ^refs/tags/ ]]
-#    then
-#      echo "Tag:    ${ref#refs/tags/}" >> build-version.txt
-#    else
-#      echo "Ref:    $ref" >> build-version.txt
-#    fi
+if [[ -n "$Label" ]]
+then
+   echo "Tag:    $Label" >> build-version.txt
+else
+   echo "Ref:    $sha1" >> build-version.txt
+fi
 echo "Commit: $(git log -n1 --format=oneline)" >> build-version.txt
 echo "Desc:   $(git describe --long --tags --dirty --always)" >> build-version.txt
 # exclude this file from git status so we don't contaminate the environment.

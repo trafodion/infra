@@ -1,3 +1,82 @@
+# pre-release or release builds from tag
+- job:
+    name: 'Release-Build'
+    node: 'master'
+    project-type: multijob
+
+    wrappers:
+      - timestamps
+      - build-user-vars
+
+    parameters:
+      - string:
+          name: EMAIL
+          default: $BUILD_USER_EMAIL
+          description: "Comma separated destination for results (default: https://jenkins.esgyn.com/me/configure)"
+      - string:
+          name: TAG
+          description: "Git tag to build against"
+      - string:
+          name: BRANCH
+          default: master
+          description: "Branch of the Label"
+      - choice:
+          name: TAGTYPE
+          choices:
+            - pre-release
+            - release
+          default: pre-release
+          description: "Type of Tag / Build"
+
+
+    scm:
+      - git:
+          url: https://github.com/apache/incubator-trafodion
+          wipe-workspace: false
+          skip-tag: true
+
+    builders:
+      - inject:
+          properties-content: |
+            LOG_PATH=Release/$TAG/$BUILD_NUMBER
+      - link-logs
+      - multijob:
+          name: build
+          projects:
+            - name: "build-label"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/build-label
+                 BUILD_TYPE=$TAGTYPE
+                 TAG=$TAG
+
+    publishers:
+      - console-log
+      - postbuildscript:
+          script-only-if-succeeded: false
+          script-only-if-failed: false
+          builders:
+            - shell: "/usr/local/bin/job-summary.sh"
+      - email-ext:
+          recipients: $EMAIL
+          reply-to: no-reply@trafodion.org
+          content-type: "text"
+          subject: Trafodion Release Build $TAGTYPE $TAG
+          save-output: true
+          always: true
+          failure: false
+          body: |
+            Release Automated Testing $TAGTYPE $TAG
+
+            Jenkins Job:   $BUILD_URL
+            Archived Logs: http://traf-logs.esgyn.com/$LOG_PATH
+            Bld Downloads: http://traf-downloads.esgyn.com/
+            
+            Test Job Results:
+            
+            ${FILE,path="build_result.txt"}
+
 # Mechanism for developers to choose tests
 
 - job:
@@ -20,7 +99,7 @@
       - string:
           name: BRANCH
           default: master
-          description: "Target Branch of the the Pull Request"
+          description: "Target Branch of the Pull Request"
       - choice:
           name: DISTRO
           choices:

@@ -45,6 +45,11 @@
       - shell: "/usr/local/bin/git-prep-single.sh -b {branch} {repos}"
 
 - builder:
+    name: single-git-label
+    builders:
+      - shell: "/usr/local/bin/git-prep-single.sh -b {branch} -l \"{label}\" {repos}"
+
+- builder:
     name: clean-workspace
     builders:
       - shell: "/usr/local/bin/wsclean.sh"

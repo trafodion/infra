@@ -68,6 +68,43 @@
       - git-log
       - traf-make-log
 
+- job-template:
+    name: 'build-label'
+    node: 'traf_bld'
+
+    parameters:
+      - string:
+          name: LOG_PATH
+      - string:
+          name: BUILD_TYPE
+          default: ""
+          description: "Blank for manual build; check, daily, pre-release, release"
+      - string:
+          name: TAG
+          desription: "Git tag to build against"
+
+    builders:
+      - link-logs
+      - clean-buildspace
+      - single-git-label:
+           repos: "apache/incubator-trafodion"
+           label: "$TAG"
+      - pkg-traf:
+           flavor: "release"
+      - pkg-dcs:
+           buildDir: "trafodion/dcs"
+           coreJDBC: "trafodion/core"
+      - pkg-install
+      - stage-traf:
+           flavor: "release"
+           btype: "$BUILD_TYPE"
+
+    publishers:
+      - traf-upload-to-cdn
+      - console-log
+      - git-log
+      - traf-make-log
+
 
 # Simple file type check can run on master
 # Does not need to be exclusive
