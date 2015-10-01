@@ -238,9 +238,6 @@
            repos: "apache/incubator-trafodion"
       - pkg-traf:
            flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
       - single-git-prep:
            repos: "apache/incubator-trafodion"
       - pkg-install
@@ -279,9 +276,6 @@
            repos: "apache/incubator-trafodion"
       - pkg-traf:
            flavor: "debug"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
       - single-git-prep:
            repos: "apache/incubator-trafodion"
       - pkg-install

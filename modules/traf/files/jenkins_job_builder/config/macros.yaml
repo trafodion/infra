@@ -84,13 +84,6 @@
           build-number: "$BLD_NUM"
           filter: "**/*"
 
-# second argument is optional
-# used if core and dcs built in same job
-- builder:
-    name: pkg-dcs
-    builders:
-      - shell: "/usr/local/bin/build-dcs.sh {buildDir} {coreJDBC}"
-
 - builder:
     name: kill-traf
     builders:

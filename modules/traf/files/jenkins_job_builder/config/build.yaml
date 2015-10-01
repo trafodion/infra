@@ -28,9 +28,6 @@
            flavor: "{flavor}"
       - check-build:
            dir: "trafodion/core"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
       - check-build:
            dir: "trafodion/dcs"
       - pkg-install
@@ -91,9 +88,6 @@
            label: "$TAG"
       - pkg-traf:
            flavor: "release"
-      - pkg-dcs:
-           buildDir: "trafodion/dcs"
-           coreJDBC: "trafodion/core"
       - pkg-install
       - stage-traf:
            flavor: "release"
