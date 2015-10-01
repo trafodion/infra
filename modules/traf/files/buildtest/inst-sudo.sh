@@ -125,6 +125,7 @@ then
   fi
   # no SUSE yet
   echo "SUSE_LINUX=false" >> ./tc
+  echo "JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk.x86_64" >> ./tc
 
 
   check_port 23400
