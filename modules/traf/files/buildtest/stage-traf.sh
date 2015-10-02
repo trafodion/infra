@@ -49,9 +49,9 @@ BLD="$(< $workspace/Build_ID)"
 
 if [[ "$Flavor" == "debug" ]]
 then
-  FileSuffix="_debug-$BLD.tar.gz"
+  FileSuffix="_debug-$BLD-incubating-bin.tar.gz"
 else
-  FileSuffix="-$BLD.tar.gz"
+  FileSuffix="-$BLD-incubating-bin.tar.gz"
 fi
 
 # Destination dir should be daily, pre-release, or release even if build
@@ -113,11 +113,11 @@ cd $workspace
 
 # installer
 install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/installer*gz)
-cp $install ./$DestDir/installer-$BLD.tar.gz  || exit 2
+cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  || exit 2
 
 # clients tarfile
 client=$(ls ./trafodion/core/trafodion_clients-*.tgz ./trafodion/distribution/trafodion_clients-*.tgz)
-cp $client ./$DestDir/clients$FileSuffix  || exit 2
+cp $client ./$DestDir/apache-trafodion-clients$FileSuffix  || exit 2
 
 # core and dcs in server tarfile
 server=$(ls ./trafodion/core/trafodion_server-*.tgz ./trafodion/distribution/trafodion_server-*.tgz)
@@ -141,7 +141,7 @@ cat collect/build-version.txt
 # publish (DestDir) dir will be uploaded by scp rules in jenkins job
 cd ./collect
 sha512sum * > sha512.txt
-tar czvf "$workspace/$DestDir/trafodion$FileSuffix" *
+tar czvf "$workspace/$DestDir/apache-trafodion$FileSuffix" *
 rcC=$?
 
 if [[ $rcC != 0 ]]
