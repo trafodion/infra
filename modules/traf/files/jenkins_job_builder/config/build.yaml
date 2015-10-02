@@ -65,7 +65,7 @@
       - git-log
       - traf-make-log
 
-- job-template:
+- job:
     name: 'build-label'
     node: 'traf_bld'
 
