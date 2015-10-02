@@ -52,7 +52,7 @@ class traf::dev (
 
 
 
-  package { ['tigervnc-server','emacs','gitk']:
+  package { ['emacs','gitk']:
     ensure => present,
   }
   # work-around for group install
