@@ -49,7 +49,7 @@ BLD="$(< $workspace/Build_ID)"
 
 if [[ "$Flavor" == "debug" ]]
 then
-  FileSuffix="_debug-$BLD-incubating-bin.tar.gz"
+  FileSuffix="-debug-$BLD-incubating-bin.tar.gz"
 else
   FileSuffix="-$BLD-incubating-bin.tar.gz"
 fi
