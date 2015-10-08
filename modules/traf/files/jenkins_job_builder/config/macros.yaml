@@ -98,7 +98,7 @@
 - builder:
     name: pkg-traf
     builders:
-      - shell: "/usr/local/bin/build-traf.sh {flavor} package pkg-sql-regress"
+      - shell: "/usr/local/bin/build-traf.sh {flavor} package-all"
 
 - builder:
     name: pkg-install
