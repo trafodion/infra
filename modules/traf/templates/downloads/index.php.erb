@@ -232,40 +232,8 @@
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
-        # Create array for pre-release
-        # If prereleaseArray is empty print empty links using oldreleaseArray which comes right before it.
-        # If prereleaseArray is smaller than oldreleaseArray then pad prereleaseArray before printing. 
-        # NOTE: Printing empty links preserves the layout of the page.
-        echo '<div class="span-8 last">' . PHP_EOL;
-        echo '    <h2 class="subhead">Pre-Release</h2>' . PHP_EOL;
-        echo '    <ul>' . PHP_EOL;
-        $prereleaseArray = array_filter($cdnArray, "prerelease");
-        if (sizeof($prereleaseArray) === 0) {
-            array_walk($oldreleaseArray, 'print_links', 'empty_list');
-        } else if (sizeof($prereleaseArray) >= sizeof($oldreleaseArray)) {
-            array_walk($prereleaseArray, 'print_links', 'pre-release');
-        } else {
-            # pad prereleaseArray to size of oldreleaseArray
-            $arraySizeDiff = sizeof($oldreleaseArray) - sizeof($prereleaseArray);
-            for ($i = 1; $i <= $arraySizeDiff; $i++) {
-                $prereleaseArray[] = 'empty';
-            }
-            array_walk($prereleaseArray, 'print_links', 'pre-release');
-        }
-        echo '    </ul>' . PHP_EOL;
-        echo '</div>' . PHP_EOL;
-
-        # Create array for daily
-        echo '<div class="span-8">' . PHP_EOL;
-        echo '    <h2 class="subhead">Daily (For Development Community Use Only)</h2>' . PHP_EOL;
-        echo '    <ul>' . PHP_EOL;
-        $dailyArray = array_filter($cdnArray, "daily");
-        array_walk($dailyArray, 'print_links', 'daily');
-        echo '    </ul>' . PHP_EOL;
-        echo '</div>' . PHP_EOL;
-
         # Create array for OpenCart
-        echo '<div class="span-8">' . PHP_EOL;
+        echo '<div class="span-8 last">' . PHP_EOL;
         echo '    <h2 class="subhead">OpenCart Demo</h2>' . PHP_EOL;
         echo '    <ul>' . PHP_EOL;
         $opencartArray = array_filter($cdnArray, "opencart");
@@ -285,6 +253,35 @@
         array_walk($sandboxArray, 'print_links', 'sandbox');
         */
         echo '        <li><a href="http://traf-downloads.esgyn.com/trafodion_release.ova" target="_blank">trafodion_release.ova</a></li>' . PHP_EOL;
+        echo '    </ul>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+
+        # Create array for pre-release
+        echo '<div class="span-8 last">' . PHP_EOL;
+        echo '    <h2 class="subhead">Pre-Release</h2>' . PHP_EOL;
+        echo '    <ul>' . PHP_EOL;
+        $prereleaseArray = array_filter($cdnArray, "prerelease");
+        #if (sizeof($prereleaseArray) === 0) {
+        #    array_walk($oldreleaseArray, 'print_links', 'empty_list');
+        #} else if (sizeof($prereleaseArray) >= sizeof($oldreleaseArray)) {
+            array_walk($prereleaseArray, 'print_links', 'pre-release');
+        #} else {
+        #    # pad prereleaseArray to size of oldreleaseArray
+        #    $arraySizeDiff = sizeof($oldreleaseArray) - sizeof($prereleaseArray);
+        #    for ($i = 1; $i <= $arraySizeDiff; $i++) {
+        #        $prereleaseArray[] = 'empty';
+        #    }
+        #    array_walk($prereleaseArray, 'print_links', 'pre-release');
+        #}
+        echo '    </ul>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+
+        # Create array for daily
+        echo '<div class="span-16">' . PHP_EOL;
+        echo '    <h2 class="subhead">Daily (For Development Community Use Only)</h2>' . PHP_EOL;
+        echo '    <ul>' . PHP_EOL;
+        $dailyArray = array_filter($cdnArray, "daily");
+        array_walk($dailyArray, 'print_links', 'daily');
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
