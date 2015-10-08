@@ -98,26 +98,16 @@ sudo -n /sbin/sysctl vm.drop_caches=3
 # check memory before running Maven Phoenix Tests
 free -m
 
-# source in InstallEnv.sh
-source $WORKSPACE/InstallEnv.sh
+source_env test
 
 # check TEST_JDBC_TYPE and set TEST_JDBC_FILE based on it
 TEST_JDBC_TYPE=$(echo $TEST_JDBC_TYPE | tr "[:lower:]" "[:upper:]")
 if [ "$TEST_JDBC_TYPE" = "T4" ]; then
   TEST_JDBC_FILE="$WORKSPACE/clients/jdbc/lib/jdbcT4.jar"
 elif [ "$TEST_JDBC_TYPE" = "T2" ]; then
-  TEST_JDBC_FILE="$ILOC/export/lib/jdbcT2.jar"
-  if [[ -f $ILOC/export/lib64d/libseabasesig.so ]]; then export SQ_MBTYPE=64d; else export SQ_MBTYPE=64; fi
-  export LANG=en_US.UTF-8
-  export HADOOP_CNF_DIR="/etc/hadoop/conf"
-  export HBASE_CNF_DIR="/etc/hbase/conf"
-  export HIVE_CNF_DIR="/etc/hive/conf"
-  export MY_SQROOT="$ILOC"
-  export MPI_TMPDIR="$ILOC/tmp"
-  export HBASE_TRXDIR="$ILOC/export/lib"
-  export TMP_LD_PRELOAD="$JAVA_HOME/jre/lib/amd64/libjsig.so:$ILOC/export/lib${SQ_MBTYPE}/libseabasesig.so"
-  export LD_LIBRARY_PATH="$ILOC/export/lib${SQ_MBTYPE}:$JAVA_HOME/jre/lib/amd64/server"
-  export PATH="$JAVA_HOME/bin:$ILOC/export/bin${SQ_MBTYPE}:$PATH"
+  TEST_JDBC_FILE="$MY_SQROOT/export/lib/jdbcT2.jar"
+  export TMP_LD_PRELOAD="$JAVA_HOME/jre/lib/amd64/libjsig.so:$MY_SQROOT/export/lib${SQ_MBTYPE}/libseabasesig.so"
+  export PATH="$JAVA_HOME/bin:$PATH"
 else
   echo "ERROR: $TEST_JDBC_TYPE is not a valid JDBC type."
   echo "       T4 and T2 are the only valid JDBC types"
@@ -155,7 +145,7 @@ else
     cd $WORKSPACE/phx_test_run
 
     chmod -R +rX $WORKSPACE/$TRAF_DIR $WORKSPACE/$DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
-    sudo -n -u trafodion SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG HADOOP_CNF_DIR=$HADOOP_CNF_DIR \
+    sudo -n -u trafodion SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG HADOOP_CNF_DIR=$HADOOP_CNF_DIR TRAFODION_VER=$TRAFODION_VER \
 		HBASE_CNF_DIR=$HBASE_CNF_DIR HIVE_CNF_DIR=$HIVE_CNF_DIR MY_SQROOT=$MY_SQROOT HBASE_TRXDIR=$HBASE_TRXDIR \
 		MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$TMP_LD_PRELOAD LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
     		./phoenix_test.py $TARGS
@@ -173,7 +163,6 @@ cat $WORKSPACE/phx_test_run/target/surefire-reports/*.txt > $WORKSPACE/test_summ
 
 # Report on parent directory of $TRAF_DIR
 # Any core files means failure
-source_env test
 report_on_corefiles -u trafodion "${WORKSPACE}"
 coreCount=$?
 if [[ $coreCount -gt 0 ]]; then
