@@ -18,7 +18,6 @@
       - phoenix-jobs
       - jdbc_test-{dist}
       - pyodbc_test-{dist}
-      - install-stable-jobs
 
 - project:
     name: infra
