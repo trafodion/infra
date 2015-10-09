@@ -29,7 +29,7 @@ set -x
 /usr/local/bin/install-traf.sh "sqlregress" "$DIR" || exit 1
 
 # Hive suite depends on pre-loaded TPC-DS data
-if [[ "$SUITES" =~ hive ]]
+if [[ "$SUITES" =~ hive|core ]]
 then
     $WORKSPACE/traf_run/sql/scripts/install_hadoop_regr_test_env \
       --unpackDir=$WORKSPACE/tpcds-tool \

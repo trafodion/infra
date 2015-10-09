@@ -24,6 +24,8 @@
 Flavor="$1"
 # type of build
 BLD_PURPOSE="$2"
+# target branch
+Branch="$3"
 
 
 if [[ -z $BLD_PURPOSE ]]
@@ -60,10 +62,8 @@ fi
 # side-branch build?
 if [[ ${BLD_PURPOSE} =~ ^daily- ]]
 then
-  Branch=${BLD_PURPOSE#daily-}
   DestDir="publish/daily/$BLD"
 else
-  Branch=master  # time based on master, or label-specific
   if [[ ${BLD_PURPOSE} == daily ]]
   then
     DestDir="publish/daily/$BLD"
@@ -100,13 +100,10 @@ then
   #   change logs for release builds would be too large 
   #    ("No, there is too much. Let me sum up.")
   cd $workspace
-  for file in changes-core changes-dcs
-  do
-    if [[ -s $file ]] # non-empty
-    then
-      mv $file $DestDir/${file}-${BLD}.txt
-    fi
-  done
+  if [[ -s changes ]] # non-empty
+  then
+    mv changes $DestDir/changes-${BLD}.txt
+  fi
 fi
 
 cd $workspace

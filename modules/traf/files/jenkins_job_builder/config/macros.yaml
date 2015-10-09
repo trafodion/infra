@@ -16,23 +16,6 @@
 #
 # @@@ END COPYRIGHT @@@
 
-# use for single-repo workspace
-- builder:
-    name: gerrit-git-prep
-    builders:
-      - shell: "/usr/local/jenkins/slave_scripts/gerrit-git-prep.sh https://review.trafodion.org http://zuul.trafodion.org https://review.trafodion.org/p"
-
-# use for multiple-repo workspace
-- builder:
-    name: multi-git-prep
-    builders:
-      - shell: "/usr/local/bin/git-prep-multi-repo.sh {repos}"
-
-- builder:
-    name: multi-git-stable
-    builders:
-      - shell: "/usr/local/bin/git-prep-multi-repo.sh -b {branch} {repos}"
-
 # use for combined repo
 - builder:
     name: single-git-prep
@@ -75,7 +58,7 @@
 - builder:
     name: get-build
     builders:
-      - shell: "/usr/local/bin/find-build-job.sh build-{flavor}"
+      - shell: "/usr/local/bin/find-build-job.sh build-{branch}-{flavor}"
       - inject:
           properties-file: bld.properties
       - copyartifact:
@@ -108,12 +91,7 @@
 - builder:
     name: stage-traf
     builders:
-      - shell: "/usr/local/bin/stage-traf.sh {flavor} {btype}"
-
-- builder:
-    name: stage-install
-    builders:
-      - shell: "/usr/local/bin/stage-install.sh"
+      - shell: "/usr/local/bin/stage-traf.sh {flavor} {btype} {branch}"
 
 - builder:
     name: sql-regress
@@ -192,7 +170,7 @@
           else
               echo "The following un-ignored files were created during the test:"
               echo "$OUT"
-              exit 0  # TODO: change to 1 to fail tests.
+              exit 1
           fi
 
 - builder:

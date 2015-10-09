@@ -19,6 +19,12 @@
     name: 'core-regress-{suite}-{dist}'
     node: 'redhat_{dist}'
 
+    parameters:
+      - string:
+          name: BRANCH
+      - string:
+          name: LOG_PATH
+
     wrappers:
       - timeout:
           timeout: 200
@@ -32,6 +38,7 @@
       - clean-testspace
       - get-build:
            flavor: "release"
+           branch: "$BRANCH"
       - sql-regress:
            dir: "./trafodion/core"
            suites: "{suite}"
@@ -84,6 +91,12 @@
     name: 'phoenix_{type}_{jdbcDriverType}-{dist}'
     node: 'redhat_{dist}'
 
+    parameters:
+      - string:
+          name: BRANCH
+      - string:
+          name: LOG_PATH
+
     wrappers:
       - timeout:
           timeout: 300
@@ -97,6 +110,7 @@
       - clean-testspace
       - get-build:
            flavor: "debug"
+           branch: "$BRANCH"
       - shell: |
            cd trafodion
            tar xf distribution/phoenix-tests.tgz
@@ -123,9 +137,20 @@
 # For pyodbc_test* jobs parameter tests1 should contain a list of tests seperated by a space. For instance : test_p2.ConnectTest.test11 test_p2.ConnectTest.test12
 # If parameter tests1 is "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the pyodbc tests will run.  This should only be used in pyodbc_test-experimental if pyodbc_test is running all tests.
+- job-group:
+    name: 'pyodbc_test-jobs'
+    jobs:
+      - 'pyodbc_test-{dist}':
+
 - job-template:
     name: 'pyodbc_test-{dist}'
     node: 'redhat_{dist}'
+
+    parameters:
+      - string:
+          name: BRANCH
+      - string:
+          name: LOG_PATH
 
     wrappers:
       - timeout:
@@ -140,6 +165,7 @@
       - clean-testspace
       - get-build:
            flavor: "debug"
+           branch: "$BRANCH"
       - shell: |
            cd trafodion
            tar xf distribution/dcs-tests.tgz
@@ -162,9 +188,20 @@
 # If parameter tests1 is "" then all tests will be run
 # If parameter tests1 = DONT_RUN_TESTS then none of the jdbc tests will run.
 # This should only be used in jdbc_test-experimental if jdbc_test is running all tests.
+- job-group:
+    name: 'jdbc_test-jobs'
+    jobs:
+      - 'jdbc_test-{dist}':
+
 - job-template:
     name: 'jdbc_test-{dist}'
     node: 'redhat_{dist}'
+
+    parameters:
+      - string:
+          name: BRANCH
+      - string:
+          name: LOG_PATH
 
     wrappers:
       - timeout:
@@ -179,6 +216,7 @@
       - clean-testspace
       - get-build:
            flavor: "debug"
+           branch: "$BRANCH"
       - shell: |
            cd trafodion
            tar xf distribution/dcs-tests.tgz
@@ -195,4 +233,3 @@
       - jdbc_test-log
       - copy-system-logs
       - traf-runtime-log
-

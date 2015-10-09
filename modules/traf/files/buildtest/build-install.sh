@@ -30,6 +30,13 @@ cd $WORKSPACE/trafodion/install || exit 2
 
 # Save build version info into package
 cp ../build-version.txt ./installer/build-version-${BLD}.txt
+# exclude this file from git status so we don't contaminate the environment.
+# check-git-status.sh script will verify no extraneous files are created.
+if ! grep -q build-version-${BLD}.txt ../.git/info/exclude
+then
+  echo "build-version-${BLD}.txt" >> ../.git/info/exclude
+fi
+
 
 make all
 

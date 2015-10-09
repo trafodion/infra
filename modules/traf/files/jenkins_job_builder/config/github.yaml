@@ -1,7 +1,17 @@
 # To-Do: add Check-Full-PR job to be triggered only on phrase
 
-- job:
+- job-group:
     name: 'Check-PR'
+    branch:
+     - master:
+         cmver: "5.3"
+         hwver: "2.2"
+
+    jobs:
+      - 'Check-PR-{branch}'
+
+- job-template:
+    name: 'Check-PR-{branch}'
     node: 'master'
     project-type: multijob
 
@@ -21,10 +31,10 @@
           skip-tag: true
           refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
           branches: 
-            - 'origin/pr/${ghprbPullId}/head'
+            - 'origin/pr/$ghprbPullId/head'
           changelog-against:
             remote: origin
-            branch: '${ghprbTargetBranch}'
+            branch: '$ghprbTargetBranch'
 
     triggers:
       - github-pull-request:
@@ -44,6 +54,8 @@
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
+          white-list-target-branches:
+            - '{branch}'
 
     builders:
       - link-logs
@@ -58,57 +70,73 @@
       - multijob:
           name: build_test
           projects:
-            - name: "build-debug"
+            - name: "build-{branch}-debug"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-debug
+                 LOG_PATH=$LOG_PATH/build-{branch}-debug
                  BUILD_TYPE=check
-            - name: "build-release"
+            - name: "build-{branch}-release"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-release
+                 LOG_PATH=$LOG_PATH/build-{branch}-release
                  BUILD_TYPE=check
-            - name: "pyodbc_test-cm5.3"
+            - name: "pyodbc_test-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/pyodbc_test-cm5.3
-            - name: "phoenix_quick_T4-ahw2.2"
+                 LOG_PATH=$LOG_PATH/pyodbc_test-cm{cmver}
+                 BRANCH={branch}
+            - name: "phoenix_quick_T4-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_quick_T4-ahw2.2
-            - name: "jdbc_test-cm5.3"
+                 LOG_PATH=$LOG_PATH/phoenix_quick_T4-ahw{hwver}
+                 BRANCH={branch}
+            - name: "jdbc_test-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/jdbc_test-cm5.3
-            - name: "core-regress-seabase-ahw2.2"
+                 LOG_PATH=$LOG_PATH/jdbc_test-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-seabase-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-seabase-ahw2.2
-            - name: "core-regress-core-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-seabase-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-core-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-core-ahw2.2
+                 LOG_PATH=$LOG_PATH/regress-core-ahw{hwver}
+                 BRANCH={branch}
 
     publishers:
       - console-log
 
 
-- job:
+- job-group:
     name: 'Check-Daily'
+    branch:
+     - master:
+         timespec: "30 8 * * *"
+         cmver: "5.3"
+         hwver: "2.2"
+
+    jobs:
+     - 'Check-Daily-{branch}'
+     
+- job-template:
+    name: 'Check-Daily-{branch}'
     node: 'master'
     project-type: multijob
 
     parameters:
       - string:
           name: LOG_PATH
-          default: 'Daily/$BUILD_ID'
+          default: 'Daily-{branch}/$BUILD_ID'
 
     properties:
       - github:
@@ -120,189 +148,220 @@
           wipe-workspace: false
           skip-tag: true
           branches: 
-            - 'remotes/origin/master'
+            - 'remotes/origin/{branch}'
 
     triggers:
-      - timed: "30 8 * * *"
+      - timed: "{timespec}"
 
     builders:
       - link-logs
       - multijob:
           name: build_test
           projects:
-            - name: "build-debug"
+            - name: "build-{branch}-debug"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-debug
+                 LOG_PATH=$LOG_PATH/build-{branch}-debug
                  BUILD_TYPE=daily
-            - name: "build-release"
+            - name: "build-{branch}-release"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-release
+                 LOG_PATH=$LOG_PATH/build-{branch}-release
                  BUILD_TYPE=daily
-            - name: "core-regress-core-ahw2.2"
+            - name: "core-regress-core-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-core-ahw2.2
-            - name: "core-regress-seabase-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-core-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-seabase-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-seabase-ahw2.2
-            - name: "pyodbc_test-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-seabase-ahw{hwver}
+                 BRANCH={branch}
+            - name: "pyodbc_test-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/pyodbc_test-ahw2.2
-            - name: "core-regress-charsets-ahw2.2"
+                 LOG_PATH=$LOG_PATH/pyodbc_test-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-charsets-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-charsets-ahw2.2
-            - name: "core-regress-qat-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-charsets-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-qat-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-qat-ahw2.2
-            - name: "core-regress-udr-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-qat-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-udr-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-udr-ahw2.2
-            - name: "core-regress-catman1-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-udr-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-catman1-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-catman1-ahw2.2
-            - name: "core-regress-compGeneral-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-catman1-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-compGeneral-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-compGeneral-ahw2.2
-            - name: "core-regress-executor-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-compGeneral-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-executor-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-executor-ahw2.2
-            - name: "core-regress-fullstack2-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-executor-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-fullstack2-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-fullstack2-ahw2.2
-            - name: "core-regress-hive-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-fullstack2-ahw{hwver}
+                 BRANCH={branch}
+            - name: "core-regress-hive-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-hive-ahw2.2
-            - name: "phoenix_part1_T4-ahw2.2"
+                 LOG_PATH=$LOG_PATH/regress-hive-ahw{hwver}
+                 BRANCH={branch}
+            - name: "phoenix_part1_T4-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_part1_T4-ahw2.2
-            - name: "phoenix_part2_T4-ahw2.2"
+                 LOG_PATH=$LOG_PATH/phoenix_part1_T4-ahw{hwver}
+                 BRANCH={branch}
+            - name: "phoenix_part2_T4-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_part2_T4-ahw2.2
-            - name: "phoenix_part1_T2-ahw2.2"
+                 LOG_PATH=$LOG_PATH/phoenix_part2_T4-ahw{hwver}
+                 BRANCH={branch}
+            - name: "phoenix_part1_T2-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_part1_T2-ahw2.2
-            - name: "phoenix_part2_T2-ahw2.2"
+                 LOG_PATH=$LOG_PATH/phoenix_part1_T2-ahw{hwver}
+                 BRANCH={branch}
+            - name: "phoenix_part2_T2-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_part2_T2-ahw2.2
-            - name: "jdbc_test-ahw2.2"
+                 LOG_PATH=$LOG_PATH/phoenix_part2_T2-ahw{hwver}
+                 BRANCH={branch}
+            - name: "jdbc_test-ahw{hwver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/jdbc_test-ahw2.2
+                 LOG_PATH=$LOG_PATH/jdbc_test-ahw{hwver}
+                 BRANCH={branch}
 #   Cloudera Jobs
-            - name: "core-regress-core-cm5.3"
+            - name: "core-regress-core-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-core-cm5.3
-            - name: "core-regress-seabase-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-core-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-seabase-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-seabase-cm5.3
-            - name: "pyodbc_test-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-seabase-cm{cmver}
+                 BRANCH={branch}
+            - name: "pyodbc_test-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/pyodbc_test-cm5.3
-            - name: "core-regress-charsets-cm5.3"
+                 LOG_PATH=$LOG_PATH/pyodbc_test-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-charsets-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-charsets-cm5.3
-            - name: "core-regress-qat-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-charsets-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-qat-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-qat-cm5.3
-            - name: "core-regress-udr-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-qat-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-udr-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-udr-cm5.3
-            - name: "core-regress-catman1-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-udr-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-catman1-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-catman1-cm5.3
-            - name: "core-regress-compGeneral-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-catman1-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-compGeneral-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-compGeneral-cm5.3
-            - name: "core-regress-executor-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-compGeneral-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-executor-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-executor-cm5.3
-            - name: "core-regress-fullstack2-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-executor-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-fullstack2-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-fullstack2-cm5.3
-            - name: "core-regress-hive-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-fullstack2-cm{cmver}
+                 BRANCH={branch}
+            - name: "core-regress-hive-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/regress-hive-cm5.3
-            - name: "phoenix_part1_T4-cm5.3"
+                 LOG_PATH=$LOG_PATH/regress-hive-cm{cmver}
+                 BRANCH={branch}
+            - name: "phoenix_part1_T4-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_part1_T4-cm5.3
-            - name: "phoenix_part2_T4-cm5.3"
+                 LOG_PATH=$LOG_PATH/phoenix_part1_T4-cm{cmver}
+                 BRANCH={branch}
+            - name: "phoenix_part2_T4-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_part2_T4-cm5.3
-            - name: "phoenix_part1_T2-cm5.3"
+                 LOG_PATH=$LOG_PATH/phoenix_part2_T4-cm{cmver}
+                 BRANCH={branch}
+            - name: "phoenix_part1_T2-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_part1_T2-cm5.3
-            - name: "phoenix_part2_T2-cm5.3"
+                 LOG_PATH=$LOG_PATH/phoenix_part1_T2-cm{cmver}
+                 BRANCH={branch}
+            - name: "phoenix_part2_T2-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/phoenix_part2_T2-cm5.3
-            - name: "jdbc_test-cm5.3"
+                 LOG_PATH=$LOG_PATH/phoenix_part2_T2-cm{cmver}
+                 BRANCH={branch}
+            - name: "jdbc_test-cm{cmver}"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=${LOG_PATH}/jdbc_test-cm5.3
+                 LOG_PATH=$LOG_PATH/jdbc_test-cm{cmver}
 
     publishers:
       - console-log
@@ -315,19 +374,20 @@
           recipients: dev@trafodion.incubator.apache.org
           reply-to: no-reply@trafodion.org
           content-type: "text"
-          subject: Trafodion Daily Test Result - $BUILD_ID
+          subject: Trafodion {branch} Daily Test Result - $BUILD_ID
           save-output: true
           always: true
           failure: false
           body: |
-            Daily Automated Testing
+            Daily Automated Testing {branch}
 
             Jenkins Job:   $BUILD_URL
             Archived Logs: http://traf-logs.esgyn.com/$LOG_PATH
+            Bld Downloads: http://traf-downloads.esgyn.com
             
             Changes since previous daily build:
-            ${CHANGES}
+            $CHANGES
             
             Test Job Results:
             
-            ${FILE,path="build_result.txt"}
+            ${{FILE,path="build_result.txt"}}

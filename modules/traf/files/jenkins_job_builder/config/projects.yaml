@@ -3,9 +3,7 @@
     github-org: apache
 
     dist:
-      - "cm5.1"
       - "cm5.3"
-      - "ahw2.1"
       - "ahw2.2"
 
     jobs:
@@ -16,16 +14,5 @@
       - core-regress-suites
       - core-regress-req
       - phoenix-jobs
-      - jdbc_test-{dist}
-      - pyodbc_test-{dist}
-
-- project:
-    name: infra
-    github-org: trafodion
-
-    jobs:
-      - gate-{name}-puppet-lint
-      - gate-{name}-puppet-syntax
-      - gate-{name}-check-for-binary
-      - gate-{name}-jjb-lint
-
+      - jdbc_test-jobs
+      - pyodbc_test-jobs

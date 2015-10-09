@@ -29,7 +29,7 @@
 
 
 # job name (jenkins "project") of top-level job
-PROJ_NAME="Check-PR"
+PROJ_NAME="$JOB_NAME"
 
 # jenkins server data cmd - jenkins provides JENKINS_URL
 API="curl -s $JENKINS_URL/job/$PROJ_NAME"

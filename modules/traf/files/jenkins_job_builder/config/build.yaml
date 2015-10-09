@@ -3,12 +3,14 @@
     flavor:
       - "release"
       - "debug"
+    branch:
+      - "master"
 
     jobs:
-      - build-{flavor}
+      - build-{branch}-{flavor}
 
 - job-template:
-    name: 'build-{flavor}'
+    name: 'build-{branch}-{flavor}'
     node: 'traf_bld'
 
     parameters:
@@ -22,8 +24,9 @@
     builders:
       - link-logs
       - clean-buildspace
-      - single-git-prep:
+      - single-git-stable:
            repos: "apache/incubator-trafodion"
+           branch: "{branch}"
       - pkg-traf:
            flavor: "{flavor}"
       - check-build:
@@ -37,6 +40,7 @@
       - stage-traf:
            flavor: "{flavor}"
            btype: "$BUILD_TYPE"
+           branch: "{branch}"
 
     publishers:
       - traf-upload-to-cdn
@@ -102,20 +106,6 @@
 
 # Simple file type check can run on master
 # Does not need to be exclusive
-- job-template:
-    name: 'gate-{name}-check-for-binary'
-    node: master
-
-    builders:
-      - link-logs
-      - gerrit-git-prep
-      - assert-no-binary-files:
-           gitdir: "."
-      - assert-no-bad-source-files:
-           gitdir: "."
-
-    publishers:
-      - console-log
 
 - job:
     name: 'static-checks'

@@ -42,7 +42,7 @@ LOGLOC="http://traf-logs.esgyn.com/buildvers"
 LOGFILE="Versions-${BRANCH}-${PURPOSE}-${FLAVOR}.txt"
 
 cd $WORKSPACE
-rm -f Previous_Version changes-*
+rm -f Previous_Version changes
 
 echo "Retrieving Previous_Version file ($LOGFILE)"
 
@@ -78,7 +78,7 @@ else
   do
     newcommit=$(grep ^$repo $WORKSPACE/Code_Versions | cut -d " " -f 2)
     cd $WORKSPACE/trafodion
-    git log ${commit}..${newcommit} > $WORKSPACE/changes-${repo#apache/}
+    git log ${commit}..${newcommit} > $WORKSPACE/changes
   done
   exit 0
 fi
