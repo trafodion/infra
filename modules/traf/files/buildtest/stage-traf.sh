@@ -112,18 +112,18 @@ fi
 cd $workspace
 
 # installer
-install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/installer*gz)
+install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/installer*gz 2>/dev/null)
 cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  || exit 2
 
 # clients tarfile
-client=$(ls ./trafodion/core/trafodion_clients-*.tgz ./trafodion/distribution/trafodion_clients-*.tgz)
+client=$(ls ./trafodion/distribution/trafodion_clients-*.tgz)
 cp $client ./$DestDir/apache-trafodion-clients$FileSuffix  || exit 2
 
 # core and dcs in server tarfile
-server=$(ls ./trafodion/core/trafodion_server-*.tgz ./trafodion/distribution/trafodion_server-*.tgz)
+server=$(ls ./trafodion/distribution/trafodion_server-*.tgz)
 cp $server collect/  || exit 2
 # rest added in 1.1 release
-rest=$(ls trafodion/core/rest/target/rest-*gz trafodion/distribution/rest-*gz 2>/dev/null)
+rest=$(ls trafodion/distribution/rest-*gz 2>/dev/null)
 if [[ -f "$rest" ]]
 then
   rbase=$(basename $rest .tar.gz)
@@ -131,7 +131,7 @@ then
 fi
 
 # change suffix from tar.gz to tgz
-dcs=$(ls trafodion/dcs/target/dcs*gz trafodion/distribution/dcs*gz)
+dcs=$(ls trafodion/distribution/dcs-[0-9]*gz)
 dcsbase=$(basename $dcs .tar.gz)
 cp $dcs collect/${dcsbase}.tgz  || exit 2
 
