@@ -81,13 +81,7 @@ else
     LDAP=""
   fi
   cd $WORKSPACE
-  # Old/New Port
-  if [[ -f $TRAF_DIR/sqf/sql/scripts/dcscheck ]]
-  then
-    dcsport=23400
-  else
-    dcsport=37800
-  fi
+  dcsport=23400
 
   ulimit -c unlimited
   if [ -z $SKIPSTART ]; then /usr/local/bin/install-traf.sh $LDAP "$TRAF_DIR" "$DCS_INSTALL_DIR" "$NUM_DCS" "installdrivers" || exit 1; fi

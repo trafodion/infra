@@ -91,13 +91,7 @@ fi
 
 if [ -z $SKIPSTART ]; then /usr/local/bin/install-traf.sh $LDAP "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" "installdrivers" || exit 1; fi
 
-# Old/New Port
-if [[ -f $TRAF_DIR/sqf/sql/scripts/dcscheck ]]
-then
-  dcsport=23400
-else
-  dcsport=37800
-fi
+dcsport=23400
 
 # run jdbc_test
 log_banner "jdbc_test.py"

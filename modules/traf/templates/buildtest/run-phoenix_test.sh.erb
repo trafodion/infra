@@ -122,13 +122,7 @@ if [ "$TESTS" = "DONT_RUN_TESTS" ]; then
   echo "INFO: Will NOT run any phoenix tests as requested. You should not see this message in the normal Jenkins job phoenix_test! This should only be used to turn off testing of the experimetal jobs."
   phoenixRes=0
 else
-  # Old/New Port
-  if [[ -f $TRAF_DIR/sqf/sql/scripts/dcscheck ]]
-  then
-    dcsport=23400
-  else
-    dcsport=37800
-  fi
+  dcsport=23400
 
   TARGS="--target=localhost:$dcsport --user=<%= jenkins_test_user %> --pw=<%= jenkins_test_password %>"
   TARGS+=" --targettype=TR --javahome=$JAVA_HOME"
