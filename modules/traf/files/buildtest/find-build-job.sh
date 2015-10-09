@@ -19,14 +19,14 @@
 
 
 # Find job with build artifacts that matches our job
-# based on:
-#   ghprbActualCommit
+# based on environment:
+#   ghprbActualCommit - check builds
 #     or
-#   (TBD: tags)
+#   PULL_NUM - on demand tests
+#     or
+#   TAG - release builds
 #     or
 #   date portion of BUILD_ID (for TIMER triggered)
-#     or
-#   PULL_NUM (for MANUAL triggered)
 #
 # Waits on build job to be complete.
 #
@@ -72,40 +72,44 @@ do
     if [[ -n "$ghprbActualCommit" ]]
     then
       bld_chgs=$($API/$Bld/api/json | 
-	  jq -r '.actions[].parameters[] | select(.name == "ghprbActualCommit").value' 2>/dev/null)
+	jq -r '.actions[].parameters[] | select(.name == "ghprbActualCommit").value' 2>/dev/null)
       if [[ $bld_chgs == $ghprbActualCommit ]]
       then
         MyBuild=$Bld
-	break 2
-      fi
-# To-Do -- tagged builds
-    # or do we have a tagged build?
-#    elif [[ -n "$ZUUL_REF" ]]
-#    then
-#      bld_ref=$($API/$Bld/api/json | 
-#	  jq -r '.actions[].parameters[] | select(.name == "ZUUL_REF").value' 2>/dev/null)
-#      if [[ $bld_ref == $ZUUL_REF ]]
-#      then
-#        MyBuild=$Bld
-#	break 2
-#      fi
-    # otherwise look for our Daily Build job and date
-    # assumes both build and test job got initiated on same date
-    elif [[ "$ROOT_BUILD_CAUSE" == "TIMERTRIGGER" ]]
-    then
-      bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_ID' 2>/dev/null)
-      if [[ ${bld_date%_*} == ${BUILD_ID%_*} ]]
-      then
-        MyBuild=$Bld
+	echo "Found ActualCommit: $ghprbActualCommit"
         break 2
       fi
-    elif [[ "$ROOT_BUILD_CAUSE" == "MANUALTRIGGER" ]]
+    elif [[ -n "$TAG" ]]
+    then
+      bld_ref=$($API/$Bld/api/json |
+          jq -r '.actions[].parameters[] | select(.name == "TAG").value' 2>/dev/null)
+      if [[ $bld_ref == $TAG ]]
+      then
+        MyBuild=$Bld
+        echo "Found Tag: $TAG"
+        break 2
+      fi
+    elif [[ -n "$PULL_NUM" ]]
     then
       # look for build previously triggered by PR (ghprb)
       bld_ref=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.ghprbPullId' 2>/dev/null)
       if [[ $bld_ref == "$PULL_NUM" ]]
       then
         MyBuild=$Bld
+	echo "Found PullReq: $PULL_NUM"
+        break 2
+      fi
+    else
+      bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_ID' 2>/dev/null)
+      if [[ ${bld_date%_*} == ${BUILD_ID%_*} ]]
+      then
+        MyBuild=$Bld
+        if [[ "$ROOT_BUILD_CAUSE" == "TIMERTRIGGER" ]]
+        then
+          echo "Found Timer Date: $bld_date"
+        else
+          echo "Found Assumed Timer Date: $bld_date"
+        fi
         break 2
       fi
     else
