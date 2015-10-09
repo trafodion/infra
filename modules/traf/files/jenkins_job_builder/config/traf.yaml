@@ -95,10 +95,11 @@
       - check-node
       - kill-traf
       - clean-testspace
-      - single-git-prep:
-           repos: "apache/incubator-trafodion"
       - get-build:
            flavor: "debug"
+      - shell: |
+           cd trafodion
+           tar xf distribution/phoenix-tests.tgz
       - run-phoenix_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
@@ -114,7 +115,6 @@
       - post-check-node
       - phoenix-xunit
       - console-log
-      - git-log
       - phoenix_test-log
       - copy-system-logs
       - traf-runtime-log
@@ -138,10 +138,11 @@
       - check-node
       - kill-traf
       - clean-testspace
-      - single-git-prep:
-           repos: "apache/incubator-trafodion"
       - get-build:
            flavor: "debug"
+      - shell: |
+           cd trafodion
+           tar xf distribution/dcs-tests.tgz
       - run-pyodbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
@@ -151,7 +152,6 @@
     publishers:
       - post-check-node
       - console-log
-      - git-log
       - pyodbc_test-log
       - copy-system-logs
       - traf-runtime-log
@@ -177,10 +177,11 @@
       - check-node
       - kill-traf
       - clean-testspace
-      - single-git-prep:
-           repos: "apache/incubator-trafodion"
       - get-build:
            flavor: "debug"
+      - shell: |
+           cd trafodion
+           tar xf distribution/dcs-tests.tgz
       - run-jdbc_test:
            trafCoreDir: "trafodion/core"
            dcsDir: "trafodion/dcs"
@@ -191,7 +192,6 @@
       - post-check-node
       - jdbc-xunit
       - console-log
-      - git-log
       - jdbc_test-log
       - copy-system-logs
       - traf-runtime-log
