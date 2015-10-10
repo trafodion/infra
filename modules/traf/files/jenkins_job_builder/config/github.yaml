@@ -44,6 +44,7 @@
           admin-list:
             - svarnau
             - alchen99
+          trigger-phrase: .*[jJ]enkins,?\W+(re)?test.*
           white-list:
             - nonstop-qfchen
             - selvaganesang
@@ -51,11 +52,18 @@
             - HowardQin
             - anoopsharma00
             - hegdean
+            - ryzuo
+            - radumarias
+            - narendragoyal
+            - arvind-narain
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
           white-list-target-branches:
             - '{branch}'
+          success-comment: "Test Passed.  $BUILD_URL"
+          failure-comment: "Test Failed.  $BUILD_URL"
+          error-comment: "Test Error.  $BUILD_URL"
 
     builders:
       - link-logs
