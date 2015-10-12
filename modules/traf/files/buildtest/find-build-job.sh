@@ -100,21 +100,23 @@ do
         break 2
       fi
     else
-      bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_ID' 2>/dev/null)
-      if [[ ${bld_date%_*} == ${BUILD_ID%_*} ]]
+      bld_type=$($API/$Bld/api/json | 
+	jq -r '.actions[].parameters[] | select(.name == "BUILD_TYPE").value' 2>/dev/null)
+      if [[ $bld_type == "daily" ]]
       then
-        MyBuild=$Bld
-        if [[ "$ROOT_BUILD_CAUSE" == "TIMERTRIGGER" ]]
+        bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_ID' 2>/dev/null)
+        if [[ ${bld_date%_*} == ${BUILD_ID%_*} ]]
         then
-          echo "Found Timer Date: $bld_date"
-        else
-          echo "Found Assumed Timer Date: $bld_date"
+          MyBuild=$Bld
+          if [[ "$ROOT_BUILD_CAUSE" == "TIMERTRIGGER" ]]
+          then
+            echo "Found Timer Date: $bld_date"
+          else
+            echo "Found Assumed Timer Date: $bld_date"
+          fi
+          break 2
         fi
-        break 2
       fi
-    else
-      echo "Unsupported build type"
-      exit 2
     fi
 
     Bld=$(( $Bld - 1))
