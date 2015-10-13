@@ -370,6 +370,7 @@
               kill-phase-on: NEVER
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/jdbc_test-cm{cmver}
+                 BRANCH={branch}
 
     publishers:
       - console-log
