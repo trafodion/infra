@@ -81,6 +81,10 @@
           default: ""
           description: "Blank for manual build; check, daily, pre-release, release"
       - string:
+          name: BRANCH
+          desription: "Branch tagged"
+          default: "master"
+      - string:
           name: TAG
           desription: "Git tag to build against"
 
@@ -96,6 +100,7 @@
       - stage-traf:
            flavor: "release"
            btype: "$BUILD_TYPE"
+           branch: "$BRANCH"
 
     publishers:
       - traf-upload-to-cdn
