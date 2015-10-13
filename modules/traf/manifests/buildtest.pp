@@ -71,6 +71,7 @@ class traf::buildtest (
       'unixODBC', 'unixODBC-devel', 'libiodbc', 'libiodbc-devel',
       'protobuf-compiler', 'protobuf-devel', 'xerces-c-devel',
       'zlib-devel', 'bzip2-devel', 'ncurses-devel', 'tk-devel', 'gdbm-devel', 'db4-devel', 'libpcap-devel',
+      'cmake',
     ]
 
     # Use exec to run yum groupinstall since it is not
