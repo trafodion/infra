@@ -52,7 +52,7 @@ class traf::dev (
 
 
 
-  package { ['emacs','gitk']:
+  package { ['emacs','gitk','gedit']:
     ensure => present,
   }
   # work-around for group install
