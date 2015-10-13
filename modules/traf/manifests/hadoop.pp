@@ -22,6 +22,8 @@ class traf::hadoop (
       'CM5.1':  { $slavename = 'slave-cm51' }
       'AHW2.2': { $slavename = 'slave-ahw22' }
       'CM5.3':  { $slavename = 'slave-cm53' }
+      'AHW2.3': { $slavename = 'slave-ahw23' }
+      'CM5.4':  { $slavename = 'slave-cm54' }
       default:  { $slavename = 'slave' }
     }
     host { "${slavename}.trafodion.org" :
@@ -69,8 +71,10 @@ class traf::hadoop (
   case $distro {
     'AHW2.1': { $distro_ver = 'HDP-2.1' }
     'AHW2.2': { $distro_ver = 'HDP-2.2' }
+    'AHW2.3': { $distro_ver = 'HDP-2.3' }
     'CM5.1':  { $distro_ver = '5.1.4' }
     'CM5.3':  { $distro_ver = '5.3.1' }
+    'CM5.4':  { $distro_ver = '5.4.4' }
     default:  { $distro_ver = 'None' } #cluster script will error out on this
   }
   # Cloudera Manager distros
@@ -138,6 +142,13 @@ class traf::hadoop (
     class {'traf::hive_metastore':
       hive_sql_pw     => 'insecure_hive',
       hive_schema_ver => '0.13.0',
+      require         => Class['::cloudera'],
+    }
+  }
+  if $distro == 'CM5.4' {
+    class {'traf::hive_metastore':
+      hive_sql_pw     => 'insecure_hive',
+      hive_schema_ver => '1.1.0',
       require         => Class['::cloudera'],
     }
   }

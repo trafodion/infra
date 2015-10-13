@@ -146,6 +146,17 @@ node /^slave-cm53-\d+\.\d+\.\d+\.\d+$/ {
     certname  => "slave-cm53-${::ipaddress}",
   }
 }
+node /^slave-cm54-\d+\.\d+\.\d+\.\d+$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'CM5.4',
+    certname  => "slave-cm54-${::ipaddress}",
+  }
+}
 
 # Ambari HortonWorks
 node /^slave-ahw21-\d\d.trafodion.org$/ {
@@ -188,6 +199,17 @@ node /^slave-ahw22-\d+\.\d+\.\d+\.\d+$/ {
     sysadmins => hiera('sysadmins'),
     distro    => 'AHW2.2',
     certname  => "slave-ahw22-${::ipaddress}",
+  }
+}
+node /^slave-ahw23-\d+\.\d+\.\d+\.\d+$/ {
+  include traf
+  include traf::puppet_cron
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'AHW2.3',
+    certname  => "slave-ahw23-${::ipaddress}",
   }
 }
 
