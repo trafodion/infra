@@ -179,9 +179,18 @@
       - shell: |
           #!/bin/sh
           if test "$LOG_PATH" ; then
-              echo "Detailed logs: http://traf-logs.esgyn.com/$LOG_PATH/"
+              echo "***"
+              echo "***"
+              echo "***"
+              echo "*** Detailed logs: http://traf-logs.esgyn.com/$LOG_PATH/"
+              echo "***"
+              echo "***"
+              echo "***"
           fi
-          echo "Jenkins build: $BUILD_URL"
+          echo "***"
+          echo "*** Jenkins build: $BUILD_URL"
+          echo "***"
+          echo "***"
 
 
 # ======================================================================
