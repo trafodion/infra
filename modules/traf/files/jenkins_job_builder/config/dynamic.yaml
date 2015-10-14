@@ -1,0 +1,139 @@
+# To-Do: add Check-Full-PR job to be triggered only on phrase
+
+- job-group:
+    name: 'DynCheck-PR'
+    branch:
+     - stable1.1
+
+    jobs:
+      - 'DynCheck-PR-{branch}'
+
+- job-template:
+    name: 'DynCheck-PR-{branch}'
+    node: 'master'
+    project-type: multijob
+
+    parameters:
+      - string:
+          name: LOG_PATH
+          default: 'PullReq/$ghprbPullId/$BUILD_NUMBER'
+
+    properties:
+      - github:
+          url: https://github.com/apache/incubator-trafodion
+
+    scm:
+      - git:
+          url: https://github.com/apache/incubator-trafodion
+          wipe-workspace: false
+          skip-tag: true
+          refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
+          branches: 
+            - 'origin/pr/$ghprbPullId/head'
+          changelog-against:
+            remote: origin
+            branch: '$ghprbTargetBranch'
+
+    triggers:
+      - github-pull-request:
+          # check for new PR every few minutes
+          cron: H/6 * * * *
+          # github user names for test approval
+          admin-list:
+            - svarnau
+            - alchen99
+          trigger-phrase: .*[jJ]enkins,?\W+(re)?test.*
+          white-list:
+            - nonstop-qfchen
+            - selvaganesang
+            - xwq
+            - HowardQin
+            - anoopsharma00
+            - hegdean
+            - ryzuo
+            - radumarias
+            - narendragoyal
+            - arvind-narain
+          allow-whitelist-orgs-as-admins: true
+          org-list:
+            - trafodion-contributors
+          white-list-target-branches:
+            - 'stable/1.1'
+          success-comment: "Test Passed.  $BUILD_URL"
+          failure-comment: "Test Failed.  $BUILD_URL"
+          error-comment: "Test Error.  $BUILD_URL"
+
+    builders:
+      - link-logs
+      - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh
+      - shell: "/usr/local/bin/supported-distro.sh ."
+      - inject:
+          properties-file: distro.properties
+      - multijob:
+          name: static
+          projects:
+            - name: "static-checks"
+              current-parameters: true
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/static-checks
+      - multijob:
+          name: build_test
+          projects:
+            - name: "build-master-debug"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/build-master-debug
+                 BUILD_TYPE=check
+            - name: "pyodbc_test-cdh"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/pyodbc_test-cdh
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+
+    publishers:
+      - console-log
+
+- job:
+    name: 'pyodbc_test-cdh'
+
+    parameters:
+      - string:
+          name: BRANCH
+      - string:
+          name: LOG_PATH
+      - label:
+          name: NODE_TYPE
+
+    wrappers:
+      - timeout:
+          timeout: 100
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - check-node
+      - kill-traf
+      - clean-testspace
+      - get-build:
+           flavor: "debug"
+           branch: "$BRANCH"
+      - shell: |
+           cd trafodion
+           tar xf distribution/dcs-tests.tgz
+      - run-pyodbc_test:
+           trafCoreDir: "trafodion/core"
+           dcsDir: "trafodion/dcs"
+           testDir: "trafodion/dcs/src/test/pytests"
+           tests1: ""
+
+    publishers:
+      - post-check-node
+      - console-log
+      - pyodbc_test-log
+      - copy-system-logs
+      - traf-runtime-log

@@ -2,10 +2,6 @@
     name: incubator-trafodion
     github-org: apache
 
-    dist:
-      - "cm5.3"
-      - "ahw2.2"
-
     jobs:
       - Check-PR
       - Check-Daily

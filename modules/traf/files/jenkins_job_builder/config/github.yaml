@@ -68,6 +68,9 @@
     builders:
       - link-logs
       - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh
+      - shell: "/usr/local/bin/supported-distro.sh ."
+      - inject:
+          properties-file: distro.properties
       - multijob:
           name: static
           projects:
@@ -90,36 +93,47 @@
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/build-{branch}-release
                  BUILD_TYPE=check
-            - name: "pyodbc_test-cm{cmver}"
+            - name: "pyodbc_test-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/pyodbc_test-cm{cmver}
+                 LOG_PATH=$LOG_PATH/pyodbc_test-cdh
                  BRANCH={branch}
-            - name: "phoenix_quick_T4-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "phoenix_quick_T4-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_quick_T4-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/phoenix_quick_T4-hdp
                  BRANCH={branch}
-            - name: "jdbc_test-cm{cmver}"
+                 HDIST="HDP$DISTHDP"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "jdbc_test-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/jdbc_test-cm{cmver}
+                 LOG_PATH=$LOG_PATH/jdbc_test-cdh
                  BRANCH={branch}
-            - name: "core-regress-seabase-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-seabase-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-seabase-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-seabase-hdp
                  BRANCH={branch}
-            - name: "core-regress-core-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-core-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-core-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-core-hdp
                  BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
 
     publishers:
       - console-log
@@ -163,6 +177,9 @@
 
     builders:
       - link-logs
+      - shell: "/usr/local/bin/supported-distro.sh ."
+      - inject:
+          properties-file: distro.properties
       - multijob:
           name: build_test
           projects:
@@ -178,199 +195,271 @@
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/build-{branch}-release
                  BUILD_TYPE=daily
-            - name: "core-regress-core-ahw{hwver}"
+            - name: "core-regress-core-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-core-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-core-hdp
                  BRANCH={branch}
-            - name: "core-regress-seabase-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-seabase-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-seabase-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-seabase-hdp
                  BRANCH={branch}
-            - name: "pyodbc_test-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "pyodbc_test-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/pyodbc_test-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/pyodbc_test-hdp
                  BRANCH={branch}
-            - name: "core-regress-charsets-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-charsets-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-charsets-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-charsets-hdp
                  BRANCH={branch}
-            - name: "core-regress-qat-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-qat-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-qat-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-qat-hdp
                  BRANCH={branch}
-            - name: "core-regress-udr-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-udr-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-udr-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-udr-hdp
                  BRANCH={branch}
-            - name: "core-regress-catman1-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-catman1-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-catman1-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-catman1-hdp
                  BRANCH={branch}
-            - name: "core-regress-compGeneral-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-compGeneral-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-compGeneral-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-compGeneral-hdp
                  BRANCH={branch}
-            - name: "core-regress-executor-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-executor-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-executor-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-executor-hdp
                  BRANCH={branch}
-            - name: "core-regress-fullstack2-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-fullstack2-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-fullstack2-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-fullstack2-hdp
                  BRANCH={branch}
-            - name: "core-regress-hive-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-hive-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-hive-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/regress-hive-hdp
                  BRANCH={branch}
-            - name: "phoenix_part1_T4-ahw{hwver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "phoenix_part1_T4-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_part1_T4-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/phoenix_part1_T4-hdp
                  BRANCH={branch}
-            - name: "phoenix_part2_T4-ahw{hwver}"
+                 HDIST="HDP$DISTHDP"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "phoenix_part2_T4-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_part2_T4-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/phoenix_part2_T4-hdp
                  BRANCH={branch}
-            - name: "phoenix_part1_T2-ahw{hwver}"
+                 HDIST="HDP$DISTHDP"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "phoenix_part1_T2-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_part1_T2-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/phoenix_part1_T2-hdp
                  BRANCH={branch}
-            - name: "phoenix_part2_T2-ahw{hwver}"
+                 HDIST="HDP$DISTHDP"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "phoenix_part2_T2-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_part2_T2-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/phoenix_part2_T2-hdp
                  BRANCH={branch}
-            - name: "jdbc_test-ahw{hwver}"
+                 HDIST="HDP$DISTHDP"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "jdbc_test-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/jdbc_test-ahw{hwver}
+                 LOG_PATH=$LOG_PATH/jdbc_test-hdp
                  BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
 #   Cloudera Jobs
-            - name: "core-regress-core-cm{cmver}"
+            - name: "core-regress-core-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-core-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-core-cdh
                  BRANCH={branch}
-            - name: "core-regress-seabase-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-seabase-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-seabase-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-seabase-cdh
                  BRANCH={branch}
-            - name: "pyodbc_test-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "pyodbc_test-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/pyodbc_test-cm{cmver}
+                 LOG_PATH=$LOG_PATH/pyodbc_test-cdh
                  BRANCH={branch}
-            - name: "core-regress-charsets-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-charsets-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-charsets-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-charsets-cdh
                  BRANCH={branch}
-            - name: "core-regress-qat-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-qat-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-qat-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-qat-cdh
                  BRANCH={branch}
-            - name: "core-regress-udr-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-udr-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-udr-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-udr-cdh
                  BRANCH={branch}
-            - name: "core-regress-catman1-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-catman1-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-catman1-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-catman1-cdh
                  BRANCH={branch}
-            - name: "core-regress-compGeneral-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-compGeneral-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-compGeneral-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-compGeneral-cdh
                  BRANCH={branch}
-            - name: "core-regress-executor-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-executor-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-executor-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-executor-cdh
                  BRANCH={branch}
-            - name: "core-regress-fullstack2-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-fullstack2-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-fullstack2-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-fullstack2-cdh
                  BRANCH={branch}
-            - name: "core-regress-hive-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-hive-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-hive-cm{cmver}
+                 LOG_PATH=$LOG_PATH/regress-hive-cdh
                  BRANCH={branch}
-            - name: "phoenix_part1_T4-cm{cmver}"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "phoenix_part1_T4-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_part1_T4-cm{cmver}
+                 LOG_PATH=$LOG_PATH/phoenix_part1_T4-cdh
                  BRANCH={branch}
-            - name: "phoenix_part2_T4-cm{cmver}"
+                 HDIST="CDH$DISTCDH"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "phoenix_part2_T4-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_part2_T4-cm{cmver}
+                 LOG_PATH=$LOG_PATH/phoenix_part2_T4-cdh
                  BRANCH={branch}
-            - name: "phoenix_part1_T2-cm{cmver}"
+                 HDIST="CDH$DISTCDH"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "phoenix_part1_T2-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_part1_T2-cm{cmver}
+                 LOG_PATH=$LOG_PATH/phoenix_part1_T2-cdh
                  BRANCH={branch}
-            - name: "phoenix_part2_T2-cm{cmver}"
+                 HDIST="CDH$DISTCDH"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "phoenix_part2_T2-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/phoenix_part2_T2-cm{cmver}
+                 LOG_PATH=$LOG_PATH/phoenix_part2_T2-cdh
                  BRANCH={branch}
-            - name: "jdbc_test-cm{cmver}"
+                 HDIST="CDH$DISTCDH"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "jdbc_test-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/jdbc_test-cm{cmver}
+                 LOG_PATH=$LOG_PATH/jdbc_test-cdh
                  BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
 
     publishers:
       - console-log
