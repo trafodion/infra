@@ -71,8 +71,15 @@ class traf::buildtest (
       'unixODBC', 'unixODBC-devel', 'libiodbc', 'libiodbc-devel',
       'protobuf-compiler', 'protobuf-devel', 'xerces-c-devel',
       'zlib-devel', 'bzip2-devel', 'ncurses-devel', 'tk-devel', 'gdbm-devel', 'db4-devel', 'libpcap-devel',
-      'cmake',
+      'cmake','npm',
     ]
+
+    exec { 'install_bower':
+        path    => '/usr/bin:/bin:/usr/local/bin',
+        command => 'npm install -g bower',
+        onlyif  => "npm ls -g bower | grep '(empty)'",
+	require => Package['npm'],
+    }
 
     # Use exec to run yum groupinstall since it is not
     # supported by the package type
