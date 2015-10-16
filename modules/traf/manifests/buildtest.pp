@@ -101,7 +101,7 @@ class traf::buildtest (
     }
 
     # Remove bug reporting tool, so we can specify core file pattern
-    package {['abrt-cli','abrt-addon-python','abrt-addon-ccpp','abrt-addon-kerneloops','abrt',] :
+    package {['abrt-python','abrt-cli','abrt-addon-python','abrt-addon-ccpp','abrt-addon-kerneloops','abrt',] :
       ensure => absent,
     }
     exec { 'set corefile pattern' :
