@@ -31,6 +31,11 @@ set -x
 # Hive suite depends on pre-loaded TPC-DS data
 if [[ "$SUITES" =~ hive|core ]]
 then
+    if [[ ! -f /home/jenkins/tpcds_kit.zip ]]
+    then
+      /usr/bin/curl --output /home/jenkins/tpcds_kit.zip http://traf-logs.esgyn.com/testdeps/tpcds_kit.zip
+    fi
+    export MY_LOCAL_SW_DIST="/home/jenkins"
     $WORKSPACE/traf_run/sql/scripts/install_hadoop_regr_test_env \
       --unpackDir=$WORKSPACE/tpcds-tool \
       --dataDir=$WORKSPACE/tpcds-data \
