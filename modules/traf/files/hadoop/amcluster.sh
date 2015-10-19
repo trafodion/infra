@@ -220,7 +220,7 @@ function initconfig {
     # parse to give property name-value pairs
     Props=$(curl $Read "$URL/stacks/$Stack/$query" | jq -r $jsonparse)
     # change format to single list
-    Proplist=$(echo $Props | sed 's/" } { "/" , "/g')
+    Proplist=$(echo $Props | sed 's/ } { "/ , "/g')
     [[ -z "$Proplist" ]] && Proplist="{}"
 
     # create the first version of this config type, with default values
