@@ -220,7 +220,7 @@ function initconfig {
     # parse to give property name-value pairs
     Props=$(curl $Read "$URL/stacks/$Stack/$query" | jq -r $jsonparse)
     # change format to single list
-    Proplist=$(echo $Props | sed 's/} {/,/g')
+    Proplist=$(echo $Props | sed 's/" } { "/" , "/g')
     [[ -z "$Proplist" ]] && Proplist="{}"
 
     # create the first version of this config type, with default values
@@ -345,6 +345,7 @@ reqinstall='{"HostRoles" : {"state" : "INSTALLED" }}'
 
 # order matters somewhat
 # e.g., yarn resource manager must before mapreduce client
+# for HDP2.3, HIVE_METASTORE must come before other hive components
 if [[ $Vers == "HDP-2.1" ]]
 then
   hcat="WEBHCAT:WEBHCAT_SERVER HCATALOG:HCAT"
@@ -356,7 +357,7 @@ for sc in HDFS:DATANODE HDFS:NAMENODE HDFS:SECONDARY_NAMENODE HDFS:HDFS_CLIENT \
       ZOOKEEPER:ZOOKEEPER_SERVER \
       YARN:APP_TIMELINE_SERVER YARN:NODEMANAGER YARN:RESOURCEMANAGER YARN:YARN_CLIENT \
       MAPREDUCE2:HISTORYSERVER MAPREDUCE2:MAPREDUCE2_CLIENT \
-      HIVE:HIVE_SERVER HIVE:MYSQL_SERVER HIVE:HIVE_METASTORE HIVE:HIVE_CLIENT $hcat \
+      HIVE:HIVE_METASTORE HIVE:HIVE_SERVER HIVE:MYSQL_SERVER HIVE:HIVE_CLIENT $hcat \
       HBASE:HBASE_MASTER HBASE:HBASE_REGIONSERVER HBASE:HBASE_CLIENT \
       TEZ:TEZ_CLIENT
 do
