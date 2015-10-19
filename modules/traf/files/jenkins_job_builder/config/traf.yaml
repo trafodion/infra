@@ -1,5 +1,8 @@
 - job-group:
     name: 'core-regress-suites'
+    dist:
+      - cdh
+      - hdp
     suite:
       - "charsets"
       - "core"
@@ -17,13 +20,14 @@
 
 - job-template:
     name: 'core-regress-{suite}-{dist}'
-    node: 'redhat_{dist}'
 
     parameters:
       - string:
           name: BRANCH
       - string:
           name: LOG_PATH
+      - label:
+          name: NODE_TYPE
 
     wrappers:
       - timeout:
@@ -69,6 +73,9 @@
     jdbcDriverType:
       - "T4"
       - "T2"
+    dist:
+      - cdh
+      - hdp
     jobs:
       - 'phoenix_{type}_{jdbcDriverType}-{dist}':
          type: test
@@ -89,13 +96,16 @@
 
 - job-template:
     name: 'phoenix_{type}_{jdbcDriverType}-{dist}'
-    node: 'redhat_{dist}'
 
     parameters:
       - string:
           name: BRANCH
       - string:
+          name: HDIST
+      - string:
           name: LOG_PATH
+      - label:
+          name: NODE_TYPE
 
     wrappers:
       - timeout:
@@ -119,7 +129,7 @@
            dcsDir: "trafodion/dcs"
            testDir: "trafodion/tests/phx"
            jdbctype: '{jdbcDriverType}'
-           hadoopdistro: '{dist}'
+           hadoopdistro: "$HDIST"
            tests1: "{subset}"
            tests2: ""
            tests3: ""
@@ -139,18 +149,22 @@
 # If parameter tests1 = DONT_RUN_TESTS then none of the pyodbc tests will run.  This should only be used in pyodbc_test-experimental if pyodbc_test is running all tests.
 - job-group:
     name: 'pyodbc_test-jobs'
+    dist:
+      - cdh
+      - hdp
     jobs:
       - 'pyodbc_test-{dist}':
 
 - job-template:
     name: 'pyodbc_test-{dist}'
-    node: 'redhat_{dist}'
 
     parameters:
       - string:
           name: BRANCH
       - string:
           name: LOG_PATH
+      - label:
+          name: NODE_TYPE
 
     wrappers:
       - timeout:
@@ -190,18 +204,22 @@
 # This should only be used in jdbc_test-experimental if jdbc_test is running all tests.
 - job-group:
     name: 'jdbc_test-jobs'
+    dist:
+      - cdh
+      - hdp
     jobs:
       - 'jdbc_test-{dist}':
 
 - job-template:
     name: 'jdbc_test-{dist}'
-    node: 'redhat_{dist}'
 
     parameters:
       - string:
           name: BRANCH
       - string:
           name: LOG_PATH
+      - label:
+          name: NODE_TYPE
 
     wrappers:
       - timeout:

@@ -148,7 +148,7 @@
       - multijob:
           name: tests
           projects:
-            - name: "core-regress-ahw2.2"
+            - name: "core-regress-hdp"
               enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'ahw2.2'"
               current-parameters: true
               kill-phase-on: NEVER
@@ -156,7 +156,9 @@
                 LOG_PATH=${LOG_PATH}/regress-${DISTRO}
                 SUITES=${sql_tests}
                 BRANCH=$BRANCH
-            - name: "core-regress-cm5.3"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "core-regress-cdh"
               enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'cm5.3'"
               current-parameters: true
               kill-phase-on: NEVER
@@ -164,62 +166,84 @@
                 LOG_PATH=${LOG_PATH}/regress-${DISTRO}
                 SUITES=${sql_tests}
                 BRANCH=$BRANCH
-            - name: "pyodbc_test-ahw2.2"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "pyodbc_test-hdp"
               enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'ahw2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
                 BRANCH=$BRANCH
-            - name: "pyodbc_test-cm5.3"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "pyodbc_test-cdh"
               enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'cm5.3'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
                 BRANCH=$BRANCH
-            - name: "jdbc_test-ahw2.2"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "jdbc_test-hdp"
               enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'ahw2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
                 BRANCH=$BRANCH
-            - name: "jdbc_test-cm5.3"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "jdbc_test-cdh"
               enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'cm5.3'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
                 BRANCH=$BRANCH
-            - name: "phoenix_test_T4-ahw2.2"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "phoenix_test_T4-hdp"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'ahw2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
                 BRANCH=$BRANCH
-            - name: "phoenix_test_T2-ahw2.2"
+                HDIST=$DISTRO
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "phoenix_test_T2-hdp"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'ahw2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
                 BRANCH=$BRANCH
-            - name: "phoenix_test_T4-cm5.3"
+                HDIST=$DISTRO
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "phoenix_test_T4-cdh"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'cm5.3'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
                 BRANCH=$BRANCH
-            - name: "phoenix_test_T2-cm5.3"
+                HDIST=$DISTRO
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "phoenix_test_T2-cdh"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'cm5.3'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
                 BRANCH=$BRANCH
+                HDIST=$DISTRO
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
 
     publishers:
       - console-log
@@ -251,12 +275,14 @@
 - job-group:
     name: 'core-regress-req'
 
+    dist:
+      - cdh
+      - hdp
     jobs:
       - core-regress-{dist}
 
 - job-template:
     name: 'core-regress-{dist}'
-    node: 'redhat_{dist}'
 
     wrappers:
       - timeout:
@@ -271,6 +297,8 @@
       - string:
           name: BRANCH
           description: "Branch built against"
+      - label:
+          name: NODE_TYPE
 
     builders:
       - link-logs
