@@ -353,13 +353,14 @@ else
   hcat="HIVE:WEBHCAT_SERVER HIVE:HCAT"
 fi
 
-for sc in HDFS:DATANODE HDFS:NAMENODE HDFS:SECONDARY_NAMENODE HDFS:HDFS_CLIENT \
+comp_list="HDFS:DATANODE HDFS:NAMENODE HDFS:SECONDARY_NAMENODE HDFS:HDFS_CLIENT \
       ZOOKEEPER:ZOOKEEPER_SERVER \
       YARN:APP_TIMELINE_SERVER YARN:NODEMANAGER YARN:RESOURCEMANAGER YARN:YARN_CLIENT \
       MAPREDUCE2:HISTORYSERVER MAPREDUCE2:MAPREDUCE2_CLIENT \
       HIVE:HIVE_METASTORE HIVE:HIVE_SERVER HIVE:MYSQL_SERVER HIVE:HIVE_CLIENT $hcat \
       HBASE:HBASE_MASTER HBASE:HBASE_REGIONSERVER HBASE:HBASE_CLIENT \
-      TEZ:TEZ_CLIENT
+      TEZ:TEZ_CLIENT"
+for sc in $comp_list
 do
   serv=${sc%:*}
   comp=${sc#*:}
@@ -382,6 +383,13 @@ do
       exit 2
     fi
   fi
+done
+
+for sc in $comp_list
+do
+  serv=${sc%:*}
+  comp=${sc#*:}
+
   HCState="$(curl $Read $URL/clusters/trafcluster/hosts/$hn/host_components/$comp \
                       | jq -r '.HostRoles.state')"
   if [[ $HCState =~ INIT|INSTALL_FAILED ]]
@@ -473,7 +481,7 @@ sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
 sudo -u hbase rm -rf /var/log/hbase/*
 
 # recreate root
-sudo -u hdfs /usr/bin/hdfs dfs -mkdir $hdata || exit $?
+sudo -u hdfs /usr/bin/hdfs dfs -mkdir -p $hdata || exit $?
 sudo -u hdfs /usr/bin/hdfs dfs -chown hbase:hbase $hdata || exit $?
 
 # verify nothing is using HBase port
