@@ -266,7 +266,7 @@ then
 else
   # global replaced by *-env
   conftypes="capacity-scheduler core-site hadoop-env hbase-log4j hbase-site hbase-env hcat-env hdfs-log4j hdfs-site"
-  conftypes+=" hive-env hive-exec-log4j hive-log4j hive-site mapred-env mapred-site tez-env tez-site"
+  conftypes+=" hive-env hive-exec-log4j hive-log4j hive-site hiveserver2-site mapred-env mapred-site tez-env tez-site"
   conftypes+=" webhcat-env webhcat-site yarn-env yarn-log4j yarn-site zoo.cfg zookeeper-env zookeeper-log4j"
 fi
 
