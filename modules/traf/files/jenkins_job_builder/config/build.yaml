@@ -128,6 +128,7 @@
            gitdir: "trafodion"
       - assert-no-bad-source-files:
            gitdir: "trafodion"
+      - rat-check
 
     publishers:
       - console-log
