@@ -18,7 +18,6 @@
 RATTAR="apache-rat-0.11-bin.tar.gz"
 RATURL="http://www.interior-dsgn.com/apache//creadur/apache-rat-0.11/apache-rat-0.11-bin.tar.gz"
 RATJAR="$HOME/apache-rat-0.11/apache-rat-0.11.jar"
-TEMPFILE=/tmp/RatReport.$$
 
 source /usr/local/bin/traf-functions.sh
 log_banner
@@ -37,16 +36,16 @@ then
   fi
 fi
 
-rm -f $TEMPFILE
+REPORT="$WORKSPACE/RatReport"
+rm -f $REPORT
 
 cd "$WORKSPACE"
-/usr/bin/java -jar $RATJAR -E ./.rat-exludes -dir . > $TEMPFILE
+/usr/bin/java -jar $RATJAR -E trafodion/.rat-exludes -dir trafodion > $REPORT
 lic=$(grep -E '^[0-9]+ Unknown Licenses' /tmp/rat24808.out)
 if [[ -z "$lic" ]]
 then
   echo "Error: RAT report incomplete"
-  cat $TEMPFILE
-  rm $TEMPFILE
+  cat $REPORT
   exit 0  ############# Temporary
 fi
 
@@ -55,11 +54,9 @@ count=${lic%% *}
 if (( $count > 0 ))
 then
   echo "Error: Found $count license issues"
-  cat $TEMPFILE
-  rm $TEMPFILE
+  cat $REPORT
   exit 0  ############# Temporary
 else
   echo "Success! Found no license issues."
-  rm $TEMPFILE
   exit 0
 fi
