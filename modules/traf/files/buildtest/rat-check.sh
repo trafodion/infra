@@ -40,7 +40,7 @@ REPORT="$WORKSPACE/RatReport"
 rm -f $REPORT
 
 cd "$WORKSPACE"
-/usr/bin/java -jar $RATJAR -E trafodion/.rat-exludes -dir trafodion > $REPORT
+/usr/bin/java -jar $RATJAR -E trafodion/.rat-excludes -dir trafodion > $REPORT
 lic=$(grep -E '^[0-9]+ Unknown Licenses' /tmp/rat24808.out)
 if [[ -z "$lic" ]]
 then
