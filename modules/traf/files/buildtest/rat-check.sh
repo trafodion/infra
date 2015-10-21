@@ -32,7 +32,7 @@ then
   if [[ ! -f $RATJAR ]]
   then
     echo "Error: could not find RAT"
-    exit 0  ############# Temporary
+    exit 3
   fi
 fi
 
@@ -50,7 +50,7 @@ if [[ -z "$lic" ]]
 then
   echo "Error: RAT report incomplete"
   cat $REPORT
-  exit 0  ############# Temporary
+  exit 3
 fi
 
 count=${lic%% *}
@@ -59,7 +59,7 @@ if (( $count > 0 ))
 then
   echo "Error: Found $count license issues"
   cat $REPORT
-  exit 0  ############# Temporary
+  exit 1
 else
   echo "Success! Found no license issues."
   exit 0
