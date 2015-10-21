@@ -39,9 +39,13 @@ fi
 REPORT="$WORKSPACE/RatReport"
 rm -f $REPORT
 
+# remove any extraneous files
+cd "$WORKSPACE/trafodion"
+git clean -x -f -d
+
 cd "$WORKSPACE"
 /usr/bin/java -jar $RATJAR -E trafodion/.rat-excludes -dir trafodion > $REPORT
-lic=$(grep -E '^[0-9]+ Unknown Licenses' /tmp/rat24808.out)
+lic=$(grep -E '^[0-9]+ Unknown Licenses' $REPORT)
 if [[ -z "$lic" ]]
 then
   echo "Error: RAT report incomplete"
