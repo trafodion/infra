@@ -18,7 +18,7 @@
 RATTAR="apache-rat-0.11-bin.tar.gz"
 RATURL="http://www.interior-dsgn.com/apache//creadur/apache-rat-0.11/apache-rat-0.11-bin.tar.gz"
 RATJAR="$HOME/apache-rat-0.11/apache-rat-0.11.jar"
-TMPFILE=/tmp/RatReport.$$
+TEMPFILE=/tmp/RatReport.$$
 
 source /usr/local/bin/traf-functions.sh
 log_banner
