@@ -58,6 +58,10 @@ else
   rc=$?
 fi
 
+if [[ $rc != 0 ]]
+then
+  /usr/local/bin/save-workspace.sh $WORKSPACE
+fi
 
 /usr/local/bin/uninstall-traf.sh
 

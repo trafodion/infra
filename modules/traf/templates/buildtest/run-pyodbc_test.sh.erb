@@ -127,10 +127,16 @@ else
     echo
   fi
 
+  toxRes=$(( toxRes + coreCount ))
+
+  if [[ $toxRes != 0 ]]
+  then
+    /usr/local/bin/save-workspace.sh $WORKSPACE
+  fi
+
   cd $WORKSPACE
   if [ -z $SKIPSTOP ]; then /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"; fi
 
-  toxRes=$(( toxRes + coreCount ))
 fi
 
 set -x

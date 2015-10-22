@@ -167,6 +167,11 @@ fi
 
 phoenixRes=$(( phoenixRes + coreCount ))
 
+if [[ $phoenixRes != 0 ]]
+then
+  /usr/local/bin/save-workspace.sh $WORKSPACE
+fi
+
 # uninstall removes trafodion user, so must come last
 cd $WORKSPACE
 if [ -z $SKIPSTOP ]; then /usr/local/bin/uninstall-traf.sh "$TRAF_DIR/sqf"; fi
