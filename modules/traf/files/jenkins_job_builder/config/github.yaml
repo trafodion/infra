@@ -67,7 +67,7 @@
 
     builders:
       - link-logs
-      - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh
+      - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh apache/incubator-trafodion
       - shell: "/usr/local/bin/supported-distro.sh ."
       - inject:
           properties-file: distro.properties

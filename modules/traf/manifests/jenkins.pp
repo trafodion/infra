@@ -81,6 +81,18 @@ class traf::jenkins (
     require                 => [ Mount['/var/lib/jenkins'] ],
   }
 
+  $ghauth = hiera('jenkins_github_auth','none')
+  if $ghauth != 'none' {
+    file { '/var/lib/jenkins/ghtoken':
+      ensure  => present,
+      content => $ghauth,
+      owner   => 'jenkins',
+      group   => 'jenkins',
+      mode    => '0600',
+      require => [ Mount['/var/lib/jenkins'] ],
+    }
+  }
+
   # jenkins master needs Gerrit's SSL cert
   file { '/usr/local/share/ca-certificates/review.crt':
     ensure  => present,

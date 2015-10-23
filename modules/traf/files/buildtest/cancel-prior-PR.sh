@@ -1,8 +1,6 @@
 #!/bin/bash
 # @@@ START COPYRIGHT @@@
 #
-# (C) Copyright 2015 Hewlett-Packard Development Company, L.P.
-#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -27,6 +25,35 @@
 # Note: we depend on single jenkins server to search. Algorithm needs to change if 
 #   scaled to multiple jenkins servers.
 
+# Required Environment variables
+# BUILD_URL
+# ghprbPullId
+# JOB_NAME
+# BUILD_NUMBER
+# JENKINS_URL
+
+repo="$1"
+
+# file with github token
+token="$HOME/ghtoken"
+
+function github_mesg {
+  mesg="$1"
+
+  ghapi="https://api.github.com"
+
+  # if we have a github token, update test status
+  if [[ -r $token ]]
+  then
+    auth="Authorization: token $(cat $token)"
+    iss_url=$(curl -s $auth $ghapi/repos/$repo/pulls/$ghprbPullId | jq -r '.issue_url')
+    data="{\"body\": \"${mesg}\"}"
+    curl -s -H "$auth" -X POST -d "$data" ${iss_url}/comments
+  else
+    echo "No access to post github message"
+  fi
+
+}
 
 # job name (jenkins "project") of top-level job
 PROJ_NAME="$JOB_NAME"
@@ -66,6 +93,7 @@ do
     Bld=$(( $Bld - 1))
   done
   echo "Did not find any prior $PROJ_NAME job for Pull Request $ghprbPullId"
+  github_mesg "Check Test Started: $BUILD_URL"
   exit 0
 done
 
@@ -76,6 +104,7 @@ echo "Build: $JENKINS_URL/job/$PROJ_NAME/$MyBuild"
 if [[ "$($API/$MyBuild/api/json | jq -r '.building' 2>/dev/null)" == "false" ]]
 then
   echo "Job is no longer running"
+  github_mesg "New Check Test Started: $BUILD_URL"
   exit 0
 fi
 
@@ -85,5 +114,18 @@ USER=$(sed -n '/^user=/s/user=//p' /etc/jenkins_jobs/jenkins_jobs.ini)
 PW=$(sed -n '/^password=/s/password=//p' /etc/jenkins_jobs/jenkins_jobs.ini)
 
 curl -X POST -s -u ${USER}:$PW $JENKINS_URL/job/$PROJ_NAME/$MyBuild/stop
+
+# wait until it is stopped
+i=0
+while (( $i < 10 ))
+do
+  if [[ "$($API/$MyBuild/api/json | jq -r '.building' 2>/dev/null)" == "false" ]]
+  then
+    exit 0
+  fi
+  sleep 20
+  i=$(( $i + 1))
+done
+github_mesg "Previous Test Aborted. New Check Test Started: $BUILD_URL"
 
 exit 0
