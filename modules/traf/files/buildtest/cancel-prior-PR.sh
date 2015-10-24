@@ -121,7 +121,7 @@ while (( $i < 10 ))
 do
   if [[ "$($API/$MyBuild/api/json | jq -r '.building' 2>/dev/null)" == "false" ]]
   then
-    exit 0
+    break
   fi
   sleep 20
   i=$(( $i + 1))
