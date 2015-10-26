@@ -3,9 +3,8 @@
 - job-group:
     name: 'Check-PR'
     branch:
-     - master:
-         cmver: "5.3"
-         hwver: "2.2"
+     - master
+     - release1.3
 
     jobs:
       - 'Check-PR-{branch}'
@@ -144,8 +143,6 @@
     branch:
      - master:
          timespec: "30 8 * * *"
-         cmver: "5.3"
-         hwver: "2.2"
 
     jobs:
      - 'Check-Daily-{branch}'

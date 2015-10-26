@@ -5,6 +5,7 @@
       - "debug"
     branch:
       - "master"
+      - "release1.3"
 
     jobs:
       - build-{branch}-{flavor}
