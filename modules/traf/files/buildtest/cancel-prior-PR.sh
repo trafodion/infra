@@ -46,7 +46,7 @@ function github_mesg {
   if [[ -r $token ]]
   then
     auth="Authorization: token $(cat $token)"
-    iss_url=$(curl -s $auth $ghapi/repos/$repo/pulls/$ghprbPullId | jq -r '.issue_url')
+    iss_url=$(curl -s -H "$auth" $ghapi/repos/$repo/pulls/$ghprbPullId | jq -r '.issue_url')
     data="{\"body\": \"${mesg}\"}"
     curl -s -H "$auth" -X POST -d "$data" ${iss_url}/comments
   else
