@@ -40,16 +40,20 @@ cd trafodion/core
 
 # Pull latest posted Win-ODBC build if available
 WINLOC="http://traf-logs.esgyn.com/winbld"
-WFILE="TFODBC64-${TRAFODION_VER}.msi"
 
 mkdir -p conn/clients
-wget --no-verbose -O conn/clients/$WFILE $WINLOC/$WFILE
-rc=$?
 
-if [[ $rc != 0 ]]
-then
-  echo "Warning: No Win-ODBC64 build found"
-fi
+for suffix in msi exe
+do
+  WFILE="TFODBC64-${TRAFODION_VER}.$suffix"
+  wget --no-verbose -O conn/clients/$WFILE $WINLOC/$WFILE
+  if [[ $? != 0 ]]
+  then
+    echo "Warning: Win-ODBC64 $suffix build not found"
+  else
+    echo "Win-ODBC64 $suffix build found"
+  fi
+done
 
 
 # Use Zuul / Jenkins values
