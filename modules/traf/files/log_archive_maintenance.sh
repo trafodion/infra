@@ -11,6 +11,7 @@ find -O3 /srv/static/logs/ -depth \
           -not -wholename /srv/static/logs/help/\* \
           -not -wholename /srv/static/logs/buildvers/\* \
           -not -wholename /srv/static/logs/winbld/\* \
+          -not -wholename /srv/static/logs/testdeps/\* \
           -not -name \*\[.-\]gz -not -name \*\[._-\]\[zZ\] \
           -exec gzip -f \{\} \; \) \
       -o \( -type f -mtime +14 -name \*.gz -execdir rm \{\} \; \) \
