@@ -22,7 +22,7 @@ class traf::dev (
   }
 
   class { 'traf::server':
-    iptables_public_tcp_ports => ['5900:5999'], # VNC
+    iptables_public_tcp_ports => ['5900:5999','45000:46000'], # VNC, DCS
     certname                  => $certname,
     sysadmins                 => $sysadmins,
   }
