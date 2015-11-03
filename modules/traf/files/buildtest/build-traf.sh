@@ -50,6 +50,7 @@ do
   if [[ $? != 0 ]]
   then
     echo "Warning: Win-ODBC64 $suffix build not found"
+    rm conn/clients/$WFILE
   else
     echo "Win-ODBC64 $suffix build found"
   fi
