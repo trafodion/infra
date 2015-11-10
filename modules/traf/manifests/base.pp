@@ -9,7 +9,6 @@ class traf::base(
   }
   include traf::params
   include traf::users
-  include sudoers
 
   file { '/etc/profile.d/Z98-byobu.sh':
     ensure => absent,
