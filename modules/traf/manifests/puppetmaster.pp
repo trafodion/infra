@@ -53,13 +53,4 @@ class traf::puppetmaster (
     mode   => '0750',
     }
 
-  # Cloud admin script
-  file { '/usr/local/bin/slave-ip.sh':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    content => template('traf/slave-ip.sh.erb'),
-  }
-
 }
