@@ -5,7 +5,7 @@ $cloud_auto_passwd=hiera('cloud_auto_passwd', '')
 $cloud_auto_tenant_id=hiera('cloud_auto_tenant_id', '')
 
 # default puppet-master
-$pserver='puppet3.esgyn.com'
+$pserver='puppet'
 
 #
 # Default: at least puppet running regularly and sysadmin access
@@ -33,7 +33,7 @@ node 'jenkins.esgyn.com' {
 }
 
 # New master running puppet 3.x
-node /^puppet3.*/ {
+node /^puppet.*/ {
   class { 'traf::puppetmaster':
     sysadmins         => hiera('sysadmins'),
   }

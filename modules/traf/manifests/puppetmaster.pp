@@ -27,14 +27,14 @@ class traf::puppetmaster (
     environment => 'PATH=/var/lib/gems/1.8/bin:/usr/bin:/bin:/usr/sbin:/sbin',
   }
 
-  cron { 'backuphiera':
-    user        => 'root',
-    hour        => '7',
-    minute      => '0',
-    command     => 'sleep $((RANDOM\%600)) && cronic useObjectStorage.sh -bu /etc/puppet/hieradata/production/common.yaml',
-    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
-    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/useObjectStorage.sh'] ],
-  }
+#  cron { 'backuphiera':
+#    user        => 'root',
+#    hour        => '7',
+#    minute      => '0',
+#    command     => 'sleep $((RANDOM\%600)) && cronic useObjectStorage.sh -bu /etc/puppet/hieradata/production/common.yaml',
+#    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
+#    require     => [ File['/usr/local/bin/cronic'], File['/usr/local/bin/useObjectStorage.sh'] ],
+#  }
 
   file { '/etc/puppet/hiera.yaml':
     ensure  => present,
