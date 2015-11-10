@@ -1,8 +1,3 @@
-# Make cloud user credentials available to all nodes
-
-$cloud_auto_user=hiera('cloud_auto_user', '')
-$cloud_auto_passwd=hiera('cloud_auto_passwd', '')
-$cloud_auto_tenant_id=hiera('cloud_auto_tenant_id', '')
 
 # default puppet-master
 $pserver='puppet'
