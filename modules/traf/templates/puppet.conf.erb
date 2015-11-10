@@ -4,19 +4,18 @@ vardir=/var/lib/puppet
 ssldir=/var/lib/puppet/ssl
 rundir=/var/run/puppet
 factpath=$vardir/lib/facter
-templatedir=$confdir/templates
 server=<%= @pserver %>
 certname=<%= @certname %>
 pluginsync=true
+environmentpath=/opt/config
+basemodulepath=$confdir/modules:/opt/puppet/share/puppet/modules
+environment_timeout = unlimited
 
 [master]
 # These are needed when the puppetmaster is run by passenger
 # and can safely be removed if webrick is used.
 ssl_client_header = SSL_CLIENT_S_DN
 ssl_client_verify_header = SSL_CLIENT_VERIFY
-manifestdir=/opt/config/$environment/manifests
-modulepath=/opt/config/$environment/modules:/etc/puppet/modules
-manifest=$manifestdir/site.pp
 reports=store, http
 reporturl=http://dashboard.esgyn.com:3000/reports/upload
 certname = <%= @pserver %>
