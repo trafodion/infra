@@ -10,6 +10,13 @@ class traf::base(
   include traf::params
   include traf::users
 
+  group { 'sudo':
+    ensure => present,
+  }
+  group { 'admin':
+    ensure => present,
+  }
+
   file { '/etc/profile.d/Z98-byobu.sh':
     ensure => absent,
   }
