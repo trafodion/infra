@@ -44,6 +44,9 @@ rm -rf /usr/lib/trafodion
 # this will force installer to go through full install, rather than upgrade path
 /usr/sbin/userdel -rf trafodion
 
+# clean up hive logs that can fill up the disk
+sudo rm /var/log/hive/hiveserver2.log.2*
+
 # check hadoop config and clean up hbase data
 # cluster script will exist only on distro slave machines, not build machines
 if [[ -x /usr/local/bin/cluster_setup ]]
