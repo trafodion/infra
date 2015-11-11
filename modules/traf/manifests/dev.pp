@@ -9,7 +9,6 @@ class traf::dev (
 ) {
   include traf
   include traf::buildtest
-  include traf::cloudeast
   include traf::tmpcleanup
   include traf::automatic_upgrades
 
