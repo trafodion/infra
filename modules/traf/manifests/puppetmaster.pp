@@ -3,7 +3,6 @@
 class traf::puppetmaster (
   $sysadmins = [],
 ) {
-  include traf::cloudeast
 
   class { 'traf::server':
     iptables_public_tcp_ports => [4505, 4506, 8140],
