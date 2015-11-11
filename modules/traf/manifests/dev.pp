@@ -157,7 +157,8 @@ class traf::dev (
   }
   $useradmins = hiera('user_admins')
   traf::devuser {$useradmins : 
-    groups => ['sudo'],
+    groups  => ['sudo'],
+    require => Group['sudo'],
   }
 }
 
