@@ -99,11 +99,6 @@ class traf::dev (
     source => "puppet:///modules/traf/trafdev-limits.conf",
   }
 
-  # swap file
-  # take the defaults - same size as memory
-  class { 'swap_file':
-    swapfile => '/mnt/swapfile',
-  }
 
 
   # firefox

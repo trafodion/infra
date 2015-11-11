@@ -49,12 +49,6 @@ class traf::slave (
     require => [ Class['jenkins::slave'], File['/mnt/jenkins'] ],
   }
 
-  # swap file
-  # take the defaults - same size as memory
-  class { 'swap_file':
-    swapfile => '/mnt/swapfile',
-  }
-
 
   # install rake and puppetlabs_spec_helper from ruby gems
   # so puppet-lint can run on the slaves
