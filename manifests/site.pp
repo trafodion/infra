@@ -6,7 +6,6 @@ $pserver='puppet'
 # Default: at least puppet running regularly and sysadmin access
 #
 node default {
-  include traf::puppet_cron
   class { 'traf::server':
     sysadmins => hiera('sysadmins'),
   }
@@ -65,9 +64,8 @@ node /^ldap\d\d.trafodion.org$/ {
 }
 
 # Dev servers
-node /^build01.trafodion.org$|^dev\d\d.trafodion.org$/ {
+node /^gdev\d\d.*/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::dev':
     sysadmins => hiera('sysadmins'),
   }
@@ -76,7 +74,6 @@ node /^build01.trafodion.org$|^dev\d\d.trafodion.org$/ {
 # hands-on test machines
 node /^mtest\d\d.trafodion.org$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::testm':
     sysadmins => hiera('sysadmins'),
   }
@@ -89,7 +86,6 @@ node /^mtest\d\d.trafodion.org$/ {
 # Build Server
 node /^build\d\d.trafodion.org$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -101,7 +97,6 @@ node /^build\d\d.trafodion.org$/ {
 # CMgr
 node /^slave-cm51-\d\d.trafodion.org$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -111,7 +106,6 @@ node /^slave-cm51-\d\d.trafodion.org$/ {
 }
 node /^slave-cm51-\d+\.\d+\.\d+\.\d+$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -122,7 +116,6 @@ node /^slave-cm51-\d+\.\d+\.\d+\.\d+$/ {
 }
 node /^slave-cm53-\d\d.trafodion.org$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -132,7 +125,6 @@ node /^slave-cm53-\d\d.trafodion.org$/ {
 }
 node /^slave-cm53-\d+\.\d+\.\d+\.\d+$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -143,7 +135,6 @@ node /^slave-cm53-\d+\.\d+\.\d+\.\d+$/ {
 }
 node /^slave-cm54-\d+\.\d+\.\d+\.\d+$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -156,7 +147,6 @@ node /^slave-cm54-\d+\.\d+\.\d+\.\d+$/ {
 # Ambari HortonWorks
 node /^slave-ahw21-\d\d.trafodion.org$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -166,7 +156,6 @@ node /^slave-ahw21-\d\d.trafodion.org$/ {
 }
 node /^slave-ahw21-\d+\.\d+\.\d+\.\d+$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -177,7 +166,6 @@ node /^slave-ahw21-\d+\.\d+\.\d+\.\d+$/ {
 }
 node /^slave-ahw22-\d\d.trafodion.org$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -187,7 +175,6 @@ node /^slave-ahw22-\d\d.trafodion.org$/ {
 }
 node /^slave-ahw22-\d+\.\d+\.\d+\.\d+$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
@@ -198,7 +185,6 @@ node /^slave-ahw22-\d+\.\d+\.\d+\.\d+$/ {
 }
 node /^slave-ahw23-\d+\.\d+\.\d+\.\d+$/ {
   include traf
-  include traf::puppet_cron
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
