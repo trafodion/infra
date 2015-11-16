@@ -6,6 +6,7 @@ class traf::dev (
   $sysadmins = [],
   $python3 = false,
   $include_pypy = false,
+  $jenkins_ssh_key = '',
 ) {
   include traf
   include traf::buildtest
@@ -27,7 +28,7 @@ class traf::dev (
   }
   class { 'jenkins::slave':
     bare         => $bare,
-    ssh_key      => $traf::jenkins_ssh_key,
+    ssh_key      => $jenkins_ssh_key,
     sudo         => false,
     python3      => $python3,
     include_pypy => $include_pypy,
@@ -49,9 +50,25 @@ class traf::dev (
     content => $traf::jenkins_ssh_pub_key,
   }
 
+  file { '/etc/yum.repos.d/scootersoftware.repo':
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+    source => 'puppet:///modules/traf/dev/scootersoftware.repo',
+  }
+  file { '/etc/BC4Key.txt':
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => hiera('BC4Key'),
+  }
+  package { 'bcompare':
+    ensure  => present,
+    require => File['/etc/BC4Key.txt','/etc/yum.repos.d/scootersoftware.repo'],
+  }
 
 
-  package { ['emacs','gitk','gedit']:
+  package { ['emacs','gitk','gedit','kdesdk']:
     ensure => present,
   }
   # work-around for group install

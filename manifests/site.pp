@@ -64,10 +64,11 @@ node /^ldap\d\d.trafodion.org$/ {
 }
 
 # Dev servers
-node /^gdev\d\d.*/ {
+node /^adev\d\d.*/ {
   include traf
   class { 'traf::dev':
-    sysadmins => hiera('sysadmins'),
+    sysadmins       => hiera('sysadmins'),
+    jenkins_ssh_key => hiera('jenkins_ssh_pub_key_contents'),
   }
 }
 
