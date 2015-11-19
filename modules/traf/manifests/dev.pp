@@ -116,6 +116,34 @@ class traf::dev (
     source => "puppet:///modules/traf/trafdev-limits.conf",
   }
 
+  # Real VNC
+  exec { 'get_vnc_rpm' :
+    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/VNC-Server-5.2.3-Linux-x64.rpm /opt/dev",
+    timeout => 900,
+    user    => 'jenkins',
+    creates => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
+    require => File['/opt/dev'],
+  }
+  package { 'realvnc-vnc-server':
+    ensure   => present,
+    provider => rpm,
+    source   => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
+    require  => Exec['get_vnc_rpm'],
+  }
+  file { '/etc/vnc/config.d/Xvnc':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => "UserPasswdVerifier=VncAuth",
+    require => Package['realvnc-vnc-server'],
+  }
+  $vnc_key = hiera('VNC_key')
+  exec { 'vnc_license' :
+    command => "/usr/bin/vnclicense -add $vnc_key",
+    unless  => '/usr/bin/vnclicense -check',
+    require => Package['realvnc-vnc-server'],
+  }
 
 
   # firefox

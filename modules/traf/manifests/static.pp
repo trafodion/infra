@@ -2,16 +2,7 @@
 #
 class traf::static (
   $sysadmins = [],
-  $reviewday_gerrit_ssh_key = '',
-  $reviewday_rsa_pubkey_contents = '',
-  $reviewday_rsa_key_contents = '',
-  $releasestatus_prvkey_contents = '',
-  $releasestatus_pubkey_contents = '',
-  $releasestatus_gerrit_ssh_key = '',
-  $er_state_dir = '/var/lib/elastic-recheck',
   $server_path = '/srv/static',
-  $download_cipher = hiera('download_cipher'),
-  $download_salt = hiera('download_salt'),
   $download_path = '/srv/static/downloads',
 
 ) {
@@ -23,21 +14,10 @@ class traf::static (
   }
 
   include traf
-  include traf::cloudwest
   class { 'jenkins::jenkinsuser':
     ssh_key => $traf::jenkins_ssh_key,
   }
 
-  # add users to jenkins ssh authorized_keys
-  # this is broken for some reason
-#  $jenkins_auth_users = {
-#    alchen     =>  { pub_key => $traf::users::alchen_sshkey},
-#    svarnau    =>  { pub_key => $traf::users::svarnau_sshkey},
-#    csheedy    =>  { pub_key => $traf::users::csheedy_sshkey},
-#    sandstroms =>  { pub_key => $traf::users::sandstroms_sshkey},
-#  }
-#
-#  create_resources(jenkins::add_pub_key, $jenkins_auth_users)
 
   include apache
   include apache::mod::wsgi
@@ -137,13 +117,14 @@ class traf::static (
     require => File["${server_path}/downloads-www"],
   }
 
-  file { "${server_path}/downloads-www/getfile.php":
-    ensure  => file,
-    owner   => 'www-data',
-    group   => 'www-data',
-    content => template('traf/downloads/getfile.php.erb'),
-    require => File["${server_path}/downloads-www"],
-  }
+  ## pull files from HP-Cloud CDN
+  #file { "${server_path}/downloads-www/getfile.php":
+  #  ensure  => file,
+  #  owner   => 'www-data',
+  #  group   => 'www-data',
+  #  content => template('traf/downloads/getfile.php.erb'),
+  #  require => File["${server_path}/downloads-www"],
+  #}
 
   file { "${server_path}/downloads-www/common.js":
     ensure  => present,

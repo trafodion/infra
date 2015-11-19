@@ -33,25 +33,11 @@ node /^puppet.*/ {
   }
 }
 
-node 'dashboard.esgyn.com' {
-  class { 'traf::dashboard':
-    password       => hiera('dashboard_password'),
-    mysql_password => hiera('dashboard_mysql_password'),
-    sysadmins      => hiera('sysadmins'),
-  }
-}
-
 # A machine to serve static content.
 # For instance, domain home page, ftp server, etc.
-node 'static.trafodion.org' {
+node /^static.*/ {
   class { 'traf::static':
     sysadmins                     => hiera('sysadmins'),
-    reviewday_rsa_key_contents    => hiera('reviewday_rsa_key_contents'),
-    reviewday_rsa_pubkey_contents => hiera('reviewday_rsa_pubkey_contents'),
-    reviewday_gerrit_ssh_key      => hiera('gerrit_ssh_rsa_pubkey_contents'),
-    releasestatus_prvkey_contents => hiera('releasestatus_rsa_key_contents'),
-    releasestatus_pubkey_contents => hiera('releasestatus_rsa_pubkey_contents'),
-    releasestatus_gerrit_ssh_key  => hiera('gerrit_ssh_rsa_pubkey_contents'),
   }
 }
 
