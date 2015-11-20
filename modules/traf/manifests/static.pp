@@ -55,7 +55,7 @@ class traf::static (
   }
 
   ###########################################################
-  # www
+  # www -- send them to Apache trafodion project page
 
   apache::vhost { 'www.trafodion.org':
     port          => 80,
@@ -70,7 +70,8 @@ class traf::static (
   ###########################################################
   # Downloads
 
-  apache::vhost { 'traf-downloads.esgyn.com':
+  # testing "traf" -> "t2"
+  apache::vhost { 't2-downloads.esgyn.com':
     serveraliases  => "downloads.trafodion.org",
     port           => 80,
     priority       => '50',
@@ -207,23 +208,6 @@ class traf::static (
   }
 
 
-  ###########################################################
-  # Maven repository
-
-  apache::vhost { 'mvnrepo.trafodion.org':
-    port     => 80,
-    priority => '50',
-    docroot  => "${server_path}/mvnrepo",
-    require  => File["${server_path}/mvnrepo"],
-  }
-
-  file { "${server_path}/mvnrepo":
-    ensure  => directory,
-    owner   => 'jenkins',
-    group   => 'jenkins',
-    require => User['jenkins'],
-  }
-
 
   ###########################################################
   # Docs
@@ -247,7 +231,8 @@ class traf::static (
   ###########################################################
   # Logs
 
-  apache::vhost { 'traf-logs.esgyn.com':
+  # "traf" -> "t2"
+  apache::vhost { 't2-logs.esgyn.com':
     serveraliases  => "logs.trafodion.org",
     port           => 80,
     priority       => '50',
