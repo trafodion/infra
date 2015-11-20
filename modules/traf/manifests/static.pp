@@ -110,13 +110,14 @@ class traf::static (
     require => File["${server_path}/downloads-www"],
   }
 
-  file { "${server_path}/downloads-www/index.php":
-    ensure  => file,
-    owner   => 'www-data',
-    group   => 'www-data',
-    content => template('traf/downloads/index.php.erb'),
-    require => File["${server_path}/downloads-www"],
-  }
+  ## HP-cloud refs
+  #file { "${server_path}/downloads-www/index.php":
+  #  ensure  => file,
+  #  owner   => 'www-data',
+  #  group   => 'www-data',
+  #  content => template('traf/downloads/index.php.erb'),
+  #  require => File["${server_path}/downloads-www"],
+  #}
 
   ## pull files from HP-Cloud CDN
   #file { "${server_path}/downloads-www/getfile.php":

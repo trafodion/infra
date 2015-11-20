@@ -27,7 +27,7 @@ node 'jenkins.esgyn.com' {
 }
 
 # New master running puppet 3.x
-node /^puppet.*/ {
+node /^puppet*/ {
   class { 'traf::puppetmaster':
     sysadmins         => hiera('sysadmins'),
   }
@@ -35,7 +35,7 @@ node /^puppet.*/ {
 
 # A machine to serve static content.
 # For instance, domain home page, ftp server, etc.
-node /^static.*/ {
+node /^static*/ {
   class { 'traf::static':
     sysadmins                     => hiera('sysadmins'),
   }
@@ -50,7 +50,7 @@ node /^ldap\d\d.trafodion.org$/ {
 }
 
 # Dev servers
-node /^adev\d\d.*/ {
+node /^adev\d\d*/ {
   include traf
   class { 'traf::dev':
     sysadmins       => hiera('sysadmins'),
