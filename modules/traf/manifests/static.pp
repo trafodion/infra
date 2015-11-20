@@ -134,13 +134,6 @@ class traf::static (
     require => File["${server_path}/downloads-www"],
   }
 
-  file { "${server_path}/downloads-www/jquery.min.js":
-    ensure  => link,
-    target  => '/usr/share/javascript/jquery/jquery.min.js',
-    require => [File["${server_path}/downloads-www"],
-                Package['libjs-jquery']],
-  }
-
   file { "${server_path}/downloads-www/themes":
     ensure  => link,
     target  => "${server_path}/themes",
@@ -276,38 +269,6 @@ class traf::static (
     require     => File['/usr/local/sbin/log_archive_maintenance.sh'],
   }
 
-  ###########################################################
-  # Status
-
-  vcsrepo { '/opt/jquery-visibility':
-    ensure   => latest,
-    provider => git,
-    revision => 'master',
-    source   => 'https://github.com/mathiasbynens/jquery-visibility.git',
-  }
-
-  exec { 'install_jquery-visibility' :
-    command     => "yui-compressor -o ${server_path}/status/jquery-visibility.min.js /opt/jquery-visibility/jquery-visibility.js",
-    path        => '/bin:/usr/bin',
-    refreshonly => true,
-    subscribe   => Vcsrepo['/opt/jquery-visibility'],
-    require     => [Vcsrepo['/opt/jquery-visibility']],
-  }
-
-  exec { 'get-jquery-visibility.min':
-    command => '/usr/bin/curl https://raw.github.com/mathiasbynens/jquery-visibility/v1.0.6/jquery-visibility.min.js > /opt/jquery-visibility/jquery-visibility.min.js',
-    require => [Package['curl'],
-                Vcsrepo['/opt/jquery-visibility']],
-    cwd     => '/opt/jquery-visibility',
-    creates => '/opt/jquery-visibility/jquery-visibility.min.js',
-  }
-
-  vcsrepo { '/opt/jquery-graphite':
-    ensure   => latest,
-    provider => git,
-    revision => 'master',
-    source   => 'https://github.com/prestontimmons/graphitejs.git',
-  }
 
 
 
