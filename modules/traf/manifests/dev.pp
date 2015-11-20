@@ -21,6 +21,12 @@ class traf::dev (
     target => '/opt/traf',
   }
 
+  host { "${::hostname}.esgyn.com":
+    ensure       => present,
+    host_aliases => $::hostname,
+    ip           => $::ipaddress,
+  }
+
   class { 'traf::server':
     iptables_public_tcp_ports => ['5900:5999','45000:46000'], # VNC, DCS
     certname                  => $certname,
