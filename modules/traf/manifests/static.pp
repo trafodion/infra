@@ -23,31 +23,31 @@ class traf::static (
   include apache::mod::wsgi
 
   # make sure Curl and PHP is installed
-  $packages = ['curl','php5','php5-cli','libapache2-mod-php5','php5-mcrypt','libapache2-mod-xsendfile','lvm2','libjs-jquery','yui-compressor']
+  $packages = ['curl','php']
   package { $packages:
     ensure  => present,
-    require => Package['apache2'],
+    require => Package['httpd'],
   }
 
   a2mod { 'expires':
     ensure  => present,
-    require => Package['apache2'],
+    require => Package['httpd'],
   }
   a2mod { 'headers':
     ensure  => present,
-    require => Package['apache2'],
+    require => Package['httpd'],
   }
   a2mod { 'rewrite':
     ensure  => present,
-    require => Package['apache2'],
+    require => Package['httpd'],
   }
   a2mod { 'proxy':
     ensure  => present,
-    require => Package['apache2'],
+    require => Package['httpd'],
   }
   a2mod { 'proxy_http':
     ensure  => present,
-    require => Package['apache2'],
+    require => Package['httpd'],
   }
 
   file { $server_path:
@@ -385,7 +385,7 @@ class traf::static (
     cwd     => '/etc/apache2/conf.d',
     command => "/bin/sed -i -e 's/^ServerTokens .*/ServerTokens Prod/g' security",
     unless  => "/bin/grep -E '^ServerTokens Prod' security",
-    notify  => Service[apache2],
+    notify  => Service[httpd],
   }
 
   # update apache2 configuration
@@ -394,7 +394,7 @@ class traf::static (
     cwd     => '/etc/apache2',
     command => "/bin/sed -i -e 's/^    MaxClients .*/    MaxClients 75/g' -e 's/^    MaxRequestsPerChild .*/    MaxRequestsPerChild 600/g' apache2.conf",
     unless  => "/bin/grep -E '^    MaxClients 75' apache2.conf && /bin/grep -E '^    MaxRequestsPerChild 600' apache2.conf",
-    notify  => Service[apache2],
+    notify  => Service[httpd],
   }
 
   # update php.ini configuration
@@ -402,7 +402,7 @@ class traf::static (
     cwd     => '/etc/php5/apache2',
     command => "/bin/sed -i -e 's/^expose_php = .*/expose_php = Off/g' -e 's/^engine = .*/engine = Off/g' php.ini",
     unless  => "/bin/grep -E '^expose_php = Off' php.ini && /bin/grep -E '^engine = Off' php.ini",
-    notify  => Service[apache2],
+    notify  => Service[httpd],
   }
 
 }
