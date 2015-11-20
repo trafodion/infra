@@ -91,19 +91,25 @@ fi
 
 if [ -z $SKIPSTART ]; then /usr/local/bin/install-traf.sh $LDAP "$TRAF_DIR" "$DCS_INSTALL_DIR" "6" "installdrivers" || exit 1; fi
 
+source_env test
+if [[ $TRAFODION_VER_MAJOR -ge 2 ]]
+then
+  dbver="--dbmaj=$TRAFODION_VER_MAJOR --dbmin=$TRAFODION_VER_MINOR"
+else
+  dbver=""  # options added in 2.0.0 code
+fi
 dcsport=23400
 
 # run jdbc_test
 log_banner "jdbc_test.py"
 cd "$WORKSPACE/$TEST_DIR"
-./jdbc_test.py --appid=jdbc_test --target=localhost:$dcsport \
+./jdbc_test.py --appid=jdbc_test --target=localhost:$dcsport $dbver \
      --user=<%= jenkins_test_user %> --pw=<%= jenkins_test_password %> --javahome=$JAVA_HOME \
      --jdbctype=T4 --jdbccp=$WORKSPACE/clients/jdbc/lib/jdbcT4.jar ${TESTS}
 jdbcRes=$?
 
 # Report on parent directory of $TRAF_DIR, before uninstall removes trafodion user
 # Any core files means failure
-source_env test
 report_on_corefiles -u trafodion "${WORKSPACE}"
 coreCount=$?
 if [[ $coreCount -gt 0 ]]; then
