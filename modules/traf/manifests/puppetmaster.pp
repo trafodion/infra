@@ -13,7 +13,7 @@ class traf::puppetmaster (
   cron { 'updatepuppetmaster':
     user        => 'root',
     minute      => '*/15',
-    command     => 'sleep $((RANDOM\%600)) && cd /opt/config/production && git fetch -q && git reset -q --hard @{u} && cronic ./install_modules.sh && touch manifests/site.pp',
+    command     => 'sleep $((RANDOM\%600)) && cd /opt/config/production && git fetch -q && git reset -q --hard @{u} && cronic ./install_modules.sh',
     environment => 'PATH=/var/lib/gems/1.8/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',
     require     => File['/usr/local/bin/cronic'],
   }
