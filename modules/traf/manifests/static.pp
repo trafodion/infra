@@ -20,32 +20,17 @@ class traf::static (
 
 
   include apache
-  include apache::mod::wsgi
+  #include apache::mod::wsgi
+  include apache::mod::expires
+  include apache::mod::headers
+  include apache::mod::rewrite
+  include apache::mod::proxy
+  include apache::mod::proxy_http
+
 
   # make sure Curl and PHP is installed
   $packages = ['curl','php']
   package { $packages:
-    ensure  => present,
-    require => Package['httpd'],
-  }
-
-  a2mod { 'expires':
-    ensure  => present,
-    require => Package['httpd'],
-  }
-  a2mod { 'headers':
-    ensure  => present,
-    require => Package['httpd'],
-  }
-  a2mod { 'rewrite':
-    ensure  => present,
-    require => Package['httpd'],
-  }
-  a2mod { 'proxy':
-    ensure  => present,
-    require => Package['httpd'],
-  }
-  a2mod { 'proxy_http':
     ensure  => present,
     require => Package['httpd'],
   }
@@ -62,7 +47,7 @@ class traf::static (
     priority      => '01',
     docroot       => $server_path,
     serveraliases => ['trafodion.org', 'www.trafodion.com', 'trafodion.com', '15.125.67.182'],
-    template      => 'traf/www.vhost.erb',
+    #template      => 'traf/www.vhost.erb',
   }
 
 
