@@ -22,10 +22,10 @@ class traf::static (
   class { 'apache':
    server_tokens => 'Prod',
   }
-  class { 'apache::mod::event':
-   maxclients             => '75',
-   maxconnectionsperchild => '600',
-  }
+  #class { 'apache::mod::event':
+  # maxclients             => '75',
+  # maxconnectionsperchild => '600',
+  #}
   include apache::mod::wsgi
   #include apache::mod::expires
   #include apache::mod::headers
