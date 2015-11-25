@@ -78,29 +78,29 @@ class traf::static (
   # where download site resides
   file { "${server_path}/downloads-www":
     ensure => directory,
-    owner  => 'www-data',
-    group  => 'www-data',
+    owner  => 'apache',
+    group  => 'apache',
   }
 
   file { "${server_path}/downloads-www/lib":
     ensure  => directory,
-    owner   => 'www-data',
-    group   => 'www-data',
+    owner   => 'apache',
+    group   => 'apache',
     require => File["${server_path}/downloads-www"],
   }
 
   file { "${server_path}/downloads-www/favicon.ico":
     ensure  => present,
-    owner   => 'www-data',
-    group   => 'www-data',
+    owner   => 'apache',
+    group   => 'apache',
     source  => 'puppet:///modules/traf/favicon.ico',
     require => File["${server_path}/downloads-www"],
   }
 
   file { "${server_path}/downloads-www/favicon.png":
     ensure  => present,
-    owner   => 'www-data',
-    group   => 'www-data',
+    owner   => 'apache',
+    group   => 'apache',
     source  => 'puppet:///modules/traf/favicon.png',
     require => File["${server_path}/downloads-www"],
   }
@@ -108,8 +108,8 @@ class traf::static (
   ## HP-cloud refs
   #file { "${server_path}/downloads-www/index.php":
   #  ensure  => file,
-  #  owner   => 'www-data',
-  #  group   => 'www-data',
+  #  owner   => 'apache',
+  #  group   => 'apache',
   #  content => template('traf/downloads/index.php.erb'),
   #  require => File["${server_path}/downloads-www"],
   #}
@@ -117,8 +117,8 @@ class traf::static (
   ## pull files from HP-Cloud CDN
   #file { "${server_path}/downloads-www/getfile.php":
   #  ensure  => file,
-  #  owner   => 'www-data',
-  #  group   => 'www-data',
+  #  owner   => 'apache',
+  #  group   => 'apache',
   #  content => template('traf/downloads/getfile.php.erb'),
   #  require => File["${server_path}/downloads-www"],
   #}
