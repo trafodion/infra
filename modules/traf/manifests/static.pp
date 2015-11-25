@@ -70,12 +70,12 @@ class traf::static (
     serveraliases    => "downloads.trafodion.org",
     port             => 80,
     priority         => '50',
-    docroot          => "${server_path}/downloads-www",
+    docroot          => "${download_path}",
     setenv           => ['no-gzip dont-vary'],
-    require          => File["${server_path}/downloads-www"],
+    require          => File["${server_path}"],
   }
 
-  # where download site resides
+  # where download site resides --- not being used for daily builds (temporary)
   file { "${server_path}/downloads-www":
     ensure => directory,
     owner  => 'apache',
@@ -225,6 +225,7 @@ class traf::static (
       { path                => "${server_path}/logs",
         provider            => 'directory',
 	override            => ['None'],
+	options             => ['Indexes','FollowSymLinks','MultiViews'],
 	order               => 'Allow,Deny',
 	allow               => 'from all',
       },
