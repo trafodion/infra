@@ -21,6 +21,7 @@ class traf::static (
 
   class { 'apache':
    server_tokens => 'Prod',
+   server_signature => 'Off',
   }
   #class { 'apache::mod::event':
   # maxclients             => '75',
@@ -70,7 +71,6 @@ class traf::static (
     port             => 80,
     priority         => '50',
     docroot          => "${server_path}/downloads-www",
-    server_signature => 'Off',
     setenv           => ['no-gzip dont-vary'],
     require          => File["${server_path}/downloads-www"],
   }
@@ -215,7 +215,6 @@ class traf::static (
     port                => 80,
     priority            => '50',
     docroot             => "${server_path}/logs",
-    server_signature    => 'Off',
     directories         => [
       { path                => '\.html\.gz$',
         provider            => 'filesmatch',
