@@ -27,11 +27,11 @@ class traf::static (
    maxconnectionsperchild => '600',
   }
   include apache::mod::wsgi
-  include apache::mod::expires
-  include apache::mod::headers
+  #include apache::mod::expires
+  #include apache::mod::headers
   include apache::mod::rewrite
-  include apache::mod::proxy
-  include apache::mod::proxy_http
+  #include apache::mod::proxy
+  #include apache::mod::proxy_http
   include apache::mod::deflate
 
 
