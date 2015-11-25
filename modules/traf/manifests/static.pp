@@ -210,7 +210,7 @@ class traf::static (
   # Logs
 
   # "traf" -> "t2"
-  apache::vhost { 't2-logs.esgyn.com':
+  apache::vhost { 'traf-testlogs.esgyn.com':
     serveraliases       => "logs.trafodion.org",
     port                => 80,
     priority            => '50',
