@@ -27,25 +27,14 @@ fi
 remove_module "gearman" #remove old saz-gearman
 remove_module "limits" # remove saz-limits (required by saz-gearman)
 
-# Concat module ----
-# razorsedge-cloudera depends on postgressql <3.0
-# postgressql (<3.0) depends on ripienaar instead of puppetlabs
-# When razorsedge-cloudera upgrades dependency to newer postgressql, 
-# then we'll need puppetlabs-concat module
-remove_module "haproxy" # not used and has puppetlabs-concat dependency
-if puppet module list | grep puppetlabs-concat
-then
-  remove_module "concat" # conflicts with ripienaar concat
-fi
-
 if [[ $(puppet --version) =~ 3.* ]]
 then
   MODULES["puppetlabs-ntp"]="3.3.0"
   MODULES["puppetlabs-apt"]="1.8.0"
   MODULES["puppetlabs-mysql"]="2.3.1" 
-  MODULES["razorsedge-cloudera"]="2.2.1"
+  MODULES["razorsedge-cloudera"]="3.0.0"
   MODULES["puppetlabs-vcsrepo"]="1.2.0"
-  MODULES["puppetlabs-apache"]="0.0.4"
+  MODULES["puppetlabs-apache"]="1.7.0"
   MODULES["puppetlabs-stdlib"]="4.5.1"
   MODULES["saz-memcached"]="2.6.0"
   MODULES["spiette-selinux"]="0.5.4"
