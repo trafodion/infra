@@ -74,7 +74,7 @@ class traf::dev (
   }
 
 
-  package { ['emacs','gitk','gedit','kdesdk','firefox','vim-enhanced']:
+  package { ['emacs','gitk','gedit','kdesdk','firefox','vim-enhanced','xterm']:
     ensure => present,
   }
   # work-around for group install
@@ -134,7 +134,7 @@ class traf::dev (
     ensure   => present,
     provider => rpm,
     source   => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
-    require  => Exec['get_vnc_rpm'],
+    require  => [ Exec['get_vnc_rpm'], Package['xterm'] ],
   }
   file { '/etc/vnc/config.d/Xvnc':
     ensure  => present,
