@@ -16,8 +16,9 @@
 function header(activeTabName) {
   tabsName = new Array();
   tabsLink = new Array();
-  tabsName[0] = 'Downloads'; tabsLink[0] = 'http://traf-downloads.esgyn.com/';
-  tabsName[1] = 'Documentation'; tabsLink[1] = 'http://docs.trafodion.org';
+  tabsName[0] = 'Downloads'; tabsLink[0] = 'http://t2-downloads.esgyn.com/';
+  tabsName[1] = 'Trafodion Project'; tabsLink[1] = 'http://trafodion.incubator.apache.org';
+  tabsName[2] = 'Trafodion Wiki'; tabsLink[2] = 'https://cwiki.apache.org/confluence/display/TRAFODION';
 
   document.write(
    '<div id="header" class="container">'+
@@ -52,29 +53,8 @@ function footer() {
   '<h3>Trafodion</h3>'+
   '<ul>'+
   ' <li><a href="https://trafodion.incubator.apache.org">Project</a></li>'+
-//  ' <li><a href="https:/wiki.trafodion.org/wiki/index.php/trafodion-security/">Trafodion Security</a></li>'+
-//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Software">Understanding the Software</a></li>'+
-//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Blog">Blog</a></li>'+
   '</ul>'+
   '</div>\n'+
-  '<div class="span-4">'+
-  '<h3>Documentation</h3>'+
-  '<ul>'+
-  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Documentation">Trafodion Documentation</a></li>'+
-  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Using_the_Software">Using the Software</a></li>'+
-  ' <li><a href="https://wiki.trafodion.org/">Trafodion Wiki</a></li>'+
-  '</ul>'+
-  '</div>\n'+
-//  '<div class="span-4 last">'+
-//  '<h3>Branding &amp; Legal</h3>'+
-//  '<ul>'+
-//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/Legal_Information">Legal Information</a></li>'+
-//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/brand/">Logos &amp; Guidelines</a></li>'+
-//  ' <li><a href="https://wiki.trafodion.org/wiki/index.php/brand/trafodion-trademark-policy/">Trademark Policy</a></li>'+
-//  ' <li><a href="http://www8.hp.com/us/en/privacy/privacy.html">Privacy Policy</a></li>'+
-//  ' <li><a href="https://review.trafodion.org/static/cla.html">Trafodion CLA</a></li>'+
-//  '</ul>'+
-//  '</div>'+
   '</div>'+
   '</div>')
 }

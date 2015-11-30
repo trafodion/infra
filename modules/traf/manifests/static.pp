@@ -123,19 +123,19 @@ class traf::static (
   #  require => File["${server_path}/downloads-www"],
   #}
 
-#  file { "${server_path}/downloads-www/common.js":
-#    ensure  => present,
-#    source  => 'puppet:///modules/traf/status/common.js',
-#    require => File["${server_path}/downloads-www"],
-#  }
-#
-#  file { "${server_path}/downloads-www/themes":
-#    ensure  => link,
-#    target  => "${server_path}/themes",
-#    require => [File["${server_path}/downloads-www"],
-#                File["${server_path}/themes"]],
-#  }
-#
+  file { "${server_path}/downloads-www/common.js":
+    ensure  => present,
+    source  => 'puppet:///modules/traf/status/common.js',
+    require => File["${server_path}/downloads-www"],
+  }
+
+  file { "${server_path}/downloads-www/themes":
+    ensure  => link,
+    target  => "${server_path}/themes",
+    require => [File["${server_path}/downloads-www"],
+                File["${server_path}/themes"]],
+  }
+
 #  exec { 'get-httpful-phar':
 #    command => "/usr/bin/curl http://phphttpclient.com/downloads/httpful.phar > ${server_path}/downloads-www/lib/httpful.phar",
 #    cwd     => "${server_path}/downloads-www/lib",
@@ -280,53 +280,53 @@ class traf::static (
   ###########################################################
   # www
 
-#  file { "${server_path}/themes":
-#    ensure  => directory,
-#    mode    => '0755',
-#    recurse => true,
-#  }
-#
-#  file { "${server_path}/themes/trafodion":
-#    ensure  => directory,
-#    mode    => '0755',
-#    recurse => true,
-#    require => File["${server_path}/themes"],
-#  }
-#
-#  file { "${server_path}/themes/trafodion/images":
-#    ensure  => directory,
-#    mode    => '0755',
-#    recurse => true,
-#    source  => 'puppet:///modules/traf/images/',
-#    require => File["${server_path}/themes/trafodion"],
-#  }
-#
-#  file { "${server_path}/themes/trafodion/images/Trafodion.png":
-#    ensure  => present,
-#    source  => 'puppet:///modules/traf/Trafodion.png',
-#    require => File["${server_path}/themes/trafodion/images"],
-#  }
-#
-#  file { "${server_path}/themes/trafodion/css":
-#    ensure  => directory,
-#    mode    => '0755',
-#    recurse => true,
-#    require => File["${server_path}/themes/trafodion"],
-#  }
-#
-#  vcsrepo { '/opt/blueprint-css':
-#    ensure   => latest,
-#    provider => git,
-#    revision => 'master',
-#    source   => 'https://github.com/joshuaclayton/blueprint-css.git',
-#  }
-#
-#  file { "${server_path}/themes/trafodion/css/blueprint":
-#    ensure  => link,
-#    target  => '/opt/blueprint-css/blueprint',
-#    require => [File["${server_path}/themes/trafodion/css"],
-#                Vcsrepo['/opt/blueprint-css']],
-#  }
+  file { "${server_path}/themes":
+    ensure  => directory,
+    mode    => '0755',
+    recurse => true,
+  }
+
+  file { "${server_path}/themes/trafodion":
+    ensure  => directory,
+    mode    => '0755',
+    recurse => true,
+    require => File["${server_path}/themes"],
+  }
+
+  file { "${server_path}/themes/trafodion/images":
+    ensure  => directory,
+    mode    => '0755',
+    recurse => true,
+    source  => 'puppet:///modules/traf/images/',
+    require => File["${server_path}/themes/trafodion"],
+  }
+
+  file { "${server_path}/themes/trafodion/images/Trafodion.png":
+    ensure  => present,
+    source  => 'puppet:///modules/traf/Trafodion.png',
+    require => File["${server_path}/themes/trafodion/images"],
+  }
+
+  file { "${server_path}/themes/trafodion/css":
+    ensure  => directory,
+    mode    => '0755',
+    recurse => true,
+    require => File["${server_path}/themes/trafodion"],
+  }
+
+  vcsrepo { '/opt/blueprint-css':
+    ensure   => latest,
+    provider => git,
+    revision => 'master',
+    source   => 'https://github.com/joshuaclayton/blueprint-css.git',
+  }
+
+  file { "${server_path}/themes/trafodion/css/blueprint":
+    ensure  => link,
+    target  => '/opt/blueprint-css/blueprint',
+    require => [File["${server_path}/themes/trafodion/css"],
+                Vcsrepo['/opt/blueprint-css']],
+  }
 #
 #  file { "${server_path}/themes/trafodion/css/dropdown.css":
 #    ensure  => present,
