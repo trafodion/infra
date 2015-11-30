@@ -65,7 +65,7 @@ class traf::static (
   ###########################################################
   # Downloads
 
-  apache::vhost { 'traf-build.esgyn.com':
+  apache::vhost { 'traf-builds.esgyn.com':
     serveraliases    => "downloads.trafodion.org",
     port             => 80,
     priority         => '50',
