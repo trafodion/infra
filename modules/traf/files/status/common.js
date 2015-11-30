@@ -16,7 +16,7 @@
 function header(activeTabName) {
   tabsName = new Array();
   tabsLink = new Array();
-  tabsName[0] = 'Downloads'; tabsLink[0] = 'http://t2-downloads.esgyn.com/';
+  tabsName[0] = 'Downloads'; tabsLink[0] = 'http://traf-build.esgyn.com/';
   tabsName[1] = 'Trafodion Project'; tabsLink[1] = 'http://trafodion.incubator.apache.org';
   tabsName[2] = 'Trafodion Wiki'; tabsLink[2] = 'https://cwiki.apache.org/confluence/display/TRAFODION';
 

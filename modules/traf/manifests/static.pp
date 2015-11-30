@@ -65,8 +65,7 @@ class traf::static (
   ###########################################################
   # Downloads
 
-  # testing "traf" -> "t2"
-  apache::vhost { 't2-downloads.esgyn.com':
+  apache::vhost { 'traf-build.esgyn.com':
     serveraliases    => "downloads.trafodion.org",
     port             => 80,
     priority         => '50',
@@ -75,7 +74,7 @@ class traf::static (
     require          => File["${server_path}"],
   }
 
-  # where download site resides --- not being used for daily builds (temporary)
+  # where download site resides 
   file { "${server_path}/downloads-www":
     ensure => directory,
     owner  => 'apache',
