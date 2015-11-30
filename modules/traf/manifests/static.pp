@@ -69,7 +69,7 @@ class traf::static (
     serveraliases    => "downloads.trafodion.org",
     port             => 80,
     priority         => '50',
-    docroot          => "${download_path}",
+    docroot          => "${server_path}/downloads-www",
     setenv           => ['no-gzip dont-vary'],
     require          => File["${server_path}"],
   }
@@ -104,14 +104,13 @@ class traf::static (
     require => File["${server_path}/downloads-www"],
   }
 
-  ## HP-cloud refs
-  #file { "${server_path}/downloads-www/index.php":
-  #  ensure  => file,
-  #  owner   => 'apache',
-  #  group   => 'apache',
-  #  content => template('traf/downloads/index.php.erb'),
-  #  require => File["${server_path}/downloads-www"],
-  #}
+  file { "${server_path}/downloads-www/index.php":
+    ensure  => file,
+    owner   => 'apache',
+    group   => 'apache',
+    content => template('traf/downloads/index.php.erb'),
+    require => File["${server_path}/downloads-www"],
+  }
 
   ## pull files from HP-Cloud CDN
   #file { "${server_path}/downloads-www/getfile.php":
