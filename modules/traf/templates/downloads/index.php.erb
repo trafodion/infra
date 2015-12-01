@@ -206,7 +206,7 @@
 
         # releases
         echo '<div>' . PHP_EOL;
-        echo '    <h2 class="subhead">Latest (Pre-Apache) Release</h2>' . PHP_EOL;
+        echo '    <h2 class="subhead">Pre-Apache Release</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
         echo '<li><a href="https://s3-us-west-2.amazonaws.com/trafodion.release/1.1.0/clients-1.1.0.tar.gz">clients-1.1.0.tar.gz</a></li>' . PHP_EOL;
         echo '<li><a href="https://s3-us-west-2.amazonaws.com/trafodion.release/1.1.0/trafodion-1.1.0.tar.gz">trafodion-1.1.0.tar.gz</a></li>' . PHP_EOL;
@@ -282,11 +282,12 @@
 
         # Create array for daily
         echo '<div>' . PHP_EOL;
-        echo '    <h2 class="subhead">Daily (For Testing Use Only)</h2>' . PHP_EOL;
+        echo '    <h2 class="subhead">Daily Build (For Development Testing Only)</h2>' . PHP_EOL;
         echo '    <ul>' . PHP_EOL;
 #        $dailyArray = array_filter($cdnArray, "daily");
         $dailyArray = find_all_files("downloads/trafodion/publish/daily");
         array_walk($dailyArray, 'print_links', 'daily');
+        echo '<li><a href="http://traf-downloads.esgyn.com">Older daily builds</a></li>' . PHP_EOL;
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
