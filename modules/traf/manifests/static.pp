@@ -18,6 +18,9 @@ class traf::static (
     ssh_key => $traf::jenkins_ssh_key,
   }
 
+  class { 'selinux':
+    mode => 'disabled',
+  }
 
   class { 'apache':
    server_tokens => 'Prod',

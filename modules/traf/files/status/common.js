@@ -50,10 +50,7 @@ function footer() {
   '<hr>'+
   '<div id="footer">'+
   '<div class="span-4">'+
-  '<h3>Trafodion</h3>'+
-  '<ul>'+
-  ' <li><a href="https://trafodion.incubator.apache.org">Project</a></li>'+
-  '</ul>'+
+  '<a href="https://trafodion.incubator.apache.org">Trafodion Project</a></li>'+
   '</div>\n'+
   '</div>'+
   '</div>')
