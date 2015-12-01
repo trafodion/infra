@@ -98,7 +98,7 @@ class traf::static (
     owner  => 'apache',
     group  => 'apache',
   }
-  file { "${server_path}/downloads-www":
+  file { "${server_path}/downloads-www/downloads":
     ensure => link,
     target  => "${server_path}/downloads",
     owner  => 'apache',
