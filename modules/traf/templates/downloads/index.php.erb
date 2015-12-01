@@ -129,7 +129,8 @@
                 $shortFname = basename($item);
                 $fName = $item;
                 if ($fName != "empty") {
-                    echo '<li><a class="postlink" href="#" target="_blank" data-f="' . $fName . '">' . $shortFname . '</a></li>' . PHP_EOL;
+#                    echo '<li><a class="postlink" href="#" target="_blank" data-f="' . $fName . '">' . $shortFname . '</a></li>' . PHP_EOL;
+                    echo '<li><a href="' . $fName . '">' . $shortFname . '</a></li>' . PHP_EOL;
                 } else {
                     echo '<li class="empty">&nbsp;</li>' . PHP_EOL;
                 }
@@ -143,7 +144,7 @@
         # main
         #
 
-        $scriptPath = __DIR__;
+#        $scriptPath = __DIR__;
 
         # include HTTPFUL PHP REST Library
 #        include ($scriptPath . '/lib/httpful.phar');
@@ -181,6 +182,20 @@
         # natural sort the generated array then reverse it
 #        natsort($tCdnArray);
 #        $cdnArray = array_reverse($tCdnArray);
+
+        # Walk local dir
+        function find_all_files($dir) {
+            $root = scandir($dir);
+            foreach($root as $value) {
+                if($value === '.' || $value === '..') {continue;}
+                if(is_file("$dir/$value")) {$result[]="$dir/$value";continue;}
+                foreach(find_all_files("$dir/$value") as $value) {
+                    $result[]=$value;
+                }
+            }
+            return $result;
+        }
+
 
         echo '<div>' . PHP_EOL;
         echo '    <h2 class="subhead">Apache (Incubating) Releases - Convenience Binaries</h2>' . PHP_EOL;
@@ -270,7 +285,8 @@
         echo '    <h2 class="subhead">Daily (For Testing Use Only)</h2>' . PHP_EOL;
         echo '    <ul>' . PHP_EOL;
 #        $dailyArray = array_filter($cdnArray, "daily");
-#        array_walk($dailyArray, 'print_links', 'daily');
+        $dailyArray = find_all_files("../downloads/trafodion/publish/daily");
+        array_walk($dailyArray, 'print_links', 'daily');
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
