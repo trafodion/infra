@@ -124,7 +124,7 @@ class traf::dev (
 
   # Real VNC
   exec { 'get_vnc_rpm' :
-    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/VNC-Server-5.2.3-Linux-x64.rpm /opt/dev",
+    command => "/usr/bin/scp traf-builds.esgyn.com:/srv/static/downloads/dev-tools/VNC-Server-5.2.3-Linux-x64.rpm /opt/dev",
     timeout => 900,
     user    => 'jenkins',
     creates => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
@@ -160,7 +160,7 @@ class traf::dev (
   }
   # eclipse
   exec { 'get_dev_eclipse' :
-    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz /opt/dev",
+    command => "/usr/bin/scp traf-builds.esgyn.com:/srv/static/downloads/dev-tools/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz /opt/dev",
     timeout => 900,
     user    => 'jenkins',
     creates => "/opt/dev/eclipse-java-cpp-mars-R-linux-gtk-x86_64.tgz",
@@ -174,7 +174,7 @@ class traf::dev (
   }
   # local SW
   exec { 'get_dev_swdist' :
-    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/local_sw_dist.tgz /opt/dev",
+    command => "/usr/bin/scp traf-builds.esgyn.com:/srv/static/downloads/dev-tools/local_sw_dist.tgz /opt/dev",
     timeout => 900,
     user    => 'jenkins',
     creates => "/opt/dev/local_sw_dist.tgz",

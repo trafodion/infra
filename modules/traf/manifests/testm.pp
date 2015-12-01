@@ -63,11 +63,6 @@ class traf::testm (
     command => '/usr/bin/yum -y groupinstall "X Window System"',
   }
 
-  # swap file
-  # take the defaults - same size as memory
-  class { 'swap_file':
-    swapfile => '/mnt/swapfile',
-  }
 
   # firefox
   file { '/opt/dev':
@@ -75,19 +70,6 @@ class traf::testm (
     owner  => 'jenkins',
     group  => 'jenkins',
     mode   => '0644',
-  }
-  exec { 'get_dev_tools' :
-    command => "/usr/bin/scp traf-downloads.esgyn.com:/srv/static/downloads/dev-tools/firefox-38.0.5.tar.bz2 /opt/dev",
-    timeout => 900,
-    user    => 'jenkins',
-    creates => "/opt/dev/firefox-38.0.5.tar.bz2",
-    require => File['/opt/dev'],
-  }
-  exec { 'untar-firefox' :
-    command => '/bin/tar xf /opt/dev/firefox-38.0.5.tar.bz2',
-    cwd     => "/opt", 
-    creates => "/opt/firefox",
-    require => Exec['get_dev_tools'],
   }
 
   # user accounts

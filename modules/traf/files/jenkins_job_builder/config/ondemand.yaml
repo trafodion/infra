@@ -72,8 +72,8 @@
             Release Automated Testing $TAGTYPE $TAG
 
             Jenkins Job:   $BUILD_URL
-            Archived Logs: http://traf-logs.esgyn.com/$LOG_PATH
-            Bld Downloads: http://traf-downloads.esgyn.com/
+            Archived Logs: http://traf-testlogs.esgyn.com/$LOG_PATH
+            Bld Downloads: http://traf-builds.esgyn.com/
             
             Test Job Results:
             
@@ -263,7 +263,7 @@
             Requested Automated Testing
 
             Jenkins Job:   $BUILD_URL
-            Archived Logs: http://traf-logs.esgyn.com/$LOG_PATH
+            Archived Logs: http://traf-testlogs.esgyn.com/$LOG_PATH
             
             Test Job Results:
             

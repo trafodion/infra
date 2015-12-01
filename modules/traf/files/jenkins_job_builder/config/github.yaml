@@ -477,8 +477,8 @@
             Daily Automated Testing {branch}
 
             Jenkins Job:   $BUILD_URL
-            Archived Logs: http://traf-logs.esgyn.com/$LOG_PATH
-            Bld Downloads: http://traf-downloads.esgyn.com
+            Archived Logs: http://traf-testlogs.esgyn.com/$LOG_PATH
+            Bld Downloads: http://traf-builds.esgyn.com
             
             Changes since previous daily build:
             $CHANGES

@@ -39,7 +39,7 @@ source_env -v build $FLAVOR
 cd trafodion/core
 
 # Pull latest posted Win-ODBC build if available
-WINLOC="http://traf-logs.esgyn.com/winbld"
+WINLOC="http://traf-testlogs.esgyn.com/winbld"
 
 mkdir -p conn/clients
 
