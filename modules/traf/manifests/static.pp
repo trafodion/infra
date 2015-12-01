@@ -37,8 +37,8 @@ class traf::static (
   #include apache::mod::proxy
   #include apache::mod::proxy_http
   include apache::mod::deflate
-  #class { 'apache::mod::php':
-  #}
+  class { 'apache::mod::php':
+  }
 
 
   # make sure Curl and PHP is installed
