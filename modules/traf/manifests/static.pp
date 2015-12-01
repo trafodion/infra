@@ -34,6 +34,8 @@ class traf::static (
   #include apache::mod::proxy
   #include apache::mod::proxy_http
   include apache::mod::deflate
+  #class { 'apache::mod::php':
+  #}
 
 
   # make sure Curl and PHP is installed
@@ -66,12 +68,20 @@ class traf::static (
   # Downloads
 
   apache::vhost { 'traf-builds.esgyn.com':
-    serveraliases    => "downloads.trafodion.org",
-    port             => 80,
-    priority         => '50',
-    docroot          => "${server_path}/downloads-www",
-    setenv           => ['no-gzip dont-vary'],
-    require          => File["${server_path}"],
+    serveraliases => "downloads.trafodion.org",
+    port          => 80,
+    priority      => '50',
+    docroot       => "${server_path}/downloads-www",
+    directories   => [
+      { path         => '\.php$',
+        provider     => 'filesmatch',
+        handler      => 'application/x-httpd-php',
+      },
+    ],
+    setenv        => ['no-gzip dont-vary'],
+    order         => 'Allow,Deny',
+    allow         => 'from all',
+    require       => File["${server_path}"],
   }
 
   # where download site resides 
@@ -207,7 +217,6 @@ class traf::static (
   ###########################################################
   # Logs
 
-  # "traf" -> "t2"
   apache::vhost { 'traf-testlogs.esgyn.com':
     serveraliases       => "logs.trafodion.org",
     port                => 80,
