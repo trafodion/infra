@@ -37,7 +37,7 @@ then
   MODULES["puppetlabs-apache"]="1.7.0"
   MODULES["puppetlabs-stdlib"]="4.5.1"
   MODULES["saz-memcached"]="2.6.0"
-  MODULES["spiette-selinux"]="0.5.4"
+  MODULES["jfryman-selinux"]="0.2.6"
   MODULES["rafaelfc-pear"]="1.0.3"
   MODULES["maestrodev-maven"]="1.4.0"
   MODULES["petems-swap_file"]="1.0.1"
