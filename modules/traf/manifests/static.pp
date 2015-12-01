@@ -77,10 +77,15 @@ class traf::static (
         provider     => 'filesmatch',
         handler      => 'application/x-httpd-php',
       },
+      { path         => "${server_path}/downloads-www",
+        provider     => 'directory',
+	override     => ['None'],
+	options      => ['Indexes','FollowSymLinks','MultiViews'],
+	order        => 'Allow,Deny',
+	allow        => 'from all',
+      },
     ],
     setenv        => ['no-gzip dont-vary'],
-    order         => 'Allow,Deny',
-    allow         => 'from all',
     require       => File["${server_path}"],
   }
 
