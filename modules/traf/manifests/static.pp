@@ -87,13 +87,6 @@ class traf::static (
 	order        => 'Allow,Deny',
 	allow        => 'from all',
       },
-      { path         => "${server_path}/downloads",
-        provider     => 'directory',
-	override     => ['None'],
-	options      => ['Indexes','FollowSymLinks','MultiViews'],
-	order        => 'Allow,Deny',
-	allow        => 'from all',
-      },
     ],
     setenv        => ['no-gzip dont-vary'],
     require       => File["${server_path}"],
@@ -104,6 +97,13 @@ class traf::static (
     ensure => directory,
     owner  => 'apache',
     group  => 'apache',
+  }
+  file { "${server_path}/downloads-www":
+    ensure => link,
+    target  => "${server_path}/downloads",
+    owner  => 'apache',
+    group  => 'apache',
+    mode    => '0775',
   }
 
   file { "${server_path}/downloads-www/lib":

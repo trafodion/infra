@@ -285,7 +285,7 @@
         echo '    <h2 class="subhead">Daily (For Testing Use Only)</h2>' . PHP_EOL;
         echo '    <ul>' . PHP_EOL;
 #        $dailyArray = array_filter($cdnArray, "daily");
-        $dailyArray = find_all_files("../downloads/trafodion/publish/daily");
+        $dailyArray = find_all_files("downloads/trafodion/publish/daily");
         array_walk($dailyArray, 'print_links', 'daily');
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
