@@ -35,7 +35,7 @@ class jenkins::master(
 
   apt::source { 'jenkins':
     location    => 'http://pkg.jenkins-ci.org/debian-stable',
-    release     => '1.609.3',
+    release     => 'binary/',
     repos       => '',
     require     => [
       Apt::Key['jenkins'],
@@ -111,7 +111,7 @@ class jenkins::master(
   }
 
   package { 'jenkins':
-    ensure  => present,
+    ensure  => '1.609.3',
     require => Apt::Source['jenkins'],
   }
 
