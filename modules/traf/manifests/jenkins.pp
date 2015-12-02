@@ -32,25 +32,6 @@ class traf::jenkins (
     $ssl_chain_file = ''
   }
 
-## machine set up with data disk mounted at /var/lib/jenkins
-
-#  # set up mount point for jenkins workspaces
-#  file { '/mnt/jenkins':
-#    ensure                  => directory,
-#    mode                    => '0755',
-#    selinux_ignore_defaults => true,
-#  }
-  # depends on /var/lib/jenkins dir, but specifying it
-  # here creates a circular dependency. It must be manually created the first time
-#  mount { '/var/lib/jenkins':
-#    ensure  => mounted,
-#    atboot  => true,
-#    fstype  => 'none',
-#    options => 'bind',
-#    device  => '/mnt/jenkins',
-#    require => [ File['/mnt/jenkins'] ],
-#  }
-
   class { '::jenkins::master':
     vhost_name              => $vhost_name,
     vhost_alias             => $vhost_alias,
@@ -64,7 +45,6 @@ class traf::jenkins (
     ssl_chain_file_contents => $ssl_chain_file_contents,
     jenkins_ssh_private_key => $jenkins_ssh_private_key,
     jenkins_ssh_public_key  => $traf::jenkins_ssh_pub_key,
-    require                 => [ Mount['/var/lib/jenkins'] ],
   }
 
   $ghauth = hiera('jenkins_github_auth','none')
@@ -75,7 +55,6 @@ class traf::jenkins (
       owner   => 'jenkins',
       group   => 'jenkins',
       mode    => '0600',
-      require => [ Mount['/var/lib/jenkins'] ],
     }
   }
 
