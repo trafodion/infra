@@ -16,7 +16,6 @@ class jenkins::master(
 ) {
   include pip
   include apt
-  include apache
 
   package { 'openjdk-7-jre-headless':
     ensure => present,
@@ -45,22 +44,31 @@ class jenkins::master(
     include_src => false,
   }
 
+  include apache
+  include apache::mod::rewrite
+  apache::vhost { "$vhost_name-redirect":
+    serveraliases   => $vhost_alias,
+    port            => 80,
+    docroot         => '/var/www',
+    priority        => '20',
+    redirect_status => 'permanent',
+    redirect_dest   => 'https://$vhost_name/',
+  }
   apache::vhost { $vhost_name:
     serveraliases => $vhost_alias,
     port          => 443,
-    docroot       => 'MEANINGLESS ARGUMENT',
+    docroot       => '/var/www',
     priority      => '50',
-    template      => 'jenkins/jenkins.vhost.erb',
     ssl           => true,
-  }
-  a2mod { 'rewrite':
-    ensure => present,
-  }
-  a2mod { 'proxy':
-    ensure => present,
-  }
-  a2mod { 'proxy_http':
-    ensure => present,
+    serveradmin   => $serveradmin,
+    ssl_chain     => $ssl_chain_file,
+    ssl_key       => $ssl_key_file,
+    ssl_cert      => $ssl_cert_file,
+    rewrites      => [
+      { rewrite_cond => ["%{HTTP_HOST} !$vhost_name"],
+        rewrite_rule => ["^.*$ https://$vhost_name/"],
+      },
+    ],
   }
 
   if $ssl_cert_file_contents != '' {

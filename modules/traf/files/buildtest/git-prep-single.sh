@@ -91,7 +91,7 @@ workspace="$(pwd)"
 echo "Using reference: $sha1"
 
 # Build ID across repos
-BLDInfo="$BUILD_TYPE $BUILD_ID"
+BLDInfo="$BUILD_TYPE $BUILD_TIMESTAMP"
 rm -f "$workspace/Build_ID" "$workspace/Code_Versions"
 
 if [[ -n "$ghprbPullId" ]]

@@ -141,8 +141,6 @@ class traf::slave (
     refreshonly => true,
   }
 
-  include jenkins::cgroups
-
   if $distro =~ /^AHW|^CM/ {
     class { 'traf::hadoop':
       certname    => $certname,

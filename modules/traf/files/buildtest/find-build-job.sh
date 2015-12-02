@@ -26,7 +26,7 @@
 #     or
 #   TAG - release builds
 #     or
-#   date portion of BUILD_ID (for TIMER triggered)
+#   date portion of BUILD_TIMESTAMP (for TIMER triggered)
 #
 # Waits on build job to be complete.
 #
@@ -104,8 +104,8 @@ do
 	jq -r '.actions[].parameters[] | select(.name == "BUILD_TYPE").value' 2>/dev/null)
       if [[ $bld_type == "daily" ]]
       then
-        bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_ID' 2>/dev/null)
-        if [[ ${bld_date%_*} == ${BUILD_ID%_*} ]]
+        bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_TIMESTAMP' 2>/dev/null)
+        if [[ ${bld_date%_*} == ${BUILD_TIMESTAMP%_*} ]]
         then
           MyBuild=$Bld
           if [[ "$ROOT_BUILD_CAUSE" == "TIMERTRIGGER" ]]

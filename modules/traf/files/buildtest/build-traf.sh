@@ -60,7 +60,7 @@ done
 # Use Zuul / Jenkins values
 VER="$(git describe --long --tags --dirty --always)"
 export PV_BUILDID=${VER}_Bld${BUILD_NUMBER}
-export PV_DATE=$(echo ${BUILD_ID} | sed 's/-//g')
+export PV_DATE=$(echo ${BUILD_TIMESTAMP} | sed 's/-//g')
 
 make $TARGET > Make.log 2>&1
 rc=$?
