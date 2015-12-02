@@ -12,31 +12,15 @@ class traf::jenkins (
   $ssl_key_file_contents = '',
   $ssl_chain_file_contents = '',
   $jenkins_ssh_private_key = '',
-  $zmq_event_receivers = [],
   $sysadmins = []
 ) {
   include traf
-  include traf::cloudeast
 
-  $iptables_rule = regsubst ($zmq_event_receivers, '^(.*)$', '-m state --state NEW -m tcp -p tcp --dport 8888 -s \1 -j ACCEPT')
   class { 'traf::server':
     iptables_public_tcp_ports => [80, 443, 8080],
-    iptables_rules6           => $iptables_rule,
-    iptables_rules4           => $iptables_rule,
     sysadmins                 => $sysadmins,
   }
 
-  # install rake and puppetlabs_spec_helper from ruby gems
-  # so puppet-lint can run on jenkins
-  package { 'rake':
-    ensure   => latest,
-    provider => 'gem',
-  }
-
-  package { 'puppetlabs_spec_helper':
-    ensure   => latest,
-    provider => 'gem',
-  }
   # json parser for API
   package { 'jq':
     ensure => present,
@@ -93,20 +77,6 @@ class traf::jenkins (
     }
   }
 
-  # jenkins master needs Gerrit's SSL cert
-  file { '/usr/local/share/ca-certificates/review.crt':
-    ensure  => present,
-    content => hiera('gerrit_ssl_cert_file_contents'),
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    notify  => Exec['update-ca-trust'],
-  }
-
-  exec { 'update-ca-trust':
-    command     => '/usr/sbin/update-ca-certificates; /usr/sbin/update-ca-certificates --fresh',
-    refreshonly => true,
-  }
 
   # ensure user jenkins home directory is set correctly in /etc/passwd
   group { 'jenkins':
