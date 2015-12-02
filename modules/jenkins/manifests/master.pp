@@ -111,7 +111,7 @@ class jenkins::master(
   }
 
   package { 'jenkins':
-    ensure  => '1.609.3',
+    ensure  => 'present',
     require => Apt::Source['jenkins'],
   }
 
