@@ -52,7 +52,7 @@ class jenkins::master(
     docroot         => '/var/www',
     priority        => '20',
     redirect_status => 'permanent',
-    redirect_dest   => 'https://$vhost_name/',
+    redirect_dest   => "https://$vhost_name/",
   }
   apache::vhost { $vhost_name:
     serveraliases => $vhost_alias,

@@ -12,10 +12,10 @@ node default {
 }
 
 
-# Jenkins master for US East
-node 'jenkins.esgyn.com' {
+# Jenkins master
+node /jenkins/ {
   class { 'traf::jenkins':
-    vhost_alias             => 'jenkins02.trafodion.org',
+    vhost_alias             => ['jenkins.esgyn.com','traf-jenkins.esgyn.com'],
     jenkins_jobs_username   => 'Traf-Jenkins',
     jenkins_jobs_password   => hiera('jenkins02_jobs_password'),
     jenkins_ssh_private_key => hiera('jenkins_ssh_private_key_contents'),
