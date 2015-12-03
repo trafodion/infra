@@ -72,7 +72,9 @@ class jenkins::master(
     ],
     allow_encoded_slashes => 'nodecode',
     proxy_preserve_host   => true,
-    proxy_dest            => 'http://127.0.0.1:8080/',
+    proxy_pass            => [
+      { 'path' => '/', 'url' => 'http://127.0.0.1:8080/', 'keywords' => ['nocanon'] },
+    ],
   }
 
   if $ssl_cert_file_contents != '' {
