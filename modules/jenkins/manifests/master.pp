@@ -46,29 +46,32 @@ class jenkins::master(
 
   include apache
   include apache::mod::rewrite
+  include apache::mod::proxy
   apache::vhost { "$vhost_name-redirect":
     serveraliases   => $vhost_alias,
     port            => 80,
     docroot         => '/var/www',
-    priority        => '20',
+    priority        => '05',
     redirect_status => 'permanent',
     redirect_dest   => "https://$vhost_name/",
   }
   apache::vhost { $vhost_name:
-    serveraliases => $vhost_alias,
-    port          => 443,
-    docroot       => '/var/www',
-    priority      => '50',
-    ssl           => true,
-    serveradmin   => $serveradmin,
-    ssl_chain     => $ssl_chain_file,
-    ssl_key       => $ssl_key_file,
-    ssl_cert      => $ssl_cert_file,
-    rewrites      => [
+    serveraliases       => $vhost_alias,
+    port                => 443,
+    docroot             => '/var/www',
+    priority            => '50',
+    ssl                 => true,
+    serveradmin         => $serveradmin,
+    ssl_chain           => $ssl_chain_file,
+    ssl_key             => $ssl_key_file,
+    ssl_cert            => $ssl_cert_file,
+    rewrites            => [
       { rewrite_cond => ["%{HTTP_HOST} !$vhost_name"],
         rewrite_rule => ["^.*$ https://$vhost_name/"],
       },
     ],
+    proxy_preserve_host => true,
+    proxy_dest          => 'http://127.0.0.1:8080/',
   }
 
   if $ssl_cert_file_contents != '' {
