@@ -71,7 +71,7 @@ node /^mtest\d\d.trafodion.org$/ {
 #
 
 # Build Server
-node /^build.*$/ {
+node /^build$/ {
   include traf
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
