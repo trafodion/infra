@@ -71,45 +71,18 @@ node /^mtest\d\d.trafodion.org$/ {
 #
 
 # Build Server
-node /^build\d\d.trafodion.org$/ {
+node /^build.*$/ {
   include traf
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
     sysadmins => hiera('sysadmins'),
     distro    => 'None',
+    certname  => "build",
   }
 }
 
 # CMgr
-node /^slave-cm51-\d\d.trafodion.org$/ {
-  include traf
-  class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    logs_host => hiera('static_host_key'),
-    sysadmins => hiera('sysadmins'),
-    distro    => 'CM5.1',
-  }
-}
-node /^slave-cm51-\d+\.\d+\.\d+\.\d+$/ {
-  include traf
-  class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    logs_host => hiera('static_host_key'),
-    sysadmins => hiera('sysadmins'),
-    distro    => 'CM5.1',
-    certname  => "slave-cm51-${::ipaddress}",
-  }
-}
-node /^slave-cm53-\d\d.trafodion.org$/ {
-  include traf
-  class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    logs_host => hiera('static_host_key'),
-    sysadmins => hiera('sysadmins'),
-    distro    => 'CM5.3',
-  }
-}
 node /^slave-cm53-\d+\.\d+\.\d+\.\d+$/ {
   include traf
   class { 'traf::slave':
@@ -132,34 +105,6 @@ node /^slave-cm54-\d+\.\d+\.\d+\.\d+$/ {
 }
 
 # Ambari HortonWorks
-node /^slave-ahw21-\d\d.trafodion.org$/ {
-  include traf
-  class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    logs_host => hiera('static_host_key'),
-    sysadmins => hiera('sysadmins'),
-    distro    => 'AHW2.1',
-  }
-}
-node /^slave-ahw21-\d+\.\d+\.\d+\.\d+$/ {
-  include traf
-  class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    logs_host => hiera('static_host_key'),
-    sysadmins => hiera('sysadmins'),
-    distro    => 'AHW2.1',
-    certname  => "slave-ahw21-${::ipaddress}",
-  }
-}
-node /^slave-ahw22-\d\d.trafodion.org$/ {
-  include traf
-  class { 'traf::slave':
-    ssh_key   => $traf::jenkins_ssh_key,
-    logs_host => hiera('static_host_key'),
-    sysadmins => hiera('sysadmins'),
-    distro    => 'AHW2.2',
-  }
-}
 node /^slave-ahw22-\d+\.\d+\.\d+\.\d+$/ {
   include traf
   class { 'traf::slave':

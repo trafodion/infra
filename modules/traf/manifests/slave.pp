@@ -13,7 +13,6 @@ class traf::slave (
 ) {
   include traf
   include traf::buildtest
-  include traf::cloudeast
   include traf::tmpcleanup
   include traf::automatic_upgrades
 
@@ -30,23 +29,6 @@ class traf::slave (
     sudo         => false,
     python3      => $python3,
     include_pypy => $include_pypy,
-  }
-  # set up mount point for jenkins workspaces
-  # prevent seltype from changing to mnt_t after jenkinsuser.pp sets to user_home_t
-  file { '/mnt/jenkins':
-    ensure                  => directory,
-    owner                   => 'jenkins',
-    group                   => 'jenkins',
-    mode                    => '0755',
-    selinux_ignore_defaults => true,
-  }
-  mount { '/home/jenkins':
-    ensure  => mounted,
-    atboot  => true,
-    fstype  => 'none',
-    options => 'bind',
-    device  => '/mnt/jenkins',
-    require => [ Class['jenkins::slave'], File['/mnt/jenkins'] ],
   }
 
 
@@ -85,7 +67,6 @@ class traf::slave (
     group   => 'jenkins',
     mode    => '0600',
     content => hiera('jenkins_ssh_private_key_contents'),
-    require => Mount['/home/jenkins'],
   }
 
   file { '/home/jenkins/.ssh/id_rsa.pub':
@@ -94,7 +75,6 @@ class traf::slave (
     group   => 'jenkins',
     mode    => '0644',
     content => $traf::jenkins_ssh_pub_key,
-    require => Mount['/home/jenkins'],
   }
   # maven scp is too dumb to look at system known_hosts file
   file { '/home/jenkins/.ssh/known_hosts':
@@ -103,7 +83,7 @@ class traf::slave (
     group   => 'jenkins',
     mode    => '0644',
     source  => '/etc/ssh/ssh_known_hosts',
-    require => [ Sshkey['traf-testlogs.esgyn.com'], Mount['/home/jenkins'] ],
+    require => [ Sshkey['traf-testlogs.esgyn.com'] ],
   }
 
   # allow Jenkins to run script to upload files to CDN
