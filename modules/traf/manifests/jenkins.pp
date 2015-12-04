@@ -132,9 +132,6 @@ class traf::jenkins (
   jenkins::plugin { 'postbuild-task':
     version => '1.8',
   }
-  jenkins::plugin { 'jclouds-jenkins':
-    version => '2.8',
-  }
   jenkins::plugin { 'jobConfigHistory':
     version => '2.11',
   }
