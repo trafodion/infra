@@ -89,7 +89,7 @@ then
   tar xzf $(basename $instball) || exit 1
 
   # prep ldap config
-  sed -e 's/LdapHostname:/LdapHostname:ldap01.trafodion.org/' \
+  sed -e 's/LdapHostname:/LdapHostname:static.trafodion.org/' \
       -e 's/UniqueIdentifier:/UniqueIdentifier:uid=,ou=users,dc=trafldap,dc=com/' \
       ./installer/traf_authentication_conf_default > ./installer/traf_auth_config
 

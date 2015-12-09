@@ -83,46 +83,46 @@ node /^build$/ {
 }
 
 # CMgr
-node /^slave-cm53-\d+\.\d+\.\d+\.\d+$/ {
+node /^slave-cm53$/ {
   include traf
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
     sysadmins => hiera('sysadmins'),
     distro    => 'CM5.3',
-    certname  => "slave-cm53-${::ipaddress}",
+    certname  => "slave-cm53",
   }
 }
-node /^slave-cm54-\d+\.\d+\.\d+\.\d+$/ {
+node /^slave-cm54$/ {
   include traf
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
     sysadmins => hiera('sysadmins'),
     distro    => 'CM5.4',
-    certname  => "slave-cm54-${::ipaddress}",
+    certname  => "slave-cm54",
   }
 }
 
 # Ambari HortonWorks
-node /^slave-ahw22-\d+\.\d+\.\d+\.\d+$/ {
+node /^slave-ahw22$/ {
   include traf
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
     sysadmins => hiera('sysadmins'),
     distro    => 'AHW2.2',
-    certname  => "slave-ahw22-${::ipaddress}",
+    certname  => "slave-ahw22",
   }
 }
-node /^slave-ahw23-\d+\.\d+\.\d+\.\d+$/ {
+node /^slave-ahw23$/ {
   include traf
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
     sysadmins => hiera('sysadmins'),
     distro    => 'AHW2.3',
-    certname  => "slave-ahw23-${::ipaddress}",
+    certname  => "slave-ahw23",
   }
 }
 

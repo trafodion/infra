@@ -8,10 +8,10 @@ class traf::hadoop (
 
   # /etc/hosts entries
 
-  host { 'ldap01.trafodion.org':
+  host { 'static.trafodion.org':
     ensure       => present,
-    host_aliases => 'ldap01',
-    ip           => '172.16.0.43',
+    host_aliases => 'ldap',
+    ip           => '172.31.17.247',
   }
 
   # new style slave nodes have hostname != certname

@@ -8,7 +8,7 @@ class traf::static (
 ) {
 
   class { 'traf::server':
-    iptables_public_tcp_ports => [22, 80, 443],
+    iptables_public_tcp_ports => [22, 80, 443, 389, 636],
     rate_unlimit_ips4         => hiera('rate_unlimit_ips'),
     sysadmins                 => $sysadmins,
   }
