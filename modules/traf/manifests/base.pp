@@ -13,6 +13,13 @@ class traf::base(
   group { 'sudo':
     ensure => present,
   }
+  file { "/etc/sudoers.d/sudo_group":
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0440',
+    content => '%sudo ALL=(ALL) NOPASSWD: ALL',
+  }
   group { 'admin':
     ensure => present,
   }
