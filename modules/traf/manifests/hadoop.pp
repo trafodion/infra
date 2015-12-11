@@ -15,7 +15,7 @@ class traf::hadoop (
   }
 
   # new style slave nodes have hostname != certname
-  if $certname =~ /^slave-.*-\d+\.\d+\.\d+\.\d+$/ {
+  if $certname =~ /^slave-/ {
     # generic slave hostname based on distro
     case $distro {
       'AHW2.1': { $slavename = 'slave-ahw21' }
