@@ -336,6 +336,12 @@ else
 fi
 setconfig hive-site "javax.jdo.option.ConnectionPassword" "notsecure"
 
+if [[ $Vers == "HDP-2.2" ]]
+then
+  setconfig capacity-scheduler "yarn.scheduler.capacity.root.accessible-node-labels.default.capacity" "1"
+  setconfig capacity-scheduler "yarn.scheduler.capacity.root.accessible-node-labels.default.maximum-capacity" "1"
+fi
+
 rm -f doSet_*.json # clean up temp files left by configs.sh
 
 
