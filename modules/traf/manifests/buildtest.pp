@@ -51,7 +51,7 @@ class traf::buildtest (
   # Superset of packages needed for build/test, not installed by default
   if $::osfamily == 'RedHat' {
     $packages = [
-      'boost-devel', 'device-mapper-multipath', 'dhcp', 'gd', 'log4cxx', 'log4cxx-devel',
+      'boost-devel', 'device-mapper-multipath', 'dhcp', 'gd', 
       'glibc-devel.i686', 'graphviz-perl', 'libaio-devel',
       'libibcm.i686', 'libibumad-devel', 'libibumad-devel.i686',
       'librdmacm-devel', 'librdmacm-devel.i686',
@@ -92,6 +92,39 @@ class traf::buildtest (
     package { $packages:
         ensure  => present,
         require => [ Exec['install_Development_Tools'] ]
+    }
+    package { 'log4cxx':
+      ensure   => present,
+      provider => 'rpm',
+      source   => '/opt/traf/rpms/log4cxx-0.10.0-13.el6.x86_64.rpm',
+      require  => [ Exec['getrpm1'] ]
+    }
+    package { 'log4cxx-devel':
+      ensure   => present,
+      provider => 'rpm',
+      source   => '/opt/traf/rpms/log4cxx-devel-0.10.0-13.el6.x86_64.rpm',
+      require  => [ Exec['getrpm2'] ]
+    }
+
+    file { '/opt/traf/rpms' :
+      ensure  => directory,
+      owner   => 'jenkins',
+      group   => 'jenkins',
+      require => File['/opt/traf'],
+    }
+    exec { 'getrpm1':
+      command  => "scp  jenkins@traf-builds.esgyn.com:/srv/static/downloads/test-deps/log4cxx-0.10.0-13.el6.x86_64.rpm /opt/traf/rpms/",
+      user     => jenkins,
+      timeout  => 100,
+      creates => '/opt/traf/rpms/log4cxx-0.10.0-13.el6.x86_64.rpm',
+      requires => Files['/opt/traf/rpms'],
+    }
+    exec { 'getrpm2':
+      command  => "scp  jenkins@traf-builds.esgyn.com:/srv/static/downloads/test-deps/log4cxx-devel-0.10.0-13.el6.x86_64.rpm /opt/traf/rpms/",
+      user     => jenkins,
+      timeout  => 100,
+      creates => '/opt/traf/rpms/log4cxx-devel-0.10.0-13.el6.x86_64.rpm',
+      requires => Files['/opt/traf/rpms'],
     }
 
     # not available in latest CentOS distribution, but is in Vault repos
