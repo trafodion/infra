@@ -51,7 +51,7 @@ class traf::buildtest (
   # Superset of packages needed for build/test, not installed by default
   if $::osfamily == 'RedHat' {
     $packages = [
-      'boost-devel', 'device-mapper-multipath', 'dhcp', 'gd', 
+      'boost-devel', 'device-mapper-multipath', 'dhcp', 'gd', 'apr-devel',
       'glibc-devel.i686', 'graphviz-perl', 'libaio-devel',
       'libibcm.i686', 'libibumad-devel', 'libibumad-devel.i686',
       'librdmacm-devel', 'librdmacm-devel.i686',
@@ -103,7 +103,7 @@ class traf::buildtest (
       ensure   => present,
       provider => 'rpm',
       source   => '/opt/traf/rpms/log4cxx-devel-0.10.0-13.el6.x86_64.rpm',
-      require  => [ Exec['getrpm2'] ]
+      require  => [ Exec['getrpm2'], Package['apr-devel'] ]
     }
 
     file { '/opt/traf/rpms' :
