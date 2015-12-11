@@ -117,14 +117,14 @@ class traf::buildtest (
       user     => jenkins,
       timeout  => 100,
       creates  => '/opt/traf/rpms/log4cxx-0.10.0-13.el6.x86_64.rpm',
-      require  => Files['/opt/traf/rpms'],
+      require  => File['/opt/traf/rpms'],
     }
     exec { 'getrpm2':
       command  => "/usr/bin/scp jenkins@traf-builds.esgyn.com:/srv/static/downloads/test-deps/log4cxx-devel-0.10.0-13.el6.x86_64.rpm /opt/traf/rpms/",
       user     => jenkins,
       timeout  => 100,
       creates  => '/opt/traf/rpms/log4cxx-devel-0.10.0-13.el6.x86_64.rpm',
-      require  => Files['/opt/traf/rpms'],
+      require  => File['/opt/traf/rpms'],
     }
 
     # not available in latest CentOS distribution, but is in Vault repos
