@@ -22,6 +22,12 @@ class traf::slave (
     iptables_public_tcp_ports => [24400, 40010],
     certname                  => $certname,
     sysadmins                 => $sysadmins,
+    rate_unlimit_ips4         => [ '172.31.32.0/20',
+                                   '172.31.0.0/20',
+                                   '172.31.16.0/20',
+                                   '172.31.16.0/20',
+				   '52.35.27.222',
+                                   ],
   }
   class { 'jenkins::slave':
     bare         => $bare,

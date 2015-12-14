@@ -47,7 +47,7 @@ fi
 BLD_PROJ_NAME="$1"
 
 # jenkins server data cmd - jenkins provides JENKINS_URL
-API="curl -s $JENKINS_URL/job/$BLD_PROJ_NAME"
+API="curl --insecure -s $JENKINS_URL/job/$BLD_PROJ_NAME"
 
 # Loop a couple times, in case server is not responding
 retry=0

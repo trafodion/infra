@@ -12,7 +12,7 @@ fi
 rm -f build_result.json
 rm -f build_result.txt
 
-curl -s $BUILD_URL/api/json > build_result.json
+curl --insecure -s $BUILD_URL/api/json > build_result.json
 
 blds=$(jq -r '.subBuilds|length' < build_result.json)
 
