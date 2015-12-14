@@ -4,4 +4,4 @@ jenkins ALL = NOPASSWD:/usr/local/bin/wsclean-sudo.sh
 # for use by check-node script
 jenkins ALL = NOPASSWD:/usr/bin/du
 # enable no tty for jenkins user
-Defaults :jenkins !requiretty , visiblepw
+Defaults:jenkins !requiretty , visiblepw
