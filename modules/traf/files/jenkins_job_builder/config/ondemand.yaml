@@ -36,6 +36,9 @@
           url: https://github.com/apache/incubator-trafodion
           wipe-workspace: false
           skip-tag: true
+          branches:
+            - refs/tags/$TAG
+
 
     builders:
       - inject:
