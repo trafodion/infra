@@ -23,6 +23,7 @@ class traf::slave (
     certname                  => $certname,
     sysadmins                 => $sysadmins,
     rate_unlimit_ips4         => [ '52.35.27.222',        # jenkins public IP
+                                   '172.31.0.0/16',       # VPC
                                    "$::ec2_public_ipv4",  # slave's own public IP
                                  ],
   }
