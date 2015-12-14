@@ -149,24 +149,6 @@ class traf::buildtest (
       unless  => '/sbin/sysctl -n kernel.core_pattern | grep -q core.%h.%p.%e',
       require => Package['abrt'],
     }
-    # Turn off randomizing virtual address space
-    exec { 'turn off random addr space ' :
-      command  => '/sbin/sysctl -w kernel.randomize_va_space=0',
-      provider => shell,
-      unless   => '[[ $(/sbin/sysctl -n kernel.randomize_va_space) == "0" ]]',
-    }
-    # Set allowed concurrent requests of asynchronous I/O
-    exec { 'set aio-max' :
-      command  => '/sbin/sysctl -w fs.aio-max-nr=262144',
-      provider => shell,
-      unless   => '[[ $(/sbin/sysctl -n fs.aio-max-nr) == "262144" ]]',
-    }
-    # Set pid_max since trafodion cannot handle anything above 64k (65535)
-    exec { 'set pid_pax' :
-      command  => '/sbin/sysctl -w kernel.pid_max=32768',
-      provider => shell,
-      unless   => '[[ $(/sbin/sysctl -n kernel.pid_max) == "32768" ]]',
-    }
 
     # This top level dir holds both tar'd up build tool binaries and the untar'd tools.
     # Jenkins write rsync output to this dir.

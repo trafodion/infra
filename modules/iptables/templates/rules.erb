@@ -11,6 +11,7 @@
 # machine talking to itself on loopback and public IP
 -A INPUT -i lo -j ACCEPT
 -A INPUT -s <%= ipaddress %> -m comment --comment "Allow machine to talk to itself on public IP" -j ACCEPT
+-A INPUT -s <%= ec2_public_ipv4 %> -m comment --comment "Allow machine to talk to itself on public IP" -j ACCEPT
 
 <% rate_unlimit_ips4.each do |ru_ip| -%>
 -A INPUT -s <%= ru_ip %> -m comment --comment "This IP is not rate limited" -j TRAF-INPUT
