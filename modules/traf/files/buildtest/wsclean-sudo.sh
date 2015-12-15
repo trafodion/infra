@@ -50,6 +50,9 @@ rm /var/log/hive/hiveserver2.log.2*
 # set corefile pattern
 /sbin/sysctl -w kernel.core_pattern=core.%h.%p.%e
 
+# puppet update
+/usr/bin/puppet agent --test
+
 # check hadoop config and clean up hbase data
 # cluster script will exist only on distro slave machines, not build machines
 if [[ -x /usr/local/bin/cluster_setup ]]
