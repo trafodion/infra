@@ -180,12 +180,12 @@
       - multijob:
           name: build_test
           projects:
-#            - name: "build-{branch}-debug"
-#              current-parameters: true
-#              kill-phase-on: NEVER
-#              predefined-parameters: |
-#                 LOG_PATH=$LOG_PATH/build-{branch}-debug
-#                 BUILD_TYPE=daily
+            - name: "build-{branch}-debug"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/build-{branch}-debug
+                 BUILD_TYPE=daily
             - name: "build-{branch}-release"
               current-parameters: true
               kill-phase-on: NEVER
