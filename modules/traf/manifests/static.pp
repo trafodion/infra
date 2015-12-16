@@ -258,7 +258,7 @@ class traf::static (
                                 '^/(.*console\.html(\.gz)?)$ /htmlify/$1 [QSA,L,PT]'],
       },
     ],
-    wsgi_script_aliases => { '/htmlify' => '/usr/local/lib/python2.7/dist-packages/os_loganalyze/wsgi.py' },
+    wsgi_script_aliases => { '/htmlify' => '/usr/lib/python2.7/site-packages/os_loganalyze/wsgi.py' },
     require             => File["${server_path}/logs"],
   }
 
