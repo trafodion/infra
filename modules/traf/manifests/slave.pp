@@ -71,7 +71,7 @@ class traf::slave (
       "localhost",
     ],
     type         => 'ssh-rsa',
-    key          => $::shrsakey,
+    key          => $::sshrsakey,
   }
 
   # add jenkins public and private ssh keys
