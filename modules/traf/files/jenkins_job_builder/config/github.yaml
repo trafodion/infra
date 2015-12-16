@@ -278,8 +278,8 @@
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/regress-hive-hdp
                  BRANCH={branch}
-#              node-label-name: "NODE_TYPE"
-#              node-label: "redhat_ahw$DISTHDP"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
 #            - name: "phoenix_part1_T4-hdp"
 #              current-parameters: true
 #              kill-phase-on: NEVER
