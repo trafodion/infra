@@ -200,14 +200,14 @@
 #                 BRANCH={branch}
 #              node-label-name: "NODE_TYPE"
 #              node-label: "redhat_ahw$DISTHDP"
-#            - name: "core-regress-seabase-hdp"
-#              current-parameters: true
-#              kill-phase-on: NEVER
-#              predefined-parameters: |
-#                 LOG_PATH=$LOG_PATH/regress-seabase-hdp
-#                 BRANCH={branch}
-#              node-label-name: "NODE_TYPE"
-#              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-seabase-hdp"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/regress-seabase-hdp
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
 #            - name: "pyodbc_test-hdp"
 #              current-parameters: true
 #              kill-phase-on: NEVER
@@ -272,12 +272,12 @@
 #                 BRANCH={branch}
 #              node-label-name: "NODE_TYPE"
 #              node-label: "redhat_ahw$DISTHDP"
-#            - name: "core-regress-hive-hdp"
-#              current-parameters: true
-#              kill-phase-on: NEVER
-#              predefined-parameters: |
-#                 LOG_PATH=$LOG_PATH/regress-hive-hdp
-#                 BRANCH={branch}
+            - name: "core-regress-hive-hdp"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/regress-hive-hdp
+                 BRANCH={branch}
 #              node-label-name: "NODE_TYPE"
 #              node-label: "redhat_ahw$DISTHDP"
 #            - name: "phoenix_part1_T4-hdp"
@@ -357,14 +357,14 @@
 #                 BRANCH={branch}
 #              node-label-name: "NODE_TYPE"
 #              node-label: "redhat_cm$DISTCDH"
-#            - name: "core-regress-qat-cdh"
-#              current-parameters: true
-#              kill-phase-on: NEVER
-#              predefined-parameters: |
-#                 LOG_PATH=$LOG_PATH/regress-qat-cdh
-#                 BRANCH={branch}
-#              node-label-name: "NODE_TYPE"
-#              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-qat-cdh"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/regress-qat-cdh
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
 #            - name: "core-regress-udr-cdh"
 #              current-parameters: true
 #              kill-phase-on: NEVER
