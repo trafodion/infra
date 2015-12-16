@@ -63,6 +63,16 @@ class traf::slave (
     type         => 'ssh-rsa',
     key          => $logs_host,
   }
+  # add known host keys for current host, to allow ssh localhost
+  sshkey { "$::hostname":
+    ensure       => present,
+    host_aliases => [
+      "${::hostname}.${::domain}",
+      "localhost",
+    ],
+    type         => 'ssh-rsa',
+    key          => $::shrsakey,
+  }
 
   # add jenkins public and private ssh keys
   file { '/home/jenkins/.ssh/id_rsa':
