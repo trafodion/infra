@@ -324,7 +324,7 @@
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "redhat_ahw$DISTHDP"
-   Cloudera Jobs
+#   Cloudera Jobs
             - name: "core-regress-core-cdh"
               current-parameters: true
               kill-phase-on: NEVER
