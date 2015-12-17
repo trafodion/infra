@@ -460,7 +460,6 @@
 
     publishers:
       - console-log
-      - traf-release-tar
       - postbuildscript:
           script-only-if-succeeded: false
           script-only-if-failed: false

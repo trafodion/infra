@@ -447,6 +447,11 @@
     name: traf-release-tar
     publishers:
       - scp:
+          site: 'traf-testlogs.esgyn.com'
+          files:
+            - target: 'logs/buildvers'
+              source: 'Versions-*'
+      - scp:
           site: 'traf-builds.esgyn.com'
           files:
             - target: 'downloads/trafodion'
