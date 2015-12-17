@@ -444,6 +444,17 @@
               copy-after-failure: true
 
 - publisher:
+    name: traf-release-tar
+    publishers:
+      - scp:
+          site: 'traf-builds.esgyn.com'
+          files:
+            - target: 'downloads/trafodion'
+              source: 'publish/**'
+              keep-hierarchy: true
+ 
+
+- publisher:
     name: traf-upload-to-cdn
     publishers:
       - scp:
