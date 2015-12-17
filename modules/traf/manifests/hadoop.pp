@@ -11,7 +11,7 @@ class traf::hadoop (
   host { 'static.trafodion.org':
     ensure       => present,
     host_aliases => 'ldap',
-    ip           => '172.31.30.174',
+    ip           => '52.27.79.56',
   }
 
   # new style slave nodes have hostname != certname
