@@ -57,7 +57,13 @@ rm /var/log/hive/hiveserver2.log.2*
 # cluster script will exist only on distro slave machines, not build machines
 if [[ -x /usr/local/bin/cluster_setup ]]
 then
-  /usr/local/bin/cluster_setup || exit 1
+  /usr/local/bin/cluster_setup
+  if [[ $? != 0 ]]
+  then
+    echo "Re-trying cluster setup"
+    /usr/local/bin/cluster_setup
+    exit $?
+  fi
 fi
 
 exit 0
