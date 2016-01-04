@@ -466,8 +466,7 @@
           builders:
             - shell: "/usr/local/bin/job-summary.sh"
       - email-ext:
-#          recipients: dev@trafodion.incubator.apache.org
-          recipients: steve.varnau@esgyn.com
+          recipients: dev@trafodion.incubator.apache.org
           reply-to: no-reply@trafodion.org
           content-type: "text"
           subject: Trafodion {branch} Daily Test Result - $BUILD_ID
