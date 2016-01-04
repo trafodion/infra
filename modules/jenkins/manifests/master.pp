@@ -73,8 +73,7 @@ class jenkins::master(
     allow_encoded_slashes => 'nodecode',
     proxy_preserve_host   => true,
     proxy_pass            => [
-      { 'path' => '/', 'url' => 'http://127.0.0.1:8080/', 'keywords' => ['nocanon'],
-        'order' => 'deny,allow', 'allow' => 'from all',},
+      { 'path' => '/', 'url' => 'http://127.0.0.1:8080/', 'keywords' => ['nocanon'] },
     ],
   }
 
