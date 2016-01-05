@@ -51,7 +51,7 @@ API="curl -s $JENKINS_URL/job/$BLD_PROJ_NAME"
 
 # Loop a couple times, in case server is not responding
 retry=0
-while (( $retry < 4 ))
+while (( $retry < 20 ))
 do
   Latest=$($API/api/json | jq -r '.lastBuild.number' 2>/dev/null)
   Earliest=$($API/api/json | jq -r '.firstBuild.number' 2>/dev/null)
