@@ -416,9 +416,18 @@ reqSTART='{"RequestInfo": {"context" :"Initial Start"}, "Body": {"ServiceInfo": 
 
 function start_service() {
   serv=$1
-  State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
-  if [[ $State != "STARTED" ]]
-  then
+
+  for retry in 0 30 60 120 240
+  do
+    State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
+    if [[ $State == "STARTED" ]]
+    then
+      return 0
+    else
+      echo "$serv not started, waiting $retry seconds"
+      sleep $retry
+    fi
+
     # first, move service (and components) from INIT to INSTALLED
     echo "Installing $serv (just in case all components are not INSTALLED)"
     RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/${serv} | jq -r '.Requests.id')
@@ -427,7 +436,8 @@ function start_service() {
     echo "*** Starting $serv"
     RID=$(curl $Update -d "$reqSTART" $URL/clusters/trafcluster/services/${serv} | jq -r '.Requests.id')
     am_cmd "$RID" "$serv Start"
-  fi
+  done
+
   # Check status
   State="$(curl $Read $URL/clusters/trafcluster/services/$serv | jq -r '.ServiceInfo.state')"
   if [[ $State != "STARTED" ]] 
