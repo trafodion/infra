@@ -126,6 +126,10 @@ then
   # no SUSE yet
   echo "SUSE_LINUX=false" >> ./tc
   echo "JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk.x86_64" >> ./tc
+  # DCS/Cloud
+  echo "CLOUD_CONFIG=Y" >> ./tc
+  echo "CLOUD_TYPE=1" >> ./tc
+  echo "AWS_CLOUD=true" >> ./tc
 
 
   check_port 23400
