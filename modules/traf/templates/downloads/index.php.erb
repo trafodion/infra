@@ -286,7 +286,9 @@
         echo '    <ul>' . PHP_EOL;
 #        $dailyArray = array_filter($cdnArray, "daily");
         $dailyArray = find_all_files("downloads/trafodion/publish/daily");
-        array_walk($dailyArray, 'print_links', 'daily');
+        natsort($dailyArray);
+        $dArray = array_reverse($dailyArray);
+        array_walk($dArray, 'print_links', 'daily');
         echo '<li><a href="http://traf-downloads.esgyn.com">Older daily builds</a></li>' . PHP_EOL;
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
