@@ -200,7 +200,10 @@
         echo '<div>' . PHP_EOL;
         echo '    <h2 class="subhead">Apache (Incubating) Releases - Convenience Binaries</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
-        echo '    <li>Stay tuned - 1.3.0 coming soon.</li>' . PHP_EOL;
+           $relArray = find_all_files("downloads/trafodion/publish/release");
+           natsort($relArray);
+           $rArray = array_reverse($relArray);
+           array_walk($rArray, 'print_links', 'release');
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
