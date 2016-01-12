@@ -20,6 +20,7 @@
           name: BRANCH
           choices:
             - master
+            - release1.3
           default: master
           description: "Release Branch"
       - choice:
