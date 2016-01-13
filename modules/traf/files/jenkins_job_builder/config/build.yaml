@@ -104,7 +104,7 @@
            branch: "$BRANCH"
 
     publishers:
-      - traf-upload-to-cdn
+      - traf-release-tar
       - console-log
       - git-log
       - traf-make-log
