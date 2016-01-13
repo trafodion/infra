@@ -240,11 +240,19 @@
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "redhat_ahw$DISTHDP"
-            - name: "core-regress-catman1-hdp"
+            - name: "core-regress-privs1-hdp"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-catman1-hdp
+                 LOG_PATH=$LOG_PATH/regress-privs1-hdp
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-privs2-hdp"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/regress-privs2-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "redhat_ahw$DISTHDP"
@@ -373,11 +381,11 @@
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "redhat_cm$DISTCDH"
-            - name: "core-regress-catman1-cdh"
+            - name: "core-regress-privs1-cdh"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-catman1-cdh
+                 LOG_PATH=$LOG_PATH/regress-privs1-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "redhat_cm$DISTCDH"
@@ -386,6 +394,14 @@
               kill-phase-on: NEVER
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/regress-compGeneral-cdh
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-privs2-cdh"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/regress-privs2-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "redhat_cm$DISTCDH"

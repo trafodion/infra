@@ -12,7 +12,8 @@
       - "hive"
       - "compGeneral"
       - "udr"
-      - "catman1"
+      - "privs1"    # 2.0 and later - replaces catman1
+      - "privs2"    # 2.0 and later
       - "fullstack2"
 
     jobs:
