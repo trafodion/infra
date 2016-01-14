@@ -70,7 +70,7 @@
       - shell: "/usr/local/bin/supported-distro.sh ."
       - inject:
           properties-file: distro.properties
-      - shell: "/usr/local/bin/check-chg-list.sh ."
+      - shell: "/usr/local/bin/check-chg-list.sh"
       - inject:
           properties-file: bucket.properties
       - multijob:
