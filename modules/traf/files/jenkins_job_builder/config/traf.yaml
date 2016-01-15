@@ -32,7 +32,7 @@
 
     wrappers:
       - timeout:
-          timeout: 200
+          timeout: 140
           fail: true
       - timestamps
 
@@ -110,7 +110,7 @@
 
     wrappers:
       - timeout:
-          timeout: 300
+          timeout: 140
           fail: true
       - timestamps
 
@@ -169,7 +169,7 @@
 
     wrappers:
       - timeout:
-          timeout: 120
+          timeout: 80
           fail: true
       - timestamps
 
@@ -224,7 +224,7 @@
 
     wrappers:
       - timeout:
-          timeout: 150
+          timeout: 100
           fail: true
       - timestamps
 
