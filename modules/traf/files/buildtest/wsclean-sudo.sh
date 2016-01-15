@@ -51,7 +51,7 @@ rm /var/log/hive/hiveserver2.log.2*
 /sbin/sysctl -w kernel.core_pattern=core.%h.%p.%e
 
 # puppet update
-/usr/bin/puppet agent --test --no-report
+/usr/bin/puppet agent --test --no-report --color html
 
 # check hadoop config and clean up hbase data
 # cluster script will exist only on distro slave machines, not build machines
