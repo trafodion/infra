@@ -1,3 +1,25 @@
+- job:
+    name: 'doc-bld-master'
+    node: 'master'
+
+    parameters:
+      - string:
+          name: LOG_PATH
+
+    builders:
+      - link-logs
+      - clean-buildspace
+      - single-git-stable:
+           repos: "apache/incubator-trafodion"
+           branch: "master"
+      - docs-build
+
+    publishers:
+      - console-log
+      - git-log
+      - doc-log
+
+
 - job-group:
     name: 'builds'
     flavor:

@@ -89,6 +89,13 @@
       - shell: "/usr/local/bin/build-install.sh"
 
 - builder:
+    name: docs-build
+    builders:
+      - shell: |
+         cd trafodion
+         mvn site > maven.log 2>&1
+
+- builder:
     name: stage-traf
     builders:
       - shell: "/usr/local/bin/stage-traf.sh {flavor} {btype} {branch}"
@@ -223,6 +230,17 @@
               source: 'trafodion/core/**/*build*log'
               copy-after-failure: true
               keep-hierarchy: true
+
+- publisher:
+    name: doc-log
+    publishers:
+      - scp:
+          site: 'traf-testlogs.esgyn.com'
+          files:
+            - target: 'logs/$LOG_PATH'
+              source: 'trafodion/maven.log'
+              copy-after-failure: true
+
 
 # rundir will be empty unless the job
 # was aborted part way thru (e.g., timeout)
