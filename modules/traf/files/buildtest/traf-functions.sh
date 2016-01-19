@@ -221,7 +221,7 @@ function report_on_corefiles() {
   CORECOUNT=0
   if [[ -d "$ADIR" ]]; then
     echo
-    COREFILES=$(find-corefiles.pl "$ADIR")
+    COREFILES=$(/usr/local/bin/find-corefiles.pl "$ADIR")
     if [[ -n "$COREFILES" ]]; then
       # for any core owned by current user, make it world-readable
       # so altuser can read it too
