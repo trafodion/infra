@@ -25,6 +25,10 @@ class traf::jenkins (
   package { 'jq':
     ensure => present,
   }
+  # maven for docs build job
+  package { 'maven':
+    ensure => present,
+  }
 
   if $ssl_chain_file_contents != '' {
     $ssl_chain_file = '/etc/ssl/certs/intermediate.pem'
