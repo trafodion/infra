@@ -33,7 +33,7 @@ DOCS=0
 NONDOCS=0
 while read fName; do
   if [[ -n "$fName" ]]; then
-    if [[ $fName =~ ^docs/ ]]
+    if [[ $fName =~ ^docs/|^pom.xml ]]
     then
       (( DOCS+=1 ))
     else
