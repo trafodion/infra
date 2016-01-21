@@ -35,7 +35,6 @@ then
   MODULES["razorsedge-cloudera"]="3.0.0"
   MODULES["puppetlabs-vcsrepo"]="1.2.0"
   MODULES["puppetlabs-apache"]="1.7.0"
-  MODULES["puppetlabs-stdlib"]="4.5.1"
   MODULES["saz-memcached"]="2.6.0"
   MODULES["jfryman-selinux"]="0.2.6"
   MODULES["rafaelfc-pear"]="1.0.3"
