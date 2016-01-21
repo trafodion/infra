@@ -18,12 +18,6 @@
       - string:
           name: LOG_PATH
           default: 'PullReq/$ghprbPullId/$BUILD_NUMBER'
-      - boolean:
-          name: BUCKET_DOC
-          default: 'false'
-      - boolean:
-          name: BUCKET_NONDOC
-          default: 'false'
 
     properties:
       - github:
@@ -93,25 +87,25 @@
           name: build_test
           projects:
             - name: "doc-build-{branch}"
-              enable-condition: "'${BUCKET_DOC}' == 'true'"
+              enable-condition: "'$BUCKET_DOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
             - name: "build-{branch}-debug"
-              #enable-condition: "'${BUCKET_NONDOC}' == 'true'"
+              #enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/build-{branch}-debug
                  BUILD_TYPE=check
             - name: "build-{branch}-release"
-              #enable-condition: "'${BUCKET_NONDOC}' == 'true'"
+              #enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/build-{branch}-release
                  BUILD_TYPE=check
             - name: "pyodbc_test-cdh"
-              #enable-condition: "'${BUCKET_NONDOC}' == 'true'"
+              #enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -120,7 +114,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "redhat_cm$DISTCDH"
             - name: "phoenix_quick_T4-hdp"
-              #enable-condition: "'${BUCKET_NONDOC}' == 'true'"
+              #enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -130,7 +124,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "redhat_ahw$DISTHDP"
             - name: "jdbc_test-cdh"
-              #enable-condition: "'${BUCKET_NONDOC}' == 'true'"
+              #enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -139,7 +133,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "redhat_cm$DISTCDH"
             - name: "core-regress-seabase-hdp"
-              #enable-condition: "'${BUCKET_NONDOC}' == 'true'"
+              #enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -148,7 +142,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "redhat_ahw$DISTHDP"
             - name: "core-regress-core-hdp"
-              #enable-condition: "'${BUCKET_NONDOC}' == 'true'"
+              #enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
