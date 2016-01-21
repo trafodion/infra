@@ -18,6 +18,12 @@
       - string:
           name: LOG_PATH
           default: 'PullReq/$ghprbPullId/$BUILD_NUMBER'
+      - boolean:
+          name: BUCKET_DOC
+          default: 'false'
+      - boolean:
+          name: BUCKET_NONDOC
+          default: 'false'
 
     properties:
       - github:
@@ -55,6 +61,9 @@
             - radumarias
             - narendragoyal
             - arvind-narain
+            - kevinxu021
+            - gtapper
+            - mashengchen
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
@@ -83,6 +92,10 @@
       - multijob:
           name: build_test
           projects:
+            - name: "doc-build-{branch}"
+              enable-condition: "'${BUCKET_DOC}' == 'true'"
+              current-parameters: true
+              kill-phase-on: NEVER
             - name: "build-{branch}-debug"
               #enable-condition: "'${BUCKET_NONDOC}' == 'true'"
               current-parameters: true

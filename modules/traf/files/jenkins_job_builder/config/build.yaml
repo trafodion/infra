@@ -1,5 +1,14 @@
-- job:
-    name: 'doc-bld-master'
+- job-group:
+    name: 'doc-builds'
+    branch:
+      - "master"
+      - "release1.3"
+
+    jobs:
+      - doc-bld-{branch}
+
+- job-template:
+    name: 'doc-bld-{branch}'
     node: 'master'
 
     parameters:
@@ -11,7 +20,7 @@
       - clean-buildspace
       - single-git-stable:
            repos: "apache/incubator-trafodion"
-           branch: "master"
+           branch: "{branch}"
       - docs-build
 
     publishers:
