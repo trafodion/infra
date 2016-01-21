@@ -476,6 +476,17 @@
               source: 'publish/**'
               keep-hierarchy: true
  
+- publisher:
+    name: traf-daily-s3
+    publishers:
+      - s3:
+          s3-profile: builder
+          entries:
+            - destination-bucket: trafodion.daily
+              source-files: 'publish/**'
+              storage-class: STANDARD
+              upload-on-failure: false
+              upload-from-slave: true
 
 - publisher:
     name: traf-upload-to-cdn
