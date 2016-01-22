@@ -93,6 +93,7 @@
     builders:
       - shell: |
          cd trafodion
+         . ./env.sh
          mvn post-site > maven.log 2>&1
 
 - builder:
