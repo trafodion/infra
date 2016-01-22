@@ -258,6 +258,9 @@
               source: 'rundir/**'
               copy-after-failure: true
               keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'build_regr_test_env.log'
+              copy-after-failure: true
 
 - publisher:
     name: traf-runtime-log
