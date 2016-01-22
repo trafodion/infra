@@ -93,7 +93,7 @@
     builders:
       - shell: |
          cd trafodion
-         mvn site > maven.log 2>&1
+         mvn post-site > maven.log 2>&1
 
 - builder:
     name: stage-traf
