@@ -485,6 +485,7 @@
             - destination-bucket: trafodion.daily
               source-files: 'publish/**'
               storage-class: STANDARD
+              bucket-region: us-west-2
               upload-on-failure: false
               upload-from-slave: true
 
