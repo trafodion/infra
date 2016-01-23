@@ -92,6 +92,7 @@
     name: docs-build
     builders:
       - shell: |
+         #!/bin/bash
          cd trafodion
          . ./env.sh
          mvn post-site > maven.log 2>&1
