@@ -94,7 +94,9 @@
       - shell: |
          #!/bin/bash
          cd trafodion
+         set +x
          . ./env.sh
+         set -x
          mvn post-site > maven.log 2>&1
 
 - builder:
