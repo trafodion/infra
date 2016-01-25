@@ -96,8 +96,9 @@
          cd trafodion
          set +x
          . ./env.sh
+         echo "Maven output archived in maven.log."
          set -x
-         mvn post-site > maven.log 2>&1
+         mvn -P'!jdbc' post-site > maven.log 2>&1
 
 - builder:
     name: stage-traf
