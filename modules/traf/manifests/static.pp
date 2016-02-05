@@ -296,6 +296,23 @@ class traf::static (
     require     => File['/usr/local/sbin/log_archive_maintenance.sh'],
   }
 
+  file { '/usr/local/sbin/bld_archive_maintenance.sh':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0744',
+    source => 'puppet:///modules/traf/bld_archive_maintenance.sh',
+  }
+
+  cron { 'rmbldlogs':
+    user        => 'root',
+    minute      => '0',
+    hour        => '8',
+    weekday     => '*',
+    command     => 'bash /usr/local/sbin/bld_archive_maintenance.sh',
+    environment => 'PATH=/usr/bin:/bin:/usr/sbin:/sbin',
+    require     => File['/usr/local/sbin/bld_archive_maintenance.sh'],
+  }
 
 
 
