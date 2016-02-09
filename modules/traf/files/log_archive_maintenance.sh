@@ -4,7 +4,6 @@
 # Compress files after 3 days, remove compressed files after 2 weeks.
 # Remove empty directories after a day.
 sleep $((RANDOM%600)) && \
-flock -n /var/run/gziplogs.lock \
 find -O3 /srv/static/logs/ -depth \
     \( \
       \( -type f -mtime +3 -not -name robots.txt \
