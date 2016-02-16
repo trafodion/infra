@@ -294,6 +294,9 @@
               source: 'Install_Start.log'
               copy-after-failure: true
             - target: 'logs/$LOG_PATH'
+              source: 'traf_inst/Install_Config'
+              copy-after-failure: true
+            - target: 'logs/$LOG_PATH'
               source: 'corefiles.log'
               copy-after-failure: true
             - target: 'logs/$LOG_PATH'

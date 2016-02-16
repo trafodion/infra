@@ -94,49 +94,49 @@ then
       ./installer/traf_authentication_conf_default > ./installer/traf_auth_config
 
   # prep config file  
-  cp ./installer/trafodion_config_default ./tc
-  echo "NODE_LIST=$(hostname -s)" >> ./tc
-  echo "HADOOP_NODES=$(hostname -s)" >> ./tc
-  echo "MY_HADOOP_NODES=\"-w $(hostname -s)\"" >> ./tc
-  echo "node_count=1" >> ./tc
-  echo "hadoop_node_count=1" >> ./tc
-  echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./tc
-  echo "OPENSTACK_VM=1" >> ./tc
-  echo "TRAF_BUILD=$trafball" >> ./tc
-  echo "REST_BUILD=$restball" >> ./tc  ## may be empty for pre-1.1 builds
-  echo "DCS_BUILD=$dcsball" >> ./tc
-  echo "SQ_ROOT=$RUNLOC" >> ./tc
-  echo "START=Y" >> ./tc
-  echo "INIT_TRAFODION=Y" >> ./tc
-  echo "DCS_SERVERS_PARM=$dcscnt" >> ./tc
-  echo "CLUSTER_NAME=trafcluster" >> ./tc
+  cp ./installer/trafodion_config_default ./Install_Config
+  echo "NODE_LIST=$(hostname -s)" >> ./Install_Config
+  echo "HADOOP_NODES=$(hostname -s)" >> ./Install_Config
+  echo "MY_HADOOP_NODES=\"-w $(hostname -s)\"" >> ./Install_Config
+  echo "node_count=1" >> ./Install_Config
+  echo "hadoop_node_count=1" >> ./Install_Config
+  echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./Install_Config
+  echo "OPENSTACK_VM=1" >> ./Install_Config
+  echo "TRAF_BUILD=$trafball" >> ./Install_Config
+  echo "REST_BUILD=$restball" >> ./Install_Config  ## may be empty for pre-1.1 builds
+  echo "DCS_BUILD=$dcsball" >> ./Install_Config
+  echo "SQ_ROOT=$RUNLOC" >> ./Install_Config
+  echo "START=Y" >> ./Install_Config
+  echo "INIT_TRAFODION=Y" >> ./Install_Config
+  echo "DCS_SERVERS_PARM=$dcscnt" >> ./Install_Config
+  echo "CLUSTER_NAME=trafcluster" >> ./Install_Config
   if rpm -q cloudera-manager-server >/dev/null
   then
-    echo "URL=$(hostname -f):7180" >> ./tc
-    echo "HADOOP_TYPE=cloudera" >> ./tc
+    echo "URL=$(hostname -f):7180" >> ./Install_Config
+    echo "HADOOP_TYPE=cloudera" >> ./Install_Config
   else
-    echo "URL=$(hostname -f):8080" >> ./tc
-    echo "HADOOP_TYPE=hortonworks" >> ./tc
+    echo "URL=$(hostname -f):8080" >> ./Install_Config
+    echo "HADOOP_TYPE=hortonworks" >> ./Install_Config
   fi
   if [[ $LDAP == "true" ]]
   then
-    echo "LDAP_SECURITY=Y" >> ./tc
-    echo "LDAP_AUTH_FILE=traf_auth_config" >> ./tc
+    echo "LDAP_SECURITY=Y" >> ./Install_Config
+    echo "LDAP_AUTH_FILE=traf_auth_config" >> ./Install_Config
   fi
   # no SUSE yet
-  echo "SUSE_LINUX=false" >> ./tc
-  echo "JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk.x86_64" >> ./tc
+  echo "SUSE_LINUX=false" >> ./Install_Config
+  echo "JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk.x86_64" >> ./Install_Config
   # DCS/Cloud
-  echo "CLOUD_CONFIG=Y" >> ./tc
-  echo "CLOUD_TYPE=1" >> ./tc
-  echo "AWS_CLOUD=true" >> ./tc
+  echo "CLOUD_CONFIG=Y" >> ./Install_Config
+  echo "CLOUD_TYPE=1" >> ./Install_Config
+  echo "AWS_CLOUD=true" >> ./Install_Config
 
 
   check_port 23400
   check_port 24400
 
   echo "*** Calling trafodion_install"
-  ./installer/trafodion_install --accept_license --config_file ./tc
+  ./installer/trafodion_install --accept_license --config_file ./Install_Config
   ret=$?
 
   check_port 23400
