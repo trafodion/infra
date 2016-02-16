@@ -237,7 +237,7 @@ function report_on_corefiles() {
       ls -l $COREFILES       | tee $WORKSPACE/corefiles.log
       if [[ -n "$altuser" ]]
       then
-        sudo -n -i -u $altuser /usr/local/bin/core_bt -t >> $WORKSPACE/corefiles.log
+        sudo -n -i -u $altuser /usr/local/bin/core_bt -t -d $ADIR >> $WORKSPACE/corefiles.log
       else
         /usr/local/bin/core_bt -t >> $WORKSPACE/corefiles.log
       fi

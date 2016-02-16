@@ -1,7 +1,7 @@
 jenkins	ALL = (trafodion) NOPASSWD:/usr/local/bin/run-dev-regress.sh
 jenkins	ALL = (trafodion) SETENV: NOPASSWD:/home/jenkins/workspace/*/phx_test_run/phoenix_test.py
 jenkins	ALL = (trafodion) NOPASSWD:/bin/rm,/bin/cp
-jenkins	ALL = (trafodion) NOPASSWD:/bin/bash -c /usr/local/bin/core_bt -t
+jenkins	ALL = (trafodion) NOPASSWD:/bin/bash -c /usr/local/bin/core_bt *
 # Pre-load data for hive suite
 jenkins	ALL = (hdfs) NOPASSWD:/usr/bin/hdfs,/usr/bin/hive
 # free cached objects
