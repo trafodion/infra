@@ -39,7 +39,8 @@ source_env -v build $FLAVOR
 cd trafodion/core
 
 # Pull latest posted Win-ODBC build if available
-WINLOC="http://traf-testlogs.esgyn.com/winbld"
+# trailing slash necessary to get content list
+WINLOC="http://traf-testlogs.esgyn.com/winbld/"
 
 mkdir -p conn/clients
 
@@ -56,9 +57,10 @@ do
   min=${suff%%\.*}
   suff=${suff#*\.}
   pat=${suff%%\.*}
-  if (( $TRAFODION_VER_MAJOR >= $maj && 
-        $TRAFODION_VER_MINOR >= $min && 
-        $TRAFODION_VER_UPDATE >= $pat ))
+  if (( $TRAFODION_VER_MAJOR > $maj || 
+       ( $TRAFODION_VER_MAJOR == $maj && $TRAFODION_VER_MINOR > $min ) ||
+       ( $TRAFODION_VER_MAJOR == $maj && $TRAFODION_VER_MINOR == $min &&
+                                             $TRAFODION_VER_UPDATE >= $pat ) ))
   then
     found="$f"
     break
