@@ -46,28 +46,39 @@ mkdir -p conn/clients
 # parse from html listing and reverse sort by version number
 avail=$(curl -s $WINLOC | sed -n -e '/TFODBC/s/^.*href="\([^"]*\)".*/\1/p' | sort -rV)
 
+# find latest one that is less or equal to our version
 found=""
 for f in $avail
 do
-  ver=${f#TFODBC64-}
-  ver=${ver%\.[a-z]+}
-done
-
-for suffix in msi exe
-do
-  WFILE="TFODBC64-${TRAFODION_VER}.$suffix"
-  wget --no-verbose -O conn/clients/$WFILE $WINLOC/$WFILE
-  if [[ $? != 0 ]]
+  suff=${f#TFODBC64-}
+  maj=${suff%%\.*}
+  suff=${suff#*\.}
+  min=${suff%%\.*}
+  suff=${suff#*\.}
+  pat=${suff%%\.*}
+  if (( $TRAFODION_VER_MAJOR >= $maj && 
+        $TRAFODION_VER_MINOR >= $min && 
+        $TRAFODION_VER_UPDATE >= $pat ))
   then
-    echo "Warning: Win-ODBC64 $suffix build not found"
-    rm conn/clients/$WFILE
-  else
-    echo "Win-ODBC64 $suffix build found"
+    found="$f"
+    break
   fi
 done
 
+if [[ -n "$found" ]]
+then
+  wget --no-verbose -O conn/clients/$found $WINLOC/$found
+  if [[ $? != 0 ]]
+  then
+    echo "Error: Win-ODBC64 download failed"
+  fi
+else
+  echo "Warning: No matching Win-ODBC64 build found"
+  echo "Found only: $avail"
+fi
 
-# Use Zuul / Jenkins values
+
+# Use Jenkins values
 VER="$(git describe --long --tags --dirty --always)"
 export PV_BUILDID=${VER}_Bld${BUILD_NUMBER}
 export PV_DATE=$(echo ${BUILD_TIMESTAMP} | sed 's/-//g')
