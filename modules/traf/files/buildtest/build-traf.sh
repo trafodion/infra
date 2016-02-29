@@ -43,6 +43,16 @@ WINLOC="http://traf-testlogs.esgyn.com/winbld"
 
 mkdir -p conn/clients
 
+# parse from html listing and reverse sort by version number
+avail=$(curl -s $WINLOC | sed -n -e '/TFODBC/s/^.*href="\([^"]*\)".*/\1/p' | sort -rV)
+
+found=""
+for f in $avail
+do
+  ver=${f#TFODBC64-}
+  ver=${ver%\.[a-z]+}
+done
+
 for suffix in msi exe
 do
   WFILE="TFODBC64-${TRAFODION_VER}.$suffix"

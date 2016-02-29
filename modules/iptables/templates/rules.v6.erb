@@ -34,7 +34,7 @@
 -A INPUT -j TRAF-INPUT
 
 # if packet gets here then log it and drop it
--A INPUT -j LOG --log-prefix "IPTABLES (End INPUT): " --log-level 7
+#-A INPUT -j LOG --log-prefix "IPTABLES (End INPUT): " --log-level 7
 -A INPUT -j DROP
 
 # BLACKLIST chain rules
@@ -70,6 +70,6 @@
 <% end -%>
 # log whatever gets to the end of our iptables so we will know when we
 # need new rules
--A TRAF-INPUT -j LOG --log-prefix "IPTABLES (End TRAF-INPUT): " --log-level 7
+#-A TRAF-INPUT -j LOG --log-prefix "IPTABLES (End TRAF-INPUT): " --log-level 7
 -A TRAF-INPUT -j REJECT --reject-with icmp6-adm-prohibited
 COMMIT
