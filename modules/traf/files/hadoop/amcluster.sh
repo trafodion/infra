@@ -114,8 +114,29 @@ fi
 curl $Read $URL/clusters | grep -q href
 if [[ $? != 0 ]]
 then
-  echo "Error: cannot contact ambari server"
-  exit 2
+  set -x
+  /sbin/service ambari-server start
+  /sbin/service ambari-agent start
+  set +x
+  echo "Waiting for Ambari to respond"
+  i=0
+  AM="DOWN"
+  while (( i < 25 ))
+  do
+    curl $Read $URL/clusters | grep -q href
+    if [[ $? == 0 ]]
+    then
+      AM="UP"
+      break
+    fi
+    ((i+=1))
+    sleep 15
+  done
+  if [[ $AM == "DOWN" ]]
+  then
+    echo "Error: cannot contact ambari server"
+    exit 2
+  fi
 fi
 
 if [[ $mode = "Delete" ]]
