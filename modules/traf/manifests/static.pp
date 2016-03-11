@@ -71,7 +71,6 @@ class traf::static (
   # Downloads
 
   apache::vhost { 'traf-builds.esgyn.com':
-    serveraliases => "downloads.trafodion.org",
     port          => 80,
     priority      => '50',
     docroot       => "${server_path}/downloads-www",
@@ -233,7 +232,6 @@ class traf::static (
   # Logs
 
   apache::vhost { 'traf-testlogs.esgyn.com':
-    serveraliases       => "logs.trafodion.org",
     port                => 80,
     priority            => '50',
     docroot             => "${server_path}/logs",
