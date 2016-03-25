@@ -29,7 +29,7 @@ set -x
 /usr/local/bin/install-traf.sh "sqlregress" "$DIR" || exit 1
 
 # Hive suite depends on pre-loaded TPC-DS data
-if [[ "$SUITES" =~ hive|core ]]
+if [[ "$SUITES" =~ hive|core|privs1 ]]
 then
     if [[ ! -f /home/jenkins/tpcds_kit.zip ]]
     then
