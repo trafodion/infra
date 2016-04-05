@@ -505,7 +505,7 @@
           recipients: dev@trafodion.incubator.apache.org
           reply-to: no-reply@trafodion.org
           content-type: "text"
-          subject: Trafodion {branch} Daily Test Result - $BUILD_ID
+          subject: Trafodion {branch} Daily Test Result - $BUILD_ID - $BUILD_STATUS
           save-output: true
           always: true
           failure: false
