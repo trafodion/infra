@@ -408,6 +408,7 @@ fi
 # Set Java Heap Size for all server roles
 # much smaller than defaults due to small mem size of test environment
 HEAP=536870912  # half GB
+RSHEAP=$(( HEAP * 2 ))
 cm_config_serv "hdfs/roles/trafDATA" "datanode_java_heapsize" "$HEAP"
 cm_config_serv "hdfs/roles/trafNAME" "namenode_java_heapsize" "$HEAP"
 cm_config_serv "hdfs/roles/trafSEC"  "secondary_namenode_java_heapsize" "$HEAP"
@@ -416,7 +417,7 @@ cm_config_serv "trafMAPRED/roles/trafJOB" "jobtracker_java_heapsize" "$HEAP"
 cm_config_serv "trafHIVE/roles/trafMETA" "hive_metastore_java_heapsize" "$HEAP"
 cm_config_serv "trafHIVE/roles/trafHSRV" "hiveserver2_java_heapsize" "$HEAP"
 cm_config_serv "trafhbase/roles/trafMAS" "hbase_master_java_heapsize" "$HEAP"
-cm_config_serv "trafhbase/roles/trafREG" "hbase_regionserver_java_heapsize" "$HEAP"
+cm_config_serv "trafhbase/roles/trafREG" "hbase_regionserver_java_heapsize" "$RSHEAP"
 
 # Deploy Client Config
 State="$(curl $Read $URL/clusters/trafcluster/services/hdfs | jq -r '.clientConfigStalenessStatus')"
