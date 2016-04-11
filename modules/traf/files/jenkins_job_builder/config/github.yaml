@@ -58,6 +58,12 @@
             - kevinxu021
             - gtapper
             - mashengchen
+            - sbroeder 
+            - traflm 
+            - prashanth-vasudev 
+            - WEISHIUN 
+            - mkby 
+            - nitin-amp
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors

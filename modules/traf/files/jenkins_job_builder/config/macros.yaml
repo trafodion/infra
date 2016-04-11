@@ -328,6 +328,10 @@
               source: 'traf_run/dcs*/logs/*'
               copy-after-failure: true
               keep-hierarchy: true
+            - target: 'logs/$LOG_PATH'
+              source: 'traf_run/etc/*'
+              copy-after-failure: true
+              keep-hierarchy: true
 
 - publisher:
     name: phoenix_test-log
