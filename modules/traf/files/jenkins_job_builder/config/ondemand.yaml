@@ -109,8 +109,8 @@
       - choice:
           name: DISTRO
           choices:
-            - cm5.3
-            - ahw2.2
+            - cm5.4
+            - ahw2.3
           description: "Distro: AmbariHortonWorks or ClouderaManager"
       - bool:
           name: sql
