@@ -296,6 +296,8 @@
 
     parameters:
       - string:
+          name: LOG_PATH
+      - string:
           name: SUITES
           description: "Space separated list of test suites"
       - string:
