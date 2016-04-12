@@ -8,6 +8,7 @@
 
     jobs:
       - 'Check-PR-{branch}'
+      - 'ExtraTest-PR-{branch}'
 
 - job-template:
     name: 'Check-PR-{branch}'
@@ -42,7 +43,6 @@
           # github user names for test approval
           admin-list:
             - svarnau
-            - alchen99
           trigger-phrase: .*[jJ]enkins,?\W+(re)?test.*
           white-list:
             - nonstop-qfchen
@@ -97,7 +97,7 @@
               kill-phase-on: NEVER
               enable-condition: "'$BUCKET_DOC' == 'true'"
       - multijob:
-          name: build_test
+          name: build
           projects:
             - name: "build-{branch}-debug"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
@@ -113,6 +113,9 @@
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/build-{branch}-release
                  BUILD_TYPE=check
+      - multijob:
+          name: test
+          projects:
             - name: "pyodbc_test-cdh"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
@@ -163,6 +166,109 @@
     publishers:
       - console-log
 
+- job-template:
+    name: 'ExtraTest-PR-{branch}'
+    node: 'master'
+    project-type: multijob
+
+    parameters:
+      - string:
+          name: LOG_PATH
+          default: 'PullReq/$ghprbPullId/Extra-$BUILD_NUMBER'
+
+    properties:
+      - github:
+          url: https://github.com/apache/incubator-trafodion
+
+    scm:
+      - git:
+          url: https://github.com/apache/incubator-trafodion
+          wipe-workspace: false
+          skip-tag: true
+          refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
+          branches: 
+            - 'origin/pr/$ghprbPullId/head'
+#          changelog-against:
+#            remote: origin
+#            branch: '$ghprbTargetBranch'
+
+    triggers:
+      - github-pull-request:
+          # check for new PR every few minutes
+          cron: H/8 * * * *
+          # github user names for test approval
+          admin-list:
+            - svarnau
+          trigger-phrase: .*[jJ]enkins,?\W+(re)?extra\Wtest.*
+          only-trigger-phrase: true
+          white-list:
+            - nonstop-qfchen
+            - selvaganesang
+            - xwq
+            - HowardQin
+            - anoopsharma00
+            - hegdean
+            - ryzuo
+            - radumarias
+            - narendragoyal
+            - arvind-narain
+            - kevinxu021
+            - gtapper
+            - mashengchen
+            - sbroeder 
+            - traflm 
+            - prashanth-vasudev 
+            - WEISHIUN 
+            - mkby 
+            - nitin-amp
+          allow-whitelist-orgs-as-admins: true
+          org-list:
+            - trafodion-contributors
+          white-list-target-branches:
+            - '{branch}'
+          success-comment: "Extra Test Passed.  $BUILD_URL"
+          failure-comment: "Extra Test Failed.  $BUILD_URL"
+          error-comment: "Extra Test Error.  $BUILD_URL"
+
+    builders:
+      - link-logs
+      - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh apache/incubator-trafodion
+      - shell: "/usr/local/bin/supported-distro.sh ."
+      - inject:
+          properties-file: distro.properties
+      - multijob:
+          name: extra_test
+          projects:
+            - name: "phoenix_test_T4-cdh"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/phoenix_test_T4-cdh
+                 BRANCH={branch}
+                 HDIST="CDH$DISTCDH"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+            - name: "core-regress-hdp"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/regress-hdp
+                SUITES=compGeneral udr privs1 privs2
+                BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
+            - name: "core-regress-cdh"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/regress-cdh
+                SUITES=charsets executor fullstack2 qat hive
+                BRANCH=$BRANCH
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_cm$DISTCDH"
+
+    publishers:
+      - console-log
 
 - job-group:
     name: 'Check-Daily'
