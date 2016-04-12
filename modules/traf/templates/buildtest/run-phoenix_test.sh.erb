@@ -139,10 +139,7 @@ else
     cd $WORKSPACE/phx_test_run
 
     chmod -R +rX $WORKSPACE/$TRAF_DIR $WORKSPACE/$DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
-    sudo -n -u trafodion SQ_MBTYPE=$SQ_MBTYPE LANG=$LANG HADOOP_CNF_DIR=$HADOOP_CNF_DIR TRAFODION_VER=$TRAFODION_VER \
-		HBASE_CNF_DIR=$HBASE_CNF_DIR HIVE_CNF_DIR=$HIVE_CNF_DIR MY_SQROOT=$MY_SQROOT HBASE_TRXDIR=$HBASE_TRXDIR \
-		MPI_TMPDIR=$MPI_TMPDIR LD_PRELOAD=$TMP_LD_PRELOAD LD_LIBRARY_PATH=$LD_LIBRARY_PATH PATH=$PATH \
-    		./phoenix_test.py $TARGS
+    sudo -n -i -u trafodion LD_PRELOAD=$TMP_LD_PRELOAD ./phoenix_test.py $TARGS
     phoenixRes=$?
   else
     rm -rf $WORKSPACE/phx_test_run

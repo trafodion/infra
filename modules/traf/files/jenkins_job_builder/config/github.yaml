@@ -199,7 +199,7 @@
           # github user names for test approval
           admin-list:
             - svarnau
-          trigger-phrase: .*[jJ]enkins,?\W+(re)?extra\Wtest.*
+          trigger-phrase: .*[jJ]enkins,?\W+extra\W(re)?test.*
           only-trigger-phrase: true
           white-list:
             - nonstop-qfchen
