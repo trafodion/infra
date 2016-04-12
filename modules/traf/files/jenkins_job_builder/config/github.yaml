@@ -252,7 +252,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/regress-hdp
+                LOG_PATH=$LOG_PATH/regress-hdp
                 SUITES=compGeneral udr privs1 privs2
                 BRANCH={branch}
               node-label-name: "NODE_TYPE"
@@ -261,7 +261,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/regress-cdh
+                LOG_PATH=$LOG_PATH/regress-cdh
                 SUITES=charsets executor fullstack2 qat hive
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
