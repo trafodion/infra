@@ -253,7 +253,7 @@
               kill-phase-on: NEVER
               predefined-parameters: |
                 LOG_PATH=$LOG_PATH/regress-hdp
-                SUITES=compGeneral udr privs1 privs2
+                SUITES=privs1 privs2 compGeneral udr
                 BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "redhat_ahw$DISTHDP"

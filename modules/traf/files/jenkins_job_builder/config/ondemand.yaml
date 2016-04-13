@@ -118,7 +118,7 @@
           description: Run SQL regression?
       - string:
           name: sql_tests
-          default:  "charsets executor fullstack2 qat hive compGeneral udr privs1 privs2"
+          default:  "privs1 privs2 charsets executor fullstack2 qat hive compGeneral udr"
           description: "Space separated list of suites. Non-default: core seabase"
       - bool:
           name: pyodbc
