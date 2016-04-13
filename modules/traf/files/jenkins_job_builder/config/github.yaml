@@ -44,6 +44,7 @@
           admin-list:
             - svarnau
           trigger-phrase: .*[jJ]enkins,?\W+(re)?test.*
+          status-context: Check
           white-list:
             - nonstop-qfchen
             - selvaganesang
@@ -201,6 +202,7 @@
             - svarnau
           trigger-phrase: .*[jJ]enkins,?\W+extra\W(re)?test.*
           only-trigger-phrase: true
+          status-context: Extra
           white-list:
             - nonstop-qfchen
             - selvaganesang
