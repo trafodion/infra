@@ -139,7 +139,7 @@ else
     cd $WORKSPACE/phx_test_run
 
     chmod -R +rX $WORKSPACE/$TRAF_DIR $WORKSPACE/$DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
-    sudo -n -i -u trafodion LD_PRELOAD=$TMP_LD_PRELOAD ./phoenix_test.py $TARGS
+    sudo -n -i -u trafodion LD_PRELOAD=$TMP_LD_PRELOAD $(pwd)/phoenix_test.py $TARGS
     phoenixRes=$?
   else
     rm -rf $WORKSPACE/phx_test_run
