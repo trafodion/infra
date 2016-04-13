@@ -250,6 +250,15 @@
                  HDIST="CDH$DISTCDH"
               node-label-name: "NODE_TYPE"
               node-label: "redhat_cm$DISTCDH"
+            - name: "phoenix_test_T2-hdp"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/phoenix_test_T2-hdp
+                 BRANCH={branch}
+                 HDIST="HDP$DISTHDP"
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_ahw$DISTHDP"
             - name: "core-regress-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -265,7 +274,7 @@
               predefined-parameters: |
                 LOG_PATH=$LOG_PATH/regress-cdh
                 SUITES=charsets executor fullstack2 qat hive
-                BRANCH=$BRANCH
+                BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "redhat_cm$DISTCDH"
 
