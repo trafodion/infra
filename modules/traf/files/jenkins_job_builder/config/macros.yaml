@@ -359,6 +359,7 @@
               copy-after-failure: true
               keep-hierarchy: true
 
+# skips parsing if no results file -- no-maven option
 - publisher:
     name: phoenix-xunit
     publishers:
@@ -377,6 +378,8 @@
           types:
             - junit:
                 pattern: "phx_test_run/target/surefire-reports/*.xml"
+                requireupdate: false
+                skip-if-no-test-files: true
 
 - publisher:
     name: pyodbc_test-log
