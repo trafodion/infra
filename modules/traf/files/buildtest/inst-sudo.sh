@@ -191,6 +191,7 @@ then
   sudo cp -r $RUNLOC/logs $WORKSPACE/traf_run.save/
   sudo cp -r $RUNLOC/sql/scripts $WORKSPACE/traf_run.save/sql
   sudo cp -r $RUNLOC/tmp $WORKSPACE/traf_run.save/
+  sudo cp -r $RUNLOC/etc $WORKSPACE/traf_run.save/
   sudo cp -r $RUNLOC/dcs* $WORKSPACE/traf_run.save/
 
   # Same location as install
