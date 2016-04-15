@@ -44,25 +44,25 @@ class traf::nondistro (
     creates  => "/opt/hadoop-${hadoop_ver}",
     cwd      => "/opt",
     command  => "/bin/tar xf hadoop-${hadoop_arch}.tar.gz",
-    requires => Exec['download_hadoop'],
+    require  => Exec['download_hadoop'],
   }
   exec { 'unpack_hbase':
     creates  => "/opt/hbase-${hbase_ver}",
     cwd      => "/opt",
     command  => "/bin/tar xf hbase-${hbase_arch}-bin.tar.gz",
-    requires => Exec['download_hbase'],
+    require  => Exec['download_hbase'],
   }
   exec { 'unpack_zoo':
     creates  => "/opt/zookeeper-${zoo_ver}",
     cwd      => "/opt",
     command  => "/bin/tar xf zookeeper-${zoo_arch}.tar.gz",
-    requires => Exec['download_zoo'],
+    require  => Exec['download_zoo'],
   }
   exec { 'unpack_hive':
     creates  => "/opt/hive-${hive_ver}",
     cwd      => "/opt",
     command  => "/bin/tar xf hive-${hive_arch}.tar.gz",
-    requires => Exec['download_hive'],
+    require  => Exec['download_hive'],
   }
   # hdfs data
   file { '/dfs':
