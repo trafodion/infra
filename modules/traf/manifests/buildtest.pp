@@ -72,6 +72,7 @@ class traf::buildtest (
       'protobuf-compiler', 'protobuf-devel', 'xerces-c-devel',
       'zlib-devel', 'bzip2-devel', 'ncurses-devel', 'tk-devel', 'gdbm-devel', 'db4-devel', 'libpcap-devel',
       'cmake','npm',
+      'lzo','lzop','lzo-devel',
     ]
 
     exec { 'install_bower':
