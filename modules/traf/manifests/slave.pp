@@ -125,7 +125,7 @@ class traf::slave (
     refreshonly => true,
   }
 
-  if $distro =~ /^AHW|^CM/ {
+  if $distro =~ /^AHW|^CM|^VH/ {
     class { 'traf::hadoop':
       certname    => $certname,
       distro      => $distro,

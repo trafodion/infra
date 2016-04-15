@@ -24,6 +24,7 @@ class traf::hadoop (
       'CM5.3':  { $slavename = 'slave-cm53' }
       'AHW2.3': { $slavename = 'slave-ahw23' }
       'CM5.4':  { $slavename = 'slave-cm54' }
+      'VH1.0':  { $slavename = 'slave-ap10' }
       default:  { $slavename = 'slave' }
     }
     host { "${slavename}.trafodion.org" :
@@ -33,9 +34,8 @@ class traf::hadoop (
     }
   }
 
-  # Cloudera Manager or Ambari
-  if $distro =~ /^CM|^AHW/ {
-    # both requires selinux disabled
+  # For all distros
+
     class { 'selinux':
       mode => 'disabled',
     }
@@ -66,7 +66,7 @@ class traf::hadoop (
     package { 'jq':
       ensure => present,
     }
-  }
+
   # Establish distro parameter for lookup by cluster script
   case $distro {
     'AHW2.1': { $distro_ver = 'HDP-2.1' }
@@ -75,6 +75,7 @@ class traf::hadoop (
     'CM5.1':  { $distro_ver = '5.1.4' }
     'CM5.3':  { $distro_ver = '5.3.1' }
     'CM5.4':  { $distro_ver = '5.4.4' }
+    'VH1.0':  { $distro_ver = '1.0.2' }
     default:  { $distro_ver = 'None' } #cluster script will error out on this
   }
   # Cloudera Manager distros
@@ -123,6 +124,21 @@ class traf::hadoop (
       distro => $distro,
     }
   }
+  # Vanilla Hadoop
+  if $distro =~ /^VH/ {
+    # cluster set-up script
+    file { '/usr/local/bin/cluster_setup':
+      ensure  => present,
+      source  => 'puppet:///modules/traf/hadoop/vancluster.sh',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0754',
+    }
+    class { 'traf::nondistro' :
+      distro => $distro,
+    }
+  }
+
   file { '/var/local/TrafTestDistro':
     ensure  => present,
     content => $distro_ver,
