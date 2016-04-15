@@ -138,22 +138,21 @@ else
     sudo -n -u trafodion cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
     cd $WORKSPACE/phx_test_run
 
-    chmod -R +rX $WORKSPACE/$TRAF_DIR $WORKSPACE/$DCS_INSTALL_DIR  # read perm for traf/dcs libs, etc
-    sudo -n -i -u trafodion LD_PRELOAD=$TMP_LD_PRELOAD $(pwd)/phoenix_test.py $TARGS | tee phx.out
+    sudo -n -i -u trafodion LD_PRELOAD=$TMP_LD_PRELOAD $(pwd)/phoenix_test.py $TARGS | tee $WORKSPACE/phx.out
     phoenixRes=${PIPESTATUS[0]}
   else
     rm -rf $WORKSPACE/phx_test_run
     cp -R $WORKSPACE/$TEST_DIR $WORKSPACE/phx_test_run
     cd $WORKSPACE/phx_test_run
     export LD_PRELOAD=$TMP_LD_PRELOAD
-    ./phoenix_test.py $TARGS | tee phx.out
+    ./phoenix_test.py $TARGS | tee $WORKSPACE/phx.out
     phoenixRes=${PIPESTATUS[0]}
   fi
 fi
 cat $WORKSPACE/phx_test_run/target/surefire-reports/*.txt > $WORKSPACE/test_summary.txt
 
 # Parse test summary in output
-nfail=$(awk '/^Total number of failures/ {print $NF}' phx.out)
+nfail=$(awk '/^Total number of failures/ {print $NF}' $WORKSPACE/phx.out)
 
 
 # Report on parent directory of $TRAF_DIR
