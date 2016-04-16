@@ -24,21 +24,25 @@ class traf::nondistro (
     creates => "/opt/hadoop-${hadoop_ver}.tar.gz",
     cwd     => "/opt",
     command => "/usr/bin/wget $hadoop_arch",
+    require => Package['wget'],
   }
   exec { 'download_hbase':
     creates => "/opt/hbase-${hbase_ver}-bin.tar.gz",
     cwd     => "/opt",
     command => "/usr/bin/wget $hbase_arch",
+    require => Package['wget'],
   }
   exec { 'download_zoo':
     creates => "/opt/zookeeper-${zoo_ver}.tar.gz",
     cwd     => "/opt",
     command => "/usr/bin/wget $zoo_arch",
+    require => Package['wget'],
   }
   exec { 'download_hive':
     creates => "/opt/hive-${hive_ver}.tar.gz",
     cwd     => "/opt",
     command => "/usr/bin/wget $hive_arch",
+    require => Package['wget'],
   }
   exec { 'unpack_hadoop':
     creates  => "/opt/hadoop-${hadoop_ver}",
@@ -91,6 +95,9 @@ class traf::nondistro (
   user { 'hive':
     ensure     => present,
     gid        => 'hive',
+  }
+  group { 'hive','zookeeper','hbase','hdfs':
+    ensure     => present,
   }
 
 
