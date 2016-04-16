@@ -96,7 +96,7 @@ class traf::nondistro (
     ensure     => present,
     gid        => 'hive',
   }
-  group { 'hive','zookeeper','hbase','hdfs':
+  group { ['hive','zookeeper','hbase','hdfs']:
     ensure     => present,
   }
 
