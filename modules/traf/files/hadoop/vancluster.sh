@@ -83,7 +83,7 @@ function addxml() {
 }
 
 addraw /opt/hadoop/etc/hadoop/hadoop-env.sh "JAVA_HOME=$JAVA_HOME"
-addraw /opt/hadoop/etc/hadoop/slaves "localhost"
+addraw /opt/hadoop/etc/hadoop/slaves "$(hostname -s)"
 
 addxml /opt/hadoop/etc/hadoop/core-site.xml "fs.default.name" "hdfs://localhost:50001"
 addxml /opt/hadoop/etc/hadoop/core-site.xml "hadoop.tmp.dir" "/dfs/tmp"
@@ -99,14 +99,14 @@ addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.http.address" "localho
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.ipc.address" "localhost:50006"
 
 # hbase basic
-addraw /opt/hbase/conf/regionservers "localhost"
+addraw /opt/hbase/conf/regionservers "$(hostname -s)"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.rootdir" "hdfs://localhost:50001/hbase"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.dataDir" "hdfs://localhost:50001/zoo"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.clientPort" "2181"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.master.info.port" "16010"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.regionserver.info.port" "16030"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.regionserver.port" "16088"
-addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.quorum" "localhost"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.quorum" "$(hostname -s)"
 
 addraw /opt/hbase/conf/hbase-env.sh "JAVA_HOME=$JAVA_HOME"
 addraw /opt/hbase/conf/hbase-env.sh "HBASE_MANAGES_ZK=false"
@@ -120,8 +120,8 @@ addraw /opt/zookeeper/conf/zookeeper-env.sh "JAVA_HOME=$JAVA_HOME"
 
 log_banner "Start Services and Delete HBase data"
 
-sudo -u zookeeper zkServer.sh start
-exit 0
+cd /tmp # write-output file here
+sudo -u zookeeper /opt/zookeeper/bin/zkServer.sh start
 
 # make sure we are not in HDFS safemode
 mode="$(hdfs dfsadmin -safemode get 2>/dev/null)"
@@ -129,6 +129,14 @@ if [[ $mode =~ ON ]]
 then
   sudo -u hdfs /opt/hadoop/bin/hdfs dfsadmin -safemode leave
 fi
+
+# first time - format namenode
+if [[ ! -d /dfs/name ]]
+then
+  sudo -u hdfs /opt/hadoop/bin/hdfs namenode -format -force
+fi
+
+sudo -u hdfs /opt/hadoop/sbin/start-dfs.sh
 
 exit 0
 
@@ -168,7 +176,7 @@ cm_config_serv "trafhbase/roles/trafREG" "hbase_regionserver_java_heapsize" "$RS
   start_service hdfs
 
   # wait for safemode so we can modify hdfs data
-  sudo -u hdfs hdfs dfsadmin -safemode wait
+  sudo -u hdfs /opt/hadoop/bin/hdfs dfsadmin -safemode wait
 
 ### Standard directories that need only to be created once
 

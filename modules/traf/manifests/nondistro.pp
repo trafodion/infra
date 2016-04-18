@@ -124,6 +124,8 @@ class traf::nondistro (
   user { 'hdfs':
     ensure     => present,
     gid        => 'hdfs',
+    home       => '/home/hdfs',
+    managehome => true,
   }
   user { 'hbase':
     ensure     => present,
