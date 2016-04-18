@@ -126,7 +126,7 @@ exit 0
 mode="$(hdfs dfsadmin -safemode get 2>/dev/null)"
 if [[ $mode =~ ON ]]
 then
-  sudo -u hdfs hdfs dfsadmin -safemode leave
+  sudo -u hdfs /opt/hadoop/bin/hdfs dfsadmin -safemode leave
 fi
 
 exit 0

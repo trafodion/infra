@@ -24,7 +24,7 @@ class traf::hadoop (
       'CM5.3':  { $slavename = 'slave-cm53' }
       'AHW2.3': { $slavename = 'slave-ahw23' }
       'CM5.4':  { $slavename = 'slave-cm54' }
-      'VH1.0':  { $slavename = 'slave-ap10' }
+      'VH1.0':  { $slavename = 'slave-va10' }
       default:  { $slavename = 'slave' }
     }
     host { "${slavename}.trafodion.org" :
