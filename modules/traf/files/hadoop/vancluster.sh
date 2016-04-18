@@ -75,7 +75,9 @@ function addxml() {
   else
     echo "Adding $prop to $file"
     sed -i "s%</configuration>%%" $file 
-    echo "<name>$prop</name><value>$value</value>" >> $file
+    echo "<property>" >> $file
+    echo "  <name>$prop</name><value>$value</value>" >> $file
+    echo "</property>" >> $file
     echo "</configuration>" >> $file
   fi
 }
