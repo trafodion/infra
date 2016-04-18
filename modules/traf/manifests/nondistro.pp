@@ -45,29 +45,40 @@ class traf::nondistro (
     command => "/usr/bin/wget $hive_arch",
     require => Package['wget'],
   }
+  file { "/opt/mydistro":
+    ensure  => directory,
+    owner   => 'tinstall',
+    group   => 'root',
+    mode    => '0644',
+    require => User['tinstall'],
+  }
   exec { 'unpack_hadoop':
     creates  => "/opt/hadoop-${hadoop_ver}",
-    cwd      => "/opt",
+    cwd      => "/opt/mydistro",
+    user     => "tinstall",
     command  => "/bin/tar xf hadoop-${hadoop_ver}.tar.gz",
-    require  => Exec['download_hadoop'],
+    require  => [ Exec['download_hadoop'], User['tinstall'], File['/opt/mydistro'] ],
   }
   exec { 'unpack_hbase':
     creates  => "/opt/hbase-${hbase_ver}",
-    cwd      => "/opt",
+    cwd      => "/opt/mydistro",
+    user     => "tinstall",
     command  => "/bin/tar xf hbase-${hbase_ver}-bin.tar.gz",
-    require  => Exec['download_hbase'],
+    require  => [ Exec['download_hbase'], User['tinstall'], File['/opt/mydistro'] ],
   }
   exec { 'unpack_zoo':
     creates  => "/opt/zookeeper-${zoo_ver}",
-    cwd      => "/opt",
+    cwd      => "/opt/mydistro",
+    user     => "tinstall",
     command  => "/bin/tar xf zookeeper-${zoo_ver}.tar.gz",
-    require  => Exec['download_zoo'],
+    require  => [ Exec['download_zoo'], User['tinstall'], File['/opt/mydistro'] ],
   }
   exec { 'unpack_hive':
     creates  => "/opt/apache-hive-${hive_ver}-bin",
-    cwd      => "/opt",
+    cwd      => "/opt/mydistro",
+    user     => "tinstall",
     command  => "/bin/tar xf apache-hive-${hive_ver}-bin.tar.gz",
-    require  => Exec['download_hive'],
+    require  => [ Exec['download_hive'], User['tinstall'], File['/opt/mydistro'] ],
   }
   # standard paths for downstream scripting
   file { "/opt/hadoop":
@@ -75,74 +86,52 @@ class traf::nondistro (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    target  => "/opt/hadoop-${hadoop_ver}",
+    target  => "/opt/mydistro/hadoop-${hadoop_ver}",
   }
   file { "/opt/hbase":
     ensure  => link,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    target  => "/opt/hbase-${hbase_ver}",
+    target  => "/opt/mydistro/hbase-${hbase_ver}",
   }
   file { "/opt/zookeeper":
     ensure  => link,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    target  => "/opt/zookeeper-${zoo_ver}",
+    target  => "/opt/mydistro/zookeeper-${zoo_ver}",
   }
   file { "/opt/hive":
     ensure  => link,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    target  => "/opt/apache-hive-${hive_ver}-bin",
+    target  => "/opt/mydistro/apache-hive-${hive_ver}-bin",
   }
 
   # hdfs data
   file { '/dfs':
     ensure  => directory,
-    owner   => 'hdfs',
-    group   => 'hdfs',
+    owner   => 'tinstall',
+    group   => 'tinstall',
     mode    => '770',
-    require => User['hdfs'],
+    require => User['tinstall'],
   }
   # zookeeper data
-  file { '/home/zookeeper':
+  file { '/home/tinstall/zookeeper':
     ensure  => directory,
-    owner   => 'zookeeper',
-    group   => 'zookeeper',
+    owner   => 'tinstall',
+    group   => 'tinstall',
     mode    => '770',
-    require => User['zookeeper'],
+    require => User['tinstall'],
   }
   class {'traf::hive_metastore':
     hive_sql_pw     => 'insecure_hive',
     hive_schema_ver => $meta_schema,
-    hive_home       => "/opt/apache-hive-${hive_ver}-bin",
-    require         => [ User['hive'], Exec['unpack_hive'], ],
+    hive_home       => "/opt/hive",
+    require         => [ Exec['unpack_hive'], File['/opt/hive'], ],
   }
-  user { 'hdfs':
-    ensure     => present,
-    gid        => 'hdfs',
-    home       => '/home/hdfs',
-    managehome => true,
-  }
-  user { 'hbase':
-    ensure     => present,
-    gid        => 'hbase',
-  }
-  user { 'zookeeper':
-    ensure     => present,
-    gid        => 'zookeeper',
-  }
-  user { 'hive':
-    ensure     => present,
-    gid        => 'hive',
-  }
-  group { ['hive','zookeeper','hbase','hdfs']:
-    ensure     => present,
-  }
-
 
 }
 

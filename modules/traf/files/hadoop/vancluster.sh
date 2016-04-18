@@ -121,78 +121,52 @@ addraw /opt/zookeeper/conf/zookeeper-env.sh "JAVA_HOME=$JAVA_HOME"
 log_banner "Start Services and Delete HBase data"
 
 cd /tmp # write-output file here
-sudo -u zookeeper /opt/zookeeper/bin/zkServer.sh start
+sudo -u tinstall /opt/zookeeper/bin/zkServer.sh start
 
 # make sure we are not in HDFS safemode
 mode="$(hdfs dfsadmin -safemode get 2>/dev/null)"
 if [[ $mode =~ ON ]]
 then
-  sudo -u hdfs /opt/hadoop/bin/hdfs dfsadmin -safemode leave
+  sudo -u tinstall /opt/hadoop/bin/hdfs dfsadmin -safemode leave
 fi
 
 # first time - format namenode
 if [[ ! -d /dfs/name ]]
 then
-  sudo -u hdfs /opt/hadoop/bin/hdfs namenode -format -force
+  sudo -u tinstall /opt/hadoop/bin/hdfs namenode -format -force
 fi
 
-sudo -u hdfs /opt/hadoop/sbin/start-dfs.sh
+sudo -u tinstall /opt/hadoop/sbin/start-dfs.sh
+
+# wait for safemode so we can modify hdfs data
+sudo -u tinsall /opt/hadoop/bin/hdfs dfsadmin -safemode wait
 
 exit 0
 
-# Hive config
 cm_config_serv "trafHIVE" "mapreduce_yarn_service" "trafMAPRED"
 cm_config_serv "trafHIVE" "zookeeper_service" "zookeeper"
 cm_config_serv "trafHIVE" "hive_metastore_database_password" "insecure_hive"
-
-# MapReduce config
 cm_config_serv "trafMAPRED" "hdfs_service" "hdfs"
-
-# HBase config
 cm_config_serv "trafhbase" "hdfs_service" "hdfs"
 cm_config_serv "trafhbase" "zookeeper_service" "zookeeper"
-
-
-# Set Java Heap Size for all server roles
-# much smaller than defaults due to small mem size of test environment
-HEAP=536870912  # half GB
-RSHEAP=$(( HEAP * 2 ))
-cm_config_serv "hdfs/roles/trafDATA" "datanode_java_heapsize" "$HEAP"
-cm_config_serv "hdfs/roles/trafNAME" "namenode_java_heapsize" "$HEAP"
-cm_config_serv "hdfs/roles/trafSEC"  "secondary_namenode_java_heapsize" "$HEAP"
-cm_config_serv "zookeeper/roles/trafSERV" "zookeeper_server_java_heapsize" "$HEAP"
-cm_config_serv "trafMAPRED/roles/trafJOB" "jobtracker_java_heapsize" "$HEAP"
-cm_config_serv "trafHIVE/roles/trafMETA" "hive_metastore_java_heapsize" "$HEAP"
-cm_config_serv "trafHIVE/roles/trafHSRV" "hiveserver2_java_heapsize" "$HEAP"
-cm_config_serv "trafhbase/roles/trafMAS" "hbase_master_java_heapsize" "$HEAP"
-cm_config_serv "trafhbase/roles/trafREG" "hbase_regionserver_java_heapsize" "$RSHEAP"
 
 
 
 # HDFS
 
-  # Make sure namenode is formatted
-
-  start_service hdfs
-
-  # wait for safemode so we can modify hdfs data
-  sudo -u hdfs /opt/hadoop/bin/hdfs dfsadmin -safemode wait
 
 ### Standard directories that need only to be created once
 
 # Hive set-up
-hdfs dfs -ls /user/hive >/dev/null
+hdfs dfs -mkdir -p /user/hive >/dev/null
 
-hdfs dfs -ls /user/hive/warehouse >/dev/null
+hdfs dfs -mkdir -p /user/hive/warehouse >/dev/null
 
 # MapReduce needs /tmp
-hdfs dfs -ls /tmp >/dev/null
+hdfs dfs -mkdir -p /tmp >/dev/null
 
 ### HBase data should be cleaned up every time
 echo "*** Removing HBase Data"
-
-# requires zookeeper up
-start_service zookeeper
 
 # hbase must be down
 
