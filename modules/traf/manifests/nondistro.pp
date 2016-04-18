@@ -107,6 +107,14 @@ class traf::nondistro (
     mode    => '770',
     require => User['hdfs'],
   }
+  # zookeeper data
+  file { '/home/zookeeper':
+    ensure  => directory,
+    owner   => 'zookeeper',
+    group   => 'zookeeper',
+    mode    => '770',
+    require => User['zookeeper'],
+  }
   class {'traf::hive_metastore':
     hive_sql_pw     => 'insecure_hive',
     hive_schema_ver => $meta_schema,
@@ -123,7 +131,7 @@ class traf::nondistro (
   }
   user { 'zookeeper':
     ensure     => present,
-    gid        => 'hive',
+    gid        => 'zookeeper',
   }
   user { 'hive':
     ensure     => present,

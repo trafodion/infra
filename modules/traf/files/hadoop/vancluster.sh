@@ -17,8 +17,8 @@ source /usr/local/bin/traf-functions.sh
 
 # Simple single-node cluster for test environment
 
-PATH="/bin:/usr/bin"
-JAVA_HOME=/usr/lib/jvm/java-1.7.0
+PATH="/bin:/usr/bin:/opt/hadoop/bin:/opt/hbase/bin:/opt/hive/bin:/opt/zookeeper/bin"
+export JAVA_HOME=/usr/lib/jvm/java-1.7.0
 
 log_banner "Checking Cluster Configuration"
 echo "*** Checking Cluster Configuration"
@@ -51,6 +51,7 @@ function addraw() {
   grep -q "$value" $file
   if (( $? != 0 ))
   then
+    echo "Adding $value to $file"
     echo "$value" >> $file
   fi
 }
@@ -68,9 +69,11 @@ function addxml() {
     grep "<name>$prop</name>" $file | grep -q "<value>$value</value>"
     if (( $? != 0 ))
     then
+      echo "Updating $prop in $file"
       sed -i "/<name>$prop</s%<value>.*</value>%<value>$value</value>%" $file 
     fi
   else
+    echo "Adding $prop to $file"
     sed -i "s%</configuration>%%" $file 
     echo "<name>$prop</name><value>$value</value>" >> $file
     echo "</configuration>" >> $file
@@ -78,10 +81,7 @@ function addxml() {
 }
 
 addraw /opt/hadoop/etc/hadoop/hadoop-env.sh "JAVA_HOME=$JAVA_HOME"
-# etc/hadoop/slaves file -- default is localhost
-
-addraw /opt/hbase/conf/hbase-env.sh "JAVA_HOME=$JAVA_HOME"
-addraw /opt/hbase/conf/hbase-env.sh "HBASE_MANAGES_ZK=false"
+addraw /opt/hadoop/etc/hadoop/slaves "localhost"
 
 addxml /opt/hadoop/etc/hadoop/core-site.xml "fs.default.name" "hdfs://localhost:50001"
 addxml /opt/hadoop/etc/hadoop/core-site.xml "hadoop.tmp.dir" "/dfs/tmp"
@@ -101,6 +101,31 @@ addraw /opt/hbase/conf/regionservers "localhost"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.rootdir" "hdfs://localhost:50001/hbase"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.dataDir" "hdfs://localhost:50001/zoo"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.clientPort" "2181"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.master.info.port" "16010"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.regionserver.info.port" "16030"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.regionserver.port" "16088"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.quorum" "localhost"
+
+addraw /opt/hbase/conf/hbase-env.sh "JAVA_HOME=$JAVA_HOME"
+addraw /opt/hbase/conf/hbase-env.sh "HBASE_MANAGES_ZK=false"
+
+#zoo
+addraw /opt/zookeeper/conf/zoo.cfg "clientPort=2181"
+addraw /opt/zookeeper/conf/zoo.cfg "autopurge.purgeInterval=24"
+addraw /opt/zookeeper/conf/zoo.cfg "dataDir=/home/zookeeper"
+addraw /opt/zookeeper/conf/zoo.cfg "server=localhost:2888:3888"
+
+log_banner "Start Services and Delete HBase data"
+
+zkServer.sh start
+exit 0
+
+# make sure we are not in HDFS safemode
+mode="$(hdfs dfsadmin -safemode get 2>/dev/null)"
+if [[ $mode =~ ON ]]
+then
+  sudo -u hdfs hdfs dfsadmin -safemode leave
+fi
 
 exit 0
 
@@ -132,17 +157,9 @@ cm_config_serv "trafhbase/roles/trafMAS" "hbase_master_java_heapsize" "$HEAP"
 cm_config_serv "trafhbase/roles/trafREG" "hbase_regionserver_java_heapsize" "$RSHEAP"
 
 
-log_banner "Start Services and Delete HBase data"
-
 
 # HDFS
 
-  # make sure we are not in HDFS safemode
-  mode="$(hdfs dfsadmin -safemode get)"
-  if [[ $mode =~ ON ]]
-  then
-    sudo -u hdfs hdfs dfsadmin -safemode leave
-  fi
   # Make sure namenode is formatted
 
   start_service hdfs
