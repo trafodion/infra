@@ -80,7 +80,7 @@ class traf::python276 {
   exec { 'download_python_pip':
       path    => '/usr/local/bin:/usr/bin:/bin',
       cwd     => '/var/python276',
-      command => 'wget --no-check-certificate https://raw.github.com/pypa/pip/master/contrib/get-pip.py',
+      command => 'wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py',
       creates => '/var/python276/get-pip.py',
       require => File['/var/python276'],
   }
