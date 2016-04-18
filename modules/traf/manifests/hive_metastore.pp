@@ -36,7 +36,7 @@ class traf::hive_metastore (
     grant    => ['all'],
   }
 
-  file { '/usr/lib/hive/lib/mysql-connector-java.jar':
+  file { "${hive_home}/lib/mysql-connector-java.jar":
     ensure  => link,
     owner   => 'root',
     group   => 'root',
