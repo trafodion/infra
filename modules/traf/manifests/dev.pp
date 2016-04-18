@@ -74,7 +74,7 @@ class traf::dev (
   }
 
 
-  package { ['emacs','gitk','gedit','kdesdk','firefox','vim-enhanced','xterm','gnuplot']:
+  package { ['emacs','gitk','gedit','kdesdk','firefox','vim-enhanced','xterm','gnuplot','valgrind']:
     ensure => present,
   }
   # work-around for group install
