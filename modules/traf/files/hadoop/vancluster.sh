@@ -116,10 +116,11 @@ addraw /opt/zookeeper/conf/zoo.cfg "clientPort=2181"
 addraw /opt/zookeeper/conf/zoo.cfg "autopurge.purgeInterval=24"
 addraw /opt/zookeeper/conf/zoo.cfg "dataDir=/home/zookeeper"
 addraw /opt/zookeeper/conf/zoo.cfg "server=localhost:2888:3888"
+addraw /opt/zookeeper/conf/zookeeper-env.sh "JAVA_HOME=$JAVA_HOME"
 
 log_banner "Start Services and Delete HBase data"
 
-zkServer.sh start
+sudo -u zookeeper zkServer.sh start
 exit 0
 
 # make sure we are not in HDFS safemode
