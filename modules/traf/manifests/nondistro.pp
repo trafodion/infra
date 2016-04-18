@@ -101,9 +101,10 @@ class traf::nondistro (
 
   # hdfs data
   file { '/dfs':
-    owner => 'hdfs',
-    group => 'hdfs',
-    mode  => '770',
+    ensure  => directory,
+    owner   => 'hdfs',
+    group   => 'hdfs',
+    mode    => '770',
     require => User['hdfs'],
   }
   class {'traf::hive_metastore':

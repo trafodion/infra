@@ -18,6 +18,7 @@ source /usr/local/bin/traf-functions.sh
 # Simple single-node cluster for test environment
 
 PATH="/bin:/usr/bin"
+JAVA_HOME=/usr/lib/jvm/java-1.7.0
 
 log_banner "Checking Cluster Configuration"
 echo "*** Checking Cluster Configuration"
@@ -41,20 +42,67 @@ else
   echo "$Vers" > /var/local/TrafTestDistro
 fi
 
-JAVA_HOME=/usr/lib/jvm/java-1.7.0
+# add value to file if not present
+# raw - does not matter location, just tack onto end
+function addraw() {
+  file="$1"
+  value="$2"
 
-grep -q 'JAVA_HOME' /opt/hadoop/etc/hadoop/hadoop-env.sh
-if (( $? != 0 ))
-then
-  echo "JAVA_HOME=$JAVA_HOME" >> /opt/hadoop/etc/hadoop/hadoop-env.sh
-fi
+  grep -q "$value" $file
+  if (( $? != 0 ))
+  then
+    echo "$value" >> $file
+  fi
+}
+# add xml property value if not present
+# xml - config file format
+#    depends on prop/values added in single line format per this script
+function addxml() {
+  file="$1"
+  prop="$2"
+  value="$3"
 
+  grep -q "<name>$prop</name>" $file
+  if (( $? == 0 ))
+  then
+    grep "<name>$prop</name>" $file | grep -q "<value>$value</value>"
+    if (( $? != 0 ))
+    then
+      sed -i "/<name>$prop</s%<value>.*</value>%<value>$value</value>%" $file 
+    fi
+  else
+    sed -i "s%</configuration>%%" $file 
+    echo "<name>$prop</name><value>$value</value>" >> $file
+    echo "</configuration>" >> $file
+  fi
+}
 
-exit 0
+addraw /opt/hadoop/etc/hadoop/hadoop-env.sh "JAVA_HOME=$JAVA_HOME"
+# etc/hadoop/slaves file -- default is localhost
 
+addraw /opt/hbase/conf/hbase-env.sh "JAVA_HOME=$JAVA_HOME"
+addraw /opt/hbase/conf/hbase-env.sh "HBASE_MANAGES_ZK=false"
+
+addxml /opt/hadoop/etc/hadoop/core-site.xml "fs.default.name" "hdfs://localhost:50001"
+addxml /opt/hadoop/etc/hadoop/core-site.xml "hadoop.tmp.dir" "/dfs/tmp"
 
 # HDFS config for single node
-cm_config_serv "hdfs" "dfs_replication" "1"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.replication" "1"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.data.dir" "/dfs/data"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.namenode.name.dir" "/dfs/name"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.http.address" "localhost:50002"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.secondary.http.address" "localhost:50003"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.address" "localhost:50004"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.http.address" "localhost:50005"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.ipc.address" "localhost:50006"
+
+# hbase basic
+addraw /opt/hbase/conf/regionservers "localhost"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.rootdir" "hdfs://localhost:50001/hbase"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.dataDir" "hdfs://localhost:50001/zoo"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.clientPort" "2181"
+
+exit 0
 
 # Hive config
 cm_config_serv "trafHIVE" "mapreduce_yarn_service" "trafMAPRED"
