@@ -39,7 +39,7 @@ class traf::nondistro (
     require => Package['wget'],
   }
   exec { 'download_hive':
-    creates => "/opt/hive-${hive_ver}.tar.gz",
+    creates => "/opt/hive-${hive_ver}-bin.tar.gz",
     cwd     => "/opt",
     command => "/usr/bin/wget $hive_arch",
     require => Package['wget'],
