@@ -69,6 +69,36 @@ class traf::nondistro (
     command  => "/bin/tar xf apache-hive-${hive_ver}-bin.tar.gz",
     require  => Exec['download_hive'],
   }
+  # standard paths for downstream scripting
+  file { "/opt/hadoop":
+    ensure  => link,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    target  => "/opt/hadoop-${hadoop_ver}",
+  }
+  file { "/opt/hbase":
+    ensure  => link,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    target  => "/opt/hbase-${hbase_ver}",
+  }
+  file { "/opt/zookeeper":
+    ensure  => link,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    target  => "/opt/zookeeper-${zoo_ver}",
+  }
+  file { "/opt/hive":
+    ensure  => link,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    target  => "/opt/apache-hive-${hive_ver}-bin",
+  }
+
   # hdfs data
   file { '/dfs':
     owner => 'hdfs',

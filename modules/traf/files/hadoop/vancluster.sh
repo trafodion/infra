@@ -41,6 +41,17 @@ else
   echo "$Vers" > /var/local/TrafTestDistro
 fi
 
+JAVA_HOME=/usr/lib/jvm/java-1.7.0
+
+grep -q 'JAVA_HOME' /opt/hadoop/etc/hadoop/hadoop-env.sh
+if (( $? != 0 ))
+then
+  echo "JAVA_HOME=$JAVA_HOME" >> /opt/hadoop/etc/hadoop/hadoop-env.sh
+fi
+
+
+exit 0
+
 
 # HDFS config for single node
 cm_config_serv "hdfs" "dfs_replication" "1"
