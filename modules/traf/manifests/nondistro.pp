@@ -39,7 +39,7 @@ class traf::nondistro (
     require => Package['wget'],
   }
   exec { 'download_hive':
-    creates => "/opt/hive-${hive_ver}-bin.tar.gz",
+    creates => "/opt/apache-hive-${hive_ver}-bin.tar.gz",
     cwd     => "/opt",
     command => "/usr/bin/wget $hive_arch",
     require => Package['wget'],
@@ -63,9 +63,9 @@ class traf::nondistro (
     require  => Exec['download_zoo'],
   }
   exec { 'unpack_hive':
-    creates  => "/opt/hive-${hive_ver}",
+    creates  => "/opt/apache-hive-${hive_ver}-bin",
     cwd      => "/opt",
-    command  => "/bin/tar xf hive-${hive_ver}.tar.gz",
+    command  => "/bin/tar xf apache-hive-${hive_ver}-bin.tar.gz",
     require  => Exec['download_hive'],
   }
   # hdfs data
