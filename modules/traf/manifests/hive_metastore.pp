@@ -7,6 +7,7 @@
 class traf::hive_metastore (
   $hive_sql_pw = '',
   $hive_schema_ver = '0.9.0',
+  $hive_home = '/usr/lib/hive',
 ) {
 
   class {'mysql::server':
@@ -31,7 +32,7 @@ class traf::hive_metastore (
     collate  => 'latin1_swedish_ci',
     password => $hive_sql_pw,
     host     => 'localhost',
-    sql      => "/usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-${hive_schema_ver}.mysql.sql",
+    sql      => "${hive_home}/scripts/metastore/upgrade/mysql/hive-schema-${hive_schema_ver}.mysql.sql",
     grant    => ['all'],
   }
 

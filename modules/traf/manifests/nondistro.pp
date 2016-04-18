@@ -13,6 +13,7 @@ class traf::nondistro (
     $hbase_ver="1.0.2"
     $zoo_ver="3.4.6"
     $hive_ver="1.2.1"
+    $meta_schema="1.2.0"
 
     $hadoop_arch="https://archive.apache.org/dist/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz"
     $hbase_arch="https://archive.apache.org/dist/hbase/hbase-1.0.2/hbase-1.0.2-bin.tar.gz"
@@ -77,7 +78,8 @@ class traf::nondistro (
   }
   class {'traf::hive_metastore':
     hive_sql_pw     => 'insecure_hive',
-    hive_schema_ver => $hive_ver,
+    hive_schema_ver => $meta_schema,
+    hive_home       => "/opt/apache-hive-${hive_ver}-bin",
     require         => [ User['hive'], Exec['unpack_hive'], ],
   }
   user { 'hdfs':
