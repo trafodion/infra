@@ -127,8 +127,12 @@ then
   echo '<configuration>' >> /opt/zookeeper/conf/hive-site.xml
   echo '</configuration>' >> /opt/zookeeper/conf/hive-site.xml
 fi
+addxml /opt/hive/conf/hive-site.xml "javax.jdo.option.ConnectionURL" "jdbc:mysql://localhost/metastore"
+addxml /opt/hive/conf/hive-site.xml "javax.jdo.option.ConnectionDrivername" "com.mysql.jdbc.Driver"
+addxml /opt/hive/conf/hive-site.xml "javax.jdo.option.ConnectionUserName" "hive"
 addxml /opt/hive/conf/hive-site.xml "javax.jdo.option.ConnectionPassword" "insecure_hive"
 addraw /opt/hive/conf/hive-env.sh "export JAVA_HOME=$JAVA_HOME"
+addraw /opt/hive/conf/hive-env.sh "export HADOOP_HOME=/opt/hadoop"
 
 log_banner "Start Services and Delete HBase data"
 
@@ -187,7 +191,10 @@ sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p $hdata >/dev/null
 sudo -u tinstall /opt/hbase/bin/start-hbase.sh
 
 # start hive
-sudo -u tinstall /opt/hive/bin/hiveserver2
+if [[ -z $(pgrep -u tinstall -f HiveServer) ]]
+then
+  sudo -u tinstall /opt/hive/bin/hiveserver2 &
+fi
 
 
 #start_service trafMAPRED
