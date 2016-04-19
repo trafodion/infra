@@ -53,31 +53,31 @@ class traf::nondistro (
     require => User['tinstall'],
   }
   exec { 'unpack_hadoop':
-    creates  => "/opt/hadoop-${hadoop_ver}",
+    creates  => "/opt/mydistro/hadoop-${hadoop_ver}",
     cwd      => "/opt/mydistro",
     user     => "tinstall",
-    command  => "/bin/tar xf hadoop-${hadoop_ver}.tar.gz",
+    command  => "/bin/tar xf /opt/hadoop-${hadoop_ver}.tar.gz",
     require  => [ Exec['download_hadoop'], User['tinstall'], File['/opt/mydistro'] ],
   }
   exec { 'unpack_hbase':
-    creates  => "/opt/hbase-${hbase_ver}",
+    creates  => "/opt/mydistro/hbase-${hbase_ver}",
     cwd      => "/opt/mydistro",
     user     => "tinstall",
-    command  => "/bin/tar xf hbase-${hbase_ver}-bin.tar.gz",
+    command  => "/bin/tar xf /opt/hbase-${hbase_ver}-bin.tar.gz",
     require  => [ Exec['download_hbase'], User['tinstall'], File['/opt/mydistro'] ],
   }
   exec { 'unpack_zoo':
-    creates  => "/opt/zookeeper-${zoo_ver}",
+    creates  => "/opt/mydistro/zookeeper-${zoo_ver}",
     cwd      => "/opt/mydistro",
     user     => "tinstall",
-    command  => "/bin/tar xf zookeeper-${zoo_ver}.tar.gz",
+    command  => "/bin/tar xf /opt/zookeeper-${zoo_ver}.tar.gz",
     require  => [ Exec['download_zoo'], User['tinstall'], File['/opt/mydistro'] ],
   }
   exec { 'unpack_hive':
-    creates  => "/opt/apache-hive-${hive_ver}-bin",
+    creates  => "/opt/mydistro/apache-hive-${hive_ver}-bin",
     cwd      => "/opt/mydistro",
     user     => "tinstall",
-    command  => "/bin/tar xf apache-hive-${hive_ver}-bin.tar.gz",
+    command  => "/bin/tar xf /opt/apache-hive-${hive_ver}-bin.tar.gz",
     require  => [ Exec['download_hive'], User['tinstall'], File['/opt/mydistro'] ],
   }
   # standard paths for downstream scripting

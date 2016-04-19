@@ -94,39 +94,7 @@ class traf::buildtest (
         ensure  => present,
         require => [ Exec['install_Development_Tools'] ]
     }
-    package { 'log4cxx':
-      ensure   => present,
-      provider => 'rpm',
-      source   => '/opt/traf/rpms/log4cxx-0.10.0-13.el6.x86_64.rpm',
-      require  => [ Exec['getrpm1'] ]
-    }
-    package { 'log4cxx-devel':
-      ensure   => present,
-      provider => 'rpm',
-      source   => '/opt/traf/rpms/log4cxx-devel-0.10.0-13.el6.x86_64.rpm',
-      require  => [ Exec['getrpm2'], Package['apr-devel'] ]
-    }
 
-    file { '/opt/traf/rpms' :
-      ensure  => directory,
-      owner   => 'jenkins',
-      group   => 'jenkins',
-      require => File['/opt/traf'],
-    }
-    exec { 'getrpm1':
-      command  => "/usr/bin/scp jenkins@traf-builds.esgyn.com:/srv/static/downloads/test-deps/log4cxx-0.10.0-13.el6.x86_64.rpm /opt/traf/rpms/",
-      user     => jenkins,
-      timeout  => 100,
-      creates  => '/opt/traf/rpms/log4cxx-0.10.0-13.el6.x86_64.rpm',
-      require  => File['/opt/traf/rpms'],
-    }
-    exec { 'getrpm2':
-      command  => "/usr/bin/scp jenkins@traf-builds.esgyn.com:/srv/static/downloads/test-deps/log4cxx-devel-0.10.0-13.el6.x86_64.rpm /opt/traf/rpms/",
-      user     => jenkins,
-      timeout  => 100,
-      creates  => '/opt/traf/rpms/log4cxx-devel-0.10.0-13.el6.x86_64.rpm',
-      require  => File['/opt/traf/rpms'],
-    }
 
     # not available in latest CentOS distribution, but is in Vault repos
     package { 'qpid-cpp-client-devel':
