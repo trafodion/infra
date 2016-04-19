@@ -95,6 +95,13 @@ class traf::nondistro (
     mode    => '0644',
     target  => "/opt/mydistro/hbase-${hbase_ver}",
   }
+  file { "/var/log/hbase":
+    ensure  => link,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    target  => "/opt/mydistro/hbase-${hbase_ver}/logs",
+  }
   file { "/opt/zookeeper":
     ensure  => link,
     owner   => 'root',

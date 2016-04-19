@@ -101,6 +101,7 @@ addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.ipc.address" "localhos
 # hbase basic
 addraw /opt/hbase/conf/regionservers "$(hostname -s)"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.rootdir" "hdfs://localhost:50001/hbase"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.cluster.distributed" "true"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.dataDir" "hdfs://localhost:50001/zoo"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.clientPort" "2181"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.master.info.port" "16010"
@@ -108,8 +109,8 @@ addxml /opt/hbase/conf/hbase-site.xml "hbase.regionserver.info.port" "16030"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.regionserver.port" "16088"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.quorum" "$(hostname -s)"
 
-addraw /opt/hbase/conf/hbase-env.sh "JAVA_HOME=$JAVA_HOME"
-addraw /opt/hbase/conf/hbase-env.sh "HBASE_MANAGES_ZK=false"
+addraw /opt/hbase/conf/hbase-env.sh "export JAVA_HOME=$JAVA_HOME"
+addraw /opt/hbase/conf/hbase-env.sh "export HBASE_MANAGES_ZK=false"
 
 #zoo
 addraw /opt/zookeeper/conf/zoo.cfg "clientPort=2181"
@@ -121,7 +122,8 @@ addraw /opt/zookeeper/conf/zookeeper-env.sh "JAVA_HOME=$JAVA_HOME"
 log_banner "Start Services and Delete HBase data"
 
 cd /tmp # write-output file here
-sudo -u tinstall /opt/zookeeper/bin/zkServer.sh start
+sudo -u tinstall /opt/zookeeper/bin/zkServer.sh status || \
+    sudo -u tinstall /opt/zookeeper/bin/zkServer.sh start
 
 # make sure we are not in HDFS safemode
 mode="$(hdfs dfsadmin -safemode get 2>/dev/null)"
@@ -157,12 +159,21 @@ echo "*** Removing HBase Data"
 # hbase must be down
 sudo -u tinstall /opt/hbase/bin/stop-hbase.sh
 
-# data locations for Cloudera
+# data locations
 hdata="/hbase"  # HDFS
 zkdata="/hbase" # zookeeper
 
 sudo -u tinstall /opt/hadoop/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
 sudo -u tinstall /opt/hbase/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
+
+# clean up logs so we can save only what is logged for this run
+sudo -u tinstall rm -rf /var/log/hbase/*
+
+# recreate root
+sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p $hdata >/dev/null
+
+# start HBase
+sudo -u tinstall /opt/hbase/bin/start-hbase.sh
 
 exit 0
 
@@ -175,38 +186,9 @@ cm_config_serv "trafhbase" "zookeeper_service" "zookeeper"
 
 
 
-# HDFS
-
-
-
-# clean up logs so we can save only what is logged for this run
-sudo -u hbase rm -rf /var/log/hbase/*
-
-# recreate root
-
-# verify nothing is using HBase port
-  HPort='60010'
-  # ss will let us know if port is in use, and -p option will give us process info
-  cmd="/usr/sbin/ss -lp src *:$HPort"
-
-  pcount=$($cmd | wc -l)
-  pids=$(sudo -n $cmd | sed -n '/users:/s/^.*users:((.*,\([0-9]*\),.*$/\1/p')
-  if [[ $pcount > 1 ]] # always get header line
-  then
-    echo "Warning: found port $HPort in use"
-    $cmd
-  fi
-  if [[ -n $pids ]]
-  then
-    echo "Warning: processes using port $HPort"
-    ps -f $pids
-    echo "Warning: killing pids: $pids"
-    kill $pids
-  fi
 
 start_service trafHIVE
 start_service trafMAPRED
-start_service trafhbase
 
 echo "*** Cluster Check Complete"
 
