@@ -97,6 +97,8 @@ then
   cp ./installer/trafodion_config_default ./Install_Config
   echo "NODE_LIST=$(hostname -s)" >> ./Install_Config
   echo "HADOOP_NODES=$(hostname -s)" >> ./Install_Config
+  echo "HDFS_NODES=$(hostname -s)" >> ./Install_Config
+  echo "HBASE_NODES=$(hostname -s)" >> ./Install_Config
   echo "MY_HADOOP_NODES=\"-w $(hostname -s)\"" >> ./Install_Config
   echo "node_count=1" >> ./Install_Config
   echo "hadoop_node_count=1" >> ./Install_Config
@@ -114,9 +116,16 @@ then
   then
     echo "URL=$(hostname -f):7180" >> ./Install_Config
     echo "HADOOP_TYPE=cloudera" >> ./Install_Config
-  else
+  elif rpm -q ambari-server >/dev/null
+  then
     echo "URL=$(hostname -f):8080" >> ./Install_Config
     echo "HADOOP_TYPE=hortonworks" >> ./Install_Config
+  else
+    echo "HADOOP_TYPE=apache" >> ./Install_Config
+    echo "HADOOP_PREFIX=/opt/hadoop" >> ./Install_Config
+    echo "HBASE_HOME=/opt/hbase" >> ./Install_Config
+    echo "ZOO_HOME=/opt/zookeeper" >> ./Install_Config
+    echo "HIVE_HOME=/opt/hive" >> ./Install_Config
   fi
   if [[ $LDAP == "true" ]]
   then
