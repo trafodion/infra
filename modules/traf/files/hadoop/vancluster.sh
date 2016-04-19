@@ -82,7 +82,7 @@ function addxml() {
   fi
 }
 
-addraw /opt/hadoop/etc/hadoop/hadoop-env.sh "JAVA_HOME=$JAVA_HOME"
+addraw /opt/hadoop/etc/hadoop/hadoop-env.sh "export JAVA_HOME=$JAVA_HOME"
 addraw /opt/hadoop/etc/hadoop/slaves "$(hostname -s)"
 
 addxml /opt/hadoop/etc/hadoop/core-site.xml "fs.default.name" "hdfs://localhost:50001"
@@ -117,7 +117,18 @@ addraw /opt/zookeeper/conf/zoo.cfg "clientPort=2181"
 addraw /opt/zookeeper/conf/zoo.cfg "autopurge.purgeInterval=24"
 addraw /opt/zookeeper/conf/zoo.cfg "dataDir=/home/tinstall/zookeeper"
 addraw /opt/zookeeper/conf/zoo.cfg "server=localhost:2888:3888"
-addraw /opt/zookeeper/conf/zookeeper-env.sh "JAVA_HOME=$JAVA_HOME"
+addraw /opt/zookeeper/conf/zookeeper-env.sh "export JAVA_HOME=$JAVA_HOME"
+
+# hive
+if [[ ! -f /opt/zookeeper/conf/hive-site.xml ]]
+then
+  echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' > /opt/zookeeper/conf/hive-site.xml
+  echo '<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>' >> /opt/zookeeper/conf/hive-site.xml
+  echo '<configuration>' >> /opt/zookeeper/conf/hive-site.xml
+  echo '</configuration>' >> /opt/zookeeper/conf/hive-site.xml
+fi
+addxml /opt/hive/conf/hive-site.xml "javax.jdo.option.ConnectionPassword" "insecure_hive"
+addraw /opt/hive/conf/hive-env.sh "export JAVA_HOME=$JAVA_HOME"
 
 log_banner "Start Services and Delete HBase data"
 
@@ -175,20 +186,11 @@ sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p $hdata >/dev/null
 # start HBase
 sudo -u tinstall /opt/hbase/bin/start-hbase.sh
 
-exit 0
-
-cm_config_serv "trafHIVE" "mapreduce_yarn_service" "trafMAPRED"
-cm_config_serv "trafHIVE" "zookeeper_service" "zookeeper"
-cm_config_serv "trafHIVE" "hive_metastore_database_password" "insecure_hive"
-cm_config_serv "trafMAPRED" "hdfs_service" "hdfs"
-cm_config_serv "trafhbase" "hdfs_service" "hdfs"
-cm_config_serv "trafhbase" "zookeeper_service" "zookeeper"
+# start hive
+sudo -u tinstall /opt/hive/bin/hiveserver2
 
 
-
-
-start_service trafHIVE
-start_service trafMAPRED
+#start_service trafMAPRED
 
 echo "*** Cluster Check Complete"
 
