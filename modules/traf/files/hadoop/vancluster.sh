@@ -133,6 +133,7 @@ addxml /opt/hive/conf/hive-site.xml "javax.jdo.option.ConnectionUserName" "hive"
 addxml /opt/hive/conf/hive-site.xml "javax.jdo.option.ConnectionPassword" "insecure_hive"
 addraw /opt/hive/conf/hive-env.sh "export JAVA_HOME=$JAVA_HOME"
 addraw /opt/hive/conf/hive-env.sh "export HADOOP_HOME=/opt/hadoop"
+addraw /opt/hive/conf/hive-env.sh "export HADOOP_USER_CLASSPATH_FIRST=true"
 
 log_banner "Start Services and Delete HBase data"
 
