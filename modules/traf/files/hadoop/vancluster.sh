@@ -48,7 +48,7 @@ function addraw() {
   file="$1"
   value="$2"
 
-  grep -q "$value" $file
+  grep -q "$value" $file 2>/dev/null
   if (( $? != 0 ))
   then
     echo "Adding $value to $file"
@@ -114,7 +114,7 @@ addraw /opt/hbase/conf/hbase-env.sh "HBASE_MANAGES_ZK=false"
 #zoo
 addraw /opt/zookeeper/conf/zoo.cfg "clientPort=2181"
 addraw /opt/zookeeper/conf/zoo.cfg "autopurge.purgeInterval=24"
-addraw /opt/zookeeper/conf/zoo.cfg "dataDir=/home/zookeeper"
+addraw /opt/zookeeper/conf/zoo.cfg "dataDir=/home/tinstall/zookeeper"
 addraw /opt/zookeeper/conf/zoo.cfg "server=localhost:2888:3888"
 addraw /opt/zookeeper/conf/zookeeper-env.sh "JAVA_HOME=$JAVA_HOME"
 
@@ -139,7 +139,30 @@ fi
 sudo -u tinstall /opt/hadoop/sbin/start-dfs.sh
 
 # wait for safemode so we can modify hdfs data
-sudo -u tinsall /opt/hadoop/bin/hdfs dfsadmin -safemode wait
+sudo -u tinstall /opt/hadoop/bin/hdfs dfsadmin -safemode wait
+
+### Standard directories that need only to be created once
+
+# Hive set-up
+sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /user/hive >/dev/null
+
+sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /user/hive/warehouse >/dev/null
+
+# MapReduce needs /tmp
+sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /tmp >/dev/null
+
+### HBase data should be cleaned up every time
+echo "*** Removing HBase Data"
+
+# hbase must be down
+sudo -u tinstall /opt/hbase/bin/stop-hbase.sh
+
+# data locations for Cloudera
+hdata="/hbase"  # HDFS
+zkdata="/hbase" # zookeeper
+
+sudo -u tinstall /opt/hadoop/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
+sudo -u tinstall /opt/hbase/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
 
 exit 0
 
@@ -155,27 +178,6 @@ cm_config_serv "trafhbase" "zookeeper_service" "zookeeper"
 # HDFS
 
 
-### Standard directories that need only to be created once
-
-# Hive set-up
-hdfs dfs -mkdir -p /user/hive >/dev/null
-
-hdfs dfs -mkdir -p /user/hive/warehouse >/dev/null
-
-# MapReduce needs /tmp
-hdfs dfs -mkdir -p /tmp >/dev/null
-
-### HBase data should be cleaned up every time
-echo "*** Removing HBase Data"
-
-# hbase must be down
-
-# data locations for Cloudera
-hdata="/hbase"  # HDFS
-zkdata="/hbase" # zookeeper
-
-sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
-sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
 
 # clean up logs so we can save only what is logged for this run
 sudo -u hbase rm -rf /var/log/hbase/*
