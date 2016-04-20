@@ -126,6 +126,10 @@ then
     echo "HBASE_HOME=/opt/hbase" >> ./Install_Config
     echo "ZOO_HOME=/opt/zookeeper" >> ./Install_Config
     echo "HIVE_HOME=/opt/hive" >> ./Install_Config
+    echo "HDFS_USER=tinstall" >> ./Install_Config
+    echo "HBASE_USER=tinstall" >> ./Install_Config
+    echo "HBASE_GROUP=tinstall" >> ./Install_Config
+    echo "ZOO_USER=tinstall" >> ./Install_Config
   fi
   if [[ $LDAP == "true" ]]
   then
