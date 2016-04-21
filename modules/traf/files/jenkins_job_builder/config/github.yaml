@@ -1,10 +1,10 @@
-# To-Do: add Check-Full-PR job to be triggered only on phrase
 
 - job-group:
     name: 'Check-PR'
     branch:
      - master
      - release1.3
+     - release2.0
 
     jobs:
       - 'Check-PR-{branch}'
