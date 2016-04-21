@@ -150,6 +150,20 @@ class traf::dev (
     unless  => '/usr/bin/vnclicense -check',
     require => Package['realvnc-vnc-server'],
   }
+  # Atom - editor for asciidoc, etc
+  exec { 'get_atom_rpm' :
+    command => "/usr/bin/wget https://github.com/atom/atom/releases/download/v1.7.2/atom.x86_64.rpm",
+    cwd     => "/opt/dev",
+    timeout => 900,
+    creates => "/opt/dev/atom.x86_64.rpm",
+    require => File['/opt/dev'],
+  }
+  package { 'atom':
+    ensure   => present,
+    provider => rpm,
+    source   => "/opt/dev/atom.x86_64.rpm",
+    require  => Exec['get_atom_rpm'],
+  }
 
 
   file { '/opt/dev':
