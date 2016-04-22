@@ -3,6 +3,7 @@
     dist:
       - cdh
       - hdp
+      - apc
     suite:
       - "charsets"
       - "core"
@@ -77,6 +78,7 @@
     dist:
       - cdh
       - hdp
+      - apc
     jobs:
       - 'phoenix_{type}_{jdbcDriverType}-{dist}':
          type: test
@@ -153,6 +155,7 @@
     dist:
       - cdh
       - hdp
+      - apc
     jobs:
       - 'pyodbc_test-{dist}':
 

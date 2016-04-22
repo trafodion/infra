@@ -202,6 +202,15 @@
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
               node-label: "redhat_$DISTRO"
+            - name: "pyodbc_test-apc"
+              enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'va1.0'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
+                BRANCH=$BRANCH
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
             - name: "jdbc_test-hdp"
               enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'ahw2.3'"
               current-parameters: true
@@ -267,6 +276,26 @@
                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "phoenix_test_T4-apc"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'va1.0'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
+                BRANCH=$BRANCH
+                HDIST=''
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "phoenix_test_T2-apc"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'va1.0'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
+                BRANCH=$BRANCH
+                HDIST=''
               node-label-name: "NODE_TYPE"
               node-label: "redhat_$DISTRO"
 
