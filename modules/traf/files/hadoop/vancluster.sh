@@ -92,6 +92,7 @@ addxml /opt/hadoop/etc/hadoop/core-site.xml "hadoop.tmp.dir" "/dfs/tmp"
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.replication" "1"
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.data.dir" "/dfs/data"
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.namenode.name.dir" "/dfs/name"
+addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.namenode.acls.enabled" "true"
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.http.address" "localhost:50002"
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.secondary.http.address" "localhost:50003"
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.address" "localhost:50004"
@@ -199,7 +200,9 @@ then
 fi
 
 
-#start_service trafMAPRED
+# Prepare for TRX installation
+addxml /opt/hbase/conf/hbase-site.xml "hbase.coprocessor.region.classes" "org.apache.hadoop.hbase.coprocessor.transactional.TrxRegionObserver,org.apache.hadoop.hbase.coprocessor.transactional.TrxRegionEndpoint,org.apache.hadoop.hbase.coprocessor.AggregateImplementation"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.hregion.impl" "org.apache.hadoop.hbase.regionserver.transactional.TransactionalRegion"
 
 echo "*** Cluster Check Complete"
 
