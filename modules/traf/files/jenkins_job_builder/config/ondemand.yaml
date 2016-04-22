@@ -112,6 +112,7 @@
           choices:
             - cm5.4
             - ahw2.3
+            - va1.0
           description: "Distro: AmbariHortonWorks or ClouderaManager"
       - bool:
           name: sql
@@ -173,6 +174,16 @@
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
               node-label: "redhat_$DISTRO"
+            - name: "core-regress-apc"
+              enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'va1.0'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/regress-${DISTRO}
+                SUITES=${sql_tests}
+                BRANCH=$BRANCH
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
             - name: "pyodbc_test-hdp"
               enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'ahw2.3'"
               current-parameters: true
@@ -202,6 +213,15 @@
               node-label: "redhat_$DISTRO"
             - name: "jdbc_test-cdh"
               enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'cm5.4'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
+                BRANCH=$BRANCH
+              node-label-name: "NODE_TYPE"
+              node-label: "redhat_$DISTRO"
+            - name: "jdbc_test-apc"
+              enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'va1.0'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -283,6 +303,7 @@
     dist:
       - cdh
       - hdp
+      - apc
     jobs:
       - core-regress-{dist}
 

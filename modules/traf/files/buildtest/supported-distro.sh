@@ -50,6 +50,10 @@ if [[ $HDP_2_3_SUPPORT == "Y" ]]
 then
   echo "DISTHDP = 2.3" >> distro.properties
 fi
+if [[ $APACHE_1_0_X_SUPPORT == "Y" ]]
+then
+  echo "DISTAPC = 1.0" >> distro.properties
+fi
 
 if [[ ! -f distro.properties ]]
 then

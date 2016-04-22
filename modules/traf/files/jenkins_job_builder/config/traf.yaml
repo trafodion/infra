@@ -208,6 +208,7 @@
     dist:
       - cdh
       - hdp
+      - apc
     jobs:
       - 'jdbc_test-{dist}':
 
