@@ -187,6 +187,8 @@ do
   sudo -u tinstall jps | grep -q -e HMaster -e HRegionServer
   if [[ $? == 0 ]]
   then
+    sudo pkill -u tinstall -f HRegionServer
+    sudo pkill -u tinstall -f HMaster
     sleep $i
   else
     break
