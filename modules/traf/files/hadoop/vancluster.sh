@@ -83,7 +83,7 @@ function addxml() {
 }
 
 addraw /opt/hadoop/etc/hadoop/hadoop-env.sh "export JAVA_HOME=$JAVA_HOME"
-addraw /opt/hadoop/etc/hadoop/slaves "$(hostname -s)"
+addraw /opt/hadoop/etc/hadoop/slaves "localhost"
 
 addxml /opt/hadoop/etc/hadoop/core-site.xml "fs.default.name" "hdfs://localhost:50001"
 addxml /opt/hadoop/etc/hadoop/core-site.xml "hadoop.tmp.dir" "/dfs/tmp"
@@ -100,7 +100,7 @@ addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.http.address" "localho
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.ipc.address" "localhost:50006"
 
 # hbase basic
-addraw /opt/hbase/conf/regionservers "$(hostname -s)"
+addraw /opt/hbase/conf/regionservers "localhost"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.rootdir" "hdfs://localhost:50001/hbase"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.cluster.distributed" "true"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.dataDir" "hdfs://localhost:50001/zoo"
@@ -108,7 +108,7 @@ addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.clientPort" "218
 addxml /opt/hbase/conf/hbase-site.xml "hbase.master.info.port" "16010"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.regionserver.info.port" "16030"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.regionserver.port" "16088"
-addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.quorum" "$(hostname -s)"
+addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.quorum" "localhost"
 
 addraw /opt/hbase/conf/hbase-env.sh "export JAVA_HOME=$JAVA_HOME"
 addraw /opt/hbase/conf/hbase-env.sh "export HBASE_MANAGES_ZK=false"
