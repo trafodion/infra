@@ -192,6 +192,7 @@ do
     break
   fi
 done
+sudo -u tinstall jps
 
 echo "Removing HBase Data"
 # data locations
