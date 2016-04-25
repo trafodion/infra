@@ -112,7 +112,6 @@ addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.quorum" "$(hostname -s)"
 
 addraw /opt/hbase/conf/hbase-env.sh "export JAVA_HOME=$JAVA_HOME"
 addraw /opt/hbase/conf/hbase-env.sh "export HBASE_MANAGES_ZK=false"
-addraw /opt/hbase/conf/hbase-env.sh 'export HADOOP_OPTS="$HADOOP_OPTS -Djava.library.path=/opt/hadoop/lib/native"'
 
 #zoo
 addraw /opt/zookeeper/conf/zoo.cfg "clientPort=2181"
@@ -155,9 +154,11 @@ fi
 # first time - format namenode
 if [[ ! -d /dfs/name ]]
 then
+  echo "Formatting Name-Node"
   sudo -u tinstall /opt/hadoop/bin/hdfs namenode -format -force
 fi
 
+echo "Starting DFS"
 sudo -u tinstall /opt/hadoop/sbin/start-dfs.sh
 
 # wait for safemode so we can modify hdfs data
@@ -165,6 +166,7 @@ sudo -u tinstall /opt/hadoop/bin/hdfs dfsadmin -safemode wait
 
 ### Standard directories that need only to be created once
 
+echo "Creating HDFS directories"
 # Hive set-up
 sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /user/hive >/dev/null
 
@@ -174,11 +176,15 @@ sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /user/hive/warehouse >/dev/n
 sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /tmp >/dev/null
 
 ### HBase data should be cleaned up every time
-echo "*** Removing HBase Data"
 
 # hbase must be down
+echo "Stopping HBase"
 sudo -u tinstall /opt/hbase/bin/stop-hbase.sh
+sudo -u tinstall  /opt/hbase/bin/hbase-daemon.sh stop regionserver
 
+sudo -u tinstall jps
+
+echo "Removing HBase Data"
 # data locations
 hdata="/hbase"  # HDFS
 zkdata="/hbase" # zookeeper
@@ -193,11 +199,13 @@ sudo -u tinstall rm -rf /var/log/hbase/*
 sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p $hdata >/dev/null
 
 # start HBase
+echo "Starting HBase"
 sudo -u tinstall /opt/hbase/bin/start-hbase.sh
 
 # start hive
 if [[ -z $(pgrep -u tinstall -f HiveServer) ]]
 then
+  echo "Starting Hive"
   sudo -u tinstall /opt/hive/bin/hiveserver2 &
 fi
 
