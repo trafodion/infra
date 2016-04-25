@@ -112,6 +112,7 @@ addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.quorum" "$(hostname -s)"
 
 addraw /opt/hbase/conf/hbase-env.sh "export JAVA_HOME=$JAVA_HOME"
 addraw /opt/hbase/conf/hbase-env.sh "export HBASE_MANAGES_ZK=false"
+addraw /opt/hbase/conf/hbase-env.sh 'export HADOOP_OPTS="$HADOOP_OPTS -Djava.library.path=/opt/hadoop/lib/native"'
 
 #zoo
 addraw /opt/zookeeper/conf/zoo.cfg "clientPort=2181"
@@ -138,6 +139,7 @@ addraw /opt/hive/conf/hive-env.sh "export HADOOP_HOME=/opt/hadoop"
 addraw /opt/hive/conf/hive-env.sh "export HADOOP_USER_CLASSPATH_FIRST=true"
 
 log_banner "Start Services and Delete HBase data"
+
 
 cd /tmp # write-output file here
 sudo -u tinstall /opt/zookeeper/bin/zkServer.sh status || \
