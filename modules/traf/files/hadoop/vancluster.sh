@@ -182,7 +182,16 @@ echo "Stopping HBase"
 sudo -u tinstall /opt/hbase/bin/stop-hbase.sh
 sudo -u tinstall  /opt/hbase/bin/hbase-daemon.sh stop regionserver
 
-sudo -u tinstall jps
+for i in 2 5 10 20
+do
+  sudo -u tinstall jps | grep -q -e HMaster -e HRegionServer
+  if [[ $? == 0 ]]
+  then
+    sleep $i
+  else
+    break
+  fi
+done
 
 echo "Removing HBase Data"
 # data locations
@@ -208,6 +217,7 @@ then
   echo "Starting Hive"
   sudo -u tinstall /opt/hive/bin/hiveserver2 &
 fi
+sudo -u tinstall jps
 
 
 # Prepare for TRX installation
