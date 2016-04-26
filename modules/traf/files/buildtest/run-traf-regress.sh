@@ -35,12 +35,20 @@ then
     then
       /usr/bin/curl --output /home/jenkins/tpcds_kit.zip http://traf-testlogs.esgyn.com/testdeps/tpcds_kit.zip
     fi
+    if [[ -e /opt/hadoop/bin/hdfs ]]
+    then
+      hdfscmd="sudo -n -u tinstall /opt/hadoop/bin/hdfs"
+      hivecmd="sudo -n -u tinstall /opt/hive/bin/hive"
+    else
+      hdfscmd="sudo -n -u hdfs /usr/bin/hdfs"
+      hivecmd="sudo -n -u hdfs /usr/bin/hive"
+    fi
     export MY_LOCAL_SW_DIST="/home/jenkins"
     $WORKSPACE/traf_run/sql/scripts/install_hadoop_regr_test_env \
       --unpackDir=$WORKSPACE/tpcds-tool \
       --dataDir=$WORKSPACE/tpcds-data \
-      --hdfsCmd="sudo -n -u hdfs /usr/bin/hdfs" \
-      --hiveCmd="sudo -n -u hdfs /usr/bin/hive" \
+      --hdfsCmd="$hdfscmd" \
+      --hiveCmd="$hivecmd" \
       --logFile=$WORKSPACE/build_regr_test_env.log
         # Choose log name so it will be archived along with build logs
 fi

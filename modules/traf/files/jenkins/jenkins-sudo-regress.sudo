@@ -5,6 +5,7 @@ jenkins	ALL = (trafodion) NOPASSWD:/bin/rm,/bin/cp
 jenkins	ALL = (trafodion) NOPASSWD:/bin/bash -c /usr/local/bin/core_bt *
 # Pre-load data for hive suite
 jenkins	ALL = (hdfs) NOPASSWD:/usr/bin/hdfs,/usr/bin/hive
+jenkins	ALL = (tinstall) NOPASSWD:/opt/hadoop/bin/hdfs,/opt/hive/bin/hive
 # free cached objects
 jenkins ALL = NOPASSWD:/bin/sync
 # free pagecache, dentries, and inodes
