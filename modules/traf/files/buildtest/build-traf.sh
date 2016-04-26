@@ -36,7 +36,11 @@ set -x
 
 source_env -v build $FLAVOR
 
-cd trafodion/core
+cd trafodion
+
+make package-src > Make-Source.log 2>&1
+
+cd core
 
 # Pull latest posted Win-ODBC build if available
 # trailing slash necessary to get content list

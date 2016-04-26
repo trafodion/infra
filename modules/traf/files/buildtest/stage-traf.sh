@@ -108,6 +108,13 @@ fi
 
 cd $workspace
 
+# src
+srcpkg=$(ls ./trafodion/distribution/*-src.tar 2>>/dev/null)
+if [[ -n $srcpkg ]]
+then
+  cp $srcpkg ./$DestDir/
+fi
+
 # installer
 install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/installer*gz 2>/dev/null)
 cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  || exit 2
@@ -115,6 +122,14 @@ cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  ||
 # clients tarfile
 client=$(ls ./trafodion/distribution/trafodion_clients-*.tgz)
 cp $client ./$DestDir/apache-trafodion-clients$FileSuffix  || exit 2
+
+cd $DestDir
+for f in $(/bin/ls)
+do
+  md5sum $f > ${f}.md5
+  sha1sum $f > ${f}.sha
+done
+cd $workspace
 
 # core and dcs in server tarfile
 server=$(ls ./trafodion/distribution/trafodion_server-*.tgz)
