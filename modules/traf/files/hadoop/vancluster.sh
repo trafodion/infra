@@ -99,6 +99,16 @@ addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.address" "localhost:50
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.http.address" "localhost:50005"
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.ipc.address" "localhost:50006"
 
+# Yarn
+addxml /opt/hadoop/etc/hadoop/yarn-site.xml "yarn.nodemanager.aux-services" "mapreduce_shuffle"
+
+# MapReduce
+if [[ ! -e /opt/hadoop/etc/hadoop/mapred-site.xml ]]
+then
+  cp /opt/hadoop/etc/hadoop/mapred-site.xml.template /opt/hadoop/etc/hadoop/mapred-site.xml
+fi
+addxml /opt/hadoop/etc/hadoop/mapred-site.xml "mapreduce.framework.name" "yarn"
+
 # hbase basic
 sed -i "s%localhost%%" /opt/hbase/conf/regionservers # must remove default
 addraw /opt/hbase/conf/regionservers "$(hostname -s)"
@@ -175,6 +185,9 @@ sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /user/hive/warehouse >/dev/n
 
 # MapReduce needs /tmp
 sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /tmp >/dev/null
+
+echo "Starting yarn"
+sudo -u tinstall /opt/hadoop/sbin/start-yarn.sh
 
 ### HBase data should be cleaned up every time
 
