@@ -100,7 +100,8 @@ addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.http.address" "localho
 addxml /opt/hadoop/etc/hadoop/hdfs-site.xml "dfs.datanode.ipc.address" "localhost:50006"
 
 # hbase basic
-addraw /opt/hbase/conf/regionservers "localhost"
+sed -i "s%localhost%%" /opt/hbase/conf/regionservers # must remove default
+addraw /opt/hbase/conf/regionservers "$(hostname -s)"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.rootdir" "hdfs://localhost:50001/hbase"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.cluster.distributed" "true"
 addxml /opt/hbase/conf/hbase-site.xml "hbase.zookeeper.property.dataDir" "hdfs://localhost:50001/zoo"
@@ -180,8 +181,8 @@ sudo -u tinstall /opt/hadoop/bin/hdfs dfs -mkdir -p /tmp >/dev/null
 # hbase must be down
 echo "Stopping HBase"
 sudo -u tinstall /opt/hbase/bin/stop-hbase.sh
-sudo -u tinstall  /opt/hbase/bin/hbase-daemon.sh stop regionserver
 
+# double-check hbase is down -- should not he needed if config is correct
 for i in 2 5 10 20
 do
   sudo -u tinstall jps | grep -q -e HMaster -e HRegionServer
