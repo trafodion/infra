@@ -55,10 +55,17 @@ then
 
   # install JDBC T4 client
   log_banner "Installing Trafodion JDBC T4 Driver"
-  mkdir jdbc
-  cd jdbc
-  unzip ../JDBCT4.zip
-  if [[ $? -ne 0 ]]
+  if [[ -e JDBCT4.zip ]]
+  then
+    mkdir jdbc
+    cd jdbc
+    unzip ../JDBCT4.zip
+    zrc=$?
+  else
+    unzip jdbcT4*.zip
+    zrc=$?
+  fi
+  if [[ $zrc -ne 0 ]]
   then
     echo "ERROR: Could not unzip JDBC T4 driver"
     exit 1

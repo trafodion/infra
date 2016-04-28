@@ -105,7 +105,7 @@ log_banner "jdbc_test.py"
 cd "$WORKSPACE/$TEST_DIR"
 ./jdbc_test.py --appid=jdbc_test --target=localhost:$dcsport $dbver \
      --user=<%= jenkins_test_user %> --pw=<%= jenkins_test_password %> --javahome=$JAVA_HOME \
-     --jdbctype=T4 --jdbccp=$WORKSPACE/clients/jdbc/lib/jdbcT4.jar ${TESTS}
+     --jdbctype=T4 --jdbccp="$(/bin/ls $WORKSPACE/clients/jdbc*/lib/jdbcT4*.jar)" ${TESTS}
 jdbcRes=$?
 
 # Report on parent directory of $TRAF_DIR, before uninstall removes trafodion user
