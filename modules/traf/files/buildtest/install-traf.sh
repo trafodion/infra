@@ -94,10 +94,11 @@ END_ODBC
   # install trafci client
   log_banner "Installing Trafodion Command Interface"
   cd $WORKSPACE/clients
+  jpath=$(/bin/ls $WORKSPACE/clients/jdbc*/lib/jdbcT4*.jar)
   unzip trafci.zip trafciInstaller.jar
   java -jar trafciInstaller.jar cm <<-END_TRAFCI 2>&1 | tee $WORKSPACE/Trafci_Install.log
 Y
-$WORKSPACE/clients/jdbc/lib/jdbcT4.jar
+$jpath
 $WORKSPACE/clients
 N
 END_TRAFCI
