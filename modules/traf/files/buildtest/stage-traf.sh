@@ -153,7 +153,7 @@ then
   exit 2
 fi
 
-cd $DestDir
+cd $workspace/$DestDir
 for f in $(/bin/ls *gz)
 do
   md5sum $f > ${f}.md5
