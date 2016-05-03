@@ -123,13 +123,6 @@ cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  ||
 client=$(ls ./trafodion/distribution/trafodion_clients-*.tgz)
 cp $client ./$DestDir/apache-trafodion-clients$FileSuffix  || exit 2
 
-cd $DestDir
-for f in $(/bin/ls)
-do
-  md5sum $f > ${f}.md5
-  sha1sum $f > ${f}.sha
-done
-cd $workspace
 
 # core and dcs in server tarfile
 server=$(ls ./trafodion/distribution/trafodion_server-*.tgz)
@@ -152,7 +145,6 @@ cat collect/build-version.txt
 
 # publish (DestDir) dir will be uploaded by scp rules in jenkins job
 cd ./collect
-sha512sum * > sha512.txt
 tar czvf "$workspace/$DestDir/apache-trafodion$FileSuffix" *
 rcC=$?
 
@@ -160,6 +152,13 @@ if [[ $rcC != 0 ]]
 then
   exit 2
 fi
+
+cd $DestDir
+for f in $(/bin/ls *gz)
+do
+  md5sum $f > ${f}.md5
+  sha1sum $f > ${f}.sha
+done
 
 # Declare success - make this the latest good build 
 # Versions* file will be uploaded by scp rules in jenkins job
