@@ -285,7 +285,7 @@
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
                 BRANCH=$BRANCH
-                HDIST=''
+                HDIST=cm5.4
               node-label-name: "NODE_TYPE"
               node-label: "redhat_$DISTRO"
             - name: "phoenix_test_T2-apc"
@@ -295,7 +295,7 @@
               predefined-parameters: |
                 LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
                 BRANCH=$BRANCH
-                HDIST=''
+                HDIST=cm5.4
               node-label-name: "NODE_TYPE"
               node-label: "redhat_$DISTRO"
 
