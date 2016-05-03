@@ -79,17 +79,28 @@ class traf::dev (
     ensure => present,
   }
   # work-around for group install
-  exec { 'Desktop':
-    unless  => '/usr/bin/yum grouplist "Desktop" | /bin/grep "^Installed Groups"',
-    command => '/usr/bin/yum -y groupinstall "Desktop"',
-  }
-  exec { 'GenDesktop':
-    unless  => '/usr/bin/yum grouplist "General Purpose Desktop" | /bin/grep "^Installed Groups"',
-    command => '/usr/bin/yum -y groupinstall "General Purpose Desktop"',
-  }
-  exec { 'XWin':
-    unless  => '/usr/bin/yum grouplist "X Window System" | /bin/grep "^Installed Groups"',
-    command => '/usr/bin/yum -y groupinstall "X Window System"',
+  if $::operatingsystemmajrelease == '7' {
+    exec { 'Desktop':
+      timeout => 1200,
+      unless  => '/usr/bin/yum grouplist "Server with GUI" | /bin/grep "^Installed Environment Groups"',
+      command => '/usr/bin/yum -y groupinstall "Server with GUI"',
+    }
+  } elsif $::operatingsystemmajrelease == '6' {
+    exec { 'Desktop':
+      timeout => 1200,
+      unless  => '/usr/bin/yum grouplist "Desktop" | /bin/grep "^Installed Groups"',
+      command => '/usr/bin/yum -y groupinstall "Desktop"',
+    }
+    exec { 'GenDesktop':
+      timeout => 1200,
+      unless  => '/usr/bin/yum grouplist "General Purpose Desktop" | /bin/grep "^Installed Groups"',
+      command => '/usr/bin/yum -y groupinstall "General Purpose Desktop"',
+    }
+    exec { 'XWin':
+      timeout => 1200,
+      unless  => '/usr/bin/yum grouplist "X Window System" | /bin/grep "^Installed Groups"',
+      command => '/usr/bin/yum -y groupinstall "X Window System"',
+    }
   }
 
   # hub
@@ -123,33 +134,45 @@ class traf::dev (
     source => "puppet:///modules/traf/trafdev-limits.conf",
   }
 
-  # Real VNC
-  exec { 'get_vnc_rpm' :
-    command => "/usr/bin/scp traf-builds.esgyn.com:/srv/static/downloads/dev-tools/VNC-Server-5.2.3-Linux-x64.rpm /opt/dev",
-    timeout => 900,
-    user    => 'jenkins',
-    creates => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
-    require => File['/opt/dev'],
+  # Real VNC does not work with Centos7 Gnome
+  if $::operatingsystemmajrelease == '6' {
+    exec { 'get_vnc_rpm' :
+      command => "/usr/bin/scp downloads.esgyn.local:/srv/static/downloads/dev-tools/VNC-Server-5.2.3-Linux-x64.rpm /opt/dev",
+      timeout => 900,
+      user    => 'jenkins',
+      creates => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
+      require => File['/opt/dev'],
+    }
+    exec { 'rm_tiger' :
+      onlyif  => '/usr/bin/yum list "tiger*" "abrt*" | /bin/grep "^Installed Packages"',
+      command => '/usr/bin/yum -y erase "tiger*" "abrt*"',
+      require => Exec['Desktop'],
+    }
+    package { 'realvnc-vnc-server':
+      ensure   => present,
+      provider => rpm,
+      source   => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
+      require  => [ Exec['get_vnc_rpm'], Package['xterm'], Exec['rm_tiger'] ],
+    }
+    file { '/etc/vnc/config.d/Xvnc':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => "UserPasswdVerifier=VncAuth",
+      require => Package['realvnc-vnc-server'],
+    }
+    $vnc_key = hiera('VNC_key')
+    exec { 'vnc_license' :
+      command => "/usr/bin/vnclicense -add $vnc_key",
+      unless  => '/usr/bin/vnclicense -check',
+      require => Package['realvnc-vnc-server'],
+    }
   }
-  package { 'realvnc-vnc-server':
-    ensure   => present,
-    provider => rpm,
-    source   => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
-    require  => [ Exec['get_vnc_rpm'], Package['xterm'] ],
-  }
-  file { '/etc/vnc/config.d/Xvnc':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    content => "UserPasswdVerifier=VncAuth",
-    require => Package['realvnc-vnc-server'],
-  }
-  $vnc_key = hiera('VNC_key')
-  exec { 'vnc_license' :
-    command => "/usr/bin/vnclicense -add $vnc_key",
-    unless  => '/usr/bin/vnclicense -check',
-    require => Package['realvnc-vnc-server'],
+  if $::operatingsystemmajrelease == '7' {
+    package { 'tigervnc-server':
+      ensure  => present,
+    }
   }
   # Atom - editor for asciidoc, etc
   exec { 'get_atom_rpm' :

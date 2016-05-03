@@ -56,24 +56,31 @@ class traf::buildtest (
       'libibcm.i686', 'libibumad-devel', 'libibumad-devel.i686',
       'librdmacm-devel', 'librdmacm-devel.i686',
       'lua-devel', 'lzo-minilzo', 'net-snmp-devel','net-snmp-perl',
-      'openldap-clients', 'openldap-devel.i686', 'openmotif','openssl-devel.i686',
+      'openldap-clients', 'openldap-devel.i686', 'openssl-devel.i686',
       'perl-Config-IniFiles', 'perl-Config-Tiny', 'perl-DBD-SQLite', 'perl-Expect', 'perl-IO-Tty',
       'perl-Math-Calc-Units','perl-Params-Validate','perl-Parse-RecDescent','perl-TermReadKey',
       'perl-Time-HiRes',
-      'python-qpid', 'python-qpid-qmf', 'qpid-cpp-client','qpid-cpp-client-ssl',
-      'qpid-cpp-server','qpid-cpp-server-ssl','qpid-qmf','qpid-tools',
       'saslwrapper', 'tog-pegasus', 'uuid-perl','xinetd',
       'readline-devel','alsa-lib-devel',
       'openssl-static',
       'java-1.6.0-openjdk-devel', 'java-1.7.0-openjdk-devel',
-      'ant','ant-nodeps',
+      'ant',
       'dos2unix','expect',
       'unixODBC', 'unixODBC-devel', 'libiodbc', 'libiodbc-devel',
       'protobuf-compiler', 'protobuf-devel', 'xerces-c-devel',
-      'zlib-devel', 'bzip2-devel', 'ncurses-devel', 'tk-devel', 'gdbm-devel', 'db4-devel', 'libpcap-devel',
+      'zlib-devel', 'bzip2-devel', 'ncurses-devel', 'tk-devel', 'gdbm-devel', 'libpcap-devel',
       'cmake','npm',
       'lzo','lzop','lzo-devel',
     ]
+    if $::operatingsystemmajrelease == '7' {
+      package { ['motif','libdb4-devel']:
+        ensure  => present,
+      }
+    } elsif $::operatingsystemmajrelease == '6' {
+      package { ['openmotif','db4-devel','ant-nodeps']:
+        ensure  => present,
+      }
+    }
 
     exec { 'install_bower':
         path    => '/usr/bin:/bin:/usr/local/bin',
@@ -87,26 +94,12 @@ class traf::buildtest (
     exec { 'install_Development_Tools':
         path    => '/usr/bin:/bin:/usr/local/bin',
         command => 'yum -y groupinstall "Development Tools"',
-        onlyif  => "test `yum grouplist \"Development Tools\" | grep -A 1 \"Installed Groups:\" | grep -c \"Development tools\"` -eq 0",
+        onlyif  => "test `yum grouplist \"Development Tools\" | grep -A 1 \"Installed Groups:\" | grep -ic \"Development tools\"` -eq 0",
     }
 
     package { $packages:
         ensure  => present,
         require => [ Exec['install_Development_Tools'] ]
-    }
-
-
-    # not available in latest CentOS distribution, but is in Vault repos
-    package { 'qpid-cpp-client-devel':
-        ensure  => present,
-    #    install_options => '--enablerepo=C6.3-updates',
-        require => Exec['enable-Vault'],
-    }
-    # install_options not supported for yum package manager in Puppet 2.7
-    # so we enable the repo the hard way
-    exec { 'enable-Vault':
-      command => "/bin/sed -i '/C6.3-updates/,/^$/s/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-Vault.repo",
-      unless  => '/bin/grep -q "enabled=1" /etc/yum.repos.d/CentOS-Vault.repo',
     }
 
     # Remove bug reporting tool, so we can specify core file pattern
