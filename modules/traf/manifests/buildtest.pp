@@ -51,7 +51,7 @@ class traf::buildtest (
   # Superset of packages needed for build/test, not installed by default
   if $::osfamily == 'RedHat' {
     $packages = [
-      'boost-devel', 'device-mapper-multipath', 'dhcp', 'gd', 'apr-devel',
+      'boost-devel', 'device-mapper-multipath', 'dhcp', 'gd', 'apr-devel', 'apr-util-devel',
       'glibc-devel.i686', 'graphviz-perl', 'libaio-devel',
       'libibcm.i686', 'libibumad-devel', 'libibumad-devel.i686',
       'librdmacm-devel', 'librdmacm-devel.i686',
