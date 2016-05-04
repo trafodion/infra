@@ -286,6 +286,8 @@
     branch:
      - master:
          timespec: "30 8 * * *"
+     - release2.0:
+         timespec: "30 5 * * *"
 
     jobs:
      - 'Check-Daily-{branch}'
