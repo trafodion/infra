@@ -108,6 +108,7 @@ then
   if [[ $trafball =~ ^apache- ]]
   then
     echo "TRAF_PACKAGE=$trafball" >> ./Install_Config
+    echo "ONE_TAR_INSTALL=Y" >> ./Install_Config
   else
     echo "TRAF_BUILD=$trafball" >> ./Install_Config
     echo "REST_BUILD=$restball" >> ./Install_Config  ## may be empty for pre-1.1 builds
