@@ -104,9 +104,15 @@ then
   echo "hadoop_node_count=1" >> ./Install_Config
   echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./Install_Config
   echo "OPENSTACK_VM=1" >> ./Install_Config
-  echo "TRAF_BUILD=$trafball" >> ./Install_Config
-  echo "REST_BUILD=$restball" >> ./Install_Config  ## may be empty for pre-1.1 builds
-  echo "DCS_BUILD=$dcsball" >> ./Install_Config
+  # As of 2.0.0, single package tar
+  if [[ $trafball =~ ^apache- ]]
+  then
+    echo "TRAF_PACKAGE=$trafball" >> ./Install_Config
+  else
+    echo "TRAF_BUILD=$trafball" >> ./Install_Config
+    echo "REST_BUILD=$restball" >> ./Install_Config  ## may be empty for pre-1.1 builds
+    echo "DCS_BUILD=$dcsball" >> ./Install_Config
+  fi
   echo "SQ_ROOT=$RUNLOC" >> ./Install_Config
   echo "START=Y" >> ./Install_Config
   echo "INIT_TRAFODION=Y" >> ./Install_Config

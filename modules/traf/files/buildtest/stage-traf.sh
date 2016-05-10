@@ -85,7 +85,6 @@ rm -rf ./collect ./publish
 rm -f $workspace/Versions*
 
 mkdir -p "./$DestDir" || exit 2
-mkdir -p "./collect" || exit 2
 
 # Check if we have already staged a build for this version of code
 if ! /usr/local/bin/build-version-check.sh "$Branch" "$Flavor" "$BLD_PURPOSE"
@@ -109,48 +108,64 @@ fi
 cd $workspace
 
 # src
-srcpkg=$(ls ./trafodion/distribution/*-src.tar 2>>/dev/null)
+srcpkg=$(ls ./trafodion/distribution/*-src.tar* 2>/dev/null)
 if [[ -n $srcpkg ]]
 then
   cp $srcpkg ./$DestDir/
 fi
 
 # installer
-install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/installer*gz 2>/dev/null)
-cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  || exit 2
+install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/*installer*gz 2>/dev/null)
+if [[ $install =~ ^apache- ]]
+then
+  cp $install ./$DestDir/  || exit 2
+else
+  cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  || exit 2
+fi
 
 # clients tarfile
-client=$(ls ./trafodion/distribution/trafodion_clients-*.tgz)
-cp $client ./$DestDir/apache-trafodion-clients$FileSuffix  || exit 2
+client=$(ls ./trafodion/distribution/*trafodion_clients-*.tgz)
+if [[ $client =~ ^apache- ]]
+then
+  cp $client ./$DestDir/  || exit 2
+else
+  cp $client ./$DestDir/apache-trafodion-clients$FileSuffix  || exit 2
+fi
 
 
 # core and dcs in server tarfile
-server=$(ls ./trafodion/distribution/trafodion_server-*.tgz)
-cp $server collect/  || exit 2
-# rest added in 1.1 release
-rest=$(ls trafodion/distribution/rest-*gz 2>/dev/null)
-if [[ -f "$rest" ]]
+server=$(ls ./trafodion/distribution/*trafodion_server-*.tgz)
+if [[ $server =~ ^apache- ]]
 then
-  rbase=$(basename $rest .tar.gz)
-  cp $rest collect/${rbase}.tgz  || exit 2
-fi
+  cp $server ./$DestDir/  || exit 2
+else
+  mkdir -p "./collect" || exit 2
+  cp $server collect/  || exit 2
+  # rest added in 1.1 release
+  rest=$(ls trafodion/distribution/rest-*gz 2>/dev/null)
+  if [[ -f "$rest" ]]
+  then
+    rbase=$(basename $rest .tar.gz)
+    cp $rest collect/${rbase}.tgz  || exit 2
+  fi
 
-# change suffix from tar.gz to tgz
-dcs=$(ls trafodion/distribution/dcs-[0-9]*gz)
-dcsbase=$(basename $dcs .tar.gz)
-cp $dcs collect/${dcsbase}.tgz  || exit 2
+  # change suffix from tar.gz to tgz
+  dcs=$(ls trafodion/distribution/dcs-[0-9]*gz)
+  dcsbase=$(basename $dcs .tar.gz)
+  cp $dcs collect/${dcsbase}.tgz  || exit 2
 
-cat trafodion/build-version.txt >> collect/build-version.txt
-cat collect/build-version.txt
+  cat trafodion/build-version.txt >> collect/build-version.txt
+  cat collect/build-version.txt
 
-# publish (DestDir) dir will be uploaded by scp rules in jenkins job
-cd ./collect
-tar czvf "$workspace/$DestDir/apache-trafodion$FileSuffix" *
-rcC=$?
+  # publish (DestDir) dir will be uploaded by scp rules in jenkins job
+  cd ./collect
+  tar czvf "$workspace/$DestDir/apache-trafodion$FileSuffix" *
+  rcC=$?
 
-if [[ $rcC != 0 ]]
-then
-  exit 2
+  if [[ $rcC != 0 ]]
+  then
+    exit 2
+  fi
 fi
 
 cd $workspace/$DestDir
