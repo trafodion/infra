@@ -105,7 +105,7 @@ then
   echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./Install_Config
   echo "OPENSTACK_VM=1" >> ./Install_Config
   # As of 2.0.0, single package tar
-  if [[ $trafball =~ ^apache- ]]
+  if [[ $(basename $trafball) =~ ^apache- ]]
   then
     echo "TRAF_PACKAGE=$trafball" >> ./Install_Config
     echo "ONE_TAR_INSTALL=Y" >> ./Install_Config

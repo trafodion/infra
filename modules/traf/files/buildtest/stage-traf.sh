@@ -116,7 +116,7 @@ fi
 
 # installer
 install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/*installer*gz 2>/dev/null)
-if [[ $install =~ ^apache- ]]
+if [[ $(basename $install) =~ ^apache- ]]
 then
   cp $install ./$DestDir/  || exit 2
 else
@@ -125,7 +125,7 @@ fi
 
 # clients tarfile
 client=$(ls ./trafodion/distribution/*trafodion_clients-*)
-if [[ $client =~ ^apache- ]]
+if [[ $(basename $client) =~ ^apache- ]]
 then
   cp $client ./$DestDir/  || exit 2
 else
@@ -135,7 +135,7 @@ fi
 
 # core and dcs in server tarfile
 server=$(ls ./trafodion/distribution/*trafodion_server-*)
-if [[ $server =~ ^apache- ]]
+if [[ $(basename $server) =~ ^apache- ]]
 then
   cp $server ./$DestDir/  || exit 2
 else
