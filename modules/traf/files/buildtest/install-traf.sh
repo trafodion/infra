@@ -50,7 +50,7 @@ then
   log_banner "Installing Trafodion clients to $WORKSPACE/clients"
   cd $WORKSPACE
   rm -rf clients
-  tar xvfz $(ls $WORKSPACE/trafodion/core/trafodion_clients-*.tgz $WORKSPACE/trafodion/distribution/*trafodion_clients-*.tgz 2>/dev/null)
+  tar xvfz $(ls $WORKSPACE/trafodion/core/trafodion_clients-*.tgz $WORKSPACE/trafodion/distribution/*trafodion_clients* 2>/dev/null)
   cd clients
 
   # install JDBC T4 client
@@ -129,7 +129,7 @@ install_loc "installed" $REGRESS
 
 # Core, DCS, Install are all required
 
-trafball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion_server-*.tgz $WORKSPACE/trafodion/distribution/*trafodion_server-*.tgz 2>/dev/null)"
+trafball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion_server-*.tgz $WORKSPACE/trafodion/distribution/*trafodion_server-* 2>/dev/null)"
 dcsball="$(/bin/ls $WORKSPACE/trafodion/dcs/target/dcs*gz $WORKSPACE/trafodion/distribution/dcs-[0-9]*gz 2>/dev/null)"
 instball="$(/bin/ls $WORKSPACE/trafodion/install/installer*gz $WORKSPACE/trafodion/distribution/*installer*gz 2>/dev/null)"
 restball="$(/bin/ls $WORKSPACE/trafodion/core/rest/target/rest-*gz $WORKSPACE/trafodion/distribution/rest-*gz 2>/dev/null)"

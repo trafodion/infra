@@ -124,7 +124,7 @@ else
 fi
 
 # clients tarfile
-client=$(ls ./trafodion/distribution/*trafodion_clients-*.tgz)
+client=$(ls ./trafodion/distribution/*trafodion_clients-*)
 if [[ $client =~ ^apache- ]]
 then
   cp $client ./$DestDir/  || exit 2
@@ -134,7 +134,7 @@ fi
 
 
 # core and dcs in server tarfile
-server=$(ls ./trafodion/distribution/*trafodion_server-*.tgz)
+server=$(ls ./trafodion/distribution/*trafodion_server-*)
 if [[ $server =~ ^apache- ]]
 then
   cp $server ./$DestDir/  || exit 2
