@@ -65,6 +65,8 @@
             - WEISHIUN 
             - mkby 
             - nitin-amp
+            - zcorrea
+            - blfritch-esgyn
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
