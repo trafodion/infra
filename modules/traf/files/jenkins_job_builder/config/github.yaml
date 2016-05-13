@@ -325,7 +325,7 @@
       - inject:
           properties-file: distro.properties
       - multijob:
-          name: build_test
+          name: build
           projects:
             - name: "build-{branch}-debug"
               current-parameters: true
@@ -339,6 +339,9 @@
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/build-{branch}-release
                  BUILD_TYPE=daily
+      - multijob:
+          name: test
+          projects:
             - name: "core-regress-core-hdp"
               current-parameters: true
               kill-phase-on: NEVER
