@@ -3,8 +3,9 @@
 # file lock to run only one at a time.
 # Compress files after 3 days, remove compressed files after 2 weeks.
 # Remove empty directories after a day.
+ulimit -n 150000
 sleep $((RANDOM%600)) && \
-find -O3 /srv/static/logs/ -depth \
+find /srv/static/logs/ -depth \
     \( \
       \( -type f -mtime +3 -not -name robots.txt \
           -not -wholename /srv/static/logs/help/\* \
