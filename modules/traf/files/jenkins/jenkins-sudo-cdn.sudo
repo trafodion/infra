@@ -1,1 +1,3 @@
 jenkins	ALL = NOPASSWD:/usr/local/bin/useObjectStorage.sh
+# sys update
+jenkins ALL = NOPASSWD:/usr/bin/puppet

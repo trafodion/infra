@@ -28,8 +28,11 @@ mode="$1"
 
 if [[ "$mode" != "build" ]]
 then
-  # delete dirs owned by non-jenkins users
+  # delete dirs owned by non-jenkins users & run puppet
   sudo -n /usr/local/bin/wsclean-sudo.sh "$WORKSPACE"
+else
+  # just do the puppet update on build system
+  sudo -n /usr/bin/puppet agent --test --no-report --color false
 fi
 
 if [[ "$mode" == "test" ]]
