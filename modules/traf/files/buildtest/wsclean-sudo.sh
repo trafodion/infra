@@ -45,7 +45,7 @@ rm -rf /usr/lib/trafodion
 /usr/sbin/userdel -rf trafodion
 
 # clean up hive logs that can fill up the disk
-rm /var/log/hive/hiveserver2.log.2*
+rm /var/log/hive/hiveserver2.log*
 
 # set corefile pattern
 /sbin/sysctl -w kernel.core_pattern=core.%h.%p.%e
