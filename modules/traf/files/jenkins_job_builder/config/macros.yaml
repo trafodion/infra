@@ -309,7 +309,7 @@
               keep-hierarchy: true
             # traf_run files saved in traf/files/buildtest/inst-sudo.sh
             - target: 'logs/$LOG_PATH'
-              source: 'traf_run/logs/*.log'
+              source: 'traf_run/logs/*'
               copy-after-failure: true
               keep-hierarchy: true
             - target: 'logs/$LOG_PATH'
