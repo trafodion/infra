@@ -23,6 +23,13 @@ log_banner
 # Build ID indicates specific date or tag
 BLD="$(< $WORKSPACE/Build_ID)"
 
+# bail out if traf buildhas already built installer
+if [[ -n "$(/bin/ls $WORKSPACE/trafodion/distribution/*installer*)" ]]
+then
+  echo "Installer already built. Skipping installer build."
+  exit 0
+fi
+
 # trace
 set -x
 
