@@ -200,7 +200,7 @@
         echo '<div>' . PHP_EOL;
         echo '    <h2 class="subhead">Releases - Convenience Binaries</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
-        echo '      <li><a href="https://archive.apache.org/dist/incubator/trafodion/">' . Apache Trafodion (Incubating) Releases . '</a></li>' . PHP_EOL;
+        echo '      <li><a href="https://archive.apache.org/dist/incubator/trafodion/">Apache Trafodion (Incubating) Releases - archive.apache.org</a></li>' . PHP_EOL;
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
@@ -260,29 +260,10 @@
 #        echo '    </ul>' . PHP_EOL;
 #        echo '</div>' . PHP_EOL;
 
-        # Create array for pre-release
-        echo '<div>' . PHP_EOL;
-        echo '    <h2 class="subhead">Pre-Release Candidates</h2>' . PHP_EOL;
-        echo '    <ul>' . PHP_EOL;
-#        $prereleaseArray = array_filter($cdnArray, "prerelease");
-        #if (sizeof($prereleaseArray) === 0) {
-        #    array_walk($oldreleaseArray, 'print_links', 'empty_list');
-        #} else if (sizeof($prereleaseArray) >= sizeof($oldreleaseArray)) {
-#            array_walk($prereleaseArray, 'print_links', 'pre-release');
-        #} else {
-        #    # pad prereleaseArray to size of oldreleaseArray
-        #    $arraySizeDiff = sizeof($oldreleaseArray) - sizeof($prereleaseArray);
-        #    for ($i = 1; $i <= $arraySizeDiff; $i++) {
-        #        $prereleaseArray[] = 'empty';
-        #    }
-        #    array_walk($prereleaseArray, 'print_links', 'pre-release');
-        #}
-        echo '    </ul>' . PHP_EOL;
-        echo '</div>' . PHP_EOL;
         echo '<div>' . PHP_EOL;
         echo '    <h2 class="subhead">Pre-Release Candidates</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
-        echo '      <li><a href="https://dist.apache.org/repos/dist/dev/incubator/trafodion/">' . Release Candidates . '</a></li>' . PHP_EOL;
+        echo '      <li><a href="https://dist.apache.org/repos/dist/dev/incubator/trafodion/">Release Candidates - dist.apache.org</a></li>' . PHP_EOL;
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
