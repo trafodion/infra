@@ -198,12 +198,9 @@
 
 
         echo '<div>' . PHP_EOL;
-        echo '    <h2 class="subhead">Apache (Incubating) Releases - Convenience Binaries</h2>' . PHP_EOL;
+        echo '    <h2 class="subhead">Releases - Convenience Binaries</h2>' . PHP_EOL;
         echo '    <p><ul>' . PHP_EOL;
-           $relArray = find_all_files("downloads/trafodion/publish/release");
-           natsort($relArray);
-           $rArray = array_reverse($relArray);
-           array_walk($rArray, 'print_links', 'release');
+        echo '      <li><a href="https://archive.apache.org/dist/incubator/trafodion/">' . Apache Trafodion (Incubating) Releases . '</a></li>' . PHP_EOL;
         echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
@@ -281,6 +278,12 @@
         #    array_walk($prereleaseArray, 'print_links', 'pre-release');
         #}
         echo '    </ul>' . PHP_EOL;
+        echo '</div>' . PHP_EOL;
+        echo '<div>' . PHP_EOL;
+        echo '    <h2 class="subhead">Pre-Release Candidates</h2>' . PHP_EOL;
+        echo '    <p><ul>' . PHP_EOL;
+        echo '      <li><a href="https://dist.apache.org/repos/dist/dev/incubator/trafodion/">' . Release Candidates . '</a></li>' . PHP_EOL;
+        echo '    </ul></p>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
         # Create array for daily
