@@ -74,7 +74,9 @@ class traf::dev (
   }
 
 
-  package { ['emacs','gitk','gedit','kdesdk','firefox','vim-enhanced','xterm','gnuplot','valgrind','apr-util-devel' ]:
+  # do not merge snappy - move to buildtest.pp for all build/test machines
+  package { ['emacs','gitk','gedit','kdesdk','firefox','vim-enhanced','xterm','gnuplot','valgrind','apr-util-devel',
+             'snappy','snappy-devel' ]:
     ensure => present,
   }
   # work-around for group install
