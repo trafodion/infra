@@ -63,7 +63,7 @@ class traf::buildtest (
       'saslwrapper', 'tog-pegasus', 'uuid-perl','xinetd',
       'readline-devel','alsa-lib-devel',
       'openssl-static',
-      'java-1.6.0-openjdk-devel', 'java-1.7.0-openjdk-devel',
+      'java-1.7.0-openjdk-devel', 'java-1.8.0-openjdk-devel',
       'ant',
       'dos2unix','expect',
       'unixODBC', 'unixODBC-devel', 'libiodbc', 'libiodbc-devel',
