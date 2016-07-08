@@ -120,9 +120,9 @@ class jenkins::slave(
   }
 
   # Packages that need to be installed from pip
-  $pip_packages = [
-    'setuptools-git',
-  ]
+  #$pip_packages = [
+  #  'setuptools-git',
+  #]
 
   if $python3 {
     if ($::lsbdistcodename == 'precise') {
@@ -131,22 +131,22 @@ class jenkins::slave(
       }
     }
     include pip::python3
-    package { $pip_packages:
-      ensure   => latest,  # we want the latest from these
-      provider => pip3,
-      require  => Class[pip::python3],
-    }
+    #package { $pip_packages:
+    #  ensure   => latest,  # we want the latest from these
+    #  provider => pip3,
+    #  require  => Class[pip::python3],
+    #}
     package { 'tox':
       ensure   => '1.7.2',
       provider => pip3,
       require  => Class[pip::python3],
     }
   } else {
-    package { $pip_packages:
-      ensure   => latest,  # we want the latest from these
-      provider => pip,
-      require  => Class[pip],
-    }
+    #package { $pip_packages:
+    #  ensure   => latest,  # we want the latest from these
+    #  provider => pip,
+    #  require  => Class[pip],
+    #}
     package { 'tox':
       ensure   => '1.7.2',
       provider => pip,
