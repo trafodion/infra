@@ -135,13 +135,11 @@ class traf::dev (
     source => "puppet:///modules/traf/trafdev-limits.conf",
   }
 
-  # Real VNC does not work with Centos7 Gnome
-  if $::operatingsystemmajrelease == '6' {
     exec { 'get_vnc_rpm' :
-      command => "/usr/bin/scp downloads.esgyn.local:/srv/static/downloads/dev-tools/VNC-Server-5.2.3-Linux-x64.rpm /opt/dev",
+      command => "/usr/bin/scp traf-builds.esgyn.com:/srv/static/downloads/dev-tools/VNC-Server-5.3.2-Linux-x64.rpm /opt/dev",
       timeout => 900,
       user    => 'jenkins',
-      creates => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
+      creates => "/opt/dev/VNC-Server-5.3.2-Linux-x64.rpm",
       require => File['/opt/dev'],
     }
     exec { 'rm_tiger' :
@@ -152,7 +150,7 @@ class traf::dev (
     package { 'realvnc-vnc-server':
       ensure   => present,
       provider => rpm,
-      source   => "/opt/dev/VNC-Server-5.2.3-Linux-x64.rpm",
+      source   => "/opt/dev/VNC-Server-5.3.2-Linux-x64.rpm",
       require  => [ Exec['get_vnc_rpm'], Package['xterm'], Exec['rm_tiger'] ],
     }
     file { '/etc/vnc/config.d/Xvnc':
@@ -169,10 +167,26 @@ class traf::dev (
       unless  => '/usr/bin/vnclicense -check',
       require => Package['realvnc-vnc-server'],
     }
-  }
-  if $::operatingsystemmajrelease == '7' {
-    package { 'tigervnc-server':
+    file { '/etc/vnc/config.d/common.custom':
       ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => "Authentication=VncAuth",
+      require => Package['realvnc-vnc-server'],
+    }
+  # Real VNC does not work with Centos7 Gnome, use KDE
+  if $::operatingsystemmajrelease == '7' {
+    package { ['kde-workspace','gdm']:
+      ensure  => present,
+    }
+    file { '/etc/sysconfig/desktop':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => "DESKTOP=KDE",
+      require => Package['kde-workspace'],
     }
   }
   # Atom - editor for asciidoc, etc
