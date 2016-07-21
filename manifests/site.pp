@@ -81,6 +81,16 @@ node /^build$/ {
     certname  => "build",
   }
 }
+node /^build7$/ {
+  include traf
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'None',
+    certname  => "build7",
+  }
+}
 
 # CMgr
 node /^slave-cm53$/ {
