@@ -121,7 +121,7 @@
     jobs:
       - build-{osver}-label-{flavor}
 
-- job:
+- job-template:
     name: 'build-{osver}-label-{flavor}'
 
     parameters:
