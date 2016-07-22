@@ -32,6 +32,11 @@
 
 - job-group:
     name: 'builds'
+    osver:
+     - rh6:
+         node: "traf_bld"
+     - rh7:
+         node: "traf_bld7"
     flavor:
       - "release"
       - "debug"
@@ -41,11 +46,10 @@
       - "release2.0"
 
     jobs:
-      - build-{branch}-{flavor}
+      - build-{osver}-{branch}-{flavor}
 
 - job-template:
-    name: 'build-{branch}-{flavor}'
-    node: 'traf_bld'
+    name: 'build-{osver}-{branch}-{flavor}'
 
     parameters:
       - string:
@@ -104,9 +108,21 @@
       - git-log
       - traf-make-log
 
+- job-group:
+    name: 'builds-label'
+    osver:
+     - rh6:
+         node: "traf_bld"
+     - rh7:
+         node: "traf_bld7"
+    flavor:
+      - "release"
+
+    jobs:
+      - build-{osver}-label-{flavor}
+
 - job:
-    name: 'build-label'
-    node: 'traf_bld'
+    name: 'build-{osver}-label-{flavor}'
 
     parameters:
       - string:
@@ -130,10 +146,10 @@
            repos: "apache/incubator-trafodion"
            label: "$TAG"
       - pkg-traf:
-           flavor: "release"
+           flavor: "{flavor}"
       - pkg-install
       - stage-traf:
-           flavor: "release"
+           flavor: "{flavor}"
            btype: "$BUILD_TYPE"
            branch: "$BRANCH"
 

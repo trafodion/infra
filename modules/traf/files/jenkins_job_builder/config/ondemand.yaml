@@ -17,6 +17,13 @@
           name: TAG
           description: "Git tag to build against"
       - choice:
+          name: OS
+          choices:
+            - rh6
+            - rh7
+          default: rh6
+          description: "OS Version, Red-Hat6 or 7"
+      - choice:
           name: BRANCH
           choices:
             - master
@@ -50,11 +57,11 @@
       - multijob:
           name: build
           projects:
-            - name: "build-label"
+            - name: "build-$OS-label-release"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-label
+                 LOG_PATH=$LOG_PATH/build-$OS-label
                  BUILD_TYPE=$TAGTYPE
                  TAG=$TAG
 
@@ -363,6 +370,7 @@
       - kill-traf
       - clean-testspace
       - get-build:
+           osver: "rh6"
            flavor: "release"
            branch: "$BRANCH"
       - sql-regress:
