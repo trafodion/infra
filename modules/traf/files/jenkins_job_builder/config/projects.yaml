@@ -6,6 +6,7 @@
       - Check-PR
       - Check-Daily
       - builds
+      - builds-label
       - doc-builds
       - static-checks
       - core-regress-suites
