@@ -288,6 +288,7 @@
     branch:
      - master:
          timespec: "30 8 * * *"
+         disabled: false
      - release2.0:
          timespec: "30 5 * * *"
          disabled: true
@@ -299,6 +300,7 @@
     name: 'Check-Daily-{branch}'
     node: 'master'
     project-type: multijob
+    disabled: "{disabled}"
 
     parameters:
       - string:

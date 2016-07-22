@@ -34,9 +34,9 @@
     name: 'builds'
     osver:
      - rh6:
-         node: "traf_bld"
+         nlabel: "traf_bld"
      - rh7:
-         node: "traf_bld7"
+         nlabel: "traf_bld7"
     flavor:
       - "release"
       - "debug"
@@ -50,6 +50,7 @@
 
 - job-template:
     name: 'build-{osver}-{branch}-{flavor}'
+    node: '{nlabel}'
 
     parameters:
       - string:
@@ -112,9 +113,9 @@
     name: 'builds-label'
     osver:
      - rh6:
-         node: "traf_bld"
+         nlabel: "traf_bld"
      - rh7:
-         node: "traf_bld7"
+         nlabel: "traf_bld7"
     flavor:
       - "release"
 
@@ -123,6 +124,7 @@
 
 - job-template:
     name: 'build-{osver}-label-{flavor}'
+    node: '{nlabel}'
 
     parameters:
       - string:
