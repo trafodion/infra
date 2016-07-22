@@ -102,19 +102,19 @@
       - multijob:
           name: build
           projects:
-            - name: "build-{branch}-debug"
+            - name: "build-rh6-{branch}-debug"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-{branch}-debug
+                 LOG_PATH=$LOG_PATH/build-rh6-{branch}-debug
                  BUILD_TYPE=check
-            - name: "build-{branch}-release"
+            - name: "build-rh6-{branch}-release"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-{branch}-release
+                 LOG_PATH=$LOG_PATH/build-rh6-{branch}-release
                  BUILD_TYPE=check
       - multijob:
           name: test
@@ -328,17 +328,17 @@
       - multijob:
           name: build
           projects:
-            - name: "build-{branch}-debug"
+            - name: "build-rh6-{branch}-debug"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-{branch}-debug
+                 LOG_PATH=$LOG_PATH/build-rh6-{branch}-debug
                  BUILD_TYPE=daily
-            - name: "build-{branch}-release"
+            - name: "build-rh6-{branch}-release"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-{branch}-release
+                 LOG_PATH=$LOG_PATH/build-rh6-{branch}-release
                  BUILD_TYPE=daily
       - multijob:
           name: test
