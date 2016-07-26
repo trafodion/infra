@@ -58,6 +58,10 @@
 - builder:
     name: get-build
     builders:
+      - shell: |
+         #!/bin/bash
+         osver="rh$(lsb_release -rs | cut -d. -f1)"
+         echo /usr/local/bin/find-build-job.sh build-${{osver}}-{branch}-{flavor}
       - shell: "/usr/local/bin/find-build-job.sh build-{osver}-{branch}-{flavor}"
       - inject:
           properties-file: bld.properties
