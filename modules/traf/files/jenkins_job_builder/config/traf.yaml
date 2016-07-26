@@ -43,7 +43,6 @@
       - kill-traf
       - clean-testspace
       - get-build:
-           osver: "rh6"
            flavor: "release"
            branch: "$BRANCH"
       - sql-regress:
@@ -123,7 +122,6 @@
       - kill-traf
       - clean-testspace
       - get-build:
-           osver: "rh6"
            flavor: "debug"
            branch: "$BRANCH"
       - shell: |
@@ -184,7 +182,6 @@
       - kill-traf
       - clean-testspace
       - get-build:
-           osver: "rh6"
            flavor: "debug"
            branch: "$BRANCH"
       - shell: |
@@ -241,7 +238,6 @@
       - kill-traf
       - clean-testspace
       - get-build:
-           osver: "rh6"
            flavor: "debug"
            branch: "$BRANCH"
       - shell: |
