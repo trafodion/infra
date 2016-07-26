@@ -127,7 +127,7 @@
                  LOG_PATH=$LOG_PATH/pyodbc_test-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "phoenix_quick_T4-hdp"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
@@ -137,7 +137,7 @@
                  BRANCH={branch}
                  HDIST="HDP$DISTHDP"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "jdbc_test-cdh"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
@@ -146,7 +146,7 @@
                  LOG_PATH=$LOG_PATH/jdbc_test-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-seabase-hdp"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
@@ -155,7 +155,7 @@
                  LOG_PATH=$LOG_PATH/regress-seabase-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-core-hdp"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
@@ -164,7 +164,7 @@
                  LOG_PATH=$LOG_PATH/regress-core-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
 
     publishers:
       - console-log
@@ -251,7 +251,7 @@
                  BRANCH={branch}
                  HDIST="CDH$DISTCDH"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
       #      - name: "phoenix_test_T2-hdp"
       #        current-parameters: true
       #        kill-phase-on: NEVER
@@ -260,7 +260,7 @@
       #           BRANCH={branch}
       #           HDIST="HDP$DISTHDP"
       #        node-label-name: "NODE_TYPE"
-      #        node-label: "redhat_ahw$DISTHDP"
+      #        node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -269,7 +269,7 @@
                 SUITES=privs1 privs2 compGeneral udr
                 BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -278,7 +278,7 @@
                 SUITES=charsets executor fullstack2 qat hive
                 BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
 
     publishers:
       - console-log
@@ -351,7 +351,7 @@
                  LOG_PATH=$LOG_PATH/regress-core-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-seabase-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -359,7 +359,7 @@
                  LOG_PATH=$LOG_PATH/regress-seabase-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "pyodbc_test-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -367,7 +367,7 @@
                  LOG_PATH=$LOG_PATH/pyodbc_test-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-charsets-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -375,7 +375,7 @@
                  LOG_PATH=$LOG_PATH/regress-charsets-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-qat-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -383,7 +383,7 @@
                  LOG_PATH=$LOG_PATH/regress-qat-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-udr-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -391,7 +391,7 @@
                  LOG_PATH=$LOG_PATH/regress-udr-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-privs1-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -399,7 +399,7 @@
                  LOG_PATH=$LOG_PATH/regress-privs1-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-privs2-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -407,7 +407,7 @@
                  LOG_PATH=$LOG_PATH/regress-privs2-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-compGeneral-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -415,7 +415,7 @@
                  LOG_PATH=$LOG_PATH/regress-compGeneral-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-executor-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -423,7 +423,7 @@
                  LOG_PATH=$LOG_PATH/regress-executor-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-fullstack2-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -431,7 +431,7 @@
                  LOG_PATH=$LOG_PATH/regress-fullstack2-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-hive-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -439,7 +439,7 @@
                  LOG_PATH=$LOG_PATH/regress-hive-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "phoenix_part1_T4-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -448,7 +448,7 @@
                  BRANCH={branch}
                  HDIST="HDP$DISTHDP"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "phoenix_part2_T4-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -457,7 +457,7 @@
                  BRANCH={branch}
                  HDIST="HDP$DISTHDP"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "phoenix_part1_T2-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -466,7 +466,7 @@
                  BRANCH={branch}
                  HDIST="HDP$DISTHDP"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "phoenix_part2_T2-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -475,7 +475,7 @@
                  BRANCH={branch}
                  HDIST="HDP$DISTHDP"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "jdbc_test-hdp"
               current-parameters: true
               kill-phase-on: NEVER
@@ -483,7 +483,7 @@
                  LOG_PATH=$LOG_PATH/jdbc_test-hdp
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_ahw$DISTHDP"
+              node-label: "rh6_ahw$DISTHDP"
 #   Cloudera Jobs
             - name: "core-regress-core-cdh"
               current-parameters: true
@@ -492,7 +492,7 @@
                  LOG_PATH=$LOG_PATH/regress-core-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-seabase-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -500,7 +500,7 @@
                  LOG_PATH=$LOG_PATH/regress-seabase-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "pyodbc_test-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -508,7 +508,7 @@
                  LOG_PATH=$LOG_PATH/pyodbc_test-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-charsets-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -516,7 +516,7 @@
                  LOG_PATH=$LOG_PATH/regress-charsets-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-qat-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -524,7 +524,7 @@
                  LOG_PATH=$LOG_PATH/regress-qat-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-udr-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -532,7 +532,7 @@
                  LOG_PATH=$LOG_PATH/regress-udr-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-privs1-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -540,7 +540,7 @@
                  LOG_PATH=$LOG_PATH/regress-privs1-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-compGeneral-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -548,7 +548,7 @@
                  LOG_PATH=$LOG_PATH/regress-compGeneral-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-privs2-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -556,7 +556,7 @@
                  LOG_PATH=$LOG_PATH/regress-privs2-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-executor-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -564,7 +564,7 @@
                  LOG_PATH=$LOG_PATH/regress-executor-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-fullstack2-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -572,7 +572,7 @@
                  LOG_PATH=$LOG_PATH/regress-fullstack2-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "core-regress-hive-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -580,7 +580,7 @@
                  LOG_PATH=$LOG_PATH/regress-hive-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "phoenix_part1_T4-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -589,7 +589,7 @@
                  BRANCH={branch}
                  HDIST="CDH$DISTCDH"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "phoenix_part2_T4-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -598,7 +598,7 @@
                  BRANCH={branch}
                  HDIST="CDH$DISTCDH"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "phoenix_part1_T2-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -607,7 +607,7 @@
                  BRANCH={branch}
                  HDIST="CDH$DISTCDH"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "phoenix_part2_T2-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -616,7 +616,7 @@
                  BRANCH={branch}
                  HDIST="CDH$DISTCDH"
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
             - name: "jdbc_test-cdh"
               current-parameters: true
               kill-phase-on: NEVER
@@ -624,7 +624,7 @@
                  LOG_PATH=$LOG_PATH/jdbc_test-cdh
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
-              node-label: "redhat_cm$DISTCDH"
+              node-label: "rh6_cm$DISTCDH"
 
     publishers:
       - console-log
