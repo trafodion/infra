@@ -103,14 +103,24 @@ node /^build7$/ {
 #    certname  => "slave-cm53",
 #  }
 #}
-node /^slave7?-cm54$/ {
+node /^slave-cm54$/ {
   include traf
   class { 'traf::slave':
     ssh_key   => $traf::jenkins_ssh_key,
     logs_host => hiera('static_host_key'),
     sysadmins => hiera('sysadmins'),
     distro    => 'CM5.4',
-    #certname  => "slave-cm54",
+    certname  => "slave-cm54",
+  }
+}
+# RH7 requires at least CDH5.5
+node /^slave7-cm55$/ {
+  include traf
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'CM5.5',
   }
 }
 

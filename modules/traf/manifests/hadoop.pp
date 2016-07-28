@@ -24,6 +24,7 @@ class traf::hadoop (
       'CM5.3':  { $slavename = 'slave-cm53' }
       'AHW2.3': { $slavename = 'slave-ahw23' }
       'CM5.4':  { $slavename = 'slave-cm54' }
+      'CM5.5':  { $slavename = 'slave-cm55' }
       'VH1.0':  { $slavename = 'slave-va10' }
       default:  { $slavename = 'slave' }
     }
@@ -75,6 +76,7 @@ class traf::hadoop (
     'CM5.1':  { $distro_ver = '5.1.4' }
     'CM5.3':  { $distro_ver = '5.3.1' }
     'CM5.4':  { $distro_ver = '5.4.4' }
+    'CM5.5':  { $distro_ver = '5.5.4' }
     'VH1.0':  { $distro_ver = '1.0.2' }
     default:  { $distro_ver = 'None' } #cluster script will error out on this
   }
@@ -162,6 +164,13 @@ class traf::hadoop (
     }
   }
   if $distro == 'CM5.4' {
+    class {'traf::hive_metastore':
+      hive_sql_pw     => 'insecure_hive',
+      hive_schema_ver => '1.1.0',
+      require         => Class['::cloudera'],
+    }
+  }
+  if $distro == 'CM5.5' {
     class {'traf::hive_metastore':
       hive_sql_pw     => 'insecure_hive',
       hive_schema_ver => '1.1.0',
