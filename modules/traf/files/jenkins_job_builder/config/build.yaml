@@ -68,14 +68,9 @@
            branch: "{branch}"
       - pkg-traf:
            flavor: "{flavor}"
-      - check-build:
-           dir: "trafodion/core"
-      - check-build:
-           dir: "trafodion/dcs"
       - pkg-install
-#      no .gitignore in install
-#      - check-build:
-#           dir: "trafodion/install"
+      - check-build:
+           dir: "trafodion"
       - stage-traf:
            flavor: "{flavor}"
            btype: "$BUILD_TYPE"
