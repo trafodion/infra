@@ -121,6 +121,7 @@ node /^slave7-cm55$/ {
     logs_host => hiera('static_host_key'),
     sysadmins => hiera('sysadmins'),
     distro    => 'CM5.5',
+    certname  => $name,
   }
 }
 
