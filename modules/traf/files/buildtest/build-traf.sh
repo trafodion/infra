@@ -38,7 +38,7 @@ source_env -v build $FLAVOR
 
 cd trafodion
 
-make package-src > Make-Source.log 2>&1
+make package-src > $WORKSPACE/Make-Source.log 2>&1
 
 cd core
 
