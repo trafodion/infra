@@ -247,6 +247,7 @@ ipaddr=$(hostname -i)
 HostID=$(curl $Read $URL/hosts | jq -r '.items[].hostId')
 if [[ $HostID == "null" ]]
 then
+  echo "Adding host: $host $ipaddr"
   HostID=$(curl $Create -d '{"items":[{"hostname":"'${host}'","ipAddress":"'${ipaddr}'"}]}' $URL/hosts | 
               jq -r '.items[].hostId')
 fi
@@ -254,6 +255,7 @@ fi
 ClHost=$(curl $Read $URL/clusters/trafcluster/hosts | jq -r '.items[].hostId')
 if [[ $ClHost == "null" ]]
 then
+  echo "Adding host to cluster: $HostID"
   curl $Create -d'{"items":[{"hostId":"'${HostID}'"}]}' $URL/clusters/trafcluster/hosts
 fi
 
