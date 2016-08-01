@@ -112,12 +112,22 @@ fi
 # Function - restart cldra mgr and deploy config
 function cm_restart_mgr {
   echo "Trying to start cloudera manager"
-  set -x
-  /sbin/service cloudera-scm-agent stop
-  /sbin/service cloudera-scm-server stop
-  /sbin/service cloudera-scm-server start
-  /sbin/service cloudera-scm-agent start
-  set +x
+  if [[ -x /usr/bin/systemctl ]]
+  then
+    set -x
+    /usr/bin/systemctl stop cloudera-scm-agent
+    /usr/bin/systemctl stop cloudera-scm-server
+    /usr/bin/systemctl start cloudera-scm-server
+    /usr/bin/systemctl start cloudera-scm-agent
+    set +x
+  else
+    set -x
+    /sbin/service cloudera-scm-agent stop
+    /sbin/service cloudera-scm-server stop
+    /sbin/service cloudera-scm-server start
+    /sbin/service cloudera-scm-agent start
+    set +x
+  fi
   echo "Waiting for cloudera manager to respond"
   i=0
   CM="DOWN"
@@ -231,6 +241,21 @@ cm_config_serv "trafhbase" "zookeeper_service" "zookeeper"
 
 # Create Service Roles -- all on local host
 host=$(hostname -f)
+ipaddr=$(hostname -i)
+
+# create host
+HostID=$(curl $Read $URL/hosts | jq -r '.items[].hostId')
+if [[ $HostID == "null" ]]
+then
+  HostID=$(curl $Create -d '{"items":[{"hostname":"'${host}'","ipAddress":"'${ipaddr}'"}]}' $URL/hosts | 
+              jq -r '.items[].hostId')
+fi
+# add host to cluster
+ClHost=$(curl $Read $URL/clusters/trafcluster/hosts | jq -r '.items[].hostId')
+if [[ $ClHost == "null" ]]
+then
+  curl $Create -d'{"items":[{"hostId":"'${HostID}'"}]}' $URL/clusters/trafcluster/hosts
+fi
 
 # HDFS
 Role="$(curl $Read $URL/clusters/trafcluster/services/hdfs/roles/trafSEC | jq -r '.name')"
@@ -242,7 +267,7 @@ then
 		  { "items" : [ {
 		      "name" : "trafDATA",
 		      "type" : "DATANODE",
-		      "hostRef" : { "hostId" : "'$host'" },
+		      "hostRef" : { "hostId" : "'$HostID'" },
 		      "config" : { "items" : [ {
 		                      "name" : "dfs_data_dir_list",
 				      "value" : "/data/dfs/data"
@@ -250,7 +275,7 @@ then
 		    }, {
 		      "name" : "trafNAME",
 		      "type" : "NAMENODE",
-		      "hostRef" : { "hostId" : "'$host'" },
+		      "hostRef" : { "hostId" : "'$HostID'" },
 		      "config" : { "items" : [ {
 		                      "name" : "dfs_name_dir_list",
 				      "value" : "/data/dfs/name"
@@ -258,7 +283,7 @@ then
 		    }, {
 		      "name" : "trafSEC",
 		      "type" : "SECONDARYNAMENODE",
-		      "hostRef" : { "hostId" : "'$host'" },
+		      "hostRef" : { "hostId" : "'$HostID'" },
 		      "config" : { "items" : [ {
 		                      "name" : "fs_checkpoint_dir_list",
 				      "value" : "/data/dfs/secname"
@@ -283,7 +308,7 @@ then
 		  { "items" : [ {
 		      "name" : "trafSERV",
 		      "type" : "SERVER",
-		      "hostRef" : { "hostId" : "'$host'" }
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    } ] }
 		  ' $URL/clusters/trafcluster/services/zookeeper/roles | jq -r '.items[].name'
        )
@@ -304,7 +329,7 @@ then
 		  { "items" : [ {
 		      "name" : "trafJOB",
 		      "type" : "JOBTRACKER",
-		      "hostRef" : { "hostId" : "'$host'" },
+		      "hostRef" : { "hostId" : "'$HostID'" },
 		      "config" : { "items" : [ {
 		                      "name" : "jobtracker_mapred_local_dir_list",
 				      "value" : "/data/mr/jobs"
@@ -312,7 +337,7 @@ then
 		    }, {
 		      "name" : "trafTASK",
 		      "type" : "TASKTRACKER",
-		      "hostRef" : { "hostId" : "'$host'" },
+		      "hostRef" : { "hostId" : "'$HostID'" },
 		      "config" : { "items" : [ {
 		                      "name" : "tasktracker_mapred_local_dir_list",
 				      "value" : "/data/mr/tasks"
@@ -337,7 +362,7 @@ then
 		  { "items" : [ {
 		      "name" : "trafMETA",
 		      "type" : "HIVEMETASTORE",
-		      "hostRef" : { "hostId" : "'$host'" }
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    } ] }
 		  ' $URL/clusters/trafcluster/services/trafHIVE/roles | jq -r '.items[].name'
        )
@@ -357,7 +382,7 @@ then
 		  { "items" : [ {
 		      "name" : "trafHSRV",
 		      "type" : "HIVESERVER2",
-		      "hostRef" : { "hostId" : "'$host'" }
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    } ] }
 		  ' $URL/clusters/trafcluster/services/trafHIVE/roles | jq -r '.items[].name'
        )
@@ -378,11 +403,11 @@ then
 		  { "items" : [ {
 		      "name" : "trafMAS",
 		      "type" : "MASTER",
-		      "hostRef" : { "hostId" : "'$host'" }
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    }, {
 		      "name" : "trafREG",
 		      "type" : "REGIONSERVER",
-		      "hostRef" : { "hostId" : "'$host'" }
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    } ] }
 		  ' $URL/clusters/trafcluster/services/trafhbase/roles | jq -r '.items[].name'
        )
