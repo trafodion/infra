@@ -241,11 +241,17 @@ cm_config_serv "trafhbase" "zookeeper_service" "zookeeper"
 
 # Create Service Roles -- all on local host
 host=$(hostname -f)
-ipaddr=$(hostname -i)
+if [[ -x /usr/bin/facter ]]
+then
+  ipaddr=$(facter ipaddress)
+else
+  ipaddr=$(hostname -I)
+  ipaddr=${ipaddr%% *}
+fi
 
 # create host
 HostID=$(curl $Read $URL/hosts | jq -r '.items[].hostId')
-if [[ $HostID == "null" ]]
+if [[ -z $HostID ]]
 then
   echo "Adding host: $host $ipaddr"
   HostID=$(curl $Create -d '{"items":[{"hostname":"'${host}'","ipAddress":"'${ipaddr}'"}]}' $URL/hosts | 
@@ -253,7 +259,7 @@ then
 fi
 # add host to cluster
 ClHost=$(curl $Read $URL/clusters/trafcluster/hosts | jq -r '.items[].hostId')
-if [[ $ClHost == "null" ]]
+if [[ -z $ClHost ]]
 then
   echo "Adding host to cluster: $HostID"
   curl $Create -d'{"items":[{"hostId":"'${HostID}'"}]}' $URL/clusters/trafcluster/hosts
