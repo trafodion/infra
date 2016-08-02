@@ -280,15 +280,15 @@ then
 		  { "items" : [ {
 		      "name" : "trafDATA",
 		      "type" : "DATANODE",
-		      "hostRef" : { "hostId" : "'$HostID'" },
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    }, {
 		      "name" : "trafNAME",
 		      "type" : "NAMENODE",
-		      "hostRef" : { "hostId" : "'$HostID'" },
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    }, {
 		      "name" : "trafSEC",
 		      "type" : "SECONDARYNAMENODE",
-		      "hostRef" : { "hostId" : "'$HostID'" },
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    } ] }
 		  ' $URL/clusters/trafcluster/services/hdfs/roles | jq -r '.items[].name'
        )
@@ -330,11 +330,11 @@ then
 		  { "items" : [ {
 		      "name" : "trafJOB",
 		      "type" : "JOBTRACKER",
-		      "hostRef" : { "hostId" : "'$HostID'" },
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    }, {
 		      "name" : "trafTASK",
 		      "type" : "TASKTRACKER",
-		      "hostRef" : { "hostId" : "'$HostID'" },
+		      "hostRef" : { "hostId" : "'$HostID'" }
 		    } ] }
 		  ' $URL/clusters/trafcluster/services/trafMAPRED/roles | jq -r '.items[].name'
        )
