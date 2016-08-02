@@ -226,6 +226,9 @@ done
 
 # HDFS config for single node
 cm_config_serv "hdfs" "dfs_replication" "1"
+cm_config_serv "hdfs/roleConfigGroups/hdfs-DATANODE-BASE" "dfs_data_dir_list" "/data/dfs/data"
+cm_config_serv "hdfs/roleConfigGroups/hdfs-NAMENODE-BASE" "dfs_name_dir_list" "/data/dfs/name"
+cm_config_serv "hdfs/roleConfigGroups/hdfs-SECONDARYNAMENODE-BASE" "fs_checkpoint_dir_list" "/data/dfs/secname"
 
 # Hive config
 cm_config_serv "trafHIVE" "mapreduce_yarn_service" "trafMAPRED"
@@ -234,6 +237,8 @@ cm_config_serv "trafHIVE" "hive_metastore_database_password" "insecure_hive"
 
 # MapReduce config
 cm_config_serv "trafMAPRED" "hdfs_service" "hdfs"
+cm_config_serv "trafMAPRED/roleConfigGroups/trafMAPRED-JOBTRACKER-BASE" "jobtracker_mapred_local_dir_list" "/data/mr/jobs"
+cm_config_serv "trafMAPRED/roleConfigGroups/trafMAPRED-TASKTRACKER-BASE" "tasktracker_mapred_local_dir_list" "/data/mr/tasks"
 
 # HBase config
 cm_config_serv "trafhbase" "hdfs_service" "hdfs"
@@ -276,26 +281,14 @@ then
 		      "name" : "trafDATA",
 		      "type" : "DATANODE",
 		      "hostRef" : { "hostId" : "'$HostID'" },
-		      "config" : { "items" : [ {
-		                      "name" : "dfs_data_dir_list",
-				      "value" : "/data/dfs/data"
-		                 } ] }
 		    }, {
 		      "name" : "trafNAME",
 		      "type" : "NAMENODE",
 		      "hostRef" : { "hostId" : "'$HostID'" },
-		      "config" : { "items" : [ {
-		                      "name" : "dfs_name_dir_list",
-				      "value" : "/data/dfs/name"
-		                 } ] }
 		    }, {
 		      "name" : "trafSEC",
 		      "type" : "SECONDARYNAMENODE",
 		      "hostRef" : { "hostId" : "'$HostID'" },
-		      "config" : { "items" : [ {
-		                      "name" : "fs_checkpoint_dir_list",
-				      "value" : "/data/dfs/secname"
-		                 } ] }
 		    } ] }
 		  ' $URL/clusters/trafcluster/services/hdfs/roles | jq -r '.items[].name'
        )
@@ -338,18 +331,10 @@ then
 		      "name" : "trafJOB",
 		      "type" : "JOBTRACKER",
 		      "hostRef" : { "hostId" : "'$HostID'" },
-		      "config" : { "items" : [ {
-		                      "name" : "jobtracker_mapred_local_dir_list",
-				      "value" : "/data/mr/jobs"
-		                 } ] }
 		    }, {
 		      "name" : "trafTASK",
 		      "type" : "TASKTRACKER",
 		      "hostRef" : { "hostId" : "'$HostID'" },
-		      "config" : { "items" : [ {
-		                      "name" : "tasktracker_mapred_local_dir_list",
-				      "value" : "/data/mr/tasks"
-		                 } ] }
 		    } ] }
 		  ' $URL/clusters/trafcluster/services/trafMAPRED/roles | jq -r '.items[].name'
        )
