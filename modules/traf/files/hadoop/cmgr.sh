@@ -154,10 +154,10 @@ function cm_restart_mgr {
 
 
 # Check that CM agent config has right hostname
-grep -q "^listening_hostname=$(hostname)\$" /etc/cloudera-scm-agent/config.ini
+grep -q "^listening_hostname=$(hostname -f)\$" /etc/cloudera-scm-agent/config.ini
 if [[ $? != 0 ]]
 then
-  sed -i "s/^listening_hostname=.*$/listening_hostname=$(hostname)/" /etc/cloudera-scm-agent/config.ini
+  sed -i "s/^listening_hostname=.*$/listening_hostname=$(hostname -f)/" /etc/cloudera-scm-agent/config.ini
   cm_restart_mgr
 fi
 
