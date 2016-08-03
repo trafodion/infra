@@ -153,6 +153,14 @@ function cm_restart_mgr {
 }
 
 
+# Check that CM agent config has right hostname
+grep -q "^listening_hostname=$(hostname)\$" /etc/cloudera-scm-agent/config.ini
+if [[ $? != 0 ]]
+then
+  sed -i "s/^listening_hostname=.*$/listening_hostname=$(hostname)/" /etc/cloudera-scm-agent/config.ini
+  cm_restart_mgr
+fi
+
 # Check that we can talk to CM
 curl $Read $URL/tools/echoError?message="hello" | grep -q hello
 if [[ $? != 0 ]]
@@ -243,6 +251,9 @@ cm_config_serv "trafMAPRED/roleConfigGroups/trafMAPRED-TASKTRACKER-BASE" "tasktr
 # HBase config
 cm_config_serv "trafhbase" "hdfs_service" "hdfs"
 cm_config_serv "trafhbase" "zookeeper_service" "zookeeper"
+
+# Zookeeper config
+cm_config_serv "zookeeper" "zookeeper_datadir_autocreate" "false"
 
 # Create Service Roles -- all on local host
 host=$(hostname -f)
