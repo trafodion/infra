@@ -115,6 +115,13 @@
           default: master
           description: "Target Branch of the Pull Request"
       - choice:
+          name: OS
+          choices:
+            - rh6
+            - rh7
+          default: rh6
+          description: "Operating System Version"
+      - choice:
           name: DISTRO
           choices:
             - cm5.4
@@ -170,7 +177,7 @@
                 SUITES=${sql_tests}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "core-regress-cdh"
               enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'cm5.4'"
               current-parameters: true
@@ -180,7 +187,7 @@
                 SUITES=${sql_tests}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "core-regress-apc"
               enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'va1.0'"
               current-parameters: true
@@ -190,7 +197,7 @@
                 SUITES=${sql_tests}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "pyodbc_test-hdp"
               enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'ahw2.3'"
               current-parameters: true
@@ -199,7 +206,7 @@
                 LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "pyodbc_test-cdh"
               enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'cm5.4'"
               current-parameters: true
@@ -208,7 +215,7 @@
                 LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "pyodbc_test-apc"
               enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'va1.0'"
               current-parameters: true
@@ -217,7 +224,7 @@
                 LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "jdbc_test-hdp"
               enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'ahw2.3'"
               current-parameters: true
@@ -226,7 +233,7 @@
                 LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "jdbc_test-cdh"
               enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'cm5.4'"
               current-parameters: true
@@ -235,7 +242,7 @@
                 LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "jdbc_test-apc"
               enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'va1.0'"
               current-parameters: true
@@ -244,7 +251,7 @@
                 LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T4-hdp"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'ahw2.3'"
               current-parameters: true
@@ -254,7 +261,7 @@
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T2-hdp"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'ahw2.3'"
               current-parameters: true
@@ -264,7 +271,7 @@
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T4-cdh"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'cm5.4'"
               current-parameters: true
@@ -274,7 +281,7 @@
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T2-cdh"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'cm5.4'"
               current-parameters: true
@@ -284,7 +291,7 @@
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T4-apc"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'va1.0'"
               current-parameters: true
@@ -294,7 +301,7 @@
                 BRANCH=$BRANCH
                 HDIST=cm5.4
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T2-apc"
               enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'va1.0'"
               current-parameters: true
@@ -304,7 +311,7 @@
                 BRANCH=$BRANCH
                 HDIST=cm5.4
               node-label-name: "NODE_TYPE"
-              node-label: "rh6_$DISTRO"
+              node-label: "${OS}_$DISTRO"
 
     publishers:
       - console-log
