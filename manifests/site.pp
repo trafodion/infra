@@ -146,6 +146,16 @@ node /^slave-ahw23$/ {
     certname  => "slave-ahw23",
   }
 }
+node /^slave7-ahw23$/ {
+  include traf
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'AHW2.3',
+    certname  => "slave7-ahw23",
+  }
+}
 node /^slave-va10$/ {
   include traf
   class { 'traf::slave':
