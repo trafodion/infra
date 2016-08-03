@@ -125,6 +125,7 @@
           name: DISTRO
           choices:
             - cm5.4
+            - cm5.5
             - ahw2.3
             - va1.0
           description: "Distro: AmbariHortonWorks or ClouderaManager"
@@ -169,7 +170,7 @@
           name: tests
           projects:
             - name: "core-regress-hdp"
-              enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'ahw2.3'"
+              enable-condition: "'${sql}' == 'true' && '${DISTRO}' =~ /ahw/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -179,7 +180,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "core-regress-cdh"
-              enable-condition: "'${sql}' == 'true' && '${DISTRO}' == 'cm5.4'"
+              enable-condition: "'${sql}' == 'true' && '${DISTRO}' =~ /cm/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -199,7 +200,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "pyodbc_test-hdp"
-              enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'ahw2.3'"
+              enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' =~ /ahw/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -208,7 +209,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "pyodbc_test-cdh"
-              enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' == 'cm5.4'"
+              enable-condition: "'${pyodbc}' == 'true' && '${DISTRO}' =~ /cm/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -226,7 +227,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "jdbc_test-hdp"
-              enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'ahw2.3'"
+              enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' =~ /ahw/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -235,7 +236,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "jdbc_test-cdh"
-              enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' == 'cm5.4'"
+              enable-condition: "'${jdbc}' == 'true' && '${DISTRO}' =~ /cm/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -253,7 +254,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T4-hdp"
-              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'ahw2.3'"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' =~ /ahw/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -263,7 +264,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T2-hdp"
-              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'ahw2.3'"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' =~ /ahw/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -273,7 +274,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T4-cdh"
-              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' == 'cm5.4'"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T4' && '${DISTRO}' =~ /cm/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -283,7 +284,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
             - name: "phoenix_test_T2-cdh"
-              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' == 'cm5.4'"
+              enable-condition: "'${phoenix}' == 'true' && '${Phx_Driver}' == 'T2' && '${DISTRO}' =~ /cm/"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
