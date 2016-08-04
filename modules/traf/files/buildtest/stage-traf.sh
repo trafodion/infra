@@ -26,6 +26,8 @@ Flavor="$1"
 BLD_PURPOSE="$2"
 # target branch
 Branch="$3"
+# target OS
+OSver="$4"
 
 
 if [[ -z $BLD_PURPOSE ]]
@@ -87,7 +89,7 @@ rm -f $workspace/Versions*
 mkdir -p "./$DestDir" || exit 2
 
 # Check if we have already staged a build for this version of code
-if ! /usr/local/bin/build-version-check.sh "$Branch" "$Flavor" "$BLD_PURPOSE"
+if ! /usr/local/bin/build-version-check.sh "$Branch" "${OSver}-$Flavor" "$BLD_PURPOSE"
 then
   # Declare success, but don't leave any files to be published
   echo "This build has been previously staged. Exiting."
@@ -177,6 +179,6 @@ done
 
 # Declare success - make this the latest good build 
 # Versions* file will be uploaded by scp rules in jenkins job
-mv $workspace/Code_Versions $workspace/Versions-${Branch}-${BLD_PURPOSE}-${Flavor}.txt
+mv $workspace/Code_Versions $workspace/Versions-${Branch}-${BLD_PURPOSE}-${OSver}-${Flavor}.txt
 
 exit 0

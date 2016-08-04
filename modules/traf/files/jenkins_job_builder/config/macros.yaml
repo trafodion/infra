@@ -108,7 +108,7 @@
 - builder:
     name: stage-traf
     builders:
-      - shell: "/usr/local/bin/stage-traf.sh {flavor} {btype} {branch}"
+      - shell: "/usr/local/bin/stage-traf.sh {flavor} {btype} {branch} {os}"
 
 - builder:
     name: sql-regress

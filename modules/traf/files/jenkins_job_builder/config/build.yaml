@@ -75,6 +75,7 @@
            flavor: "{flavor}"
            btype: "$BUILD_TYPE"
            branch: "{branch}"
+           os: "{osver}"
 
     publishers:
       - traf-release-tar
@@ -149,6 +150,7 @@
            flavor: "{flavor}"
            btype: "$BUILD_TYPE"
            branch: "$BRANCH"
+           os: "{osver}"
 
     publishers:
       - traf-release-tar

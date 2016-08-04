@@ -15,14 +15,15 @@
           description: "Comma separated destination for results (default: https://jenkins.esgyn.com/me/configure)"
       - string:
           name: TAG
-          description: "Git tag to build against"
-      - choice:
-          name: OS
-          choices:
-            - rh6
-            - rh7
-          default: rh6
-          description: "OS Version, Red-Hat6 or 7"
+          description: "Git tag to build against, blank to build against HEAD of branch"
+      - bool:
+          name: rh6
+          default: true
+          description: Build on RH6
+      - bool:
+          name: rh7
+          default: true
+          description: Build on RH7
       - choice:
           name: BRANCH
           choices:
@@ -57,11 +58,20 @@
       - multijob:
           name: build
           projects:
-            - name: "build-$OS-label-release"
+            - name: "build-rh6-label-release"
+              enable-condition: "'${rh6}' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/build-$OS-label
+                 LOG_PATH=$LOG_PATH/build-rh6-label
+                 BUILD_TYPE=$TAGTYPE
+                 TAG=$TAG
+            - name: "build-rh7-label-release"
+              enable-condition: "'${rh7}' == 'true'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/build-rh7-label
                  BUILD_TYPE=$TAGTYPE
                  TAG=$TAG
 
