@@ -67,6 +67,7 @@
             - nitin-amp
             - zcorrea
             - blfritch-esgyn
+            - AlexPeng19
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
