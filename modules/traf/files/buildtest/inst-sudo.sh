@@ -41,6 +41,8 @@ dcsball="$6"
 dcscnt="$7"
 # optional sql regression tarball
 regball="$8"
+# java ver
+TRAFJAVA="$9"
 
 source "/usr/local/bin/traf-functions.sh"
 log_banner "Trafodion $action"
@@ -145,7 +147,7 @@ then
   fi
   # no SUSE yet
   echo "SUSE_LINUX=false" >> ./Install_Config
-  echo "JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk.x86_64" >> ./Install_Config
+  echo "JAVA_HOME=$TRAFJAVA" >> ./Install_Config
   # DCS/Cloud
   echo "CLOUD_CONFIG=Y" >> ./Install_Config
   echo "CLOUD_TYPE=1" >> ./Install_Config

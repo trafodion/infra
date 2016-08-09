@@ -150,6 +150,29 @@ do
   fi
 done
 
+# JDK path different on RH6/7
+if [[ "$(lsb_release -rs | cut -d. -f1)" == "6" ]]
+then
+  JDKPKG="openjdk.x86_64"
+else
+  JDKPKG="openjdk"
+fi
+
+# default java home
+JH="/usr/lib/jvm/java-1.7.0-$JDKPKG"
+
+features=$WORKSPACE/trafodion/core/sqf/conf/install_features
+if [[ -r $features ]]
+then
+  echo "Source $features"
+  source $features
+  if [[ $JAVA_8_SUPPORT == "Y" ]]
+  then
+    JH="/usr/lib/jvm/java-1.8.0-$JDKPKG"
+  fi
+fi
+echo "Java for Trafodion install: $JH"
+
 echo "Saving output in Install_Start.log"
 set -x
 
@@ -162,7 +185,7 @@ sudo -n -u tinstall /usr/local/bin/inst-sudo.sh $LDAP install "$WORKSPACE" \
        "$trafball" \
        "$restball" \
        "$dcsball" "$DCSSERV" \
-       "$regball" 2>&1 | tee Install_Start.log | \
+       "$regball" "$JH" 2>&1 | tee Install_Start.log | \
           grep --line-buffered -e '\*\*\*'
 ret=${PIPESTATUS[0]}
 
