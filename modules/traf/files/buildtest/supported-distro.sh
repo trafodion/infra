@@ -26,6 +26,9 @@ fi
 
 DIR="$1"
 
+# optional OS
+OS="$2"
+
 features="$DIR/core/sqf/conf/install_features"
 
 rm -rf distro.properties
@@ -42,9 +45,12 @@ if [[ $CDH_5_3_HDP_2_2_SUPPORT == "Y" ]]
 then
   echo "DISTCDH = 5.3" > distro.properties
   echo "DISTHDP = 2.2" >> distro.properties
-elif [[ $CDH_5_4_SUPPORT == "Y" ]]
+elif [[ $CDH_5_4_SUPPORT == "Y" && $OS != "rh7" ]]
 then
   echo "DISTCDH = 5.4" >> distro.properties
+elif [[ $CDH_5_5_SUPPORT == "Y" ]]
+then
+  echo "DISTCDH = 5.5" >> distro.properties
 fi
 if [[ $HDP_2_3_SUPPORT == "Y" ]]
 then
