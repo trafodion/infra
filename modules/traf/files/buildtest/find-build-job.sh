@@ -49,6 +49,31 @@ BLD_PROJ_NAME="$1"
 # jenkins server data cmd - jenkins provides JENKINS_URL
 API="curl -s $JENKINS_URL/job/$BLD_PROJ_NAME"
 
+# compare build timestamp to my job
+# need build that is within previous 24 hours
+job=$BUILD_TIMESTAMP
+jdate=${job%_*}
+jtime=${job#*_}
+jhour=${jtime%-*}
+jmin=${jtime#*-}
+jsec=$(date +%s -d "$jdate ${jhour}:${jmin}")
+function bld_cmp {
+  bld="$1"
+
+  bdate=${bld%_*}
+  btime=${bld#*_}
+  bhour=${btime%-*}
+  bmin=${btime#*-}
+  bsec=$(date +%s -d "$bdate ${bhour}:${bmin}")
+
+  if (( $jsec >= $bsec && $jsec - $bsec < 86400 ))
+  then
+    return 0
+  else
+    return 1
+  fi
+}
+
 # Loop a couple times, in case server is not responding
 retry=0
 while (( $retry < 20 ))
@@ -105,7 +130,7 @@ do
       if [[ $bld_type == "daily" ]]
       then
         bld_date=$($API/$Bld/injectedEnvVars/api/json | jq -r '.envMap.BUILD_TIMESTAMP' 2>/dev/null)
-        if [[ ${bld_date%_*} == ${BUILD_TIMESTAMP%_*} ]]
+        if bld_cmp "$bld_date"
         then
           MyBuild=$Bld
           if [[ "$ROOT_BUILD_CAUSE" == "TIMERTRIGGER" ]]
