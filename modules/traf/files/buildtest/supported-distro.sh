@@ -67,4 +67,19 @@ then
   exit 1
 fi
 
+# default yes
+if [[ $REDHAT_6_SUPPORT == "N" ]]
+then
+  echo "OS_RH6 = false" >> distro.properties
+else
+  echo "OS_RH6 = true" >> distro.properties
+fi
+# default no
+if [[ $REDHAT_7_SUPPORT == "Y" ]]
+then
+  echo "OS_RH7 = true" >> distro.properties
+else
+  echo "OS_RH7 = false" >> distro.properties
+fi
+
 exit 0
