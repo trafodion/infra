@@ -111,6 +111,17 @@ class traf::buildtest (
       unless  => '/sbin/sysctl -n kernel.core_pattern | grep -q core.%h.%p.%e',
       require => Package['abrt'],
     }
+    # link perms for saving workspaces
+    if $::operatingsystemmajrelease == '7' {
+      sysctl { "fs.protected_hardlinks":
+        ensure => present,
+        value  => "0",
+      }
+      sysctl { "fs.protected_symlinks":
+        ensure => present,
+        value  => "0",
+      }
+    }
 
     # This top level dir holds both tar'd up build tool binaries and the untar'd tools.
     # Jenkins write rsync output to this dir.
