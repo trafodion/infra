@@ -227,6 +227,10 @@
             - WEISHIUN 
             - mkby 
             - nitin-amp
+            - zcorrea
+            - blfritch-esgyn
+            - AlexPeng19
+            - lanbb
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
