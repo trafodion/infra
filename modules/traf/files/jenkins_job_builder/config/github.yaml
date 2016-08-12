@@ -31,7 +31,7 @@
           skip-tag: true
           refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
           branches: 
-            - 'origin/pr/$ghprbPullId/head'
+            - '$sha1'
           changelog-against:
             remote: origin
             branch: '$ghprbTargetBranch'
@@ -192,7 +192,7 @@
           skip-tag: true
           refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
           branches: 
-            - 'origin/pr/$ghprbPullId/head'
+            - '$sha1'
 #          changelog-against:
 #            remote: origin
 #            branch: '$ghprbTargetBranch'
