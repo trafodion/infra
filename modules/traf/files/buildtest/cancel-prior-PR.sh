@@ -75,7 +75,7 @@ do
 
   # Search from newest
   Bld=$Latest
-  while (( $Bld > $Earliest ))
+  while (( $Bld >= $Earliest ))
   do
     # make sure we don't cancel ourself
     if (( $Bld == $BUILD_NUMBER ))
