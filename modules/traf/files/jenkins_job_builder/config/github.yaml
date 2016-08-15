@@ -105,18 +105,32 @@
           name: build
           projects:
             - name: "build-rh6-{branch}-debug"
-              enable-condition: "'$BUCKET_NONDOC' == 'true'"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH6' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/build-rh6-{branch}-debug
                  BUILD_TYPE=check
             - name: "build-rh6-{branch}-release"
-              enable-condition: "'$BUCKET_NONDOC' == 'true'"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH6' == 'true'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
                  LOG_PATH=$LOG_PATH/build-rh6-{branch}-release
+                 BUILD_TYPE=check
+            - name: "build-rh7-{branch}-debug"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'true'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/build-rh7-{branch}-debug
+                 BUILD_TYPE=check
+            - name: "build-rh7-{branch}-release"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'true'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/build-rh7-{branch}-release
                  BUILD_TYPE=check
       - multijob:
           name: test
@@ -141,7 +155,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "rh6_ahw$DISTHDP"
             - name: "jdbc_test-cdh"
-              enable-condition: "'$BUCKET_NONDOC' == 'true'"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'false'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -149,6 +163,15 @@
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "rh6_cm$DISTCDH"
+            - name: "jdbc_test-cdh"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'true'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/jdbc_test-cdh
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "rh7_cm$DIST7CDH"
             - name: "core-regress-seabase-hdp"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
@@ -159,7 +182,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-core-hdp"
-              enable-condition: "'$BUCKET_NONDOC' == 'true'"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'false'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -167,6 +190,15 @@
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "rh6_ahw$DISTHDP"
+            - name: "core-regress-core-hdp"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'true'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/regress-core-hdp
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "rh7_ahw$DIST7HDP"
 
     publishers:
       - console-log

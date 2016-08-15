@@ -41,7 +41,9 @@ fi
 
 source $features
 
-if [[ $CDH_5_3_HDP_2_2_SUPPORT == "Y" ]]
+# DIST for $OS, or if no $OS, then for RH6
+# DIST7 for RH7
+if [[ $CDH_5_3_HDP_2_2_SUPPORT == "Y" && $OS != "rh7" ]]
 then
   echo "DISTCDH = 5.3" > distro.properties
   echo "DISTHDP = 2.2" >> distro.properties
@@ -52,9 +54,14 @@ elif [[ $CDH_5_5_SUPPORT == "Y" ]]
 then
   echo "DISTCDH = 5.5" >> distro.properties
 fi
+if [[ $CDH_5_5_SUPPORT == "Y" ]]
+then
+  echo "DIST7CDH = 5.5" >> distro.properties
+fi
 if [[ $HDP_2_3_SUPPORT == "Y" ]]
 then
   echo "DISTHDP = 2.3" >> distro.properties
+  echo "DIST7HDP = 2.3" >> distro.properties
 fi
 if [[ $APACHE_1_0_X_SUPPORT == "Y" ]]
 then
