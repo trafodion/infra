@@ -50,13 +50,13 @@ then
 elif [[ $CDH_5_4_SUPPORT == "Y" && $OS != "rh7" ]]
 then
   echo "DISTCDH = 5.4" >> distro.properties
-elif [[ $CDH_5_5_SUPPORT == "Y" ]]
+elif [[ $CDH_5_7_SUPPORT == "Y" ]]
 then
-  echo "DISTCDH = 5.5" >> distro.properties
+  echo "DISTCDH = 5.7" >> distro.properties
 fi
-if [[ $CDH_5_5_SUPPORT == "Y" ]]
+if [[ $CDH_5_7_SUPPORT == "Y" ]]
 then
-  echo "DIST7CDH = 5.5" >> distro.properties
+  echo "DIST7CDH = 5.7" >> distro.properties
 fi
 if [[ $HDP_2_3_SUPPORT == "Y" ]]
 then

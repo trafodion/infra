@@ -136,6 +136,7 @@
           choices:
             - cm5.4
             - cm5.5
+            - cm5.7
             - ahw2.3
             - va1.0
           description: "Distro: AmbariHortonWorks or ClouderaManager"
