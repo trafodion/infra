@@ -124,6 +124,17 @@ node /^slave7-cm55$/ {
     certname  => "slave7-cm55",
   }
 }
+# RH7.2 requires at least CDH5.7
+node /^slave7-cm57$/ {
+  include traf
+  class { 'traf::slave':
+    ssh_key   => $traf::jenkins_ssh_key,
+    logs_host => hiera('static_host_key'),
+    sysadmins => hiera('sysadmins'),
+    distro    => 'CM5.7',
+    certname  => "slave7-cm57",
+  }
+}
 
 # Ambari HortonWorks
 #node /^slave-ahw22$/ {

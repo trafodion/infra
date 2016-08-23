@@ -25,6 +25,7 @@ class traf::hadoop (
       'AHW2.3': { $slavename = 'slave-ahw23' }
       'CM5.4':  { $slavename = 'slave-cm54' }
       'CM5.5':  { $slavename = 'slave-cm55' }
+      'CM5.7':  { $slavename = 'slave-cm57' }
       'VH1.0':  { $slavename = 'slave-va10' }
       default:  { $slavename = 'slave' }
     }
@@ -73,10 +74,16 @@ class traf::hadoop (
     'AHW2.1': { $distro_ver = 'HDP-2.1' }
     'AHW2.2': { $distro_ver = 'HDP-2.2' }
     'AHW2.3': { $distro_ver = 'HDP-2.3' }
-    'CM5.1':  { $distro_ver = '5.1.4' }
-    'CM5.3':  { $distro_ver = '5.3.1' }
-    'CM5.4':  { $distro_ver = '5.4.4' }
-    'CM5.5':  { $distro_ver = '5.5.4' }
+    'CM5.1':  { $distro_ver = '5.1.4' 
+                $hive_schema = '0.12.0' }
+    'CM5.3':  { $distro_ver = '5.3.1' 
+                $hive_schema = '0.13.0' }
+    'CM5.4':  { $distro_ver = '5.4.4' 
+                $hive_schema = '1.1.0' }
+    'CM5.5':  { $distro_ver = '5.5.4' 
+                $hive_schema = '1.1.0' }
+    'CM5.7':  { $distro_ver = '5.7.2' 
+                $hive_schema = '1.1.0' }
     'VH1.0':  { $distro_ver = '1.0.2' }
     default:  { $distro_ver = 'None' } #cluster script will error out on this
   }
@@ -107,6 +114,11 @@ class traf::hadoop (
       install_cmserver => true,
       use_parcels      => false,
       cdh_version      => $distro_ver,
+    }
+    class {'traf::hive_metastore':
+      hive_sql_pw     => 'insecure_hive',
+      hive_schema_ver => $hive_schema,
+      require         => Class['::cloudera'],
     }
   }
 
@@ -147,35 +159,6 @@ class traf::hadoop (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-  }
-
-  if $distro == 'CM5.1' {
-    class {'traf::hive_metastore':
-      hive_sql_pw     => 'insecure_hive',
-      hive_schema_ver => '0.12.0',
-      require         => Class['::cloudera'],
-    }
-  }
-  if $distro == 'CM5.3' {
-    class {'traf::hive_metastore':
-      hive_sql_pw     => 'insecure_hive',
-      hive_schema_ver => '0.13.0',
-      require         => Class['::cloudera'],
-    }
-  }
-  if $distro == 'CM5.4' {
-    class {'traf::hive_metastore':
-      hive_sql_pw     => 'insecure_hive',
-      hive_schema_ver => '1.1.0',
-      require         => Class['::cloudera'],
-    }
-  }
-  if $distro == 'CM5.5' {
-    class {'traf::hive_metastore':
-      hive_sql_pw     => 'insecure_hive',
-      hive_schema_ver => '1.1.0',
-      require         => Class['::cloudera'],
-    }
   }
 
 }
