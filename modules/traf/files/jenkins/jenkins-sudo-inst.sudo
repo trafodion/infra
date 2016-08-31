@@ -4,5 +4,6 @@ Defaults !requiretty , visiblepw
 jenkins ALL = (tinstall) NOPASSWD:/usr/local/bin/inst-sudo.sh
 jenkins ALL = NOPASSWD:/usr/local/bin/kill-rogue-instance.sh
 jenkins ALL = NOPASSWD:/usr/local/bin/wsclean-sudo.sh
+jenkins ALL = NOPASSWD:/usr/bin/puppet
 # for use by check-node script
 jenkins ALL = NOPASSWD:/usr/bin/du
