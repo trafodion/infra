@@ -71,6 +71,7 @@ class traf::buildtest (
       'zlib-devel', 'bzip2-devel', 'ncurses-devel', 'tk-devel', 'gdbm-devel', 'libpcap-devel',
       'cmake','npm',
       'lzo','lzop','lzo-devel',
+      'doxygen',
     ]
     if $::operatingsystemmajrelease == '7' {
       package { ['motif','libdb4-devel']:
