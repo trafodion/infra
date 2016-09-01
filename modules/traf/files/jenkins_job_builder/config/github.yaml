@@ -69,6 +69,7 @@
             - blfritch-esgyn
             - AlexPeng19
             - lanbb
+            - orrk
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
