@@ -136,15 +136,15 @@
       - multijob:
           name: test
           projects:
-            #- name: "pyodbc_test-cdh"
-            #  enable-condition: "'$BUCKET_NONDOC' == 'true'"
-            #  current-parameters: true
-            #  kill-phase-on: NEVER
-            #  predefined-parameters: |
-            #     LOG_PATH=$LOG_PATH/pyodbc_test-cdh
-            #     BRANCH={branch}
-            #  node-label-name: "NODE_TYPE"
-            #  node-label: "rh6_cm$DISTCDH"
+            - name: "pyodbc_test-cdh"
+              enable-condition: "'$BUCKET_NONDOC' == 'true'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/pyodbc_test-cdh
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "rh6_cm$DISTCDH"
             - name: "phoenix_quick_T4-hdp"
               enable-condition: "'$BUCKET_NONDOC' == 'true'"
               current-parameters: true
