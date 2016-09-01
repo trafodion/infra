@@ -109,6 +109,9 @@ fi
 
 cd $workspace
 
+# save record of git commit ID
+cp ./trafodion/build-version.txt ./$DestDir/
+
 # src
 srcpkg=$(ls ./trafodion/distribution/*-src.tar* 2>/dev/null)
 if [[ -n $srcpkg ]]
