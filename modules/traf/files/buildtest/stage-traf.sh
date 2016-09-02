@@ -64,11 +64,11 @@ fi
 # side-branch build?
 if [[ ${BLD_PURPOSE} =~ ^daily- ]]
 then
-  DestDir="publish/daily/$BLD"
+  DestDir="publish/daily/${BLD}-${Branch}-$Flavor"
 else
   if [[ ${BLD_PURPOSE} == daily ]]
   then
-    DestDir="publish/daily/$BLD"
+    DestDir="publish/daily/${BLD}-$Flavor"
   elif [[ ${BLD_PURPOSE} =~ ^release ]]
   then
     DestDir="publish/release/$BLD"
@@ -94,10 +94,9 @@ then
   # Declare success, but don't leave any files to be published
   echo "This build has been previously staged. Exiting."
   exit 0
-elif [[ "$Flavor" == "release" && ${BLD_PURPOSE} =~ ^daily ]]
+elif [[ ${BLD_PURPOSE} =~ ^daily ]]
 then
-  # Publish change-logs, but only for release flavor, daily* (including side-branches)
-  #   debug flavor should be identical
+  # Publish change-logs, but only for daily* (including side-branches)
   #   change logs for release builds would be too large 
   #    ("No, there is too much. Let me sum up.")
   cd $workspace

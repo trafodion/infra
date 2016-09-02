@@ -271,11 +271,12 @@
         echo '<div>' . PHP_EOL;
         echo '    <h2 class="subhead">Daily Build (For Development Testing Only)</h2>' . PHP_EOL;
         echo '    <ul>' . PHP_EOL;
+        echo '      <li><a href="downloads/trafodion/publish/daily/">Daily builds by date/time</a></li>' . PHP_EOL;
 #        $dailyArray = array_filter($cdnArray, "daily");
-        $dailyArray = find_all_files("downloads/trafodion/publish/daily");
-        natsort($dailyArray);
-        $dArray = array_reverse($dailyArray);
-        array_walk($dArray, 'print_links', 'daily');
+#        $dailyArray = find_all_files("downloads/trafodion/publish/daily");
+#        natsort($dailyArray);
+#        $dArray = array_reverse($dailyArray);
+#        array_walk($dArray, 'print_links', 'daily');
         echo '    </ul>' . PHP_EOL;
         echo '</div>' . PHP_EOL;
 
