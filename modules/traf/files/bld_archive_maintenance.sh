@@ -6,7 +6,7 @@
 sleep $((RANDOM%600)) && \
 find -O3 /srv/static/downloads/trafodion/publish/daily/ -depth \
     \( \
-         \( -type f -not *.txt -mtime +14 -execdir rm \{\} \; \) \
+         \( -type f -not -name *.txt -mtime +14 -execdir rm \{\} \; \) \
       -o \( -type d -not -name lost+found -empty -mtime +1 \
           -execdir rmdir {} \; \) \
     \)
