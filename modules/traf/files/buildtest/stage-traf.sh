@@ -94,11 +94,8 @@ then
   # Declare success, but don't leave any files to be published
   echo "This build has been previously staged. Exiting."
   exit 0
-elif [[ ${BLD_PURPOSE} =~ ^daily ]]
-then
-  # Publish change-logs, but only for daily* (including side-branches)
-  #   change logs for release builds would be too large 
-  #    ("No, there is too much. Let me sum up.")
+else
+  # Publish change-logs, if there is one (previous build to compare against)
   cd $workspace
   if [[ -s changes ]] # non-empty
   then
