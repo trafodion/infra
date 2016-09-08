@@ -3,7 +3,6 @@
     name: 'Check-PR'
     branch:
      - master
-     - release1.3
      - release2.0
 
     jobs:
