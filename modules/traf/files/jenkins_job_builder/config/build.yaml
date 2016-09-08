@@ -77,7 +77,6 @@
 
     publishers:
       - traf-release-tar
-      - traf-daily-s3
       - archive:
           artifacts: 'trafodion/install/install*.tar.gz'
           allow-empty: true
