@@ -31,6 +31,7 @@ class traf::dev (
     iptables_public_tcp_ports => ['5900:5999','45000:46000'], # VNC, DCS
     certname                  => $certname,
     sysadmins                 => $sysadmins,
+    ssh_hitcount              => '12',
   }
   class { 'jenkins::slave':
     bare         => $bare,
