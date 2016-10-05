@@ -71,6 +71,21 @@ class traf::base(
     provider => pip,
     require  => Class['pip'],
   }
+  package { 'gevent':
+    ensure   => '1.1.1',
+    provider => pip,
+    require  => Class['pip'],
+  }
+  package { 'eventlet':
+    ensure   => '0.15.2',
+    provider => pip,
+    require  => Class['pip'],
+  }
+  package { 'kazoo':
+    ensure   => '2.2.1',
+    provider => pip,
+    require  => Class['pip'],
+  }
 
 
 #  file { '/usr/local/bin/useObjectStorage.sh':
