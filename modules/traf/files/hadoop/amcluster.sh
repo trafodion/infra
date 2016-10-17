@@ -289,6 +289,11 @@ else
   conftypes="capacity-scheduler core-site hadoop-env hbase-log4j hbase-site hbase-env hcat-env hdfs-log4j hdfs-site"
   conftypes+=" hive-env hive-exec-log4j hive-log4j hive-site hiveserver2-site mapred-env mapred-site tez-env tez-site"
   conftypes+=" webhcat-env webhcat-site yarn-env yarn-log4j yarn-site zoo.cfg zookeeper-env zookeeper-log4j"
+  # required by ambari2.4 (DB consistency check)
+  conftypes+=" ranger-yarn-policymgr-ssl ranger-yarn-audit ranger-yarn-security ranger-yarn-plugin-properties"
+  conftypes+=" ranger-hbase-security hbase-policy ranger-hbase-policymgr-ssl ranger-hbase-audit ranger-hbase-plugin-properties"
+  conftypes+=" ssl-server ranger-hdfs-audit ranger-hdfs-plugin-properties ssl-client ranger-hdfs-policymgr-ssl hadoop-policy ranger-hdfs-security"
+  conftypes+=" ranger-hive-plugin-properties ranger-hive-policymgr-ssl ranger-hive-audit webhcat-log4j ranger-hive-security"
 fi
 
 for ctype in $conftypes
@@ -347,6 +352,7 @@ else
   setconfig hadoop-env "namenode_opt_maxnewsize" "200m"
   setconfig hbase-env "hbase_master_heapsize" "1024m"
   setconfig hbase-env "hbase_regionserver_heapsize" "1024m"
+  setconfig zookeeper-env "zk_server_heapsize" "1024m"
 fi
 
 if [[ $Vers == "HDP-2.1" ]]

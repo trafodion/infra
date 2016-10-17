@@ -21,6 +21,13 @@ class traf::ambari (
       $repoamb = 'puppet:///modules/traf/hadoop/ambari-2.1.2.repo'
     }
   }
+  if $distro == 'AHW2.5' {
+    if $::operatingsystemmajrelease == '7' {
+      $repoamb = 'puppet:///modules/traf/hadoop/ambari-centos7-2.4.0.1.repo'
+    } elsif $::operatingsystemmajrelease == '6' {
+      $repoamb = 'puppet:///modules/traf/hadoop/ambari-2.4.0.1.repo'
+    }
+  }
 
   file { '/etc/yum.repos.d/ambari.repo':
     owner  => 'root',
