@@ -115,6 +115,9 @@ then
   cp $srcpkg ./$DestDir/
 fi
 
+# RPM packages
+cp -r trafodion/distribution/RH* $workspace/$DestDir/
+
 # installer
 install=$(ls ./trafodion/install/installer*gz ./trafodion/distribution/*installer*gz 2>/dev/null)
 if [[ $(basename $install) =~ ^apache- ]]
@@ -169,6 +172,7 @@ else
   fi
 fi
 
+# checksums for tar files
 cd $workspace/$DestDir
 for f in $(/bin/ls *gz)
 do
