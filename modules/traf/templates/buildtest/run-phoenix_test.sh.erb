@@ -154,6 +154,7 @@ cat $WORKSPACE/phx_test_run/target/surefire-reports/*.txt > $WORKSPACE/test_summ
 # Parse test summary in output
 nrun=$(awk '/^Total number of tests run/ {print $NF}' $WORKSPACE/phx.out)
 nfail=$(awk '/^Total number of failures/ {print $NF}' $WORKSPACE/phx.out)
+nerr=$(awk '/^Total number of errors/ {print $NF}' $WORKSPACE/phx.out)
 
 if [[ $nrun == 0 ]]
 then
@@ -173,7 +174,7 @@ if [[ $coreCount -gt 0 ]]; then
   echo
 fi
 
-phoenixRes=$(( phoenixRes + nfail + coreCount ))
+phoenixRes=$(( phoenixRes + nfail + nerr + coreCount ))
 
 if [[ $phoenixRes != 0 ]]
 then
