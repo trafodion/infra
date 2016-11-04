@@ -42,47 +42,54 @@ make package-src > $WORKSPACE/Make-Source.log 2>&1
 
 cd core
 
-# Pull latest posted Win-ODBC build if available
-# trailing slash necessary to get content list
-WINLOC="http://traf-testlogs.esgyn.com/winbld/"
+# Pull latest posted windows build if available
+function client_down {
+  CNAME="$1"
+  CPREFIX="$2"
 
-mkdir -p conn/clients
+  # trailing slash necessary to get content list
+  WINLOC="http://traf-testlogs.esgyn.com/winbld/"
 
-# parse from html listing and reverse sort by version number
-avail=$(curl -s $WINLOC | sed -n -e '/TFODBC/s/^.*href="\([^"]*\)".*/\1/p' | sort -rV)
+  mkdir -p conn/clients
 
-# find latest one that is less or equal to our version
-found=""
-for f in $avail
-do
-  suff=${f#TFODBC64-}
-  maj=${suff%%\.*}
-  suff=${suff#*\.}
-  min=${suff%%\.*}
-  suff=${suff#*\.}
-  pat=${suff%%\.*}
-  if (( $TRAFODION_VER_MAJOR > $maj || 
-       ( $TRAFODION_VER_MAJOR == $maj && $TRAFODION_VER_MINOR > $min ) ||
-       ( $TRAFODION_VER_MAJOR == $maj && $TRAFODION_VER_MINOR == $min &&
-                                             $TRAFODION_VER_UPDATE >= $pat ) ))
+  # parse from html listing and reverse sort by version number
+  avail=$(curl -s $WINLOC | sed -n -e "/$CPREFIX/"'s/^.*href="\([^"]*\)".*/\1/p' | sort -rV)
+
+  # find latest one that is less or equal to our version
+  found=""
+  for f in $avail
+  do
+    suff=${f#$CPREFIX}
+    maj=${suff%%\.*}
+    suff=${suff#*\.}
+    min=${suff%%\.*}
+    suff=${suff#*\.}
+    pat=${suff%%\.*}
+    if (( $TRAFODION_VER_MAJOR > $maj || 
+         ( $TRAFODION_VER_MAJOR == $maj && $TRAFODION_VER_MINOR > $min ) ||
+         ( $TRAFODION_VER_MAJOR == $maj && $TRAFODION_VER_MINOR == $min &&
+                                               $TRAFODION_VER_UPDATE >= $pat ) ))
+    then
+      found="$f"
+      break
+    fi
+  done
+
+  if [[ -n "$found" ]]
   then
-    found="$f"
-    break
+    wget --no-verbose -O conn/clients/$found $WINLOC/$found
+    if [[ $? != 0 ]]
+    then
+      echo "Error: $CNAME download failed"
+    fi
+  else
+    echo "Warning: No matching $CNAME build found"
+    echo "Found only: $avail"
   fi
-done
+}
 
-if [[ -n "$found" ]]
-then
-  wget --no-verbose -O conn/clients/$found $WINLOC/$found
-  if [[ $? != 0 ]]
-  then
-    echo "Error: Win-ODBC64 download failed"
-  fi
-else
-  echo "Warning: No matching Win-ODBC64 build found"
-  echo "Found only: $avail"
-fi
-
+client_down "Win-ODBC" "TFODBC64-"
+client_down "Windows ODB" "odb-"
 
 # Use Jenkins values
 VER="$(git describe --long --tags --dirty --always)"
