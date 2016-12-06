@@ -117,6 +117,7 @@ then
     echo "DCS_BUILD=$dcsball" >> ./Install_Config
   fi
   echo "SQ_ROOT=$RUNLOC" >> ./Install_Config
+  echo "MY_SQROOT=$RUNLOC" >> ./Install_Config
   echo "START=Y" >> ./Install_Config
   echo "INIT_TRAFODION=Y" >> ./Install_Config
   echo "DCS_SERVERS_PARM=$dcscnt" >> ./Install_Config
