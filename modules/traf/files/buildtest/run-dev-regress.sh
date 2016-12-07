@@ -51,9 +51,6 @@ testloc=$(loc_regress)
 mkdir $rundir
 export rundir  # pass along to regression tests
 
-# Debug for TESTRTS
-echo "ABORT_ON_ERROR=8926" >> $MY_SQROOT/etc/ms.env
-
 
 # run SQL regression tests
 cd $testloc

@@ -207,11 +207,13 @@ function report_on_corefiles() {
   fi
   ADIR="$1"
   if [[ -z "$ADIR" ]]; then
-    if [[ -n "$MY_SQROOT" ]]; then
+    if [[ -n "$TRAF_HOME" ]]; then
+      BDIR=$(dirname "$TRAF_HOME")
+    elif [[ -n "$MY_SQROOT" ]]; then
       BDIR=$(dirname "$MY_SQROOT")
-      if [[ -d "$BDIR" ]]; then
-        ADIR="$BDIR"
-      fi
+    fi
+    if [[ -d "$BDIR" ]]; then
+      ADIR="$BDIR"
     fi
   fi
   if [[ -z "$ADIR" ]]; then
