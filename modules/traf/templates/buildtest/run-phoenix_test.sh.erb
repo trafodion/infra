@@ -100,6 +100,9 @@ free -m
 
 source_env test
 
+# be compatible w/ or w/o new name for MY_SQROOT
+[[ -n $TRAF_HOME ]] && MY_SQROOT=$TRAF_HOME
+
 # check TEST_JDBC_TYPE and set TEST_JDBC_FILE based on it
 TEST_JDBC_TYPE=$(echo $TEST_JDBC_TYPE | tr "[:lower:]" "[:upper:]")
 if [ "$TEST_JDBC_TYPE" = "T4" ]; then
