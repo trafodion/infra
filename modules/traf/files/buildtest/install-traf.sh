@@ -131,7 +131,7 @@ install_loc "installed" $REGRESS
 
 trafball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion_server-*.tgz $WORKSPACE/trafodion/distribution/*trafodion_server-* 2>/dev/null)"
 dcsball="$(/bin/ls $WORKSPACE/trafodion/dcs/target/dcs*gz $WORKSPACE/trafodion/distribution/dcs-[0-9]*gz 2>/dev/null)"
-instball="$(/bin/ls $WORKSPACE/trafodion/install/installer*gz $WORKSPACE/trafodion/distribution/*installer*gz 2>/dev/null)"
+instball="$(/bin/ls $WORKSPACE/trafodion/install/installer*gz $WORKSPACE/trafodion/distribution/*_installer*gz 2>/dev/null)"
 restball="$(/bin/ls $WORKSPACE/trafodion/core/rest/target/rest-*gz $WORKSPACE/trafodion/distribution/rest-*gz 2>/dev/null)"
 
 flist="$instball $trafball $dcsball"
