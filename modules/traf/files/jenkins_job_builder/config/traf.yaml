@@ -33,7 +33,7 @@
 
     wrappers:
       - timeout:
-          timeout: 140
+          timeout: 160
           fail: true
       - timestamps
 
