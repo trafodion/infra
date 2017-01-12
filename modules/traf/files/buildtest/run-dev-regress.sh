@@ -118,11 +118,14 @@ fail=$(grep FAIL */runregr*.log | wc -l)
 pass=$(grep PASS */runregr*.log | wc -l)
 echo "Total Passed:   $pass"
 echo "Total Failures: $fail"
-# remove rundir
-# jenkins will upload these logs,
-# in case test times out before we get this far.
+
+# move aside rundir
+# jenkins will upload these logs, in case test times out before we get this far.
+# Now that we have gotten this far, we'll only upload the logarchive ones.
 cd $WORKSPACE
-rm -rf $rundir
+rm -rf ${rundir}.completed
+mkdir ${rundir}.completed
+mv ${rundir}/* ${rundir}.completed/
 
 if [[ $totalCoreCount -gt 0 ]]; then
     echo
