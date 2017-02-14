@@ -126,6 +126,11 @@ then
 else
   cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  || exit 2
 fi
+clmgr=$(ls ./trafodion/distribution/*ambari*rpm)
+if [[ -n $clmgr ]]
+then
+  cp $clmgr ./$DestDir/  || exit 2
+fi
 
 # clients tarfile
 client=$(ls ./trafodion/distribution/*trafodion_clients-*)

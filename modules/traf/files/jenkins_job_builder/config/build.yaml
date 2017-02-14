@@ -98,6 +98,9 @@
       - archive:
           artifacts: 'trafodion/distribution/*'
           allow-empty: true
+      - archive:
+          artifacts: 'trafodion/core/sqf/conf/install_features'
+          allow-empty: true
       - console-log
       - git-log
       - traf-make-log
