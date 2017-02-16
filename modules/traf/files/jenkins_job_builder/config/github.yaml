@@ -67,6 +67,7 @@
             - AlexPeng19
             - lanbb
             - orrk
+            - liuyu000
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
