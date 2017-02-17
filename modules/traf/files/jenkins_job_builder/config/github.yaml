@@ -4,6 +4,7 @@
     branch:
      - master
      - release2.0
+     - release2.1
 
     jobs:
       - 'Check-PR-{branch}'

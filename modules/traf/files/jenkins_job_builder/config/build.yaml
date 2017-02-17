@@ -3,6 +3,7 @@
     branch:
       - "master"
       - "release2.0"
+      - "release2.1"
 
     jobs:
       - doc-bld-{branch}
@@ -42,6 +43,7 @@
     branch:
       - "master"
       - "release2.0"
+      - "release2.1"
 
     jobs:
       - build-{osver}-{branch}-{flavor}
