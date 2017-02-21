@@ -326,10 +326,8 @@
     branch:
      - master:
          timespec: "30 8 * * *"
-     - release2.0:
+     - release2.1:
          timespec: "30 5 * * *"
-         # disabled property not passed. found no way to set false
-         disabled: true
 
     jobs:
      - 'Check-Daily-{branch}'
