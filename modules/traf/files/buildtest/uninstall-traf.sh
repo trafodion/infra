@@ -20,11 +20,17 @@
 source /usr/local/bin/traf-functions.sh
 log_banner
 
+if [[ -e $(ls $WORKSPACE/trafodion/distribution/*pyinstall*) ]]
+then
+  action=pyuninstall
+else
+  action=uninstall
+fi
 
 set -x
 
 # tinstall user has required permissions 
-sudo -n -u tinstall /usr/local/bin/inst-sudo.sh uninstall $WORKSPACE
+sudo -n -u tinstall /usr/local/bin/inst-sudo.sh $action $WORKSPACE
 rc=$?
 
 exit $rc
