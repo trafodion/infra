@@ -185,7 +185,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/regress-${DISTRO}
+                LOG_PATH=${LOG_PATH}/regress-${DISTRO}-${OS}
                 SUITES=${sql_tests}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
@@ -195,7 +195,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/regress-${DISTRO}
+                LOG_PATH=${LOG_PATH}/regress-${DISTRO}-${OS}
                 SUITES=${sql_tests}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
@@ -205,7 +205,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/regress-${DISTRO}
+                LOG_PATH=${LOG_PATH}/regress-${DISTRO}-${OS}
                 SUITES=${sql_tests}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
@@ -215,7 +215,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
+                LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}-${OS}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
@@ -224,7 +224,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
+                LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}-${OS}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
@@ -233,7 +233,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}
+                LOG_PATH=${LOG_PATH}/pyodbc_test-${DISTRO}-${OS}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
@@ -242,7 +242,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
+                LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}-${OS}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
@@ -251,7 +251,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
+                LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}-${OS}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
@@ -260,7 +260,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}
+                LOG_PATH=${LOG_PATH}/jdbc_test-${DISTRO}-${OS}
                 BRANCH=$BRANCH
               node-label-name: "NODE_TYPE"
               node-label: "${OS}_$DISTRO"
@@ -269,7 +269,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
+                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}-${OS}
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
               node-label-name: "NODE_TYPE"
@@ -279,7 +279,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
+                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}-${OS}
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
               node-label-name: "NODE_TYPE"
@@ -289,7 +289,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
+                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}-${OS}
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
               node-label-name: "NODE_TYPE"
@@ -299,7 +299,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
+                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}-${OS}
                 BRANCH=$BRANCH
                 HDIST=$DISTRO
               node-label-name: "NODE_TYPE"
@@ -309,7 +309,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
+                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}-${OS}
                 BRANCH=$BRANCH
                 HDIST=cm5.4
               node-label-name: "NODE_TYPE"
@@ -319,7 +319,7 @@
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}
+                LOG_PATH=${LOG_PATH}/phoenix_test_${Phx_Driver}-${DISTRO}-${OS}
                 BRANCH=$BRANCH
                 HDIST=cm5.4
               node-label-name: "NODE_TYPE"
