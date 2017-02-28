@@ -676,12 +676,12 @@
           recipients: dev@trafodion.incubator.apache.org
           reply-to: no-reply@trafodion.org
           content-type: "text"
-          subject: Trafodion {branch} Daily Test Result - $BUILD_ID - $BUILD_STATUS
+          subject: Trafodion {branch} {os} Daily Test Result - $BUILD_ID - $BUILD_STATUS
           save-output: true
           always: true
           failure: false
           body: |
-            Daily Automated Testing {branch}
+            Daily Automated Testing {branch} {os}
 
             Jenkins Job:   $BUILD_URL
             Archived Logs: http://traf-testlogs.esgyn.com/$LOG_PATH
