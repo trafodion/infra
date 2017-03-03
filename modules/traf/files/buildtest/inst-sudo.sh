@@ -235,17 +235,17 @@ then
   fi
   echo "java_home = $TRAFJAVA" >> ./Install_Config
   echo "traf_package = $trafball" >> ./Install_Config
+  echo "dcs_cnt_per_node = $dcscnt" >> ./Install_Config
 
   sudo mkdir -p $WORKSPACE/home
   echo "home_dir = $WORKSPACE/home" >> ./Install_Config
   echo "traf_dirname = traf_run" >> ./Install_Config
+  ## bogus param -- TRAFODION-2510
+  echo "db_admin_pwd = foobar" >> ./Install_Config
 
   echo "*** Calling db_install.py"
   ./python-installer/db_install.py --verbose --silent --config-file ./Install_Config
   ret=$?
-
-  # link workspace path used in legacy installer to trafodion home installation
-  ln -s /home/trafodion/traf_run $RUNLOC
 
   if [[ $ret == 0 ]]
   then
