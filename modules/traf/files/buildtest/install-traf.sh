@@ -135,7 +135,28 @@ instball="$(/bin/ls $WORKSPACE/trafodion/install/installer*gz $WORKSPACE/trafodi
 pyinstball="$(/bin/ls $WORKSPACE/trafodion/distribution/*pyinstaller*gz 2>/dev/null)"
 restball="$(/bin/ls $WORKSPACE/trafodion/core/rest/target/rest-*gz $WORKSPACE/trafodion/distribution/rest-*gz 2>/dev/null)"
 
-flist="$instball $trafball $dcsball"
+# py installer supercedes bash installer
+  # Currently only on release2.1 branch
+  if [[ -n $ghprbTargetBranch ]]
+  then
+    relbranch="$ghprbTargetBranch"
+  elif [[ -n $GIT_BRANCH ]]
+  then
+    relbranch="$GIT_BRANCH"
+  else 
+    relbranch="$BRANCH"
+  fi
+if [[ -n $pyinstball && $relbranch == "release2.1" ]]
+then
+  action=pyinstall
+  instball=$pyinstball
+  filter='^.'
+else
+  action=install
+  filter='\*\*\*'
+fi
+
+flist="$instball $trafball"
 if [[ $REGRESS == "regress" ]]
 then
   regball="$(/bin/ls $WORKSPACE/trafodion/core/trafodion-regress.tgz $WORKSPACE/trafodion/distribution/*trafodion-regress.tgz 2>/dev/null)"
@@ -181,13 +202,13 @@ set -x
 chmod o+r $flist
 
 # tinstall user has required permissions to run installer
-sudo -n -u tinstall /usr/local/bin/inst-sudo.sh $LDAP install "$WORKSPACE" \
+sudo -n -u tinstall /usr/local/bin/inst-sudo.sh $LDAP $action "$WORKSPACE" \
        "$instball" \
        "$trafball" \
        "$restball" \
        "$dcsball" "$DCSSERV" \
        "$regball" "$JH" 2>&1 | tee Install_Start.log | \
-          grep --line-buffered -e '\*\*\*'
+          grep --line-buffered -e "$filter"
 ret=${PIPESTATUS[0]}
 
 # Check mxosrvr processes match requested DCS servers

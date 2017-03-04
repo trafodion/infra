@@ -26,7 +26,7 @@ else
   LDAP="false"
 fi
 
-# install or uninstall
+# install or uninstall or pyinstall or pyuninstall
 action="$1"
 
 # work location - required for traf-functions.sh
@@ -206,6 +206,83 @@ then
 
   exit $ret
 
+elif [[ $action == "pyinstall" ]]
+then
+  sudo rm -rf /var/log/trafodion/* # clean out logs from any prior jobs
+  sudo rm -rf $INSTLOC $RUNLOC || exit 1
+
+  sudo mkdir $INSTLOC || exit 1
+
+  sudo chown tinstall $INSTLOC || exit 1
+
+  cp "$instball" $INSTLOC || exit 1
+
+  cd $INSTLOC
+  tar xzf $(basename $instball) || exit 1
+
+  cp ./python-installer/configs/db_config_default.ini ./Install_Config
+  echo "node_list = $(hostname -s)" >> ./Install_Config
+  echo "first_rsnode = $(hostname -s)" >> ./Install_Config
+  echo "ldap_identifiers = uid=,ou=users,dc=trafldap,dc=com" >> ./Install_Config
+  echo "ldap_security = Y" >> ./Install_Config
+  echo "ldap_hosts = static.trafodion.org" >> ./Install_Config
+  if rpm -q cloudera-manager-server >/dev/null
+  then
+    echo "mgr_url = $(hostname -f):7180" >> ./Install_Config
+  elif rpm -q ambari-server >/dev/null
+  then
+    echo "mgr_url = $(hostname -f):8080" >> ./Install_Config
+  fi
+  echo "java_home = $TRAFJAVA" >> ./Install_Config
+  echo "traf_package = $trafball" >> ./Install_Config
+  echo "dcs_cnt_per_node = $dcscnt" >> ./Install_Config
+
+  sudo mkdir -p $WORKSPACE/home
+  echo "home_dir = $WORKSPACE/home" >> ./Install_Config
+  echo "traf_dirname = traf_run" >> ./Install_Config
+  ## bogus param -- TRAFODION-2510
+  echo "db_admin_pwd = foobar" >> ./Install_Config
+
+  echo "*** Calling db_install.py"
+  ./python-installer/db_install.py --verbose --silent --config-file ./Install_Config
+  ret=$?
+
+  if [[ $ret == 0 ]]
+  then
+    # Extra dir needed by hive regressions
+    # must be HDFS superuser (hdfs) to chown
+    sudo -n -u hive hadoop dfs -chmod +rx -p /user/hive
+    sudo -n -u hive hadoop dfs -mkdir -p /user/hive/exttables
+    sudo -n -u hdfs hadoop dfs -chown trafodion /user/hive/exttables
+    # trafodion user directory must exist to accomodate Trash folder 
+    # (or every use of hdfs rm has to use -skipTrash option)
+    sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
+    sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
+
+    if [[ $LDAP == "true" ]]
+    then
+      echo "register user qa001;" | sudo -n -i -u trafodion 'sqlci'
+    fi
+  fi
+
+  # Dev regressions
+  if [[ $ret == 0 && -n "$regball" ]]
+  then
+    echo "*** Installing regressions"
+    cd $RUNLOC
+    sudo -n -u trafodion tar xf $regball
+  fi
+  # make system logs read-able in case of early exit of job
+  sudo chmod -R a+rX $RUNLOC
+
+  # create alternate directory for Maven Local repo for T2 tests
+  if [[ ! -d /var/local/traf_mvn_repo ]]; then
+    sudo mkdir /var/local/traf_mvn_repo
+  fi
+  sudo chown -R trafodion:trafodion /var/local/traf_mvn_repo
+
+  exit $ret
+
 elif [[ $action == "uninstall" ]]
 then
   # uninstaller will remove $RUNLOC, so save logs we need
@@ -225,6 +302,14 @@ then
   sudo rm -rf $RUNLOC                   # just in case uninstaller left it
   sudo mv $WORKSPACE/traf_run.save $RUNLOC   # back to the expected location
   sudo chmod -R a+rX $RUNLOC            # make system logs world-readable for archival
+
+  exit $uninst_ret
+
+elif [[ $action == "pyuninstall" ]]
+then
+  cd $INSTLOC 
+  ./python-installer/db_uninstall.py --verbose --silent --config-file ./Install_Config
+  uninst_ret=$?
 
   exit $uninst_ret
 

@@ -20,11 +20,28 @@
 source /usr/local/bin/traf-functions.sh
 log_banner
 
+  # Currently only on release2.1 branch
+  if [[ -n $ghprbTargetBranch ]]
+  then
+    relbranch="$ghprbTargetBranch"
+  elif [[ -n $GIT_BRANCH ]]
+  then
+    relbranch="$GIT_BRANCH"
+  else
+    relbranch="$BRANCH"
+  fi
+
+if [[ -e $(ls $WORKSPACE/trafodion/distribution/*pyinstall*) && $relbranch == "release2.1" ]]
+then
+  action=pyuninstall
+else
+  action=uninstall
+fi
 
 set -x
 
 # tinstall user has required permissions 
-sudo -n -u tinstall /usr/local/bin/inst-sudo.sh uninstall $WORKSPACE
+sudo -n -u tinstall /usr/local/bin/inst-sudo.sh $action $WORKSPACE
 rc=$?
 
 exit $rc
