@@ -247,6 +247,8 @@ then
   ./python-installer/db_install.py --verbose --silent --config-file ./Install_Config
   ret=$?
 
+  ln -s $WORKSPACE/home/trafodion/traf_run $RUNLOC
+
   if [[ $ret == 0 ]]
   then
     # Extra dir needed by hive regressions
@@ -307,6 +309,15 @@ then
 
 elif [[ $action == "pyuninstall" ]]
 then
+  # uninstaller will remove $RUNLOC, so save logs we need
+  # see list: traf/files/jenkins_job_builder/config/macros.yaml
+  sudo mkdir -p $WORKSPACE/traf_run.save/sql
+  sudo cp -r $RUNLOC/logs $WORKSPACE/traf_run.save/
+  sudo cp -r $RUNLOC/sql/scripts $WORKSPACE/traf_run.save/sql
+  sudo cp -r $RUNLOC/tmp $WORKSPACE/traf_run.save/
+  sudo cp -r $RUNLOC/etc $WORKSPACE/traf_run.save/
+  sudo cp -r $RUNLOC/dcs* $WORKSPACE/traf_run.save/
+
   cd $INSTLOC 
   ./python-installer/db_uninstall.py --verbose --silent --config-file ./Install_Config
   uninst_ret=$?
