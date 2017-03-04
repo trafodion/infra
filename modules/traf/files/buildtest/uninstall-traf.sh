@@ -20,7 +20,18 @@
 source /usr/local/bin/traf-functions.sh
 log_banner
 
-if [[ -e $(ls $WORKSPACE/trafodion/distribution/*pyinstall*) ]]
+  # Currently only on release2.1 branch
+  if [[ -n $ghprbTargetBranch ]]
+  then
+    relbranch="$ghprbTargetBranch"
+  elif [[ -n $GIT_BRANCH ]]
+  then
+    relbranch="$GIT_BRANCH"
+  else
+    relbranch="$BRANCH"
+  fi
+
+if [[ -e $(ls $WORKSPACE/trafodion/distribution/*pyinstall*) && $relbranch == "release2.1" ]]
 then
   action=pyuninstall
 else

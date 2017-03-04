@@ -136,7 +136,17 @@ pyinstball="$(/bin/ls $WORKSPACE/trafodion/distribution/*pyinstaller*gz 2>/dev/n
 restball="$(/bin/ls $WORKSPACE/trafodion/core/rest/target/rest-*gz $WORKSPACE/trafodion/distribution/rest-*gz 2>/dev/null)"
 
 # py installer supercedes bash installer
-if [[ -n $pyinstball ]]
+  # Currently only on release2.1 branch
+  if [[ -n $ghprbTargetBranch ]]
+  then
+    relbranch="$ghprbTargetBranch"
+  elif [[ -n $GIT_BRANCH ]]
+  then
+    relbranch="$GIT_BRANCH"
+  else 
+    relbranch="$BRANCH"
+  fi
+if [[ -n $pyinstball && $relbranch == "release2.1" ]]
 then
   action=pyinstall
   instball=$pyinstball
