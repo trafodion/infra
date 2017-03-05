@@ -302,7 +302,7 @@ then
   echo "Y" | ./installer/trafodion_uninstaller
   uninst_ret=$?
 
-  sudo rm -f $RUNLOC                   # just in case uninstaller left it
+  sudo rm -rf $RUNLOC                   # just in case uninstaller left it
   sudo mv $WORKSPACE/traf_run.save $RUNLOC   # back to the expected location
   sudo chmod -R a+rX $RUNLOC            # make system logs world-readable for archival
 
@@ -322,6 +322,10 @@ then
   cd $INSTLOC 
   ./python-installer/db_uninstall.py --verbose --silent --config-file ./Install_Config
   uninst_ret=$?
+
+  sudo rm -f $RUNLOC                   # remove symlink
+  sudo mv $WORKSPACE/traf_run.save $RUNLOC   # back to the expected location
+  sudo chmod -R a+rX $RUNLOC            # make system logs world-readable for archival
 
   exit $uninst_ret
 
