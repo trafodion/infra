@@ -267,6 +267,9 @@ then
     fi
   fi
 
+  # make trafodion tree readable
+  sudo chmod -R a+rX $WORKSPACE/home
+
   # Dev regressions
   if [[ $ret == 0 && -n "$regball" ]]
   then
@@ -274,8 +277,6 @@ then
     cd $RUNLOC
     sudo -n -u trafodion tar xf $regball
   fi
-  # make system logs read-able in case of early exit of job
-  sudo chmod -R a+rX $WORKSPACE/home
 
   # create alternate directory for Maven Local repo for T2 tests
   if [[ ! -d /var/local/traf_mvn_repo ]]; then
@@ -301,7 +302,7 @@ then
   echo "Y" | ./installer/trafodion_uninstaller
   uninst_ret=$?
 
-  sudo rm -rf $RUNLOC                   # just in case uninstaller left it
+  sudo rm -f $RUNLOC                   # just in case uninstaller left it
   sudo mv $WORKSPACE/traf_run.save $RUNLOC   # back to the expected location
   sudo chmod -R a+rX $RUNLOC            # make system logs world-readable for archival
 
