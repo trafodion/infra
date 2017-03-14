@@ -89,7 +89,7 @@ function client_down {
 }
 
 client_down "Win-ODBC" "TFODBC64-"
-client_down "Windows ODB" "odb-"
+client_down "Windows ODB" "TRAFODB-"
 
 # Use Jenkins values
 VER="$(git describe --long --tags --dirty --always)"
