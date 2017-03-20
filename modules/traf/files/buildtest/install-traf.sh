@@ -201,6 +201,11 @@ set -x
 # make sure tinstall user can read them
 chmod o+r $flist
 
+echo "Checking shared mem"
+ls -ld /dev/shm
+ls -l /dev/shm
+echo "============"
+
 # tinstall user has required permissions to run installer
 sudo -n -u tinstall /usr/local/bin/inst-sudo.sh $LDAP $action "$WORKSPACE" \
        "$instball" \

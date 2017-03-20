@@ -44,4 +44,9 @@ set -x
 sudo -n -u tinstall /usr/local/bin/inst-sudo.sh $action $WORKSPACE
 rc=$?
 
+echo "Checking shared mem"
+ls -ld /dev/shm
+ls -l /dev/shm
+echo "============"
+
 exit $rc
