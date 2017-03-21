@@ -44,6 +44,9 @@ rm -rf /usr/lib/trafodion
 # this will force installer to go through full install, rather than upgrade path
 /usr/sbin/userdel -rf trafodion
 
+# clean up shared mem
+rm -rf /dev/shmem/*
+
 # clean up hive logs that can fill up the disk
 rm /var/log/hive/hiveserver2.log*
 
