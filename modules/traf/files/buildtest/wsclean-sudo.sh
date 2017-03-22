@@ -45,7 +45,7 @@ rm -rf /usr/lib/trafodion
 /usr/sbin/userdel -rf trafodion
 
 # clean up shared mem
-rm -rf /dev/shmem/*
+rm -rf /dev/shm/*
 
 # clean up hive logs that can fill up the disk
 rm /var/log/hive/hiveserver2.log*
