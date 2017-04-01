@@ -31,7 +31,7 @@ log_banner
     relbranch="$BRANCH"
   fi
 
-if [[ -e $(ls $WORKSPACE/trafodion/distribution/*pyinstall*) && $relbranch == "release2.1" ]]
+if [[ $ghprbPullAuthorLogin == "svarnau" || -e $(ls $WORKSPACE/trafodion/distribution/*pyinstall*) && $relbranch == "release2.1" ]]
 then
   action=pyuninstall
 else
