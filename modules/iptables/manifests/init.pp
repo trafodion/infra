@@ -36,6 +36,11 @@ class iptables(
     status     => $::iptables::params::service_status_cmd,
     hasrestart => $::iptables::params::service_has_restart,
   }
+  if $::operatingsystemmajrelease == '7' {
+    service { 'firewalld':
+      ensure => stopped,
+    }
+  }
 
   file { $::iptables::params::rules_dir:
     ensure  => directory,
