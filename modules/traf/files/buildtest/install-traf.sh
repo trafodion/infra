@@ -146,7 +146,7 @@ restball="$(/bin/ls $WORKSPACE/trafodion/core/rest/target/rest-*gz $WORKSPACE/tr
   else 
     relbranch="$BRANCH"
   fi
-if [[ $ghprbPullAuthorLogin == "svarnau" || -n $pyinstball && $relbranch == "release2.1" ]]
+if [[ -n $pyinstball && $relbranch ]]
 then
   action=pyinstall
   instball=$pyinstball
