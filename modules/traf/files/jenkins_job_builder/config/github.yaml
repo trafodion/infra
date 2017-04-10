@@ -69,6 +69,7 @@
             - lanbb
             - orrk
             - liuyu000
+            - andyyangcn
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
