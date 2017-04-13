@@ -154,12 +154,6 @@ class jenkins::slave(
     }
   }
 
-  package { 'git-review':
-    ensure   => '1.17',
-    provider => pip,
-    require  => Class[pip],
-  }
-
   file { '/etc/profile.d/rubygems.sh':
     ensure => present,
     owner  => 'root',
