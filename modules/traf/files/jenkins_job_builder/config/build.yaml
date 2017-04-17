@@ -68,7 +68,6 @@
            branch: "{branch}"
       - pkg-traf:
            flavor: "{flavor}"
-      - pkg-install
       - check-build:
            dir: "trafodion"
       - stage-traf:
@@ -147,7 +146,6 @@
            label: "$TAG"
       - pkg-traf:
            flavor: "{flavor}"
-      - pkg-install
       - stage-traf:
            flavor: "{flavor}"
            btype: "$BUILD_TYPE"

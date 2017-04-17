@@ -88,11 +88,6 @@
       - shell: "/usr/local/bin/build-traf.sh {flavor} package-all"
 
 - builder:
-    name: pkg-install
-    builders:
-      - shell: "/usr/local/bin/build-install.sh"
-
-- builder:
     name: docs-build
     builders:
       - shell: |
