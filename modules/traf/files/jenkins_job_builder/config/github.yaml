@@ -327,8 +327,8 @@
     branch:
      - master:
          timespec: "30 8 * * *"
-     - release2.1:
-         timespec: "30 5 * * *"
+#     - release2.1:
+#         timespec: "30 5 * * *"
 
     os:
      - rh6
