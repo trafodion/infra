@@ -70,6 +70,7 @@
             - orrk
             - liuyu000
             - andyyangcn
+            - Weixin-Xu
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
