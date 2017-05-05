@@ -514,7 +514,7 @@ fi
 echo "*** Removing HBase Data"
 
 # data locations for Ambari
-hdata="/apps/hbase/data" # HDFS
+hdata="/apps/hbase/data /bulkload /lobs /trafodion_backups /user/trafodion" # HDFS
 zkdata="/hbase-unsecure" # zookeeper
 
 sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
