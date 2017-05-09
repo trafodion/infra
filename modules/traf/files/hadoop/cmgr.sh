@@ -565,7 +565,7 @@ then
 fi
 
 # data locations for Cloudera
-hdata="/hbase /lobs /bulkload /trafodion_backups /user/trafodion"  # HDFS
+hdata="/hbase /lobs /bulkload /trafodion_backups"  # HDFS
 zkdata="/hbase" # zookeeper
 
 sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
