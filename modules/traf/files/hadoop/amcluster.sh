@@ -27,8 +27,6 @@ PATH="/bin:/usr/bin"
 log_banner "Checking Cluster Configuration"
 echo "*** Checking Cluster Configuration"
 
-# Distro 
-
 if [[ "$1" == "-d" ]]
 then
   mode="Delete"
@@ -36,6 +34,17 @@ then
 else
   mode="Create"
 fi
+# debug options
+if [[ $1 =~ -n ]]
+then
+  dataopt="leave"
+  shift
+else
+  dataopt="remove"
+fi
+
+
+# Distro 
 
 # previously saved?
 if [[ -r /var/local/TrafTestDistro ]]
@@ -494,38 +503,45 @@ else
   sudo -u hdfs hdfs dfsadmin -safemode wait
 fi
 
-### HBase data cleaned up every time
-State="$(curl $Read $URL/clusters/trafcluster/services/HBASE | jq -r '.ServiceInfo.state')"
-if [[ $State == "STARTED" ]] 
+if [[ $dataopt == "remove" ]]
 then
-  echo "*** Stopping HBase"
-  reqINSTALL='{"RequestInfo": {"context" :"HBase Stop"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
-  RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/HBASE | jq -r '.Requests.id')
-  am_cmd "$RID" "HBASE Stop"
-  # Check status
+
+  ### HBase data cleaned up every time
   State="$(curl $Read $URL/clusters/trafcluster/services/HBASE | jq -r '.ServiceInfo.state')"
-  if [[ $State != "INSTALLED" ]]
+  if [[ $State == "STARTED" ]] 
   then
-    echo "Error: HBASE not stopped"
-    exit 2
+    echo "*** Stopping HBase"
+    reqINSTALL='{"RequestInfo": {"context" :"HBase Stop"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
+    RID=$(curl $Update -d "$reqINSTALL" $URL/clusters/trafcluster/services/HBASE | jq -r '.Requests.id')
+    am_cmd "$RID" "HBASE Stop"
+    # Check status
+    State="$(curl $Read $URL/clusters/trafcluster/services/HBASE | jq -r '.ServiceInfo.state')"
+    if [[ $State != "INSTALLED" ]]
+    then
+      echo "Error: HBASE not stopped"
+      exit 2
+    fi
   fi
+  
+  echo "*** Removing HBase Data"
+  
+  # data locations for Ambari
+  hdata="/apps/hbase/data /bulkload /lobs /trafodion_backups" # HDFS
+  zkdata="/hbase-unsecure" # zookeeper
+  
+  sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
+  sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
+  
+  # clean up logs so we can save only what is logged for this run
+  sudo -u hbase rm -rf /var/log/hbase/*
+  
+  # recreate root
+  sudo -u hdfs /usr/bin/hdfs dfs -mkdir -p $hdata || exit $?
+  sudo -u hdfs /usr/bin/hdfs dfs -chown hbase:hbase $hdata || exit $?
+
+else
+  echo "Skipping hbase data removal"
 fi
-
-echo "*** Removing HBase Data"
-
-# data locations for Ambari
-hdata="/apps/hbase/data /bulkload /lobs /trafodion_backups" # HDFS
-zkdata="/hbase-unsecure" # zookeeper
-
-sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
-sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
-
-# clean up logs so we can save only what is logged for this run
-sudo -u hbase rm -rf /var/log/hbase/*
-
-# recreate root
-sudo -u hdfs /usr/bin/hdfs dfs -mkdir -p $hdata || exit $?
-sudo -u hdfs /usr/bin/hdfs dfs -chown hbase:hbase $hdata || exit $?
 
 # verify nothing is using HBase port
   HPort='60010'

@@ -27,6 +27,16 @@ PATH="/bin:/usr/bin"
 log_banner "Checking Cluster Configuration"
 echo "*** Checking Cluster Configuration"
 
+# debug options
+if [[ $1 =~ -n ]]
+then
+  dataopt="leave"
+  shift
+else
+  dataopt="remove"
+fi
+
+#
 # Distro
 
 
@@ -549,34 +559,39 @@ then
   hdfs dfs -ls /tmp >/dev/null || exit 2
 fi
 
-### HBase data should be cleaned up every time
-echo "*** Removing HBase Data"
-
 # requires zookeeper up
 start_service zookeeper
-
-# hbase must be down
-State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
-if [[ $State != "STOPPED" ]]
+  
+if [[ $dataopt == "remove" ]]
 then
-  echo "*** Stopping HBase"
-  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/stop | jq -r '.id')
-  cm_cmd $CID "HBase Stop"
+  ### HBase data should be cleaned up every time
+  echo "*** Removing HBase Data"
+  
+  # hbase must be down
+  State="$(curl $Read $URL/clusters/trafcluster/services/trafhbase | jq -r '.serviceState')"
+  if [[ $State != "STOPPED" ]]
+  then
+    echo "*** Stopping HBase"
+    CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/stop | jq -r '.id')
+    cm_cmd $CID "HBase Stop"
+  fi
+  
+  # data locations for Cloudera
+  hdata="/hbase /lobs /bulkload /trafodion_backups"  # HDFS
+  zkdata="/hbase" # zookeeper
+  
+  sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
+  sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
+  
+  # clean up logs so we can save only what is logged for this run
+  sudo -u hbase rm -rf /var/log/hbase/*
+  # recreate root
+  CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/hbaseCreateRoot | jq -r '.id')
+  cm_cmd $CID "HBase Create root"
+
+else
+  echo "Skipping hbase data removal"
 fi
-
-# data locations for Cloudera
-hdata="/hbase /lobs /bulkload /trafodion_backups"  # HDFS
-zkdata="/hbase" # zookeeper
-
-sudo -u hdfs /usr/bin/hdfs dfs -rm -r -f -skipTrash $hdata || exit $?
-sudo -u zookeeper /usr/bin/hbase zkcli rmr $zkdata 2>/dev/null || exit $?
-
-# clean up logs so we can save only what is logged for this run
-sudo -u hbase rm -rf /var/log/hbase/*
-
-# recreate root
-CID=$(curl $Create $URL/clusters/trafcluster/services/trafhbase/commands/hbaseCreateRoot | jq -r '.id')
-cm_cmd $CID "HBase Create root"
 
 # verify nothing is using HBase port
   HPort='60010'
