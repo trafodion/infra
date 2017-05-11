@@ -34,7 +34,12 @@ if [[ ! -f /home/jenkins/tpcds_kit.zip ]]
 then
   /usr/bin/curl --output /home/jenkins/tpcds_kit.zip http://traf-testlogs.esgyn.com/testdeps/tpcds_kit.zip
 fi
-if [[ -e /opt/hadoop/bin/hdfs ]]
+source_env test # get release version info
+if (( $TRAFODION_VER_MAJOR > 2 || $TRAFODION_VER_MAJOR == 2 && $TRAFODION_VER_MINOR > 1 ))
+then
+  hdfscmd="sudo -n -u trafodion /usr/bin/hdfs"
+  hivecmd="sudo -n -u trafodion /usr/bin/hive"
+elif [[ -e /opt/hadoop/bin/hdfs ]]
 then
   hdfscmd="sudo -n -u tinstall /opt/hadoop/bin/hdfs"
   hivecmd="sudo -n -u tinstall /opt/hive/bin/hive"

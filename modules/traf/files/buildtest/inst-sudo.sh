@@ -172,7 +172,7 @@ then
 
   if [[ $ret == 0 ]]
   then
-    # Extra dir needed by hive regressions
+    # Extra dir needed by hive regressions -- for 2.1 and earlier
     # must be HDFS superuser (hdfs) to chown
     sudo -n -u hive hadoop dfs -chmod +rx -p /user/hive
     sudo -n -u hive hadoop dfs -mkdir -p /user/hive/exttables
@@ -251,16 +251,6 @@ then
 
   if [[ $ret == 0 ]]
   then
-    # Extra dir needed by hive regressions
-    # must be HDFS superuser (hdfs) to chown
-    sudo -n -u hive hadoop dfs -chmod +rx -p /user/hive
-    sudo -n -u hive hadoop dfs -mkdir -p /user/hive/exttables
-    sudo -n -u hdfs hadoop dfs -chown trafodion /user/hive/exttables
-    # trafodion user directory must exist to accomodate Trash folder 
-    # (or every use of hdfs rm has to use -skipTrash option)
-    sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
-    sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
-
     if [[ $LDAP == "true" ]]
     then
       echo "register user qa001;" | sudo -n -i -u trafodion 'sqlci'
