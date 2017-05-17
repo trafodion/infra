@@ -71,6 +71,7 @@
             - liuyu000
             - andyyangcn
             - Weixin-Xu
+            - CoderSong2015
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
