@@ -98,7 +98,7 @@ export PV_DATE=$(echo ${BUILD_TIMESTAMP} | sed 's/-//g')
 
 make $TARGET > Make.log 2>&1
 rc=$?
-ls -l *.tgz 2>/dev/null
+ls -l ../distribution 2>/dev/null
 
 cd $WORKSPACE
 
