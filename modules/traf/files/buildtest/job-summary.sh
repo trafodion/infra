@@ -12,7 +12,7 @@ fi
 rm -f build_result.json
 rm -f build_result.txt
 
-curl -s $BUILD_URL/api/json > build_result.json
+curl -s -k $BUILD_URL/api/json > build_result.json
 
 blds=$(jq -r '.subBuilds|length' < build_result.json)
 
@@ -37,10 +37,19 @@ do
     read result
     read duration
     read job
+
+    curl -s -k $JENKINS_URL/$url/logText/progressiveText | grep -q 'WARNING: Core files found'
+    if [[ $? == 0 ]]
+    then
+      cf=" *Corefiles*"
+    else
+      cf=""
+    fi
     
     echo -n $result
     echo -n " $job"
     echo -n " ($duration)"
+    echo -n "$cf"
     echo
   } 
   (( i += 1 ))
