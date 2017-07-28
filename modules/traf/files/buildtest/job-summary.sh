@@ -38,7 +38,7 @@ do
     read duration
     read job
 
-    curl -s -k $JENKINS_URL/$url/logText/progressiveText | grep -q 'WARNING: Core files found'
+    curl -s -k $JENKINS_URL/$url/logText/progressiveText | grep -v grep | grep -q 'WARNING: Core files found'
     if [[ $? == 0 ]]
     then
       cf=" *Corefiles*"
