@@ -3,8 +3,8 @@
     name: 'Check-PR'
     branch:
      - master
-     - release2.0
-     - release2.1
+     #- release2.0
+     #- release2.1
      - release2.2
 
     jobs:
@@ -74,6 +74,8 @@
             - Weixin-Xu
             - CoderSong2015
             - SuJinpei
+            - gpj1987
+            - EEDY
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
