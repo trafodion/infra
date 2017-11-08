@@ -196,7 +196,7 @@ then
     sudo -n -u trafodion tar xf $regball
   fi
   # make system logs read-able in case of early exit of job
-  sudo chmod -R a+rX $RUNLOC
+  sudo chmod -R a+rX $RUNLOC ~trafodion
 
   # create alternate directory for Maven Local repo for T2 tests
   if [[ ! -d /var/local/traf_mvn_repo ]]; then

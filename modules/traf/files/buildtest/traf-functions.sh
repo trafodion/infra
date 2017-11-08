@@ -131,10 +131,8 @@ function source_env () {
 
   elif [[ $1 == "run" || $1 == "test" ]]
   then
-    source "$WORKSPACE/InstallEnv.sh"
-    echo "Sourcing $ILOC/$IENV"
-    cd "$ILOC"
-    source "./$IENV"
+    echo "Sourcing ~trafodion/.bashrc"
+    source ~trafodion/.bashrc
     rc=$?
 
   else
