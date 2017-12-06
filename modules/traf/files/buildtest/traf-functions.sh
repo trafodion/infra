@@ -132,7 +132,7 @@ function source_env () {
   elif [[ $1 == "run" || $1 == "test" ]]
   then
     echo "Sourcing ~trafodion/.bashrc"
-    source ~trafodion/.bashrc
+    source ~trafodion/.bashrc >/dev/null 2>&1
     rc=$?
 
   else
