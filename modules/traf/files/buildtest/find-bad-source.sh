@@ -17,7 +17,7 @@
 #
 # @@@ END COPYRIGHT @@@
 
-egrepcmd="egrep -rnH -e'<<<<<<<.*HEAD|>>>>>>>>.*HEAD'"
+egrepcmd="egrep -rnH -e'^<<<<<<<.*HEAD|^>>>>>>>>.*HEAD'"
 
 usage()
 {
