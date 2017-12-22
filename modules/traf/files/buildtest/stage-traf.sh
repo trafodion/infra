@@ -53,9 +53,9 @@ BLD="$(< $workspace/Build_ID)"
 
 if [[ "$Flavor" == "debug" ]]
 then
-  FileSuffix="-debug-$BLD-incubating-bin.tar.gz"
+  FileSuffix="-debug-$BLD-bin.tar.gz"
 else
-  FileSuffix="-$BLD-incubating-bin.tar.gz"
+  FileSuffix="-$BLD-bin.tar.gz"
 fi
 
 # Destination dir should be daily, pre-release, or release even if build
@@ -124,7 +124,7 @@ if [[ $(basename $install) =~ ^apache- ]]
 then
   cp $install ./$DestDir/  || exit 2
 else
-  cp $install ./$DestDir/apache-trafodion-installer-$BLD-incubating-bin.tar.gz  || exit 2
+  cp $install ./$DestDir/apache-trafodion-installer-$BLD-bin.tar.gz  || exit 2
 fi
 clmgr=$(ls ./trafodion/distribution/*ambari*rpm)
 if [[ -n $clmgr ]]

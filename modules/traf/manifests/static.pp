@@ -62,7 +62,7 @@ class traf::static (
     serveraliases   => ['trafodion.org', 'www.trafodion.com', 'trafodion.com', '15.125.67.182'],
     redirect_source => '/',
     redirect_status => 'permanent',
-    redirect_dest   => 'http://trafodion.incubator.apache.org/',
+    redirect_dest   => 'http://trafodion.apache.org/',
   }
 
 

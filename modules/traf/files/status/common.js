@@ -17,13 +17,13 @@ function header(activeTabName) {
   tabsName = new Array();
   tabsLink = new Array();
   tabsName[0] = 'Downloads'; tabsLink[0] = 'http://traf-builds.esgyn.com/';
-  tabsName[1] = 'Trafodion Project'; tabsLink[1] = 'http://trafodion.incubator.apache.org';
+  tabsName[1] = 'Trafodion Project'; tabsLink[1] = 'http://trafodion.apache.org';
   tabsName[2] = 'Trafodion Wiki'; tabsLink[2] = 'https://cwiki.apache.org/confluence/display/TRAFODION';
 
   document.write(
    '<div id="header" class="container">'+
    '<div class="span-5">'+
-   ' <h1 id="logo"><a href="http://trafodion.incubator.apache.org/">Trafodion</a></h1>'+
+   ' <h1 id="logo"><a href="http://trafodion.apache.org/">Trafodion</a></h1>'+
    '</div>\n'+
    '<div class="span-19 last blueLine">'+
    '<div id="navigation" class="span-19">'+
@@ -50,7 +50,7 @@ function footer() {
   '<hr>'+
   '<div id="footer">'+
   '<div class="span-4">'+
-  '<a href="https://trafodion.incubator.apache.org">Trafodion Project</a></li>'+
+  '<a href="https://trafodion.apache.org">Trafodion Project</a></li>'+
   '</div>\n'+
   '</div>'+
   '</div>')
