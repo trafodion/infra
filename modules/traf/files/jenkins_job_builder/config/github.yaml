@@ -23,11 +23,11 @@
 
     properties:
       - github:
-          url: https://github.com/apache/incubator-trafodion
+          url: https://github.com/apache/trafodion
 
     scm:
       - git:
-          url: https://github.com/apache/incubator-trafodion
+          url: https://github.com/apache/trafodion
           wipe-workspace: false
           skip-tag: true
           refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
@@ -87,7 +87,7 @@
 
     builders:
       - link-logs
-      - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh apache/incubator-trafodion
+      - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh apache/trafodion
       - shell: "/usr/local/bin/supported-distro.sh ."
       - inject:
           properties-file: distro.properties
@@ -222,11 +222,11 @@
 
     properties:
       - github:
-          url: https://github.com/apache/incubator-trafodion
+          url: https://github.com/apache/trafodion
 
     scm:
       - git:
-          url: https://github.com/apache/incubator-trafodion
+          url: https://github.com/apache/trafodion
           wipe-workspace: false
           skip-tag: true
           refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
@@ -285,7 +285,7 @@
 
     builders:
       - link-logs
-      - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh apache/incubator-trafodion
+      - shell: sudo -n -E /usr/local/bin/cancel-prior-PR.sh apache/trafodion
       - shell: "/usr/local/bin/supported-distro.sh ."
       - inject:
           properties-file: distro.properties
@@ -358,11 +358,11 @@
 
     properties:
       - github:
-          url: https://github.com/apache/incubator-trafodion
+          url: https://github.com/apache/trafodion
 
     scm:
       - git:
-          url: https://github.com/apache/incubator-trafodion
+          url: https://github.com/apache/trafodion
           wipe-workspace: false
           skip-tag: true
           branches: 

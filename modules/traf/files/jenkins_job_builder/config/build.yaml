@@ -21,7 +21,7 @@
       - link-logs
       - clean-buildspace
       - single-git-stable:
-           repos: "apache/incubator-trafodion"
+           repos: "apache/trafodion"
            branch: "{branch}"
       - docs-build
 
@@ -66,7 +66,7 @@
       - link-logs
       - clean-buildspace
       - single-git-stable:
-           repos: "apache/incubator-trafodion"
+           repos: "apache/trafodion"
            branch: "{branch}"
       - pkg-traf:
            flavor: "{flavor}"
@@ -144,7 +144,7 @@
       - link-logs
       - clean-buildspace
       - single-git-label:
-           repos: "apache/incubator-trafodion"
+           repos: "apache/trafodion"
            label: "$TAG"
       - pkg-traf:
            flavor: "{flavor}"
@@ -175,7 +175,7 @@
     builders:
       - link-logs
       - single-git-prep:
-           repos: "apache/incubator-trafodion"
+           repos: "apache/trafodion"
       - assert-no-binary-files:
            gitdir: "trafodion"
       - assert-no-bad-source-files:

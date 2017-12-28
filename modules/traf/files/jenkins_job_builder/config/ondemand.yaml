@@ -44,7 +44,7 @@
 
     scm:
       - git:
-          url: https://github.com/apache/incubator-trafodion
+          url: https://github.com/apache/trafodion
           wipe-workspace: false
           skip-tag: true
           branches:
@@ -170,7 +170,7 @@
 
     properties:
       - github:
-          url: https://github.com/apache/incubator-trafodion
+          url: https://github.com/apache/trafodion
 
 
     builders:

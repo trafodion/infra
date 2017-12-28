@@ -1,5 +1,5 @@
 - project:
-    name: incubator-trafodion
+    name: trafodion
     github-org: apache
 
     jobs:

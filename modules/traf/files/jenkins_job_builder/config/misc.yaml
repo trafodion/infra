@@ -58,7 +58,7 @@
       - kill-traf
       - clean-testspace
       - single-git-prep:
-           repos: "apache/incubator-trafodion"
+           repos: "apache/trafodion"
       - copyartifact:
            project: "$BLD_PROJ"
            which-build: specific-build
