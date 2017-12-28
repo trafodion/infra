@@ -64,45 +64,46 @@
            which-build: specific-build
            build-number: "$BLD_NUM"
            filter: "**/*"
-      - conditional-step:
-           condition-kind: boolean-expression
-           condition-expression: $SQL
-           steps:
-               - sql-regress:
-                    dir: "./trafodion/core"
-                    suites: "$SQLSUITE"
-      - conditional-step:
-           condition-kind: boolean-expression
-           condition-expression: $PQ
-           steps:
-               - run-phoenix_test:
-                    trafCoreDir: "trafodion/core"
-                    dcsDir: "trafodion/dcs"
-                    testDir: "trafodion/phoenix_test"
-                    jdbctype: "$DRIVER"
-                    hadoopdistro: '$HADOOP_DISTRO'
-                    tests1: "QUICK2"
-                    tests2: ""
-                    tests3: ""
-                    tests4: ""
-      - conditional-step:
-           condition-kind: boolean-expression
-           condition-expression: $PYODBC
-           steps:
-               - run-pyodbc_test:
-                    trafCoreDir: "trafodion/core"
-                    dcsDir: "trafodion/dcs"
-                    testDir: "trafodion/dcs/src/test/pytests"
-                    tests1: ""
-      - conditional-step:
-           condition-kind: boolean-expression
-           condition-expression: $JDBC
-           steps:
-               - run-jdbc_test:
-                    trafCoreDir: "trafodion/core"
-                    dcsDir: "trafodion/dcs"
-                    testDir: "trafodion/dcs/src/test/jdbc_test"
-                    tests1: ""
+      ## macros not working for conditional steps
+      #- conditional-step:
+      #     condition-kind: boolean-expression
+      #     condition-expression: $SQL
+      #     steps:
+      #         - sql-regress:
+      #              dir: "./trafodion/core"
+      #              suites: "$SQLSUITE"
+      #- conditional-step:
+      #     condition-kind: boolean-expression
+      #     condition-expression: $PQ
+      #     steps:
+      #         - run-phoenix_test:
+      #              trafCoreDir: "trafodion/core"
+      #              dcsDir: "trafodion/dcs"
+      #              testDir: "trafodion/phoenix_test"
+      #              jdbctype: "$DRIVER"
+      #              hadoopdistro: '$HADOOP_DISTRO'
+      #              tests1: "QUICK2"
+      #              tests2: ""
+      #              tests3: ""
+      #              tests4: ""
+      #- conditional-step:
+      #     condition-kind: boolean-expression
+      #     condition-expression: $PYODBC
+      #     steps:
+      #         - run-pyodbc_test:
+      #              trafCoreDir: "trafodion/core"
+      #              dcsDir: "trafodion/dcs"
+      #              testDir: "trafodion/dcs/src/test/pytests"
+      #              tests1: ""
+      #- conditional-step:
+      #     condition-kind: boolean-expression
+      #     condition-expression: $JDBC
+      #     steps:
+      #         - run-jdbc_test:
+      #              trafCoreDir: "trafodion/core"
+      #              dcsDir: "trafodion/dcs"
+      #              testDir: "trafodion/dcs/src/test/jdbc_test"
+      #              tests1: ""
 
     # superset here
     publishers:
