@@ -684,7 +684,7 @@
           builders:
             - shell: "/usr/local/bin/job-summary.sh"
       - email-ext:
-          recipients: dev@trafodion.incubator.apache.org
+          recipients: dev@trafodion.apache.org
           reply-to: no-reply@trafodion.org
           content-type: "text"
           subject: Trafodion {branch} {os} Daily Test Result - $BUILD_ID - $BUILD_STATUS
