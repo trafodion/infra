@@ -76,6 +76,7 @@
             - SuJinpei
             - gpj1987
             - EEDY
+            - PierreSmits
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
