@@ -77,6 +77,8 @@
             - gpj1987
             - EEDY
             - PierreSmits
+            - wenjun-zhu
+            - kakaxi3019
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
