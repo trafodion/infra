@@ -80,6 +80,7 @@
             - wenjun-zhu
             - kakaxi3019
             - xiaozhongwang
+            - dxgeorge
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
