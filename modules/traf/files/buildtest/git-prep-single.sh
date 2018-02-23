@@ -56,7 +56,7 @@ done # options
 
 repo="$1"
 
-GIT_ORIGIN="git@github.com:"
+GIT_ORIGIN="https://github.com/"
 
 if [[ -z "$sha1" ]]
 then
