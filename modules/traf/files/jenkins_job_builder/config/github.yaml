@@ -81,6 +81,7 @@
             - kakaxi3019
             - xiaozhongwang
             - dxgeorge
+            - liuYuTW
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
