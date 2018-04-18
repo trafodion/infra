@@ -23,7 +23,7 @@ class jenkins::job_builder (
   vcsrepo { '/opt/jenkins_job_builder':
     ensure   => latest,
     provider => git,
-    revision => 'master',
+    revision => '1.6.2',
     source   => 'https://git.openstack.org/openstack-infra/jenkins-job-builder',
   }
 
