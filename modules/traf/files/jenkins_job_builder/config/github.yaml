@@ -186,7 +186,7 @@
               node-label-name: "NODE_TYPE"
               node-label: "rh7_cm$DIST7CDH"
             - name: "core-regress-seabase-hdp"
-              enable-condition: "'$BUCKET_NONDOC' == 'true'"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '{branch}' == 'release2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -194,8 +194,17 @@
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "rh6_ahw$DISTHDP"
+            - name: "core-regress-checktest1-hdp"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '{branch}' != 'release2.2'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/regress-checktest1-hdp-rh6
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "rh6_ahw$DISTHDP"
             - name: "core-regress-core-hdp"
-              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'false'"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '{branch}' == 'release2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
@@ -203,12 +212,21 @@
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "rh6_ahw$DISTHDP"
-            - name: "core-regress-core-hdp"
-              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'true'"
+            - name: "core-regress-checktest2-hdp"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'false' && '{branch}' != 'release2.2'"
               current-parameters: true
               kill-phase-on: NEVER
               predefined-parameters: |
-                 LOG_PATH=$LOG_PATH/regress-core-hdp-rh7
+                 LOG_PATH=$LOG_PATH/regress-checktest2-hdp-rh6
+                 BRANCH={branch}
+              node-label-name: "NODE_TYPE"
+              node-label: "rh6_ahw$DISTHDP"
+            - name: "core-regress-checktest2-hdp"
+              enable-condition: "'$BUCKET_NONDOC' == 'true' && '$OS_RH7' == 'true' && '{branch}' != 'release2.2'"
+              current-parameters: true
+              kill-phase-on: NEVER
+              predefined-parameters: |
+                 LOG_PATH=$LOG_PATH/regress-checktest2-hdp-rh7
                  BRANCH={branch}
               node-label-name: "NODE_TYPE"
               node-label: "rh7_ahw$DIST7HDP"
