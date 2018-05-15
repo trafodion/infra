@@ -72,6 +72,7 @@ class traf::buildtest (
       'cmake','npm',
       'lzo','lzop','lzo-devel',
       'doxygen',
+      'uuid',
     ]
     if $::operatingsystemmajrelease == '7' {
       package { ['motif','libdb4-devel']:
