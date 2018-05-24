@@ -82,6 +82,7 @@
             - xiaozhongwang
             - dxgeorge
             - liuYuTW
+            - gdgy
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
