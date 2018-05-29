@@ -84,6 +84,7 @@
             - liuYuTW
             - gdgy
             - zlei929
+            - Guhaiyan
           allow-whitelist-orgs-as-admins: true
           org-list:
             - trafodion-contributors
