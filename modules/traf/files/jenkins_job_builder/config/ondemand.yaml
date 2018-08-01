@@ -31,6 +31,7 @@
             - release2.0
             - release2.1
             - release2.2
+            - release2.3
           default: master
           description: "Release Branch"
       - choice:

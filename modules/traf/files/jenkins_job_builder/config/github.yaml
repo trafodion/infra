@@ -6,6 +6,7 @@
      #- release2.0
      #- release2.1
      - release2.2
+     - release2.3
 
     jobs:
       - 'Check-PR-{branch}'
@@ -369,8 +370,8 @@
     branch:
      - master:
          timespec: "30 8 * * *"
-     #- release2.2:
-     #    timespec: "30 5 * * *"
+     - release2.3:
+         timespec: "30 5 * * *"
 
     os:
      - rh6
