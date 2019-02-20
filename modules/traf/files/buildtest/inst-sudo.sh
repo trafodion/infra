@@ -78,6 +78,7 @@ set -x
 if [[ $action == "install" ]]
 then
   sudo rm -rf /var/log/trafodion/* # clean out logs from any prior jobs
+  sudo rm -rf /etc/trafodion
   sudo rm -rf $INSTLOC $RUNLOC || exit 1
 
   sudo mkdir $INSTLOC || exit 1
@@ -209,6 +210,7 @@ then
 elif [[ $action == "pyinstall" ]]
 then
   sudo rm -rf /var/log/trafodion/* # clean out logs from any prior jobs
+  sudo rm -rf /etc/trafodion
   sudo rm -rf $INSTLOC $RUNLOC || exit 1
 
   sudo mkdir $INSTLOC || exit 1
@@ -240,6 +242,8 @@ then
   sudo mkdir -p $WORKSPACE/home
   echo "home_dir = $WORKSPACE/home" >> ./Install_Config
   echo "traf_dirname = traf_run" >> ./Install_Config
+  echo "traf_log = $WORKSPACE/traf_run/logs" >> ./Install_Config
+  echo "traf_var = $WORKSPACE/traf_run/tmp" >> ./Install_Config
   ## bogus param -- TRAFODION-2510
   echo "db_admin_pwd = foobar" >> ./Install_Config
 
