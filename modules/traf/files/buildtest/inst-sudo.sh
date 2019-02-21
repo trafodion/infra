@@ -269,6 +269,8 @@ then
   then
     echo "*** Installing regressions"
     cd $RUNLOC
+    sudo mkdir sql
+    sudo chown trafodion:trafodion sql
     sudo -n -u trafodion tar xf $regball
   fi
 
