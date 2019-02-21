@@ -242,8 +242,8 @@ then
   sudo mkdir -p $WORKSPACE/home
   echo "home_dir = $WORKSPACE/home" >> ./Install_Config
   echo "traf_dirname = traf_run" >> ./Install_Config
-  echo "traf_log = $WORKSPACE/traf_run/logs" >> ./Install_Config
-  echo "traf_var = $WORKSPACE/traf_run/tmp" >> ./Install_Config
+  echo "traf_log = $WORKSPACE/home/trafodion/traf_run/logs" >> ./Install_Config
+  echo "traf_var = $WORKSPACE/home/trafodion/traf_run/tmp" >> ./Install_Config
   ## bogus param -- TRAFODION-2510
   echo "db_admin_pwd = foobar" >> ./Install_Config
 
@@ -269,8 +269,6 @@ then
   then
     echo "*** Installing regressions"
     cd $RUNLOC
-    sudo mkdir sql
-    sudo chown trafodion:trafodion sql
     sudo -n -u trafodion tar xf $regball
   fi
 
