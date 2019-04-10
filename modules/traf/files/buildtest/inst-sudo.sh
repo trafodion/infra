@@ -75,140 +75,11 @@ function check_port() {
 }
 set -x
 
-if [[ $action == "install" ]]
+if [[ $action == "pyinstall" ]]
 then
-  sudo rm -rf /var/log/trafodion/* # clean out logs from any prior jobs
-  sudo rm -rf /etc/trafodion
-  sudo rm -rf $INSTLOC $RUNLOC || exit 1
+  sudo yum clean all # clean stale data
+  sudo sed -i 's/\(mirrorlist=http\)s/\1/' /etc/yum.repos.d/epel.repo # use http access
 
-  sudo mkdir $INSTLOC || exit 1
-  sudo mkdir $RUNLOC || exit 1
-
-  sudo chown tinstall $INSTLOC || exit 1
-
-  cp "$instball" $INSTLOC || exit 1
-
-  cd $INSTLOC
-  tar xzf $(basename $instball) || exit 1
-
-  # prep ldap config
-  sed -e 's/LdapHostname:/LdapHostname:static.trafodion.org/' \
-      -e 's/UniqueIdentifier:/UniqueIdentifier:uid=,ou=users,dc=trafldap,dc=com/' \
-      ./installer/traf_authentication_conf_default > ./installer/traf_auth_config
-
-  # prep config file  
-  cp ./installer/trafodion_config_default ./Install_Config
-  echo "NODE_LIST=$(hostname -s)" >> ./Install_Config
-  echo "HADOOP_NODES=$(hostname -s)" >> ./Install_Config
-  echo "HDFS_NODES=$(hostname -s)" >> ./Install_Config
-  echo "HBASE_NODES=$(hostname -s)" >> ./Install_Config
-  echo "MY_HADOOP_NODES=\"-w $(hostname -s)\"" >> ./Install_Config
-  echo "node_count=1" >> ./Install_Config
-  echo "hadoop_node_count=1" >> ./Install_Config
-  echo "LOCAL_WORKDIR=$INSTLOC/installer" >> ./Install_Config
-  echo "OPENSTACK_VM=1" >> ./Install_Config
-  # As of 2.0.0, single package tar
-  if [[ $(basename $trafball) =~ ^apache- ]]
-  then
-    echo "TRAF_PACKAGE=$trafball" >> ./Install_Config
-    echo "ONE_TAR_INSTALL=Y" >> ./Install_Config
-  else
-    echo "TRAF_BUILD=$trafball" >> ./Install_Config
-    echo "REST_BUILD=$restball" >> ./Install_Config  ## may be empty for pre-1.1 builds
-    echo "DCS_BUILD=$dcsball" >> ./Install_Config
-  fi
-  echo "SQ_ROOT=$RUNLOC" >> ./Install_Config
-  echo "TRAF_HOME=$RUNLOC" >> ./Install_Config
-  echo "START=Y" >> ./Install_Config
-  echo "INIT_TRAFODION=Y" >> ./Install_Config
-  echo "DCS_SERVERS_PARM=$dcscnt" >> ./Install_Config
-  echo "CLUSTER_NAME=trafcluster" >> ./Install_Config
-  if rpm -q cloudera-manager-server >/dev/null
-  then
-    echo "URL=$(hostname -f):7180" >> ./Install_Config
-    echo "HADOOP_TYPE=cloudera" >> ./Install_Config
-  elif rpm -q ambari-server >/dev/null
-  then
-    echo "URL=$(hostname -f):8080" >> ./Install_Config
-    echo "HADOOP_TYPE=hortonworks" >> ./Install_Config
-  else
-    echo "HADOOP_TYPE=apache" >> ./Install_Config
-    echo "HADOOP_PREFIX=/opt/hadoop" >> ./Install_Config
-    echo "HBASE_HOME=/opt/hbase" >> ./Install_Config
-    echo "ZOO_HOME=/opt/zookeeper" >> ./Install_Config
-    echo "HIVE_HOME=/opt/hive" >> ./Install_Config
-    echo "HDFS_USER=tinstall" >> ./Install_Config
-    echo "HBASE_USER=tinstall" >> ./Install_Config
-    echo "HBASE_GROUP=tinstall" >> ./Install_Config
-    echo "ZOO_USER=tinstall" >> ./Install_Config
-  fi
-  if [[ $LDAP == "true" ]]
-  then
-    echo "LDAP_SECURITY=Y" >> ./Install_Config
-    echo "LDAP_AUTH_FILE=traf_auth_config" >> ./Install_Config
-  fi
-  # no SUSE yet
-  echo "SUSE_LINUX=false" >> ./Install_Config
-  echo "JAVA_HOME=$TRAFJAVA" >> ./Install_Config
-  # DCS/Cloud
-  echo "CLOUD_CONFIG=Y" >> ./Install_Config
-  echo "CLOUD_TYPE=1" >> ./Install_Config
-  echo "AWS_CLOUD=true" >> ./Install_Config
-
-
-  check_port 23400
-  check_port 24400
-
-  echo "*** Calling trafodion_install"
-  ./installer/trafodion_install --accept_license --config_file ./Install_Config
-  ret=$?
-
-  check_port 23400
-  check_port 24400
-
-  # save installer logs
-  sudo -n -u jenkins mkdir -p $WORKSPACE/var_log_trafodion
-  sudo chmod -R +r /var/log/trafodion
-  sudo -n -u jenkins cp /var/log/trafodion/* $WORKSPACE/var_log_trafodion/
-
-  if [[ $ret == 0 ]]
-  then
-    # Extra dir needed by hive regressions -- for 2.1 and earlier
-    # must be HDFS superuser (hdfs) to chown
-    sudo -n -u hive hadoop dfs -chmod +rx -p /user/hive
-    sudo -n -u hive hadoop dfs -mkdir -p /user/hive/exttables
-    sudo -n -u hdfs hadoop dfs -chown trafodion /user/hive/exttables
-    # trafodion user directory must exist to accomodate Trash folder 
-    # (or every use of hdfs rm has to use -skipTrash option)
-    sudo -n -u hdfs hadoop dfs -mkdir -p /user/trafodion
-    sudo -n -u hdfs hadoop dfs -chown trafodion /user/trafodion
-
-    if [[ $LDAP == "true" ]]
-    then
-      echo "register user qa001;" | sudo -n -i -u trafodion 'sqlci'
-    fi
-  fi
-
-  # Dev regressions
-  if [[ $ret == 0 && -n "$regball" ]]
-  then
-    echo "*** Installing regressions"
-    cd $RUNLOC
-    sudo -n -u trafodion tar xf $regball
-  fi
-  # make system logs read-able in case of early exit of job
-  sudo chmod -R a+rX $RUNLOC ~trafodion
-
-  # create alternate directory for Maven Local repo for T2 tests
-  if [[ ! -d /var/local/traf_mvn_repo ]]; then
-    sudo mkdir /var/local/traf_mvn_repo
-  fi
-  sudo chown -R trafodion:trafodion /var/local/traf_mvn_repo
-
-  exit $ret
-
-elif [[ $action == "pyinstall" ]]
-then
   sudo rm -rf /var/log/trafodion/* # clean out logs from any prior jobs
   sudo rm -rf /etc/trafodion
   sudo rm -rf $INSTLOC $RUNLOC || exit 1
@@ -279,28 +150,6 @@ then
   sudo chown -R trafodion:trafodion /var/local/traf_mvn_repo
 
   exit $ret
-
-elif [[ $action == "uninstall" ]]
-then
-  # uninstaller will remove $RUNLOC, so save logs we need
-  # see list: traf/files/jenkins_job_builder/config/macros.yaml
-  sudo mkdir -p $WORKSPACE/traf_run.save/sql
-  sudo cp -r $RUNLOC/logs $WORKSPACE/traf_run.save/
-  sudo cp -r $RUNLOC/sql/scripts $WORKSPACE/traf_run.save/sql
-  sudo cp -r $RUNLOC/tmp $WORKSPACE/traf_run.save/
-  sudo cp -r $RUNLOC/etc $WORKSPACE/traf_run.save/
-  sudo cp -r $RUNLOC/dcs* $WORKSPACE/traf_run.save/
-
-  # Same location as install
-  cd $INSTLOC 
-  echo "Y" | ./installer/trafodion_uninstaller
-  uninst_ret=$?
-
-  sudo rm -rf $RUNLOC                   # just in case uninstaller left it
-  sudo mv $WORKSPACE/traf_run.save $RUNLOC   # back to the expected location
-  sudo chmod -R a+rX $RUNLOC            # make system logs world-readable for archival
-
-  exit $uninst_ret
 
 elif [[ $action == "pyuninstall" ]]
 then
