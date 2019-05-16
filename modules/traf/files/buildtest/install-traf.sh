@@ -29,6 +29,9 @@ else
   LDAP=""
 fi
 
+# short-term fix for out-dated puppet repo file in images
+sudo -n sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/puppetlabs.repo
+
 # Option to install regression tests
 if [[ "$1" == "sqlregress" ]]
 then

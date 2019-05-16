@@ -31,9 +31,6 @@ log_banner
 
 sudo -n -u tinstall rm -rf $WORKSPACE/traf_inst 
 
-# short-term fix for out-dated puppet repo file in images
-sudo -n sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/puppetlabs.repo
-
 # trafodion id may be removed by trafodion uninstall
 # root will delete these
 rm -rf $WORKSPACE/phx_test_run $WORKSPACE/traf_run
