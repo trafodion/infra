@@ -17,8 +17,12 @@ class jenkins::master(
   include pip
   include apt
 
-  package { 'openjdk-7-jre-headless':
+  package { 'openjdk-8-jre-headless':
     ensure => present,
+  }
+  package { 'openjdk-7-jre-headless':
+    ensure => purged,
+    require => Package['openjdk-8-jre-headless'],
   }
 
   package { 'openjdk-6-jre-headless':
@@ -39,7 +43,7 @@ class jenkins::master(
     repos       => '',
     require     => [
       Apt::Key['jenkins'],
-      Package['openjdk-7-jre-headless'],
+      Package['openjdk-8-jre-headless'],
     ],
     include_src => false,
   }
