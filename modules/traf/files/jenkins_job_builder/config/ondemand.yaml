@@ -80,10 +80,13 @@
     publishers:
       - console-log
       - postbuildscript:
-          script-only-if-succeeded: false
-          script-only-if-failed: false
-          builders:
-            - shell: "/usr/local/bin/job-summary.sh"
+          generic-script:
+            - file-path: "/usr/local/bin/job-summary.sh"
+              role: SLAVE
+              build-on:
+                - SUCCESS
+                - FAILURE
+                - UNSTABLE
       - email-ext:
           recipients: $EMAIL
           reply-to: no-reply@trafodion.org
@@ -330,10 +333,13 @@
     publishers:
       - console-log
       - postbuildscript:
-          script-only-if-succeeded: false
-          script-only-if-failed: false
-          builders:
-            - shell: "/usr/local/bin/job-summary.sh"
+          generic-script:
+            - file-path: "/usr/local/bin/job-summary.sh"
+              role: SLAVE
+              build-on:
+                - SUCCESS
+                - FAILURE
+                - UNSTABLE
       - email-ext:
           recipients: $EMAIL
           reply-to: no-reply@trafodion.org

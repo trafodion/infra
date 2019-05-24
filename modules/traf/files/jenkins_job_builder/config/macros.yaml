@@ -272,15 +272,13 @@
     publishers:
       # corefile check if job aborted
       - postbuildscript:
-          script-only-if-succeeded: false
-          script-only-if-failed: false
           builders:
-            - conditional-step:
-                 condition-kind:  current-status
-                 condition-worst: ABORTED
-                 condition-best:  FAILURE
-                 steps:
-                     - shell: |
+            - role: SLAVE
+              build-on:
+                - ABORTED
+                - FAILURE
+              build-steps:
+                - shell: |
                          #!/bin/bash
                          source /usr/local/bin/traf-functions.sh
                          source_env run
@@ -511,46 +509,29 @@
               upload-from-slave: true
 
 - publisher:
-    name: traf-upload-to-cdn
-    publishers:
-      - scp:
-          site: 'traf-testlogs.esgyn.com'
-          files:
-            - target: 'logs/buildvers'
-              source: 'Versions-*'
-      - postbuildscript:
-          builders:
-            - shell: |
-                #!/bin/bash
-                cd $WORKSPACE/publish || exit 0
-                res=0
-                ls -d */ | while read dirName
-                do
-                  # make sure there are actually files
-                  if [[ $(find $dirname -type f | wc -l) -ne 0 ]]; then
-                    sudo -n /usr/local/bin/useObjectStorage.sh -cu $dirName
-                    (( res += $? ))
-                  fi
-                done
-                exit $res
-
-- publisher:
     name: copy-system-logs
     publishers:
       - postbuildscript:
-          script-only-if-succeeded: false
-          script-only-if-failed: false
           builders:
-            - shell: |
-                #!/bin/bash
-                mkdir -p $WORKSPACE/hbase-logs
-                cp -r /var/log/hbase/* $WORKSPACE/hbase-logs/
+            - role: SLAVE
+              build-on:
+                - ABORTED
+                - FAILURE
+              build-steps:
+                - shell: |
+                   #!/bin/bash
+                   mkdir -p $WORKSPACE/hbase-logs
+                   cp -r /var/log/hbase/* $WORKSPACE/hbase-logs/
 
 - publisher:
     name: post-check-node
     publishers:
       - postbuildscript:
-          script-only-if-succeeded: false
-          script-only-if-failed: false
           builders:
-            - shell: "/usr/local/bin/check-node.sh"
+            - role: SLAVE
+              build-on:
+                - ABORTED
+                - FAILURE
+                - SUCCESS
+              build-steps:
+                - shell: "/usr/local/bin/check-node.sh"
