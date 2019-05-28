@@ -712,7 +712,7 @@
       - postbuildscript:
           generic-script:
             - file-path: "/usr/local/bin/job-summary.sh"
-              role: SLAVE
+              role: MASTER
               build-on:
                 - SUCCESS
                 - FAILURE
