@@ -81,8 +81,8 @@
       - console-log
       - postbuildscript:
           generic-script:
-            - file-path: "/usr/local/bin/job-summary.sh"
-              role: SLAVE
+            - file-path: "/usr/local/bin/job-summary.sh $BUILD_URL"
+              role: MASTER
               build-on:
                 - SUCCESS
                 - FAILURE
@@ -335,7 +335,7 @@
       - postbuildscript:
           generic-script:
             - file-path: "/usr/local/bin/job-summary.sh"
-              role: SLAVE
+              role: MASTER
               build-on:
                 - SUCCESS
                 - FAILURE

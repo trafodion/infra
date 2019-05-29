@@ -711,7 +711,7 @@
       - console-log
       - postbuildscript:
           generic-script:
-            - file-path: "/usr/local/bin/job-summary.sh"
+            - file-path: "/usr/local/bin/job-summary.sh $BUILD_URL"
               role: MASTER
               build-on:
                 - SUCCESS

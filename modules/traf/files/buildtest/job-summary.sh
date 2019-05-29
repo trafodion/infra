@@ -2,6 +2,7 @@
 
 # Summarize results of all child jobs in format suitable for email
 
+BUILD_URL="$1"
 
 if [[ -z "$BUILD_URL" ]]
 then
