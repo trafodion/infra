@@ -17,6 +17,12 @@
     node: 'master'
     project-type: multijob
 
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
+
     parameters:
       - string:
           name: LOG_PATH
@@ -243,6 +249,12 @@
     node: 'master'
     project-type: multijob
 
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
+
     parameters:
       - string:
           name: LOG_PATH
@@ -381,6 +393,12 @@
     name: 'Check-Daily-{branch}-{os}'
     node: 'master'
     project-type: multijob
+
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
 
     parameters:
       - string:

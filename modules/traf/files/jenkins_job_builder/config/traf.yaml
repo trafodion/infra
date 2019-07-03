@@ -25,6 +25,12 @@
 - job-template:
     name: 'core-regress-{suite}-{dist}'
 
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
+
     parameters:
       - string:
           name: BRANCH
@@ -102,6 +108,12 @@
 - job-template:
     name: 'phoenix_{type}_{jdbcDriverType}-{dist}'
 
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
+
     parameters:
       - string:
           name: BRANCH
@@ -164,6 +176,12 @@
 - job-template:
     name: 'pyodbc_test-{dist}'
 
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
+
     parameters:
       - string:
           name: BRANCH
@@ -219,6 +237,12 @@
 
 - job-template:
     name: 'jdbc_test-{dist}'
+
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
 
     parameters:
       - string:

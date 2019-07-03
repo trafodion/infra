@@ -4,6 +4,12 @@
     node: 'master'
     project-type: multijob
 
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
+
     wrappers:
       - timestamps
       - build-user-vars
@@ -112,6 +118,12 @@
     name: 'Requested-Test'
     node: 'master'
     project-type: multijob
+
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
 
     wrappers:
       - timestamps
@@ -372,6 +384,12 @@
 
 - job-template:
     name: 'core-regress-{dist}'
+
+    build-discarder:
+      days-to-keep: 20
+      num-to-keep: -1
+      artifact-days-to-keep: 10
+      artifact-num-to-keep: -1
 
     wrappers:
       - timeout:
