@@ -14,11 +14,8 @@
     name: 'doc-bld-{branch}'
     node: 'master'
 
-    build-discarder:
-      days-to-keep: 20
-      num-to-keep: -1
-      artifact-days-to-keep: 10
-      artifact-num-to-keep: -1
+    properties:
+      - discard20
 
     parameters:
       - string:
@@ -62,11 +59,8 @@
     name: 'build-{osver}-{branch}-{flavor}'
     node: '{nlabel}'
 
-    build-discarder:
-      days-to-keep: 20
-      num-to-keep: -1
-      artifact-days-to-keep: 10
-      artifact-num-to-keep: -1
+    properties:
+      - discard20
 
     parameters:
       - string:
@@ -139,11 +133,8 @@
     name: 'build-{osver}-label-{flavor}'
     node: '{nlabel}'
 
-    build-discarder:
-      days-to-keep: 20
-      num-to-keep: -1
-      artifact-days-to-keep: 10
-      artifact-num-to-keep: -1
+    properties:
+      - discard20
 
     parameters:
       - string:
@@ -192,11 +183,8 @@
       - string:
           name: LOG_PATH
 
-    build-discarder:
-      days-to-keep: 20
-      num-to-keep: -1
-      artifact-days-to-keep: 10
-      artifact-num-to-keep: -1
+    properties:
+      - discard20
 
     builders:
       - link-logs

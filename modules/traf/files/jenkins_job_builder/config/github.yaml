@@ -17,11 +17,8 @@
     node: 'master'
     project-type: multijob
 
-    build-discarder:
-      days-to-keep: 20
-      num-to-keep: -1
-      artifact-days-to-keep: 10
-      artifact-num-to-keep: -1
+    properties:
+      - discard20
 
     parameters:
       - string:
@@ -249,11 +246,8 @@
     node: 'master'
     project-type: multijob
 
-    build-discarder:
-      days-to-keep: 20
-      num-to-keep: -1
-      artifact-days-to-keep: 10
-      artifact-num-to-keep: -1
+    properties:
+      - discard20
 
     parameters:
       - string:
@@ -394,11 +388,8 @@
     node: 'master'
     project-type: multijob
 
-    build-discarder:
-      days-to-keep: 20
-      num-to-keep: -1
-      artifact-days-to-keep: 10
-      artifact-num-to-keep: -1
+    properties:
+      - discard20
 
     parameters:
       - string:
