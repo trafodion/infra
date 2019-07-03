@@ -19,9 +19,9 @@
 - property:
     name: discard20
     properties:
-      build-discarder:
-        days-to-keep: 20
-        artifact-days-to-keep: 10
+      - build-discarder:
+          days-to-keep: 20
+          artifact-days-to-keep: 10
 
 # use for combined repo
 - builder:
