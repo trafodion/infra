@@ -20,14 +20,12 @@ class jenkins::master(
   package { 'openjdk-8-jre-headless':
     ensure => present,
   }
-  package { 'openjdk-7-jre-headless':
+  package { 'openjdk-7-jdk':
     ensure => present,
-    require => Package['openjdk-8-jre-headless'],
   }
 
   package { 'openjdk-6-jre-headless':
     ensure  => purged,
-    require => Package['openjdk-7-jre-headless'],
   }
 
   #This key is at http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key
