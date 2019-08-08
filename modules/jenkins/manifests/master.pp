@@ -21,7 +21,7 @@ class jenkins::master(
     ensure => present,
   }
   package { 'openjdk-7-jre-headless':
-    ensure => purged,
+    ensure => present,
     require => Package['openjdk-8-jre-headless'],
   }
 
